@@ -1,1 +1,1 @@
-# gitizen
+# git-based social application framework

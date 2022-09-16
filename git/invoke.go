@@ -28,21 +28,30 @@ func InvokeStdin(ctx context.Context, dir string, stdin string, args ...string) 
 	return string(buf), nil
 }
 
-func Init(ctx context.Context, dir string) error {
-	err := os.MkdirAll(dir, 0755)
+type LocalRepo struct {
+	Dir string
+}
+
+func Init(ctx context.Context, repo LocalRepo) error {
+	err := os.MkdirAll(repo.Dir, 0755)
 	if err != nil {
 		return err
 	}
-	_, err = Invoke(ctx, dir, "init")
+	_, err = Invoke(ctx, repo.Dir, "init")
 	return err
 }
 
-func RenameBranch(ctx context.Context, dir, newBranchName string) error {
-	_, err := Invoke(ctx, dir, "branch", "-M", newBranchName)
+func RenameBranch(ctx context.Context, repo LocalRepo, newBranchName string) error {
+	_, err := Invoke(ctx, repo.Dir, "branch", "-M", newBranchName)
 	return err
 }
 
-func Commit(ctx context.Context, dir string, msg string) error {
-	_, err := InvokeStdin(ctx, dir, msg, "commit", "-F", "-")
+func Commit(ctx context.Context, repo LocalRepo, msg string) error {
+	_, err := InvokeStdin(ctx, repo.Dir, msg, "commit", "-F", "-")
+	return err
+}
+
+func AddRemote(ctx context.Context, repo LocalRepo, name string, url string) error {
+	_, err := Invoke(ctx, repo.Dir, "remote", "add", name, url)
 	return err
 }

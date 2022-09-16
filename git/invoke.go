@@ -28,30 +28,35 @@ func InvokeStdin(ctx context.Context, dir string, stdin string, args ...string) 
 	return string(buf), nil
 }
 
-type LocalRepo struct {
-	Dir string
-}
-
-func Init(ctx context.Context, repo LocalRepo) error {
-	err := os.MkdirAll(repo.Dir, 0755)
+func Init(ctx context.Context, repo string) error {
+	err := os.MkdirAll(repo, 0755)
 	if err != nil {
 		return err
 	}
-	_, err = Invoke(ctx, repo.Dir, "init")
+	_, err = Invoke(ctx, repo, "init")
 	return err
 }
 
-func RenameBranch(ctx context.Context, repo LocalRepo, newBranchName string) error {
-	_, err := Invoke(ctx, repo.Dir, "branch", "-M", newBranchName)
+func RenameBranch(ctx context.Context, repo string, newBranchName string) error {
+	_, err := Invoke(ctx, repo, "branch", "-M", newBranchName)
 	return err
 }
 
-func Commit(ctx context.Context, repo LocalRepo, msg string) error {
-	_, err := InvokeStdin(ctx, repo.Dir, msg, "commit", "-F", "-")
+func Commit(ctx context.Context, repo string, msg string) error {
+	_, err := InvokeStdin(ctx, repo, msg, "commit", "-F", "-")
 	return err
 }
 
-func AddRemote(ctx context.Context, repo LocalRepo, name string, url string) error {
-	_, err := Invoke(ctx, repo.Dir, "remote", "add", name, url)
+func AddRemote(ctx context.Context, repo string, remoteName string, remoteURL string) error {
+	_, err := Invoke(ctx, repo, "remote", "add", remoteName, remoteURL)
+	return err
+}
+
+func AddRemoteOrigin(ctx context.Context, repo string, remoteURL string) error {
+	return AddRemote(ctx, repo, "origin", remoteURL)
+}
+
+func PushToOrigin(ctx context.Context, repo string, srcBranch string) error {
+	_, err := Invoke(ctx, repo, "push", "-u", "origin", srcBranch)
 	return err
 }

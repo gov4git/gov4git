@@ -7,8 +7,8 @@ import (
 	url "github.com/whilp/git-urls"
 )
 
-// URL2Path converts a git repo URL into a workspace path.
-func URL2Path(repoURL string) (string, error) {
+// RepoURLToPath converts a git repo URL into a workspace path.
+func RepoURLToPath(repoURL string) (string, error) {
 	// parse URL first
 	u, err := url.Parse(repoURL)
 	if err != nil {

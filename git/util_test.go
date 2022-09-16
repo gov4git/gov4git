@@ -4,7 +4,7 @@ import "testing"
 
 func TestURL2Path(t *testing.T) {
 	for _, testURL := range testURL2Path {
-		u2p, err := URL2Path(testURL[0])
+		u2p, err := RepoURLToPath(testURL[0])
 		if err != nil {
 			t.Error(err)
 		} else if u2p != testURL[1] {

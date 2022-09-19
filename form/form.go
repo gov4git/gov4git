@@ -1,9 +1,9 @@
-package forms
+package form
 
 import (
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 )
 
 func EncodeBytesToString(buf []byte) string {
@@ -27,11 +27,11 @@ func EncodeFormToFile(form any, filepath string) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filepath, data, 0644)
+	return os.WriteFile(filepath, data, 0644)
 }
 
 func DecodeFormFromFile(filepath string, form any) error {
-	data, err := ioutil.ReadFile(filepath)
+	data, err := os.ReadFile(filepath)
 	if err != nil {
 		return err
 	}

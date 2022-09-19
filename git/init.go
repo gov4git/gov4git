@@ -7,11 +7,11 @@ import (
 	"github.com/petar/gitsoc/files"
 )
 
-func InitStageCommitPushToOrigin(ctx context.Context, repoDir string, repoURL string, stage files.Files, commitMsg string) error {
-	if err := Init(ctx, repoDir); err != nil {
+func InitStageCommitPushToOrigin(ctx context.Context, repo Local, repoURL string, stage files.FormFiles, commitMsg string) error {
+	if err := repo.Init(ctx); err != nil {
 		return err
 	}
-	if err := files.WriteFiles(repoDir, stage); err != nil {
+	if err := repo.Dir().WriteFormFiles(stage); err != nil {
 		return err
 	}
 	if err := Add(ctx, repoDir, stage.Paths()...); err != nil {

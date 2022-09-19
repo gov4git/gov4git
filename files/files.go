@@ -42,15 +42,13 @@ func ReadByteFiles(paths []string) (ByteFiles, error) {
 	return files, nil
 }
 
-func WriteByteFiles(dir string, files ByteFiles) error {
-	for _, file := range files {
-		fdir, _ := filepath.Split(file.Path)
-		if err := os.MkdirAll(filepath.Join(dir, fdir), 0755); err != nil {
-			return err
-		}
-		if err := os.WriteFile(filepath.Join(dir, file.Path), file.Bytes, 0644); err != nil {
-			return err
-		}
+func WriteByteFile(root string, file ByteFile) error {
+	fdir, _ := filepath.Split(file.Path)
+	if err := os.MkdirAll(filepath.Join(root, fdir), 0755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(root, file.Path), file.Bytes, 0644); err != nil {
+		return err
 	}
 	return nil
 }
@@ -77,15 +75,13 @@ func ReadFormFile(path string, f any) (FormFile, error) {
 	return FormFile{Path: path, Form: f}, nil
 }
 
-func WriteFormFiles(root string, formFiles FormFiles) error {
-	for _, ff := range formFiles {
-		fdir, _ := filepath.Split(ff.Path)
-		if err := os.MkdirAll(filepath.Join(root, fdir), 0755); err != nil {
-			return err
-		}
-		if err := form.EncodeFormToFile(ff.Form, filepath.Join(root, ff.Path)); err != nil {
-			return err
-		}
+func WriteFormFile(root string, file FormFile) error {
+	fdir, _ := filepath.Split(file.Path)
+	if err := os.MkdirAll(filepath.Join(root, fdir), 0755); err != nil {
+		return err
+	}
+	if err := form.EncodeFormToFile(file.Form, filepath.Join(root, file.Path)); err != nil {
+		return err
 	}
 	return nil
 }

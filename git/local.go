@@ -6,10 +6,16 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/petar/gitsoc/files"
 )
 
 type Local struct {
 	Path string
+}
+
+func (x Local) Dir() files.Dir {
+	return files.Dir{Path: x.Path}
 }
 
 func (x Local) Invoke(ctx context.Context, args ...string) (stdout string, err error) {
@@ -38,7 +44,7 @@ func (x Local) Init(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = Invoke(ctx, x.Path, "init")
+	_, err = x.Invoke(ctx, "init")
 	return err
 }
 

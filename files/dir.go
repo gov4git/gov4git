@@ -18,7 +18,16 @@ func (d Dir) Mkdir(path string) error {
 }
 
 func (d Dir) WriteByteFile(file ByteFile) error {
-	return WriteByteFiles(d.Path, ByteFiles{file})
+	return WriteByteFile(d.Path, file)
+}
+
+func (d Dir) WriteByteFiles(files ByteFiles) error {
+	for _, f := range files {
+		if err := WriteByteFile(d.Path, f); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (d Dir) ReadByteFile(path string) (ByteFile, error) {
@@ -26,7 +35,16 @@ func (d Dir) ReadByteFile(path string) (ByteFile, error) {
 }
 
 func (d Dir) WriteFormFile(file FormFile) error {
-	return WriteFormFiles(d.Path, FormFiles{file})
+	return WriteFormFile(d.Path, file)
+}
+
+func (d Dir) WriteFormFiles(files FormFiles) error {
+	for _, f := range files {
+		if err := WriteFormFile(d.Path, f); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (d Dir) ReadFormFile(path string, f any) (FormFile, error) {

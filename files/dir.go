@@ -1,9 +1,24 @@
 package files
 
 import (
+	"context"
+	"math/rand"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
 )
+
+func WithDir(ctx context.Context, dir Dir) context.Context {
+	return context.WithValue(ctx, ctxDirKey{}, dir)
+}
+
+type ctxDirKey struct{}
+
+func DirOf(ctx context.Context) Dir {
+	return ctx.Value(ctxDirKey{}).(Dir)
+}
 
 type Dir struct {
 	Path string
@@ -11,6 +26,10 @@ type Dir struct {
 
 func (d Dir) Abs(path string) string {
 	return filepath.Join(d.Path, path)
+}
+
+func (d Dir) Mk() error {
+	return os.MkdirAll(d.Path, 0755)
 }
 
 func (d Dir) Mkdir(path string) error {
@@ -49,4 +68,24 @@ func (d Dir) WriteFormFiles(files FormFiles) error {
 
 func (d Dir) ReadFormFile(path string, f any) (FormFile, error) {
 	return ReadFormFile(d.Abs(path), f)
+}
+
+func EphemeralPath(topic string) string {
+	t := time.Now()
+	return filepath.Join(
+		"ephemeral",
+		strconv.Itoa(t.Year()),
+		strconv.Itoa(int(t.Month())),
+		strconv.Itoa(t.Day()),
+		strconv.Itoa(t.Hour()),
+		strings.Join([]string{topic, strconv.FormatUint(uint64(rand.Int63()), 64)}, "."),
+	)
+}
+
+func (d Dir) MakeEphemeralDir(topic string) (string, error) {
+	eph := EphemeralPath(topic)
+	if err := os.MkdirAll(d.Abs(eph), 0755); err != nil {
+		return "", err
+	}
+	return eph, nil
 }

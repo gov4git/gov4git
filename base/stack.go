@@ -1,10 +1,10 @@
-package errors
+package base
 
 /*
 
-	ctx = errors.Infof(ctx, "doing blah for %v", v)
+	ctx = base.Infof(ctx, "doing blah for %v", v)
 	...
-	return nil, errors.ContextErr(ctx, err)
+	return nil, base.ContextErr(ctx, err)
 
 */
 

@@ -7,8 +7,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/petar/gitsoc/base"
+	. "github.com/petar/gitsoc/base"
 	"github.com/petar/gitsoc/files"
+	"github.com/petar/gitsoc/proto/layout"
 )
 
 type Local struct {
@@ -26,7 +27,7 @@ func (x Local) Invoke(ctx context.Context, args ...string) (stdout, stderr strin
 	cmd.Stdout, cmd.Stderr = &outbuf, &errbuf
 	err = cmd.Run()
 	stdout, stderr = outbuf.String(), errbuf.String()
-	base.Infof("$ git %s\nstdout> %s\nstderr> %s\n", strings.Join(args, " "), stdout, stderr)
+	Infof("$ git %s\nstdout> %s\nstderr> %s\n", strings.Join(args, " "), stdout, stderr)
 	return stdout, stderr, err
 }
 
@@ -38,7 +39,7 @@ func (x Local) InvokeStdin(ctx context.Context, stdin string, args ...string) (s
 	cmd.Stdout, cmd.Stderr = &outbuf, &errbuf
 	err = cmd.Run()
 	stdout, stderr = outbuf.String(), errbuf.String()
-	base.Infof("$ git %s\nstdin> %s\nstdout> %s\nstderr> %s\n", strings.Join(args, " "), stdin, stdout, stderr)
+	Infof("$ git %s\nstdin> %s\nstdout> %s\nstderr> %s\n", strings.Join(args, " "), stdin, stdout, stderr)
 	return stdout, stderr, err
 }
 
@@ -80,7 +81,7 @@ func (x Local) Add(ctx context.Context, paths []string) error {
 	return err
 }
 
-func (x Local) Clone(ctx context.Context, remoteURL, branch string) error {
+func (x Local) CloneBranch(ctx context.Context, remoteURL, branch string) error {
 	if err := x.Dir().Mk(); err != nil {
 		return nil
 	}
@@ -94,11 +95,36 @@ func (x Local) Clone(ctx context.Context, remoteURL, branch string) error {
 	return nil
 }
 
+func (x Local) CloneOrMakeBranch(ctx context.Context, remoteURL, branch string) error {
+	if err := x.CloneBranch(ctx, remoteURL, branch); err != nil {
+		if err != ErrRemoteBranchNotFound {
+			return err
+		}
+		if err := x.InitWithRemoteBranch(ctx, remoteURL, branch); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (x Local) InitWithRemoteBranch(ctx context.Context, remoteURL, branch string) error {
+	if err := x.Init(ctx); err != nil {
+		return err
+	}
+	if err := x.RenameBranch(ctx, layout.MainBranch); err != nil {
+		return err
+	}
+	if err := x.AddRemoteOrigin(ctx, remoteURL); err != nil {
+		return err
+	}
+	return nil
+}
+
 func init() {
 	p, err := exec.LookPath("git")
 	if err != nil {
-		println("did not find git")
+		Fatalf("did not find git in path")
 	} else {
-		println("using", p)
+		Infof("using %s", p)
 	}
 }

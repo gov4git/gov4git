@@ -20,3 +20,7 @@ func init() {
 func Infof(template string, args ...interface{}) {
 	logger.Sugar().Infof(template, args...)
 }
+
+func Fatalf(template string, args ...interface{}) {
+	logger.Sugar().Fatalf(template, args...)
+}

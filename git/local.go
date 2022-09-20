@@ -71,8 +71,17 @@ func (x Local) AddRemoteOrigin(ctx context.Context, remoteURL string) error {
 	return x.AddRemote(ctx, "origin", remoteURL)
 }
 
-func (x Local) PushToOrigin(ctx context.Context, srcBranch string) error {
+func (x Local) PushBranchUpstream(ctx context.Context, srcBranch string) error {
 	_, _, err := x.Invoke(ctx, "push", "-u", "origin", srcBranch)
+	return err
+}
+
+func (x Local) PushUpstream(ctx context.Context) error {
+	return x.PushBranchUpstream(ctx, "HEAD")
+}
+
+func (x Local) Push(ctx context.Context) error {
+	_, _, err := x.Invoke(ctx, "push", "origin")
 	return err
 }
 
@@ -105,6 +114,16 @@ func (x Local) CloneOrMakeBranch(ctx context.Context, remoteURL, branch string) 
 		}
 	}
 	return nil
+}
+
+func (x Local) AddCommitPush(ctx context.Context, addPaths []string, commitMsg string) error {
+	if err := x.Add(ctx, addPaths); err != nil {
+		return err
+	}
+	if err := x.Commit(ctx, commitMsg); err != nil {
+		return err
+	}
+	return x.PushUpstream(ctx)
 }
 
 func (x Local) InitWithRemoteBranch(ctx context.Context, remoteURL, branch string) error {

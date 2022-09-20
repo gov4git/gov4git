@@ -11,3 +11,7 @@ func TestCloneMissingBranch(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestCloneLocal(t *testing.T) {
+	XXX
+}

@@ -28,6 +28,10 @@ func (d Dir) Abs(path string) string {
 	return filepath.Join(d.Path, path)
 }
 
+func (d Dir) Subdir(path string) Dir {
+	return Dir{Path: filepath.Join(d.Path, path)}
+}
+
 func (d Dir) Mk() error {
 	return os.MkdirAll(d.Path, 0755)
 }

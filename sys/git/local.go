@@ -16,6 +16,10 @@ type Local struct {
 	Path string
 }
 
+func LocalFromDir(d files.Dir) Local {
+	return Local{Path: d.Path}
+}
+
 func (x Local) Dir() files.Dir {
 	return files.Dir{Path: x.Path}
 }
@@ -104,7 +108,7 @@ func (x Local) CloneBranch(ctx context.Context, remoteURL, branch string) error 
 	return nil
 }
 
-func (x Local) CloneOrMakeBranch(ctx context.Context, remoteURL, branch string) error {
+func (x Local) CloneOrInitBranch(ctx context.Context, remoteURL, branch string) error {
 	if err := x.CloneBranch(ctx, remoteURL, branch); err != nil {
 		if err != ErrRemoteBranchNotFound {
 			return err

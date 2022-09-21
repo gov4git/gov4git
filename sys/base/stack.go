@@ -12,20 +12,24 @@ import (
 	"context"
 )
 
-type ErrorInContext struct {
+type ContextError struct {
 	context.Context
 	error
 }
 
-func (x ErrorInContext) Error() string {
-	return x.Err.Error()
+func (x ContextError) Error() string {
+	return x.error.Error()
 	// var w bytes.Buffer
 	// XXX
 	// return w.String()
 }
 
-func ErrInCtx(ctx context.Context, err error) error {
-	return ErrorInContext{Context: ctx, error: err}
+func ErrIn(ctx context.Context, err error) ContextError {
+	return ContextError{Context: ctx, error: err}
+}
+
+func OkIn(ctx context.Context) error {
+	return ContextError{Context: ctx, error: nil}
 }
 
 // stack

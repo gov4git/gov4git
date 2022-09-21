@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+type Form interface{}
+
 func EncodeBytesToString(buf []byte) string {
 	return base64.StdEncoding.EncodeToString(buf)
 }

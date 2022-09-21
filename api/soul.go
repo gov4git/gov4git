@@ -18,7 +18,7 @@ func (x SoulAPI) InitKeygen(ctx context.Context) ContextError {
 	repo := git.LocalFromDir(DirOf(ctx).Subdir("private"))
 	// clone or init repo
 	if err := repo.CloneOrInitBranch(ctx, x.Address.PrivateURL, layout.MainBranch); err != nil {
-		return ErrIn(ctx, err)
+		return DoneErr(ctx, err)
 	}
 	// check if key files already exist
 	XXX
@@ -27,7 +27,7 @@ func (x SoulAPI) InitKeygen(ctx context.Context) ContextError {
 		FormFile{Path: XXX, Form: XXX},
 	}
 	XXX
-	return OkIn(ctx)
+	return DoneOk(ctx)
 }
 
 // func (x SoulAPI) CloneKeyGen(ctx context.Context) (*forms.PrivateInfo, error) {

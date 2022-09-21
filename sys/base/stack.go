@@ -24,11 +24,11 @@ func (x ContextError) Error() string {
 	// return w.String()
 }
 
-func ErrIn(ctx context.Context, err error) ContextError {
+func DoneErr(ctx context.Context, err error) ContextError {
 	return ContextError{Context: ctx, error: err}
 }
 
-func OkIn(ctx context.Context) error {
+func DoneOk(ctx context.Context) error {
 	return ContextError{Context: ctx, error: nil}
 }
 

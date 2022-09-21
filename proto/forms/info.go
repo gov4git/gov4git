@@ -1,11 +1,9 @@
 package forms
 
-import "github.com/petar/gitsoc/form"
-
 type PublicInfo struct {
-	Form             string
-	PublicRepoURL    string
-	Ed25519PublicKey form.Bytes
+	Form          string
+	PublicRepoURL string
+	PublicKey     Ed25519PublicKey
 }
 
 func (x *PublicInfo) Tidy() {
@@ -13,10 +11,10 @@ func (x *PublicInfo) Tidy() {
 }
 
 type PrivateInfo struct {
-	Form              string
-	PrivateRepoURL    string
-	Ed25519PrivateKey form.Bytes
-	PublicInfo        PublicInfo
+	Form           string
+	PrivateRepoURL string
+	PrivateKey     Ed25519PrivateKey
+	PublicInfo     PublicInfo
 }
 
 func (x *PrivateInfo) Tidy() {

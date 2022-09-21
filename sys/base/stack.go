@@ -12,24 +12,26 @@ import (
 	"context"
 )
 
-type Frame interface {
-	String() string
+type ErrorInContext struct {
+	context.Context
+	error
 }
 
-type contextErr struct {
-	Stack *Stack
-	Err   error
-}
-
-func (x contextErr) Error() string {
+func (x ErrorInContext) Error() string {
 	return x.Err.Error()
 	// var w bytes.Buffer
 	// XXX
 	// return w.String()
 }
 
-func Error(ctx context.Context, err error) error {
-	return contextErr{Stack: stackOf(ctx), Err: err}
+func ErrInCtx(ctx context.Context, err error) error {
+	return ErrorInContext{Context: ctx, error: err}
+}
+
+// stack
+
+type Frame interface {
+	String() string
 }
 
 type ctxStackFrame struct{}

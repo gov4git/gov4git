@@ -6,36 +6,19 @@ import (
 	"github.com/petar/gitsoc/files"
 	"github.com/petar/gitsoc/git"
 	"github.com/petar/gitsoc/proto/forms"
-	"github.com/petar/gitsoc/proto/layout"
 )
 
 type SoulAPI struct {
 	Address forms.SoulAddress
 }
 
-func (x SoulAPI) InitBareRemote(ctx context.Context) error {
+func (x SoulAPI) InitKeygen(ctx context.Context) error {
 	repo := git.Local{Path: files.DirOf(ctx).Path}
 	if err := repo.Init(ctx); err != nil {
 		return err
 	}
 	var stage files.FormFiles
 	XXX
-	// if err := repo.Dir().WriteFormFiles(stage); err != nil {
-	// 	return err
-	// }
-	if err := repo.Add(ctx, stage.Paths()); err != nil {
-		return err
-	}
-	if err := repo.Commit(ctx, "initialize empty private soul repo"); err != nil {
-		return err
-	}
-	if err := repo.RenameBranch(ctx, layout.MainBranch); err != nil {
-		return err
-	}
-	if err := repo.AddRemoteOrigin(ctx, repoURL); err != nil {
-		return err
-	}
-	return repo.PushToOrigin(ctx, layout.MainBranch)
 }
 
 // func (x SoulAPI) CloneKeyGen(ctx context.Context) (*forms.PrivateInfo, error) {

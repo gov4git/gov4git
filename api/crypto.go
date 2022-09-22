@@ -3,8 +3,8 @@ package soul
 import (
 	"crypto/ed25519"
 
-	"github.com/petar/gitsoc/proto/forms"
-	"github.com/petar/gitsoc/sys/form"
+	"github.com/petar/gitty/proto/forms"
+	"github.com/petar/gitty/sys/form"
 )
 
 func GenerateKeyPair() (*forms.PrivateInfo, error) {

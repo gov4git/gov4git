@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/petar/gitsoc/sys/form"
+	"github.com/petar/gitty/sys/form"
 )
 
 type ByteFile struct {

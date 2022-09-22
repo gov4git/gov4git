@@ -3,11 +3,11 @@ package soul
 import (
 	"context"
 
-	"github.com/petar/gitsoc/proto/forms"
-	"github.com/petar/gitsoc/proto/layout"
-	. "github.com/petar/gitsoc/sys/base"
-	. "github.com/petar/gitsoc/sys/files"
-	"github.com/petar/gitsoc/sys/git"
+	"github.com/petar/gitty/proto/forms"
+	"github.com/petar/gitty/proto/layout"
+	. "github.com/petar/gitty/sys/base"
+	. "github.com/petar/gitty/sys/files"
+	"github.com/petar/gitty/sys/git"
 )
 
 type SoulAPI struct {

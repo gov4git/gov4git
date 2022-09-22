@@ -1,4 +1,4 @@
-module github.com/petar/gitsoc
+module github.com/petar/gitty
 
 go 1.19
 

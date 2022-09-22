@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/petar/gitsoc/proto/layout"
-	. "github.com/petar/gitsoc/sys/base"
-	"github.com/petar/gitsoc/sys/files"
+	"github.com/petar/gitty/proto/layout"
+	. "github.com/petar/gitty/sys/base"
+	"github.com/petar/gitty/sys/files"
 )
 
 type Local struct {

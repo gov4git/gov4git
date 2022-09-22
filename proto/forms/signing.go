@@ -3,8 +3,8 @@ package forms
 import (
 	"encoding/json"
 
-	"github.com/petar/gitsoc/proto/forms"
-	"github.com/petar/gitsoc/sys/form"
+	"github.com/petar/gitty/proto/forms"
+	"github.com/petar/gitty/sys/form"
 )
 
 type Ed25519PublicKey = form.Bytes

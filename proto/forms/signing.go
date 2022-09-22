@@ -11,7 +11,7 @@ type Ed25519PublicKey = form.Bytes
 
 type Ed25519PrivateKey = form.Bytes
 
-func Sign[Statement form.Form](priv *forms.PrivateInfo) {
+func Sign[Statement form.Form](priv *forms.PrivateInfo, stmt Statement) (*Signed[Statement], error) {
 	XXX
 }
 

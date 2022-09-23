@@ -13,6 +13,9 @@ func skeletize(ctx context.Context, v reflect.Value) reflect.Value {
 	if f, ok := v.Interface().(Form); ok {
 		return reflect.ValueOf(f.Skeletize(ctx))
 	}
+	if f, ok := v.Addr().Interface().(Form); ok {
+		return reflect.ValueOf(f.Skeletize(ctx))
+	}
 	switch v.Kind() {
 	case reflect.Bool:
 		return v

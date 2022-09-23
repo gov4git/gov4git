@@ -6,6 +6,7 @@ import (
 	"fmt"
 )
 
+// TODO: handle []byte transparently in the de/skeletization?
 type Bytes []byte
 
 func (x Bytes) Skeletize(context.Context) any {

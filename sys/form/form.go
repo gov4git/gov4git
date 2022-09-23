@@ -8,7 +8,7 @@ import (
 
 type Form interface {
 	Skeletize(context.Context) any
-	DeSkeletize(context.Context, any) error
+	Deskeletize(context.Context, any) error
 }
 
 func EncodeForm(ctx context.Context, form Form) ([]byte, error) {
@@ -20,7 +20,7 @@ func DecodeForm(ctx context.Context, data []byte, form Form) error {
 	if err := json.Unmarshal(data, &skel); err != nil {
 		return err
 	}
-	return form.DeSkeletize(ctx, skel)
+	return form.Deskeletize(ctx, skel)
 }
 
 func EncodeFormToFile(ctx context.Context, form Form, filepath string) error {

@@ -1,41 +1,40 @@
 package form
 
 import (
-	"encoding/base64"
+	"context"
 	"encoding/json"
 	"os"
 )
 
-type Form interface{}
-
-func EncodeBytesToString(buf []byte) string {
-	return base64.StdEncoding.EncodeToString(buf)
+type Form interface {
+	Skeletize(context.Context) any
+	DeSkeletize(context.Context, any) error
 }
 
-func DecodeBytesFromString(s string) ([]byte, error) {
-	return base64.StdEncoding.DecodeString(s)
+func EncodeForm(ctx context.Context, form Form) ([]byte, error) {
+	return json.MarshalIndent(form.Skeletize(ctx), "", "   ")
 }
 
-func EncodeForm(form any) ([]byte, error) {
-	return json.MarshalIndent(form, "", "   ")
+func DecodeForm(ctx context.Context, data []byte, form Form) error {
+	var skel any
+	if err := json.Unmarshal(data, &skel); err != nil {
+		return err
+	}
+	return form.DeSkeletize(ctx, skel)
 }
 
-func DecodeForm(data []byte, form any) error {
-	return json.Unmarshal(data, form)
-}
-
-func EncodeFormToFile(form any, filepath string) error {
-	data, err := EncodeForm(form)
+func EncodeFormToFile(ctx context.Context, form Form, filepath string) error {
+	data, err := EncodeForm(ctx, form)
 	if err != nil {
 		return err
 	}
 	return os.WriteFile(filepath, data, 0644)
 }
 
-func DecodeFormFromFile(filepath string, form any) error {
+func DecodeFormFromFile(ctx context.Context, filepath string, form Form) error {
 	data, err := os.ReadFile(filepath)
 	if err != nil {
 		return err
 	}
-	return DecodeForm(data, form)
+	return DecodeForm(ctx, data, form)
 }

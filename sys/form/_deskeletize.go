@@ -109,8 +109,19 @@ func deskeletizeStruct(ctx context.Context, v reflect.Value, skeleton reflect.Va
 }
 
 func deskeletizeMap(ctx context.Context, v reflect.Value, skeleton reflect.Value) error {
+	if v.Type().Key().Kind() != reflect.String {
+		panic("only strings can be map keys")
+	}
 	w := reflect.MakeMap(reflect.TypeOf(v))
-	XXX
+	for _, k := range skeleton.MapKeys() {
+		mk := reflect.New(v.Type().Key()).Elem()
+		mv := reflect.New(v.Type().Elem()).Elem()
+		mk.Set(k)
+		if err := deskeletize(ctx, mv, skeleton.MapIndex(k)); err != nil {
+			return err
+		}
+		w.MapIndex(mk).Set(mv)
+	}
 	v.Set(w)
 	return nil
 }

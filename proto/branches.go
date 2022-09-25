@@ -1,4 +1,4 @@
-package layout
+package proto
 
 const (
 	MainBranch = "main"

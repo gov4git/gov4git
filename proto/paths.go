@@ -1,9 +1,9 @@
-package layout
+package proto
 
 import "path/filepath"
 
 const (
-	RootPath = ".gov"
+	RootPath = ".gitty"
 )
 
 var (

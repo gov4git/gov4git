@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/petar/gitty/proto/layout"
+	"github.com/petar/gitty/proto"
 	. "github.com/petar/gitty/sys/base"
 	"github.com/petar/gitty/sys/files"
 )
@@ -134,7 +134,7 @@ func (x Local) InitWithRemoteBranch(ctx context.Context, remoteURL, branch strin
 	if err := x.Init(ctx); err != nil {
 		return err
 	}
-	if err := x.RenameBranch(ctx, layout.MainBranch); err != nil {
+	if err := x.RenameBranch(ctx, proto.MainBranch); err != nil {
 		return err
 	}
 	if err := x.AddRemoteOrigin(ctx, remoteURL); err != nil {

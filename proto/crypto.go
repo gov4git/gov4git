@@ -1,4 +1,4 @@
-package forms
+package proto
 
 import (
 	"crypto/ed25519"

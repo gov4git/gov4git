@@ -3,9 +3,9 @@ package proto
 import "path/filepath"
 
 const (
-	RootPath = ".gitty"
+	RootPath = ".ana"
 )
 
 var (
-	PrivateSoulInfoPath = filepath.Join(RootPath, "private_soul_info")
+	PrivateCredentialsPath = filepath.Join(RootPath, "private_credentials")
 )

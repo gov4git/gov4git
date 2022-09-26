@@ -6,21 +6,14 @@ import (
 	"os"
 )
 
-type Form interface {
-	Skeletize(context.Context) any
-	Deskeletize(context.Context, any) error
-}
+type Form interface{}
 
 func EncodeForm(ctx context.Context, form Form) ([]byte, error) {
-	return json.MarshalIndent(form.Skeletize(ctx), "", "   ")
+	return json.MarshalIndent(form, "", "   ")
 }
 
 func DecodeForm(ctx context.Context, data []byte, form Form) error {
-	var skel any
-	if err := json.Unmarshal(data, &skel); err != nil {
-		return err
-	}
-	return form.Deskeletize(ctx, skel)
+	return json.Unmarshal(data, form)
 }
 
 func EncodeFormToFile(ctx context.Context, form Form, filepath string) error {

@@ -1,22 +1,20 @@
 package form
 
 import (
-	"context"
 	"encoding/base64"
-	"fmt"
+	"encoding/json"
 )
 
-// TODO: handle []byte transparently in the de/skeletization?
 type Bytes []byte
 
-func (x Bytes) Skeletize(context.Context) any {
-	return EncodeBytesToString(x)
+func (x Bytes) MarshalJSON() ([]byte, error) {
+	return json.Marshal(EncodeBytesToString(x))
 }
 
-func (x *Bytes) DeSkeletize(_ context.Context, from any) error {
-	s, ok := from.(string)
-	if !ok {
-		return fmt.Errorf("bytes are represented as a string")
+func (x *Bytes) UnmarshalJSON(d []byte) error {
+	var s string
+	if err := json.Unmarshal(d, &s); err != nil {
+		return err
 	}
 	b, err := DecodeBytesFromString(s)
 	if err != nil {

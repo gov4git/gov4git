@@ -57,21 +57,21 @@ func (d Dir) ReadByteFile(path string) (ByteFile, error) {
 	return ReadByteFile(d.Abs(path))
 }
 
-func (d Dir) WriteFormFile(file FormFile) error {
-	return WriteFormFile(d.Path, file)
+func (d Dir) WriteFormFile(ctx context.Context, file FormFile) error {
+	return WriteFormFile(ctx, d.Path, file)
 }
 
-func (d Dir) WriteFormFiles(files FormFiles) error {
+func (d Dir) WriteFormFiles(ctx context.Context, files FormFiles) error {
 	for _, f := range files {
-		if err := WriteFormFile(d.Path, f); err != nil {
+		if err := WriteFormFile(ctx, d.Path, f); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (d Dir) ReadFormFile(path string, f any) (FormFile, error) {
-	return ReadFormFile(d.Abs(path), f)
+func (d Dir) ReadFormFile(ctx context.Context, path string, f any) (FormFile, error) {
+	return ReadFormFile(ctx, d.Abs(path), f)
 }
 
 func EphemeralPath(topic string) string {

@@ -5,7 +5,7 @@ import (
 	"crypto/ed25519"
 	"encoding/json"
 
-	"github.com/petar/gitty/sys/form"
+	"github.com/petar/gitty/lib/form"
 )
 
 type Ed25519PublicKey = form.Bytes

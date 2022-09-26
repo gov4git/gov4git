@@ -1,10 +1,11 @@
 package files
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 
-	"github.com/petar/gitty/sys/form"
+	"github.com/petar/gitty/lib/form"
 )
 
 type ByteFile struct {
@@ -68,19 +69,19 @@ func (x FormFiles) Paths() []string {
 	return p
 }
 
-func ReadFormFile(path string, f any) (FormFile, error) {
-	if err := form.DecodeFormFromFile(path, f); err != nil {
+func ReadFormFile(ctx context.Context, path string, f any) (FormFile, error) {
+	if err := form.DecodeFormFromFile(ctx, path, f); err != nil {
 		return FormFile{}, err
 	}
 	return FormFile{Path: path, Form: f}, nil
 }
 
-func WriteFormFile(root string, file FormFile) error {
+func WriteFormFile(ctx context.Context, root string, file FormFile) error {
 	fdir, _ := filepath.Split(file.Path)
 	if err := os.MkdirAll(filepath.Join(root, fdir), 0755); err != nil {
 		return err
 	}
-	if err := form.EncodeFormToFile(file.Form, filepath.Join(root, file.Path)); err != nil {
+	if err := form.EncodeFormToFile(ctx, file.Form, filepath.Join(root, file.Path)); err != nil {
 		return err
 	}
 	return nil

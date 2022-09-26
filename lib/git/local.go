@@ -3,14 +3,11 @@ package git
 import (
 	"bytes"
 	"context"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 
 	. "github.com/petar/gitty/lib/base"
 	"github.com/petar/gitty/lib/files"
-	"github.com/petar/gitty/proto"
 )
 
 type Local struct {
@@ -49,7 +46,7 @@ func (x Local) InvokeStdin(ctx context.Context, stdin string, args ...string) (s
 }
 
 func (x Local) Init(ctx context.Context) error {
-	err := os.MkdirAll(x.Path, 0755)
+	err := x.Dir().Mk()
 	if err != nil {
 		return err
 	}
@@ -58,8 +55,7 @@ func (x Local) Init(ctx context.Context) error {
 }
 
 func (x Local) InitBare(ctx context.Context) error {
-	dotGit := filepath.Join(x.Path, ".git")
-	err := os.MkdirAll(dotGit, 0755)
+	err := x.Dir().Mk()
 	if err != nil {
 		return err
 	}
@@ -145,7 +141,7 @@ func (x Local) InitWithRemoteBranch(ctx context.Context, remoteURL, branch strin
 	if err := x.Init(ctx); err != nil {
 		return err
 	}
-	if err := x.RenameBranch(ctx, proto.MainBranch); err != nil {
+	if err := x.RenameBranch(ctx, branch); err != nil {
 		return err
 	}
 	if err := x.AddRemoteOrigin(ctx, remoteURL); err != nil {

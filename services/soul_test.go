@@ -33,4 +33,9 @@ func TestSoulInit(t *testing.T) {
 	if r := api.Init(apiCtx); r.Err() != nil {
 		t.Fatal(r.Err())
 	}
+
+	// re-init should return error
+	if r := api.Init(apiCtx); r.Err() == nil {
+		t.Fatal("re-initializing a soul should fail")
+	}
 }

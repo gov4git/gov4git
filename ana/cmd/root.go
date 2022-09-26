@@ -34,11 +34,13 @@ var publicURL string
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	rootCmd.SilenceUsage = true
+	rootCmd.SilenceErrors = true
 	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "config file (default is $HOME/.ana/config.json)")
 	rootCmd.PersistentFlags().StringVar(&privateURL, "private_url", "", "private url of soul")
 	rootCmd.PersistentFlags().StringVar(&publicURL, "public_url", "", "public url of soul")
-	rootCmd.MarkPersistentFlagRequired("private_url")
-	rootCmd.MarkPersistentFlagRequired("public_url")
+	// rootCmd.MarkPersistentFlagRequired("private_url")
+	// rootCmd.MarkPersistentFlagRequired("public_url")
 	viper.BindPFlag("private_url", rootCmd.PersistentFlags().Lookup("private_url"))
 	viper.BindPFlag("public_url", rootCmd.PersistentFlags().Lookup("public_url"))
 
@@ -76,5 +78,6 @@ func initConfig() {
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		base.Fatalf("command error (%v)", err)
+		base.Sync()
 	}
 }

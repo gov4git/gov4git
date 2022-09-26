@@ -31,3 +31,11 @@ func Infof(template string, args ...interface{}) {
 func Fatalf(template string, args ...interface{}) {
 	logger.Sugar().Fatalf(template, args...)
 }
+
+func Errorf(template string, args ...interface{}) {
+	logger.Sugar().Errorf(template, args...)
+}
+
+func Sync() error {
+	return logger.Sync()
+}

@@ -2,59 +2,88 @@ package soul
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/petar/gitty/proto/forms"
-	"github.com/petar/gitty/proto/layout"
-	. "github.com/petar/gitty/sys/base"
-	. "github.com/petar/gitty/sys/files"
-	"github.com/petar/gitty/sys/git"
+	. "github.com/petar/gitty/lib/base"
+	. "github.com/petar/gitty/lib/files"
+	"github.com/petar/gitty/lib/git"
+	"github.com/petar/gitty/proto"
 )
 
 type SoulAPI struct {
-	Address forms.SoulAddress
+	SoulConfig proto.SoulConfig
 }
 
-func (x SoulAPI) InitKeygen(ctx context.Context) ContextError {
-	repo := git.LocalFromDir(DirOf(ctx).Subdir("private"))
+func (x SoulAPI) Init(ctx context.Context) ContextError {
+
+	// generate private credentials
+
+	localPrivate := git.LocalFromDir(WorkDir(ctx).Subdir("private"))
 	// clone or init repo
-	if err := repo.CloneOrInitBranch(ctx, x.Address.PrivateURL, layout.MainBranch); err != nil {
+	if err := localPrivate.CloneOrInitBranch(ctx, x.SoulConfig.PrivateURL, proto.IdentityBranch); err != nil {
 		return DoneErr(ctx, err)
 	}
 	// check if key files already exist
-	XXX
-	// generate keys
-	stage := FormFiles{
-		FormFile{Path: XXX, Form: XXX},
+	if _, err := localPrivate.Dir().Stat(proto.PrivateCredentialsPath); err == nil {
+		return DoneErr(ctx, fmt.Errorf("private credentials file already exists"))
 	}
-	XXX
+	// generate credentials
+	privateCredentials, err := proto.GenerateCredentials(x.SoulConfig.PublicURL, x.SoulConfig.PrivateURL)
+	if err != nil {
+		return DoneErr(ctx, err)
+	}
+	// write changes
+	stagePrivate := FormFiles{
+		FormFile{Path: proto.PrivateCredentialsPath, Form: privateCredentials},
+	}
+	if err = localPrivate.Dir().WriteFormFiles(ctx, stagePrivate); err != nil {
+		return DoneErr(ctx, err)
+	}
+	// stage changes
+	if err = localPrivate.Add(ctx, stagePrivate.Paths()); err != nil {
+		return DoneErr(ctx, err)
+	}
+	// commit changes
+	if err = localPrivate.Commit(ctx, "initializing private credentials"); err != nil {
+		return DoneErr(ctx, err)
+	}
+	// push repo
+	if err = localPrivate.PushUpstream(ctx); err != nil {
+		return DoneErr(ctx, err)
+	}
+
+	// generate public credentials
+
+	localPublic := git.LocalFromDir(WorkDir(ctx).Subdir("public"))
+	// clone or init repo
+	if err := localPublic.CloneOrInitBranch(ctx, x.SoulConfig.PublicURL, proto.IdentityBranch); err != nil {
+		return DoneErr(ctx, err)
+	}
+	// write changes
+	stagePublic := FormFiles{
+		FormFile{Path: proto.PublicCredentialsPath, Form: privateCredentials.PublicCredentials},
+	}
+	if err = localPublic.Dir().WriteFormFiles(ctx, stagePublic); err != nil {
+		return DoneErr(ctx, err)
+	}
+	// stage changes
+	if err = localPublic.Add(ctx, stagePublic.Paths()); err != nil {
+		return DoneErr(ctx, err)
+	}
+	// commit changes
+	if err = localPublic.Commit(ctx, "initializing public credentials"); err != nil {
+		return DoneErr(ctx, err)
+	}
+	// push repo
+	if err = localPublic.PushUpstream(ctx); err != nil {
+		return DoneErr(ctx, err)
+	}
+
 	return DoneOk(ctx)
 }
 
-// func (x SoulAPI) CloneKeyGen(ctx context.Context) (*forms.PrivateInfo, error) {
-
-// 	// create workspace
-// 	ctxDir := files.DirOf(ctx)
-// 	privRepo, pubRepo := git.Local{Path: ctxDir.Abs("priv")}, git.Local{Path: ctxDir.Abs("priv")}
-
-// 	// build private repo
-// 	privFiles := files.FormFiles{
-// 		files.FormFile{Path: config.PrivateSoulInfoPath, Form: XXX},
-// 	}
-
-// 	if err := privRepo.
-
-// 	// if err = git.InitStageCommitPushToOrigin(ctx, privDir, XXXurl, privStage, XXXprivCommit); err != nil {
-// 	// 	return nil, err
-// 	// }
-
-// 	// build public repo
-// 	XXX
-// }
-
 // func (x SoulAPI) CheckoutSendChannel(ctx context.Context, to XXX, topic string) error {
-// 	XXX
 // }
 
 // func (x SoulAPI) SyncCheckoutReceiveChannel(ctx context.Context, from XXX, topic string) error {
-// 	XXX
 // }

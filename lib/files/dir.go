@@ -10,22 +10,34 @@ import (
 	"time"
 )
 
-func WithDir(ctx context.Context, dir Dir) context.Context {
+func WithWorkDir(ctx context.Context, dir Dir) context.Context {
 	return context.WithValue(ctx, ctxDirKey{}, dir)
 }
 
 type ctxDirKey struct{}
 
-func DirOf(ctx context.Context) Dir {
-	return ctx.Value(ctxDirKey{}).(Dir)
+func WorkDir(ctx context.Context) *Dir {
+	d, ok := ctx.Value(ctxDirKey{}).(Dir)
+	if !ok {
+		return nil
+	}
+	return &d
 }
 
 type Dir struct {
 	Path string
 }
 
+func PathDir(path string) Dir {
+	return Dir{Path: path}
+}
+
 func (d Dir) Abs(path string) string {
 	return filepath.Join(d.Path, path)
+}
+
+func (d Dir) Stat(path string) (os.FileInfo, error) {
+	return os.Stat(d.Abs(path))
 }
 
 func (d Dir) Subdir(path string) Dir {

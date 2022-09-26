@@ -7,5 +7,6 @@ const (
 )
 
 var (
+	PublicCredentialsPath  = filepath.Join(RootPath, "public_credentials")
 	PrivateCredentialsPath = filepath.Join(RootPath, "private_credentials")
 )

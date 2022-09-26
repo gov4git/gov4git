@@ -5,6 +5,7 @@ import (
 	"context"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	. "github.com/petar/gitty/lib/base"
@@ -53,6 +54,16 @@ func (x Local) Init(ctx context.Context) error {
 		return err
 	}
 	_, _, err = x.Invoke(ctx, "init")
+	return err
+}
+
+func (x Local) InitBare(ctx context.Context) error {
+	dotGit := filepath.Join(x.Path, ".git")
+	err := os.MkdirAll(dotGit, 0755)
+	if err != nil {
+		return err
+	}
+	_, _, err = x.Invoke(ctx, "init", "--bare")
 	return err
 }
 

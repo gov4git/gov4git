@@ -17,6 +17,10 @@ type ContextError struct {
 	error
 }
 
+func (x ContextError) Err() error {
+	return x.error
+}
+
 func (x ContextError) Error() string {
 	return x.error.Error()
 	// var w bytes.Buffer
@@ -28,7 +32,7 @@ func DoneErr(ctx context.Context, err error) ContextError {
 	return ContextError{Context: ctx, error: err}
 }
 
-func DoneOk(ctx context.Context) error {
+func DoneOk(ctx context.Context) ContextError {
 	return ContextError{Context: ctx, error: nil}
 }
 

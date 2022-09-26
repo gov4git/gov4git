@@ -3,7 +3,6 @@ package proto
 const (
 	MainBranch = "main"
 
-	// soul's public repo branches
-	PublicIdentityBranch   = "identity"
-	PublicSendBranchPrefix = "send"
+	IdentityBranch   = "identity" // public and private repos, contains credentials
+	SendBranchPrefix = "send"
 )

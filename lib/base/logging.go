@@ -17,6 +17,13 @@ func init() {
 	logger = l
 }
 
+func AssertNoErr(err error) {
+	if err == nil {
+		return
+	}
+	Fatalf("encountered %v", err)
+}
+
 func Infof(template string, args ...interface{}) {
 	logger.Sugar().Infof(template, args...)
 }

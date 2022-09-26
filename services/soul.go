@@ -1,4 +1,4 @@
-package soul
+package services
 
 import (
 	"context"
@@ -10,11 +10,11 @@ import (
 	"github.com/petar/gitty/proto"
 )
 
-type SoulAPI struct {
+type SoulService struct {
 	SoulConfig proto.SoulConfig
 }
 
-func (x SoulAPI) Init(ctx context.Context) ContextError {
+func (x SoulService) Init(ctx context.Context) ContextError {
 
 	// generate private credentials
 
@@ -81,9 +81,3 @@ func (x SoulAPI) Init(ctx context.Context) ContextError {
 
 	return DoneOk(ctx)
 }
-
-// func (x SoulAPI) CheckoutSendChannel(ctx context.Context, to XXX, topic string) error {
-// }
-
-// func (x SoulAPI) SyncCheckoutReceiveChannel(ctx context.Context, from XXX, topic string) error {
-// }

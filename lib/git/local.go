@@ -32,7 +32,7 @@ func (x Local) Invoke(ctx context.Context, args ...string) (stdout, stderr strin
 	cmd.Stdout, cmd.Stderr = &outbuf, &errbuf
 	err = cmd.Run()
 	stdout, stderr = outbuf.String(), errbuf.String()
-	Infof("$ git %s\nstdout> %s\nstderr> %s\n", strings.Join(args, " "), stdout, stderr)
+	Infof("\n$ git %s\nstdout> %s\nstderr> %s", strings.Join(args, " "), stdout, stderr)
 	return stdout, stderr, err
 }
 
@@ -44,7 +44,7 @@ func (x Local) InvokeStdin(ctx context.Context, stdin string, args ...string) (s
 	cmd.Stdout, cmd.Stderr = &outbuf, &errbuf
 	err = cmd.Run()
 	stdout, stderr = outbuf.String(), errbuf.String()
-	Infof("$ git %s\nstdin> %s\nstdout> %s\nstderr> %s\n", strings.Join(args, " "), stdin, stdout, stderr)
+	Infof("\n$ git %s\nstdin> %s\nstdout> %s\nstderr> %s", strings.Join(args, " "), stdin, stdout, stderr)
 	return stdout, stderr, err
 }
 

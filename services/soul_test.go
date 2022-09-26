@@ -1,4 +1,4 @@
-package soul
+package services
 
 import (
 	"context"
@@ -29,7 +29,7 @@ func TestSoulInit(t *testing.T) {
 
 	// init soul
 	apiCtx := files.WithWorkDir(ctx, files.PathDir(t.TempDir()).Subdir("soul_api"))
-	api := SoulAPI{SoulConfig: proto.SoulConfig{PublicURL: testPubDir.Path, PrivateURL: testPrivDir.Path}}
+	api := SoulService{SoulConfig: proto.SoulConfig{PublicURL: testPubDir.Path, PrivateURL: testPrivDir.Path}}
 	if r := api.Init(apiCtx); r.Err() != nil {
 		t.Fatal(r.Err())
 	}

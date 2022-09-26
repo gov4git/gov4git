@@ -4,6 +4,9 @@ import "path/filepath"
 
 const (
 	RootPath = ".ana"
+
+	LocalAgentPath     = ".ana"
+	LocalAgentTempPath = "ana"
 )
 
 var (

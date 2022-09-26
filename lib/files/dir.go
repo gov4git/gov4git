@@ -6,10 +6,10 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 )
 
+// WithWorkDir attaches a working directory to the given context and returns the updated context.
 func WithWorkDir(ctx context.Context, dir Dir) context.Context {
 	return context.WithValue(ctx, ctxDirKey{}, dir)
 }
@@ -30,6 +30,10 @@ type Dir struct {
 
 func PathDir(path string) Dir {
 	return Dir{Path: path}
+}
+
+func TempDir() Dir {
+	return Dir{Path: os.TempDir()}
 }
 
 func (d Dir) Abs(path string) string {
@@ -86,22 +90,21 @@ func (d Dir) ReadFormFile(ctx context.Context, path string, f any) (FormFile, er
 	return ReadFormFile(ctx, d.Abs(path), f)
 }
 
-func EphemeralPath(topic string) string {
+// EphemeralPath returns /prefix/YYYY-MM-DD/HH:MM:SS/suffix/nonce
+func EphemeralPath(prefix, suffix string) string {
 	t := time.Now()
 	return filepath.Join(
 		"ephemeral",
-		strconv.Itoa(t.Year()),
-		strconv.Itoa(int(t.Month())),
-		strconv.Itoa(t.Day()),
-		strconv.Itoa(t.Hour()),
-		strings.Join([]string{topic, strconv.FormatUint(uint64(rand.Int63()), 64)}, "."),
+		t.Format("2006-01-02"),
+		t.Format("15:04:05"),
+		strconv.FormatUint(uint64(rand.Int63()), 36),
 	)
 }
 
-func (d Dir) MakeEphemeralDir(topic string) (string, error) {
-	eph := EphemeralPath(topic)
-	if err := os.MkdirAll(d.Abs(eph), 0755); err != nil {
-		return "", err
+func (d Dir) MkEphemeralDir(prefix, suffix string) (Dir, error) {
+	eph := Dir{Path: d.Abs(EphemeralPath(prefix, suffix))}
+	if err := os.MkdirAll(eph.Path, 0755); err != nil {
+		return Dir{}, err
 	}
 	return eph, nil
 }

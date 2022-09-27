@@ -18,13 +18,6 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 		},
 	}
-	// govCmd = &cobra.Command{
-	// 	Use:   "gov",
-	// 	Short: "",
-	// 	Long:  ``,
-	// 	Run: func(cmd *cobra.Command, args []string) {
-	// 	},
-	// }
 )
 
 var configPath string
@@ -45,10 +38,7 @@ func init() {
 	viper.BindPFlag("public_url", rootCmd.PersistentFlags().Lookup("public_url"))
 
 	rootCmd.AddCommand(initCmd)
-
-	// rootCmd.AddCommand(sendCmd)
-	// rootCmd.AddCommand(receiveCmd)
-	// rootCmd.AddCommand(govCmd)
+	rootCmd.AddCommand(govCmd)
 }
 
 func initConfig() {

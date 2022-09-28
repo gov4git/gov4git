@@ -106,8 +106,27 @@ var (
 	userGetCmd = &cobra.Command{
 		Use:   "get",
 		Short: "Get user property",
-		Long:  ``,
-		Run: func(cmd *cobra.Command, args []string) {
+		Long:  man.GovUserGet,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			s := services.GovService{
+				GovConfig: proto.GovConfig{
+					CommunityURL: communityURL,
+				},
+			}
+			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-get")
+			base.AssertNoErr(err)
+			ctx := files.WithWorkDir(cmd.Context(), workDir)
+			r, err := s.UserGet(ctx, &services.GovUserGetIn{
+				Name:            userName,
+				Key:             userKey,
+				CommunityBranch: communityBranch,
+			})
+			if err == nil {
+				fmt.Fprint(os.Stdout, r.Human())
+			} else {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+			return err
 		},
 	}
 )
@@ -132,4 +151,6 @@ func init() {
 
 	userSetCmd.Flags().StringVar(&userKey, "key", "", "user property key")
 	userSetCmd.Flags().StringVar(&userValue, "value", "", "user property value")
+
+	userGetCmd.Flags().StringVar(&userKey, "key", "", "user property key")
 }

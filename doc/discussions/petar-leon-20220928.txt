@@ -1,0 +1,18 @@
+
+- prioritizing PR/issue using a vote
+	- single/multiple candidate
+- voice credits spent on QV
+
+
+questions:
+- multicandidate voting (prioritization) vs single-candidate (approval)?
+- voting budget that you spend from? vs static voting power?
+
+- voting credit budget types:
+	- credits that deplete after every use (can be used once)
+	- credits that reset after every referendum instance
+
+- role groups
+
+- cluster voting
+	- voting power can depend on group membership and vote

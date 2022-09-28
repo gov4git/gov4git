@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/petar/gitty/lib/base"
 	"github.com/petar/gitty/lib/files"
 	"github.com/petar/gitty/proto"
@@ -22,8 +25,13 @@ var (
 			}
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "init")
 			base.AssertNoErr(err)
-			r := s.Init(files.WithWorkDir(cmd.Context(), workDir))
-			return r.Err()
+			r, err := s.Init(files.WithWorkDir(cmd.Context(), workDir), &services.SoulInitIn{})
+			if err == nil {
+				fmt.Fprint(os.Stdout, r.Human())
+			} else {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+			return err
 		},
 	}
 )

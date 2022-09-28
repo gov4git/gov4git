@@ -30,12 +30,12 @@ func TestSoulInit(t *testing.T) {
 	// init soul
 	apiCtx := files.WithWorkDir(ctx, files.PathDir(t.TempDir()).Subdir("soul_api"))
 	api := SoulService{SoulConfig: proto.SoulConfig{PublicURL: testPubDir.Path, PrivateURL: testPrivDir.Path}}
-	if r := api.Init(apiCtx); r.Err() != nil {
-		t.Fatal(r.Err())
+	if _, err := api.Init(apiCtx, &SoulInitIn{}); err != nil {
+		t.Fatal(err)
 	}
 
 	// re-init should return error
-	if r := api.Init(apiCtx); r.Err() == nil {
+	if _, err := api.Init(apiCtx, &SoulInitIn{}); err == nil {
 		t.Fatal("re-initializing a soul should fail")
 	}
 }

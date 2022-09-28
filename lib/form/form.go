@@ -8,6 +8,10 @@ import (
 
 type Form interface{}
 
+type Human interface {
+	Human() string
+}
+
 func EncodeForm(ctx context.Context, form Form) ([]byte, error) {
 	return json.MarshalIndent(form, "", "   ")
 }

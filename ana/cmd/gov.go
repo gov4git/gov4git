@@ -42,15 +42,6 @@ var (
 		},
 	}
 
-	// membership management
-	memberCmd = &cobra.Command{
-		Use:   "member",
-		Short: "",
-		Long:  ``,
-		Run: func(cmd *cobra.Command, args []string) {
-		},
-	}
-
 	// approval of change proceedings
 
 	// propose a change and begin governance review proceedings (e.g. referendum)
@@ -89,7 +80,7 @@ var (
 
 func init() {
 	govCmd.AddCommand(configCmd)
-	govCmd.AddCommand(memberCmd)
+	govCmd.AddCommand(userCmd)
 	govCmd.AddCommand(proposeCmd)
 	govCmd.AddCommand(voteCmd)
 	govCmd.AddCommand(approveCmd)

@@ -56,6 +56,14 @@ func (d Dir) Mkdir(path string) error {
 	return os.MkdirAll(d.Abs(path), 0755)
 }
 
+func (d Dir) Remove(path string) error {
+	return os.Remove(d.Abs(path))
+}
+
+func (d Dir) RemoveAll(path string) error {
+	return os.Remove(d.Abs(path))
+}
+
 func (d Dir) WriteByteFile(file ByteFile) error {
 	return WriteByteFile(d.Path, file)
 }

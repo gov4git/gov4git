@@ -20,6 +20,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 		},
 	}
+
 	userAddCmd = &cobra.Command{
 		Use:   "add",
 		Short: "Add user to the community",
@@ -46,13 +47,33 @@ var (
 			return err
 		},
 	}
+
 	userRmCmd = &cobra.Command{
 		Use:   "rm",
-		Short: "Remove user",
+		Short: "Remove user from community",
 		Long:  ``,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
+			s := services.GovService{
+				GovConfig: proto.GovConfig{
+					CommunityURL: communityURL,
+				},
+			}
+			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-rm")
+			base.AssertNoErr(err)
+			ctx := files.WithWorkDir(cmd.Context(), workDir)
+			r, err := s.RmUser(ctx, &services.GovRmUserIn{
+				Name:            userName,
+				CommunityBranch: communityBranch,
+			})
+			if err == nil {
+				fmt.Fprint(os.Stdout, r.Human())
+			} else {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+			return err
 		},
 	}
+
 	userSetCmd = &cobra.Command{
 		Use:   "set",
 		Short: "Set user property",
@@ -60,6 +81,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 		},
 	}
+
 	userGetCmd = &cobra.Command{
 		Use:   "get",
 		Short: "Get user property",

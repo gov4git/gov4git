@@ -107,6 +107,11 @@ func (x Local) Add(ctx context.Context, paths []string) error {
 	return err
 }
 
+func (x Local) Remove(ctx context.Context, paths []string) error {
+	_, _, err := x.InvokeStdin(ctx, strings.Join(paths, "\n"), "rm", "--pathspec-from-file=-")
+	return err
+}
+
 func (x Local) CloneBranch(ctx context.Context, remoteURL, branch string) error {
 	if err := x.Dir().Mk(); err != nil {
 		return nil

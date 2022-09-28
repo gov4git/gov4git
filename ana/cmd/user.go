@@ -6,6 +6,7 @@ import (
 
 	"github.com/petar/gitty/lib/base"
 	"github.com/petar/gitty/lib/files"
+	"github.com/petar/gitty/man"
 	"github.com/petar/gitty/proto"
 	"github.com/petar/gitty/services"
 	"github.com/spf13/cobra"
@@ -16,7 +17,7 @@ var (
 	userCmd = &cobra.Command{
 		Use:   "user",
 		Short: "User management",
-		Long:  `Add and remove users. Set and get user properties.`,
+		Long:  man.GovUser,
 		Run: func(cmd *cobra.Command, args []string) {
 		},
 	}
@@ -24,7 +25,7 @@ var (
 	userAddCmd = &cobra.Command{
 		Use:   "add",
 		Short: "Add user to the community",
-		Long:  ``,
+		Long:  man.GovUserAdd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := services.GovService{
 				GovConfig: proto.GovConfig{
@@ -51,7 +52,7 @@ var (
 	userRmCmd = &cobra.Command{
 		Use:   "rm",
 		Short: "Remove user from community",
-		Long:  ``,
+		Long:  man.GovUserRm,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := services.GovService{
 				GovConfig: proto.GovConfig{

@@ -3,6 +3,7 @@ package git
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os/exec"
 	"strings"
 
@@ -70,6 +71,11 @@ func (x Local) RenameBranch(ctx context.Context, newBranchName string) error {
 
 func (x Local) Commit(ctx context.Context, msg string) error {
 	_, _, err := x.InvokeStdin(ctx, msg, "commit", "-F", "-")
+	return err
+}
+
+func (x Local) Commitf(ctx context.Context, f string, args ...any) error {
+	_, _, err := x.InvokeStdin(ctx, fmt.Sprintf(f, args...), "commit", "-F", "-")
 	return err
 }
 

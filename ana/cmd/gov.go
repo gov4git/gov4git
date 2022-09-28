@@ -78,7 +78,15 @@ var (
 	}
 )
 
+var (
+	communityURL    string
+	communityBranch string
+)
+
 func init() {
+	govCmd.PersistentFlags().StringVar(&communityURL, "community", "", "community repo URL")
+	govCmd.PersistentFlags().StringVar(&communityBranch, "branch", "", "branch in community repo to work with")
+
 	govCmd.AddCommand(configCmd)
 	govCmd.AddCommand(userCmd)
 	govCmd.AddCommand(proposeCmd)

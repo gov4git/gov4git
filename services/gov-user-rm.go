@@ -9,18 +9,18 @@ import (
 	"github.com/petar/gitty/proto"
 )
 
-type GovRmUserIn struct {
+type GovUserRemoveIn struct {
 	Name            string `json:"name"`             // community unique handle for this user
 	CommunityBranch string `json:"community_branch"` // branch in community repo where user will be added
 }
 
-type GovRmUserOut struct{}
+type GovUserRemoveOut struct{}
 
-func (x GovRmUserOut) Human() string {
+func (x GovUserRemoveOut) Human() string {
 	return ""
 }
 
-func (x GovService) RmUser(ctx context.Context, in *GovRmUserIn) (*GovRmUserOut, error) {
+func (x GovService) UserRemove(ctx context.Context, in *GovUserRemoveIn) (*GovUserRemoveOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
@@ -34,7 +34,7 @@ func (x GovService) RmUser(ctx context.Context, in *GovRmUserIn) (*GovRmUserOut,
 	if err := community.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
-	return &GovRmUserOut{}, nil
+	return &GovUserRemoveOut{}, nil
 }
 
 func GovRmUser(ctx context.Context, community git.Local, name string) error {
@@ -48,7 +48,7 @@ func GovRmUser(ctx context.Context, community git.Local, name string) error {
 		return err
 	}
 	// commit changes
-	if err := community.Commitf(ctx, "add user %v", name); err != nil {
+	if err := community.Commitf(ctx, "gov: remove user %v", name); err != nil {
 		return err
 	}
 	return nil

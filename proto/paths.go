@@ -24,4 +24,5 @@ const (
 var (
 	GovUsersDir         = filepath.Join(GovRoot, "users")
 	GovUserInfoFilebase = "info"
+	GovUserMetaDirbase  = "meta"
 )

@@ -35,7 +35,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-add")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.AddUser(ctx, &services.GovAddUserIn{
+			r, err := s.UserAdd(ctx, &services.GovUserAddIn{
 				Name:            userName,
 				URL:             userURL,
 				CommunityBranch: communityBranch,
@@ -62,7 +62,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-rm")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.RmUser(ctx, &services.GovRmUserIn{
+			r, err := s.UserRemove(ctx, &services.GovUserRemoveIn{
 				Name:            userName,
 				CommunityBranch: communityBranch,
 			})
@@ -78,8 +78,28 @@ var (
 	userSetCmd = &cobra.Command{
 		Use:   "set",
 		Short: "Set user property",
-		Long:  ``,
-		Run: func(cmd *cobra.Command, args []string) {
+		Long:  man.GovUserSet,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			s := services.GovService{
+				GovConfig: proto.GovConfig{
+					CommunityURL: communityURL,
+				},
+			}
+			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-set")
+			base.AssertNoErr(err)
+			ctx := files.WithWorkDir(cmd.Context(), workDir)
+			r, err := s.UserSet(ctx, &services.GovUserSetIn{
+				Name:            userName,
+				Key:             userKey,
+				Value:           userValue,
+				CommunityBranch: communityBranch,
+			})
+			if err == nil {
+				fmt.Fprint(os.Stdout, r.Human())
+			} else {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+			return err
 		},
 	}
 
@@ -93,8 +113,10 @@ var (
 )
 
 var (
-	userName string
-	userURL  string
+	userName  string
+	userURL   string
+	userKey   string
+	userValue string
 )
 
 func init() {
@@ -105,4 +127,9 @@ func init() {
 
 	userAddCmd.Flags().StringVar(&userName, "name", "", "name of user, unique for the community")
 	userAddCmd.Flags().StringVar(&userName, "url", "", "URL of user")
+
+	userRmCmd.Flags().StringVar(&userName, "name", "", "name of user, unique for the community")
+
+	userSetCmd.Flags().StringVar(&userKey, "key", "", "user property key")
+	userSetCmd.Flags().StringVar(&userValue, "value", "", "user property value")
 }

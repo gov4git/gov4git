@@ -174,6 +174,7 @@ func init() {
 
 	userRemoveCmd.Flags().StringVar(&userName, "name", "", "name of user, unique for the community")
 
+	userSetCmd.Flags().StringVar(&userName, "name", "", "name of user")
 	userSetCmd.Flags().StringVar(&userKey, "key", "", "user property key")
 	userSetCmd.Flags().StringVar(&userValue, "value", "", "user property value")
 

@@ -70,8 +70,11 @@ func (x Local) RenameBranch(ctx context.Context, newBranchName string) error {
 }
 
 func (x Local) Commit(ctx context.Context, msg string) error {
-	_, _, err := x.InvokeStdin(ctx, msg, "commit", "-F", "-")
-	return err
+	_, stderr, err1 := x.InvokeStdin(ctx, msg, "commit", "-F", "-")
+	if err2 := ParseCommitError(stderr); err2 != nil {
+		return err2
+	}
+	return err1
 }
 
 func (x Local) Commitf(ctx context.Context, f string, args ...any) error {
@@ -120,10 +123,7 @@ func (x Local) CloneBranch(ctx context.Context, remoteURL, branch string) error 
 	if err2 := ParseCloneError(stderr, branch, "origin"); err2 != nil {
 		return err2
 	}
-	if err1 != nil {
-		return err1
-	}
-	return nil
+	return err1
 }
 
 func (x Local) CloneOrInitBranch(ctx context.Context, remoteURL, branch string) error {

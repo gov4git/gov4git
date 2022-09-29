@@ -64,6 +64,17 @@ func (d Dir) RemoveAll(path string) error {
 	return os.Remove(d.Abs(path))
 }
 
+func (d Dir) Glob(pattern string) ([]string, error) {
+	m, err := filepath.Glob(filepath.Join(d.Path, pattern))
+	if err != nil {
+		return nil, err
+	}
+	for i := range m {
+		m[i] = m[i][len(d.Path):] // remove dir prefix
+	}
+	return m, nil
+}
+
 func (d Dir) WriteByteFile(file ByteFile) error {
 	return WriteByteFile(d.Path, file)
 }

@@ -1,6 +1,6 @@
 package man
 
-const GovUserRm = `
+const GovUserRemove = `
 SYNOPSIS
 Removes a user from the community's users directory.
 

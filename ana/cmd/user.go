@@ -49,10 +49,10 @@ var (
 		},
 	}
 
-	userRmCmd = &cobra.Command{
-		Use:   "rm",
+	userRemoveCmd = &cobra.Command{
+		Use:   "remove",
 		Short: "Remove user from community",
-		Long:  man.GovUserRm,
+		Long:  man.GovUserRemove,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := services.GovService{
 				GovConfig: proto.GovConfig{
@@ -129,6 +129,31 @@ var (
 			return err
 		},
 	}
+
+	userListCmd = &cobra.Command{
+		Use:   "list",
+		Short: "List all community users",
+		Long:  man.GovUserList,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			s := services.GovService{
+				GovConfig: proto.GovConfig{
+					CommunityURL: communityURL,
+				},
+			}
+			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-list")
+			base.AssertNoErr(err)
+			ctx := files.WithWorkDir(cmd.Context(), workDir)
+			r, err := s.UserList(ctx, &services.GovUserListIn{
+				CommunityBranch: communityBranch,
+			})
+			if err == nil {
+				fmt.Fprint(os.Stdout, r.Human())
+			} else {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+			return err
+		},
+	}
 )
 
 var (
@@ -140,14 +165,14 @@ var (
 
 func init() {
 	userCmd.AddCommand(userAddCmd)
-	userCmd.AddCommand(userRmCmd)
+	userCmd.AddCommand(userRemoveCmd)
 	userCmd.AddCommand(userSetCmd)
 	userCmd.AddCommand(userGetCmd)
 
 	userAddCmd.Flags().StringVar(&userName, "name", "", "name of user, unique for the community")
 	userAddCmd.Flags().StringVar(&userName, "url", "", "URL of user")
 
-	userRmCmd.Flags().StringVar(&userName, "name", "", "name of user, unique for the community")
+	userRemoveCmd.Flags().StringVar(&userName, "name", "", "name of user, unique for the community")
 
 	userSetCmd.Flags().StringVar(&userKey, "key", "", "user property key")
 	userSetCmd.Flags().StringVar(&userValue, "value", "", "user property value")

@@ -1,2 +1,3 @@
-- [√] can Context hold custom objects? yes.
-  - [ ] piggyback error reporting and user stack on context
+
+FEATURES
+- [ ] semantic human-readable stack traces

@@ -28,7 +28,7 @@ func (x GovService) UserAdd(ctx context.Context, in *GovUserAddIn) (*GovUserAddO
 		return nil, err
 	}
 	// make changes to repo
-	if err := GovAddUser(ctx, community, in.Name, in.URL); err != nil {
+	if err := GovUserAdd(ctx, community, in.Name, in.URL); err != nil {
 		return nil, err
 	}
 	// push to origin
@@ -38,7 +38,7 @@ func (x GovService) UserAdd(ctx context.Context, in *GovUserAddIn) (*GovUserAddO
 	return &GovUserAddOut{}, nil
 }
 
-func GovAddUser(ctx context.Context, community git.Local, name string, url string) error {
+func GovUserAdd(ctx context.Context, community git.Local, name string, url string) error {
 	userFile := filepath.Join(proto.GovUsersDir, name, proto.GovUserInfoFilebase)
 	// write user file
 	stage := files.FormFiles{

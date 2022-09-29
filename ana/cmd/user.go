@@ -170,7 +170,7 @@ func init() {
 	userCmd.AddCommand(userGetCmd)
 
 	userAddCmd.Flags().StringVar(&userName, "name", "", "name of user, unique for the community")
-	userAddCmd.Flags().StringVar(&userName, "url", "", "URL of user")
+	userAddCmd.Flags().StringVar(&userURL, "url", "", "URL of user")
 
 	userRemoveCmd.Flags().StringVar(&userName, "name", "", "name of user, unique for the community")
 

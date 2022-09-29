@@ -168,6 +168,7 @@ func init() {
 	userCmd.AddCommand(userRemoveCmd)
 	userCmd.AddCommand(userSetCmd)
 	userCmd.AddCommand(userGetCmd)
+	userCmd.AddCommand(userListCmd)
 
 	userAddCmd.Flags().StringVar(&userName, "name", "", "name of user, unique for the community")
 	userAddCmd.Flags().StringVar(&userURL, "url", "", "URL of user")
@@ -178,5 +179,6 @@ func init() {
 	userSetCmd.Flags().StringVar(&userKey, "key", "", "user property key")
 	userSetCmd.Flags().StringVar(&userValue, "value", "", "user property value")
 
+	userGetCmd.Flags().StringVar(&userName, "name", "", "name of user")
 	userGetCmd.Flags().StringVar(&userKey, "key", "", "user property key")
 }

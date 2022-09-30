@@ -8,7 +8,7 @@ import (
 	"github.com/petar/gitty/lib/files"
 	man "github.com/petar/gitty/man/member"
 	"github.com/petar/gitty/proto"
-	"github.com/petar/gitty/services/member"
+	"github.com/petar/gitty/services/gov/member"
 	"github.com/spf13/cobra"
 )
 

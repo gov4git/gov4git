@@ -1,4 +1,4 @@
-package services
+package gov
 
 import (
 	"github.com/petar/gitty/proto"

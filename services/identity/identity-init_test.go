@@ -1,4 +1,4 @@
-package services
+package identity
 
 import (
 	"context"
@@ -29,13 +29,13 @@ func TestSoulInit(t *testing.T) {
 
 	// init soul
 	apiCtx := files.WithWorkDir(ctx, files.PathDir(t.TempDir()).Subdir("soul_api"))
-	api := SoulService{SoulConfig: proto.SoulConfig{PublicURL: testPubDir.Path, PrivateURL: testPrivDir.Path}}
-	if _, err := api.Init(apiCtx, &SoulInitIn{}); err != nil {
+	api := IdentityService{IdentityConfig: proto.IdentityConfig{PublicURL: testPubDir.Path, PrivateURL: testPrivDir.Path}}
+	if _, err := api.Init(apiCtx, &IdentityInitIn{}); err != nil {
 		t.Fatal(err)
 	}
 
 	// re-init should return error
-	if _, err := api.Init(apiCtx, &SoulInitIn{}); err == nil {
+	if _, err := api.Init(apiCtx, &IdentityInitIn{}); err == nil {
 		t.Fatal("re-initializing a soul should fail")
 	}
 }

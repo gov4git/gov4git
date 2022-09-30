@@ -1,4 +1,4 @@
-package services
+package identity
 
 import (
 	"context"
@@ -10,28 +10,28 @@ import (
 	"github.com/petar/gitty/proto"
 )
 
-type SoulService struct {
-	SoulConfig proto.SoulConfig
+type IdentityService struct {
+	IdentityConfig proto.IdentityConfig
 }
 
-type SoulInitIn struct{}
+type IdentityInitIn struct{}
 
-type SoulInitOut struct {
+type IdentityInitOut struct {
 	PrivateCredentials proto.PrivateCredentials
 }
 
-func (x SoulInitOut) Human(context.Context) string {
+func (x IdentityInitOut) Human(context.Context) string {
 	data, _ := json.MarshalIndent(x.PrivateCredentials, "", "   ")
 	return string(data)
 }
 
-func (x SoulService) Init(ctx context.Context, in *SoulInitIn) (*SoulInitOut, error) {
+func (x IdentityService) Init(ctx context.Context, in *IdentityInitIn) (*IdentityInitOut, error) {
 
 	// generate private credentials
 
 	localPrivate := git.LocalFromDir(files.WorkDir(ctx).Subdir("private"))
 	// clone or init repo
-	if err := localPrivate.CloneOrInitBranch(ctx, x.SoulConfig.PrivateURL, proto.IdentityBranch); err != nil {
+	if err := localPrivate.CloneOrInitBranch(ctx, x.IdentityConfig.PrivateURL, proto.IdentityBranch); err != nil {
 		return nil, err
 	}
 	// check if key files already exist
@@ -39,7 +39,7 @@ func (x SoulService) Init(ctx context.Context, in *SoulInitIn) (*SoulInitOut, er
 		return nil, fmt.Errorf("private credentials file already exists")
 	}
 	// generate credentials
-	privateCredentials, err := proto.GenerateCredentials(x.SoulConfig.PublicURL, x.SoulConfig.PrivateURL)
+	privateCredentials, err := proto.GenerateCredentials(x.IdentityConfig.PublicURL, x.IdentityConfig.PrivateURL)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (x SoulService) Init(ctx context.Context, in *SoulInitIn) (*SoulInitOut, er
 
 	localPublic := git.LocalFromDir(files.WorkDir(ctx).Subdir("public"))
 	// clone or init repo
-	if err := localPublic.CloneOrInitBranch(ctx, x.SoulConfig.PublicURL, proto.IdentityBranch); err != nil {
+	if err := localPublic.CloneOrInitBranch(ctx, x.IdentityConfig.PublicURL, proto.IdentityBranch); err != nil {
 		return nil, err
 	}
 	// write changes
@@ -90,5 +90,5 @@ func (x SoulService) Init(ctx context.Context, in *SoulInitIn) (*SoulInitOut, er
 		return nil, err
 	}
 
-	return &SoulInitOut{PrivateCredentials: *privateCredentials}, nil
+	return &IdentityInitOut{PrivateCredentials: *privateCredentials}, nil
 }

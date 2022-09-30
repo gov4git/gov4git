@@ -7,7 +7,7 @@ import (
 	"github.com/petar/gitty/lib/base"
 	"github.com/petar/gitty/lib/files"
 	"github.com/petar/gitty/proto"
-	"github.com/petar/gitty/services"
+	"github.com/petar/gitty/services/identity"
 	"github.com/spf13/cobra"
 )
 
@@ -17,15 +17,15 @@ var (
 		Short: "Initialize the public and private repositories of your soul",
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			s := services.SoulService{
-				SoulConfig: proto.SoulConfig{
+			s := identity.IdentityService{
+				IdentityConfig: proto.IdentityConfig{
 					PublicURL:  publicURL,
 					PrivateURL: privateURL,
 				},
 			}
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "init")
 			base.AssertNoErr(err)
-			r, err := s.Init(files.WithWorkDir(cmd.Context(), workDir), &services.SoulInitIn{})
+			r, err := s.Init(files.WithWorkDir(cmd.Context(), workDir), &identity.IdentityInitIn{})
 			if err == nil {
 				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
 			} else {

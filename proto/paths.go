@@ -31,4 +31,6 @@ var (
 	GovGroupMetaDirbase  = "meta"
 
 	GovMembersDirbase = "members"
+
+	GovDirPolicyFilebase = "policy"
 )

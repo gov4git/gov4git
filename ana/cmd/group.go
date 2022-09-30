@@ -16,7 +16,7 @@ var (
 	// group management
 	groupCmd = &cobra.Command{
 		Use:   "group",
-		Short: "Group management",
+		Short: "Manage groups",
 		Long:  man.GovGroup,
 		Run: func(cmd *cobra.Command, args []string) {
 		},

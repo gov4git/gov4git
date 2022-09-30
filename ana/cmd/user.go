@@ -16,7 +16,7 @@ var (
 	// user management
 	userCmd = &cobra.Command{
 		Use:   "user",
-		Short: "User management",
+		Short: "Manage users",
 		Long:  man.GovUser,
 		Run: func(cmd *cobra.Command, args []string) {
 		},

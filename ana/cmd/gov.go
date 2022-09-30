@@ -90,6 +90,7 @@ func init() {
 	govCmd.AddCommand(configCmd)
 	govCmd.AddCommand(userCmd)
 	govCmd.AddCommand(groupCmd)
+	govCmd.AddCommand(memberCmd)
 	govCmd.AddCommand(proposeCmd)
 	govCmd.AddCommand(voteCmd)
 	govCmd.AddCommand(approveCmd)

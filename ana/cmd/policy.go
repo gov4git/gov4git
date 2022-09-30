@@ -43,7 +43,7 @@ var (
 				CommunityBranch: communityBranch,
 			})
 			if err == nil {
-				fmt.Fprint(os.Stdout, r.Human())
+				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
 			} else {
 				fmt.Fprint(os.Stderr, err.Error())
 			}
@@ -69,7 +69,7 @@ var (
 				CommunityBranch: communityBranch,
 			})
 			if err == nil {
-				fmt.Fprint(os.Stdout, r.Human())
+				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
 			} else {
 				fmt.Fprint(os.Stderr, err.Error())
 			}

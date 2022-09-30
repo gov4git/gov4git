@@ -26,7 +26,7 @@ type GovMemberListMembership struct {
 	Group string `json:"group"`
 }
 
-func (x GovMemberListOut) Human() string {
+func (x GovMemberListOut) Human(context.Context) string {
 	var w bytes.Buffer
 	for _, u := range x.Memberships {
 		fmt.Fprintln(&w, u.User, u.Group)

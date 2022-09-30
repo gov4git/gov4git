@@ -18,7 +18,7 @@ type GovGroupSetIn struct {
 
 type GovGroupSetOut struct{}
 
-func (x GovGroupSetOut) Human() string {
+func (x GovGroupSetOut) Human(context.Context) string {
 	return ""
 }
 

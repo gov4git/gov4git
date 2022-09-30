@@ -20,7 +20,7 @@ type SoulInitOut struct {
 	PrivateCredentials proto.PrivateCredentials
 }
 
-func (x SoulInitOut) Human() string {
+func (x SoulInitOut) Human(context.Context) string {
 	data, _ := json.MarshalIndent(x.PrivateCredentials, "", "   ")
 	return string(data)
 }

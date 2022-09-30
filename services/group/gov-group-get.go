@@ -19,7 +19,7 @@ type GovGroupGetOut struct {
 	Value string `json:"value"` // group property value
 }
 
-func (x GovGroupGetOut) Human() string {
+func (x GovGroupGetOut) Human(context.Context) string {
 	return x.Value
 }
 

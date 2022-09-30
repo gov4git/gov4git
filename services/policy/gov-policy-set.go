@@ -20,7 +20,7 @@ type GovPolicySetIn struct {
 
 type GovPolicySetOut struct{}
 
-func (x GovPolicySetOut) Human() string {
+func (x GovPolicySetOut) Human(context.Context) string {
 	return ""
 }
 

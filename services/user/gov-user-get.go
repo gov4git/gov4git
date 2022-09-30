@@ -19,7 +19,7 @@ type GovUserGetOut struct {
 	Value string `json:"value"` // user property value
 }
 
-func (x GovUserGetOut) Human() string {
+func (x GovUserGetOut) Human(context.Context) string {
 	return x.Value
 }
 

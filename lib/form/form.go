@@ -9,7 +9,7 @@ import (
 type Form interface{}
 
 type Human interface {
-	Human() string
+	Human(context.Context) string
 }
 
 func EncodeForm(ctx context.Context, form Form) ([]byte, error) {

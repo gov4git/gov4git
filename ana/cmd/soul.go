@@ -27,7 +27,7 @@ var (
 			base.AssertNoErr(err)
 			r, err := s.Init(files.WithWorkDir(cmd.Context(), workDir), &services.SoulInitIn{})
 			if err == nil {
-				fmt.Fprint(os.Stdout, r.Human())
+				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
 			} else {
 				fmt.Fprint(os.Stderr, err.Error())
 			}

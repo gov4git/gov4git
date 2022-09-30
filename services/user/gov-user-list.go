@@ -19,7 +19,7 @@ type GovUserListOut struct {
 	Users []string
 }
 
-func (x GovUserListOut) Human() string {
+func (x GovUserListOut) Human(context.Context) string {
 	var w bytes.Buffer
 	for _, u := range x.Users {
 		fmt.Fprintln(&w, u)

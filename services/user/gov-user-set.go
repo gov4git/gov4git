@@ -18,7 +18,7 @@ type GovUserSetIn struct {
 
 type GovUserSetOut struct{}
 
-func (x GovUserSetOut) Human() string {
+func (x GovUserSetOut) Human(context.Context) string {
 	return ""
 }
 

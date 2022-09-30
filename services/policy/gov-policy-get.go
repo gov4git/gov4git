@@ -19,8 +19,8 @@ type GovPolicyGetOut struct {
 	Policy proto.GovDirPolicy `json:"policy"`
 }
 
-func (x GovPolicyGetOut) Human() string {
-	data, _ := form.EncodeForm(context.TODO(), x.Policy)
+func (x GovPolicyGetOut) Human(ctx context.Context) string {
+	data, _ := form.EncodeForm(ctx, x.Policy)
 	return string(data)
 }
 

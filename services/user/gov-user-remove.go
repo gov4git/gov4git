@@ -16,7 +16,7 @@ type GovUserRemoveIn struct {
 
 type GovUserRemoveOut struct{}
 
-func (x GovUserRemoveOut) Human() string {
+func (x GovUserRemoveOut) Human(context.Context) string {
 	return ""
 }
 

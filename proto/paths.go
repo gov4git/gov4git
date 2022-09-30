@@ -5,9 +5,9 @@ import "path/filepath"
 // soul-related constants
 
 const (
-	RootPath           = ".ana"
-	LocalAgentPath     = ".ana"
-	LocalAgentTempPath = "ana"
+	RootPath           = ".az"
+	LocalAgentPath     = ".az"
+	LocalAgentTempPath = "az"
 )
 
 var (

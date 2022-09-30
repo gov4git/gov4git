@@ -8,8 +8,23 @@ import (
 
 var logger *zap.Logger
 
-func init() {
-	l, err := zap.NewDevelopment()
+func newQuietConfig() zap.Config {
+	cfg := zap.NewProductionConfig()
+	cfg.Level = zap.NewAtomicLevelAt(zap.WarnLevel)
+	return cfg
+}
+
+func LogQuietly() {
+	l, err := newQuietConfig().Build()
+	if err != nil {
+		println("cannot create logger:", err)
+		os.Exit(1)
+	}
+	logger = l
+}
+
+func LogVerbosely() {
+	l, err := zap.NewDevelopmentConfig().Build()
 	if err != nil {
 		println("cannot create logger:", err)
 		os.Exit(1)

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/petar/gitty/lib/base"
 	"github.com/petar/gitty/lib/form"
 )
 
@@ -77,6 +78,7 @@ func ReadFormFile(ctx context.Context, path string, f any) (FormFile, error) {
 }
 
 func WriteFormFile(ctx context.Context, path string, f form.Form) error {
+	base.Infof("writing form file %v", path)
 	dir, _ := filepath.Split(path)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
@@ -84,5 +86,6 @@ func WriteFormFile(ctx context.Context, path string, f form.Form) error {
 	if err := form.EncodeFormToFile(ctx, f, path); err != nil {
 		return err
 	}
+	base.Infof("wrote form file %v", path)
 	return nil
 }

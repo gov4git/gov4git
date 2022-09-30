@@ -83,7 +83,7 @@ func (d Dir) WriteByteFile(path string, bytes []byte) error {
 
 func (d Dir) WriteByteFiles(files ByteFiles) error {
 	for _, f := range files {
-		if err := WriteByteFile(f.Path, f.Bytes); err != nil {
+		if err := d.WriteByteFile(f.Path, f.Bytes); err != nil {
 			return err
 		}
 	}
@@ -100,7 +100,7 @@ func (d Dir) WriteFormFile(ctx context.Context, path string, f form.Form) error 
 
 func (d Dir) WriteFormFiles(ctx context.Context, files FormFiles) error {
 	for _, f := range files {
-		if err := WriteFormFile(ctx, f.Path, f.Form); err != nil {
+		if err := d.WriteFormFile(ctx, f.Path, f.Form); err != nil {
 			return err
 		}
 	}

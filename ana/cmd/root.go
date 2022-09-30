@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/petar/gitty/lib/base"
+	"github.com/petar/gitty/lib/git"
 	"github.com/petar/gitty/proto"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -20,18 +21,22 @@ var (
 	}
 )
 
-var configPath string
-var privateURL string
-var publicURL string
+var (
+	configPath string
+	privateURL string
+	publicURL  string
+	verbose    bool
+)
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initAfterFlags)
 
 	rootCmd.SilenceUsage = true
 	rootCmd.SilenceErrors = true
 	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "config file (default is $HOME/.ana/config.json)")
 	rootCmd.PersistentFlags().StringVar(&privateURL, "private_url", "", "private url of soul")
 	rootCmd.PersistentFlags().StringVar(&publicURL, "public_url", "", "public url of soul")
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "run in developer mode with verbose logging")
 	// rootCmd.MarkPersistentFlagRequired("private_url")
 	// rootCmd.MarkPersistentFlagRequired("public_url")
 	viper.BindPFlag("private_url", rootCmd.PersistentFlags().Lookup("private_url"))
@@ -41,7 +46,13 @@ func init() {
 	rootCmd.AddCommand(govCmd)
 }
 
-func initConfig() {
+func initAfterFlags() {
+	if verbose {
+		base.LogVerbosely()
+	} else {
+		base.LogQuietly()
+	}
+
 	if configPath != "" {
 		viper.SetConfigFile(configPath) // use config file from the flag
 	} else {
@@ -63,6 +74,8 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		base.Infof("using config file %v", viper.ConfigFileUsed())
 	}
+
+	git.Init()
 }
 
 func Execute() {

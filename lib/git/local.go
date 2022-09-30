@@ -161,7 +161,7 @@ func (x Local) InitWithRemoteBranch(ctx context.Context, remoteURL, branch strin
 	return nil
 }
 
-func init() {
+func Init() {
 	p, err := exec.LookPath("git")
 	if err != nil {
 		Fatalf("did not find git in path")

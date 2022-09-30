@@ -1,4 +1,4 @@
-package man
+package group
 
 const GovUserSet = `
 SYNOPSIS

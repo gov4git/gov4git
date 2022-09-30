@@ -6,9 +6,9 @@ import (
 
 	"github.com/petar/gitty/lib/base"
 	"github.com/petar/gitty/lib/files"
-	"github.com/petar/gitty/man"
+	man "github.com/petar/gitty/man/user"
 	"github.com/petar/gitty/proto"
-	"github.com/petar/gitty/services"
+	"github.com/petar/gitty/services/user"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +27,7 @@ var (
 		Short: "Add user to the community",
 		Long:  man.GovUserAdd,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			s := services.GovService{
+			s := user.GovUserService{
 				GovConfig: proto.GovConfig{
 					CommunityURL: communityURL,
 				},
@@ -35,7 +35,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-add")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.UserAdd(ctx, &services.GovUserAddIn{
+			r, err := s.UserAdd(ctx, &user.GovUserAddIn{
 				Name:            userName,
 				URL:             userURL,
 				CommunityBranch: communityBranch,
@@ -54,7 +54,7 @@ var (
 		Short: "Remove user from community",
 		Long:  man.GovUserRemove,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			s := services.GovService{
+			s := user.GovUserService{
 				GovConfig: proto.GovConfig{
 					CommunityURL: communityURL,
 				},
@@ -62,7 +62,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-rm")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.UserRemove(ctx, &services.GovUserRemoveIn{
+			r, err := s.UserRemove(ctx, &user.GovUserRemoveIn{
 				Name:            userName,
 				CommunityBranch: communityBranch,
 			})
@@ -80,7 +80,7 @@ var (
 		Short: "Set user property",
 		Long:  man.GovUserSet,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			s := services.GovService{
+			s := user.GovUserService{
 				GovConfig: proto.GovConfig{
 					CommunityURL: communityURL,
 				},
@@ -88,7 +88,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-set")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.UserSet(ctx, &services.GovUserSetIn{
+			r, err := s.UserSet(ctx, &user.GovUserSetIn{
 				Name:            userName,
 				Key:             userKey,
 				Value:           userValue,
@@ -108,7 +108,7 @@ var (
 		Short: "Get user property",
 		Long:  man.GovUserGet,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			s := services.GovService{
+			s := user.GovUserService{
 				GovConfig: proto.GovConfig{
 					CommunityURL: communityURL,
 				},
@@ -116,7 +116,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-get")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.UserGet(ctx, &services.GovUserGetIn{
+			r, err := s.UserGet(ctx, &user.GovUserGetIn{
 				Name:            userName,
 				Key:             userKey,
 				CommunityBranch: communityBranch,
@@ -135,7 +135,7 @@ var (
 		Short: "List all community users",
 		Long:  man.GovUserList,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			s := services.GovService{
+			s := user.GovUserService{
 				GovConfig: proto.GovConfig{
 					CommunityURL: communityURL,
 				},
@@ -143,7 +143,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-list")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.UserList(ctx, &services.GovUserListIn{
+			r, err := s.UserList(ctx, &user.GovUserListIn{
 				CommunityBranch: communityBranch,
 			})
 			if err == nil {

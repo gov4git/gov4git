@@ -1,3 +1,5 @@
+- [ ] turn off info logging by default
+- [ ] rename soul to user
 
 FEATURES
 - [ ] semantic human-readable stack traces

@@ -8,3 +8,6 @@ type GovConfig struct {
 type GovUserInfo struct {
 	URL string `json:"url"` // url of user's public soul repository
 }
+
+type GovGroupInfo struct {
+}

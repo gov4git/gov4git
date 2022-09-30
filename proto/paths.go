@@ -25,4 +25,8 @@ var (
 	GovUsersDir         = filepath.Join(GovRoot, "users")
 	GovUserInfoFilebase = "info"
 	GovUserMetaDirbase  = "meta"
+
+	GovGroupsDir         = filepath.Join(GovRoot, "groups")
+	GovGroupInfoFilebase = "info"
+	GovGroupMetaDirbase  = "meta"
 )

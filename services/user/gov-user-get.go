@@ -1,4 +1,4 @@
-package services
+package user
 
 import (
 	"context"
@@ -23,7 +23,7 @@ func (x GovUserGetOut) Human() string {
 	return x.Value
 }
 
-func (x GovService) UserGet(ctx context.Context, in *GovUserGetIn) (*GovUserGetOut, error) {
+func (x GovUserService) UserGet(ctx context.Context, in *GovUserGetIn) (*GovUserGetOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {

@@ -1,4 +1,4 @@
-package services
+package user
 
 import (
 	"bytes"
@@ -27,7 +27,7 @@ func (x GovUserListOut) Human() string {
 	return w.String()
 }
 
-func (x GovService) UserList(ctx context.Context, in *GovUserListIn) (*GovUserListOut, error) {
+func (x GovUserService) UserList(ctx context.Context, in *GovUserListIn) (*GovUserListOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {

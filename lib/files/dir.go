@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/petar/gitty/lib/form"
 )
 
 // WithWorkDir attaches a working directory to the given context and returns the updated context.
@@ -75,13 +77,13 @@ func (d Dir) Glob(pattern string) ([]string, error) {
 	return m, nil
 }
 
-func (d Dir) WriteByteFile(file ByteFile) error {
-	return WriteByteFile(d.Path, file)
+func (d Dir) WriteByteFile(path string, bytes []byte) error {
+	return WriteByteFile(d.Abs(path), bytes)
 }
 
 func (d Dir) WriteByteFiles(files ByteFiles) error {
 	for _, f := range files {
-		if err := WriteByteFile(d.Path, f); err != nil {
+		if err := WriteByteFile(f.Path, f.Bytes); err != nil {
 			return err
 		}
 	}
@@ -92,13 +94,13 @@ func (d Dir) ReadByteFile(path string) (ByteFile, error) {
 	return ReadByteFile(d.Abs(path))
 }
 
-func (d Dir) WriteFormFile(ctx context.Context, file FormFile) error {
-	return WriteFormFile(ctx, d.Path, file)
+func (d Dir) WriteFormFile(ctx context.Context, path string, f form.Form) error {
+	return WriteFormFile(ctx, d.Abs(path), f)
 }
 
 func (d Dir) WriteFormFiles(ctx context.Context, files FormFiles) error {
 	for _, f := range files {
-		if err := WriteFormFile(ctx, d.Path, f); err != nil {
+		if err := WriteFormFile(ctx, f.Path, f.Form); err != nil {
 			return err
 		}
 	}

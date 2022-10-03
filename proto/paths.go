@@ -32,5 +32,6 @@ var (
 
 	GovDirPolicyFilebase = "policy"
 
-	GovPollAdFilebase = "polling"
+	GovPollAdFilebase   = "poll_ad"
+	GovPollBranchPrefix = "poll"
 )

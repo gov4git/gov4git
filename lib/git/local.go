@@ -115,6 +115,23 @@ func (x Local) Remove(ctx context.Context, paths []string) error {
 	return err
 }
 
+func (x Local) CheckoutNewBranch(ctx context.Context, branch string) error {
+	_, _, err := x.Invoke(ctx, "checkout", "-b", branch)
+	return err
+}
+
+func (x Local) HeadCommitHash(ctx context.Context) (string, error) {
+	stdout, _, err := x.Invoke(ctx, "rev-parse", "HEAD")
+	if err != nil {
+		return "", err
+	}
+	h := strings.Trim(stdout, " \t\n\r")
+	if h == "" {
+		return "", fmt.Errorf("head commit missing")
+	}
+	return h, nil
+}
+
 func (x Local) CloneBranch(ctx context.Context, remoteURL, branch string) error {
 	if err := x.Dir().Mk(); err != nil {
 		return nil

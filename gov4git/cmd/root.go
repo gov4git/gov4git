@@ -4,9 +4,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/petar/gitty/lib/base"
-	"github.com/petar/gitty/lib/git"
-	"github.com/petar/gitty/proto"
+	"github.com/petar/gov4git/lib/base"
+	"github.com/petar/gov4git/lib/git"
+	"github.com/petar/gov4git/proto"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

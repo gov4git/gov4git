@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"strings"
 
-	. "github.com/petar/gitty/lib/base"
-	"github.com/petar/gitty/lib/files"
+	. "github.com/petar/gov4git/lib/base"
+	"github.com/petar/gov4git/lib/files"
 )
 
 type Local struct {

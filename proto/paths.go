@@ -31,4 +31,6 @@ var (
 	GovMembersDirbase = "members"
 
 	GovDirPolicyFilebase = "policy"
+
+	GovPollAdFilebase = "polling"
 )

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/petar/gitty/lib/files"
-	"github.com/petar/gitty/lib/git"
-	"github.com/petar/gitty/proto"
+	"github.com/petar/gov4git/lib/files"
+	"github.com/petar/gov4git/lib/git"
+	"github.com/petar/gov4git/proto"
 )
 
 type GovUserListIn struct {

@@ -5,8 +5,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/petar/gitty/lib/base"
-	"github.com/petar/gitty/lib/form"
+	"github.com/petar/gov4git/lib/base"
+	"github.com/petar/gov4git/lib/form"
 )
 
 type ByteFile struct {

@@ -1,13 +1,14 @@
 package arb
 
+/*
 import (
 	"context"
 	"fmt"
 	"path/filepath"
 
-	"github.com/petar/gitty/lib/files"
-	"github.com/petar/gitty/lib/git"
-	"github.com/petar/gitty/proto"
+	"github.com/petar/gov4git/lib/files"
+	"github.com/petar/gov4git/lib/git"
+	"github.com/petar/gov4git/proto"
 )
 
 type GovArbPollIn struct {
@@ -47,7 +48,12 @@ func (x GovArbService) ArbPoll(ctx context.Context, in *GovArbPollIn) (*GovArbPo
 
 func GovArbPoll(ctx context.Context, community git.Local, in *GovArbPollIn) error {
 	// checkout a new poll branch
+	pollBranch := filepath.Join(in.Path, proto.GovPollAdFilebase)
+	if err := community.XXX; err != nil {
+		XXX
+	}
 	// create and stage poll advertisement
+	XXX
 	// commit poll advertisement, including poll ad in commit message
 	XXX
 	groupFile := filepath.Join(proto.GovGroupsDir, name, proto.GovGroupInfoFilebase)
@@ -68,3 +74,4 @@ func GovArbPoll(ctx context.Context, community git.Local, in *GovArbPollIn) erro
 	}
 	return nil
 }
+*/

@@ -2,12 +2,10 @@ package proto
 
 import "path/filepath"
 
-// soul-related constants
-
 const (
-	RootPath           = ".az"
-	LocalAgentPath     = ".az"
-	LocalAgentTempPath = "az"
+	RootPath           = ".gov"
+	LocalAgentPath     = ".gov"
+	LocalAgentTempPath = "gov"
 )
 
 var (

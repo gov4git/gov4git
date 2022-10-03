@@ -13,8 +13,8 @@ import (
 
 var (
 	rootCmd = &cobra.Command{
-		Use:   "az",
-		Short: "az is a command-line tool for ...",
+		Use:   "gov4git",
+		Short: "gov4git is a command-line client for transparent community operations",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 		},
@@ -33,7 +33,7 @@ func init() {
 
 	rootCmd.SilenceUsage = true
 	rootCmd.SilenceErrors = true
-	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "config file (default is $HOME/.az/config.json)")
+	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "config file (default is $HOME/.gov/config.json)")
 	rootCmd.PersistentFlags().StringVar(&privateURL, "private_url", "", "private url of soul")
 	rootCmd.PersistentFlags().StringVar(&publicURL, "public_url", "", "public url of soul")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "run in developer mode with verbose logging")
@@ -63,7 +63,7 @@ func initAfterFlags() {
 		}
 		base.AssertNoErr(err)
 
-		// search for config in ~/.az/ directory with name "config" (without extension).
+		// search for config in ~/.gov/ directory with name "config" (without extension).
 		viper.AddConfigPath(filepath.Join(home, proto.LocalAgentPath))
 		viper.SetConfigType("json")
 		viper.SetConfigName("config")

@@ -71,6 +71,9 @@ func (x GovArbService) Poll(ctx context.Context, in *GovArbPollIn) (*GovArbPollO
 }
 
 func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *GovArbPollIn) (*GovArbPollOut, error) {
+	// XXX: verify path is not in use
+	// XXX: verify poll branch is not in use
+	// XXX: verify group exists
 	if err := in.Sanitize(); err != nil {
 		return nil, err
 	}
@@ -130,7 +133,7 @@ Vote using:
 
    gov4git vote --community=%v --branch=%v
 
-   `, out.Path, out.PollBranch, out.CommunityURL, out.PollBranch)
+   `, out.CommunityURL, out.PollBranch)
 	msg, err := git.PrepareCommitMsg(ctx, hum, pollAd)
 	if err != nil {
 		return nil, err

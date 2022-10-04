@@ -8,6 +8,10 @@ import (
 
 var logger *zap.Logger
 
+func init() {
+	LogQuietly()
+}
+
 func newQuietConfig() zap.Config {
 	cfg := zap.NewProductionConfig()
 	cfg.Level = zap.NewAtomicLevelAt(zap.WarnLevel)

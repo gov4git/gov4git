@@ -2,7 +2,6 @@ package proto
 
 import (
 	"fmt"
-	"path/filepath"
 )
 
 type GovPollAd struct {
@@ -26,7 +25,7 @@ var (
 )
 
 func PollBranch(path string) string {
-	return filepath.Join(GovPollBranchPrefix, path)
+	return GovPollBranchPrefix + path
 }
 
 func PollGenesisCommitHeader(branch string) string {

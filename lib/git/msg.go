@@ -10,7 +10,6 @@ import (
 
 func PrepareCommitMsg(ctx context.Context, human string, embed form.Form) (string, error) {
 	var w bytes.Buffer
-	human = strings.TrimLeft(human, "\n\r")
 	human = strings.TrimRight(human, "\n\r\t ")
 	if strings.Index(human, "\n\n\n") >= 0 {
 		panic("commit messages cannot contain triple new line")

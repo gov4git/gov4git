@@ -115,9 +115,19 @@ func (x Local) Remove(ctx context.Context, paths []string) error {
 	return err
 }
 
+func (x Local) CheckoutBranch(ctx context.Context, branch string) error {
+	_, _, err := x.Invoke(ctx, "checkout", branch)
+	return err
+}
+
 func (x Local) CheckoutNewBranch(ctx context.Context, branch string) error {
 	_, _, err := x.Invoke(ctx, "checkout", "-b", branch)
 	return err
+}
+
+func (x Local) LogOneline(ctx context.Context) (string, error) {
+	stdout, _, err := x.Invoke(ctx, "log", "--pretty=oneline")
+	return stdout, err
 }
 
 func (x Local) HeadCommitHash(ctx context.Context) (string, error) {

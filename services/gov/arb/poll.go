@@ -20,7 +20,7 @@ type GovArbPollIn struct {
 
 func (x *GovArbPollIn) Sanitize() error {
 	// sanitize path
-	x.Path = files.MakeNonAbs(x.Path)
+	x.Path = git.MakeNonAbs(x.Path)
 	if x.Path == "" {
 		return fmt.Errorf("missing poll path")
 	}
@@ -52,14 +52,14 @@ Vote using:
 	)
 }
 
-func (x GovArbService) ArbPoll(ctx context.Context, in *GovArbPollIn) (*GovArbPollOut, error) {
+func (x GovArbService) Poll(ctx context.Context, in *GovArbPollIn) (*GovArbPollOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.GoverningBranch); err != nil {
 		return nil, err
 	}
 	// make changes to repo
-	out, err := x.ArbPollLocal(ctx, community, in)
+	out, err := x.PollLocal(ctx, community, in)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (x GovArbService) ArbPoll(ctx context.Context, in *GovArbPollIn) (*GovArbPo
 	return out, nil
 }
 
-func (x GovArbService) ArbPollLocal(ctx context.Context, community git.Local, in *GovArbPollIn) (*GovArbPollOut, error) {
+func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *GovArbPollIn) (*GovArbPollOut, error) {
 	if err := in.Sanitize(); err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func (x GovArbService) ArbPollLocal(ctx context.Context, community git.Local, in
 	}
 
 	// checkout a new poll branch
-	pollBranch := filepath.Join(proto.GovPollBranchPrefix, in.Path)
+	pollBranch := proto.PollBranch(in.Path)
 	if err := community.CheckoutNewBranch(ctx, pollBranch); err != nil {
 		return nil, err
 	}
@@ -118,8 +118,7 @@ func (x GovArbService) ArbPollLocal(ctx context.Context, community git.Local, in
 		PollBranch:        pollBranch,
 		PollGenesisCommit: "", // populate after commit
 	}
-	hum := fmt.Sprintf(`
-Gov: Poll %v initiated on branch %v.
+	hum := fmt.Sprintf(proto.PollGenesisCommitHeader(pollBranch)+`
 
 Vote using:
 

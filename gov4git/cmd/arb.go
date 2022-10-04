@@ -26,7 +26,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-arb-poll")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.ArbPoll(ctx, &arb.GovArbPollIn{
+			r, err := s.Poll(ctx, &arb.GovArbPollIn{
 				Path:            pollPath,
 				Choices:         pollChoices,
 				Group:           pollGroup,

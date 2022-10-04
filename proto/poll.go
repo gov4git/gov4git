@@ -1,5 +1,10 @@
 package proto
 
+import (
+	"fmt"
+	"path/filepath"
+)
+
 type GovPollAd struct {
 	Path         string   `json:"path"`          // path within repo where poll will be persisted, also unique poll name
 	Choices      []string `json:"choices"`       // ballot choices
@@ -10,3 +15,16 @@ type GovPollAd struct {
 }
 
 // XXX: polling strategies?
+
+var (
+	GovPollAdFilebase   = "poll_advertisement"
+	GovPollBranchPrefix = "poll#"
+)
+
+func PollBranch(path string) string {
+	return filepath.Join(GovPollBranchPrefix, path)
+}
+
+func PollGenesisCommitHeader(branch string) string {
+	return fmt.Sprintf("Create poll on branch %v", branch)
+}

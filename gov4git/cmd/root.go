@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -80,7 +81,6 @@ func initAfterFlags() {
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		base.Fatalf("command error (%v)", err)
-		base.Sync()
+		fmt.Fprintln(os.Stderr, err)
 	}
 }

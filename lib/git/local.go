@@ -106,12 +106,12 @@ func (x Local) Push(ctx context.Context) error {
 }
 
 func (x Local) Add(ctx context.Context, paths []string) error {
-	_, _, err := x.InvokeStdin(ctx, strings.Join(files.MakeNonAbsPaths(paths), "\n"), "add", "--pathspec-from-file=-")
+	_, _, err := x.InvokeStdin(ctx, strings.Join(MakeNonAbsPaths(paths), "\n"), "add", "--pathspec-from-file=-")
 	return err
 }
 
 func (x Local) Remove(ctx context.Context, paths []string) error {
-	_, _, err := x.InvokeStdin(ctx, strings.Join(files.MakeNonAbsPaths(paths), "\n"), "rm", "--pathspec-from-file=-")
+	_, _, err := x.InvokeStdin(ctx, strings.Join(MakeNonAbsPaths(paths), "\n"), "rm", "--pathspec-from-file=-")
 	return err
 }
 

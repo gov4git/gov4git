@@ -1,4 +1,4 @@
-package files
+package git
 
 import (
 	"path/filepath"
@@ -6,7 +6,7 @@ import (
 )
 
 func MakeNonAbs(p string) string {
-	return strings.TrimLeft(filepath.Clean(p), "/") //XXX: unix specific?
+	return strings.TrimLeft(filepath.Clean(p), "/")
 }
 
 func MakeNonAbsPaths(paths []string) []string {

@@ -6,15 +6,19 @@ import (
 )
 
 type GovPollAd struct {
-	Path         string   `json:"path"`          // path within repo where poll will be persisted, also unique poll name
-	Choices      []string `json:"choices"`       // ballot choices
-	Group        string   `json:"group"`         // community group eligible to participate
-	Strategy     string   `json:"strategy"`      // polling strategy
-	Branch       string   `json:"branch"`        // branch governing the poll
-	ParentCommit string   `json:"parent_commit"` // commit before poll
+	Path         string          `json:"path"`          // path within repo where poll will be persisted, also unique poll name
+	Choices      []string        `json:"choices"`       // ballot choices
+	Group        string          `json:"group"`         // community group eligible to participate
+	Strategy     GovPollStrategy `json:"strategy"`      // polling strategy
+	Branch       string          `json:"branch"`        // branch governing the poll
+	ParentCommit string          `json:"parent_commit"` // commit before poll
 }
 
-// XXX: polling strategies?
+type GovPollStrategy struct {
+	Prioritize *GovPollStrategyPrioritize `json:"prioritize"`
+}
+
+type GovPollStrategyPrioritize struct{}
 
 var (
 	GovPollAdFilebase   = "poll_advertisement"

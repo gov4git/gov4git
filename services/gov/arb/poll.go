@@ -89,13 +89,19 @@ func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *G
 
 	// create and stage poll advertisement
 	pollAdPath := filepath.Join(in.Path, proto.GovPollAdFilebase)
-	pollAd := proto.GovPollAd{
-		Path:         in.Path,
-		Choices:      in.Choices,
-		Group:        in.Group,
-		Strategy:     in.Strategy,
-		Branch:       in.GoverningBranch,
-		ParentCommit: head,
+	var pollAd proto.GovPollAd
+	switch in.Strategy {
+	case "prioritize":
+		pollAd = proto.GovPollAd{
+			Path:         in.Path,
+			Choices:      in.Choices,
+			Group:        in.Group,
+			Strategy:     proto.GovPollStrategy{Prioritize: &proto.GovPollStrategyPrioritize{}},
+			Branch:       in.GoverningBranch,
+			ParentCommit: head,
+		}
+	default:
+		return nil, fmt.Errorf("unknown poll strategy %v", in.Strategy)
 	}
 	stage := files.FormFiles{
 		files.FormFile{

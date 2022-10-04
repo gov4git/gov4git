@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/petar/gitty/lib/form"
+	"github.com/petar/gov4git/lib/form"
 )
 
 func TestSign(t *testing.T) {

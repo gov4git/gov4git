@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/petar/gitty/lib/form"
+	"github.com/petar/gov4git/lib/form"
 )
 
 // WithWorkDir attaches a working directory to the given context and returns the updated context.

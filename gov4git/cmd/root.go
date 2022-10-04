@@ -1,20 +1,21 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/petar/gitty/lib/base"
-	"github.com/petar/gitty/lib/git"
-	"github.com/petar/gitty/proto"
+	"github.com/petar/gov4git/lib/base"
+	"github.com/petar/gov4git/lib/git"
+	"github.com/petar/gov4git/proto"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
 	rootCmd = &cobra.Command{
-		Use:   "az",
-		Short: "az is a command-line tool for ...",
+		Use:   "gov4git",
+		Short: "gov4git is a command-line client for transparent community operations",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 		},
@@ -33,7 +34,7 @@ func init() {
 
 	rootCmd.SilenceUsage = true
 	rootCmd.SilenceErrors = true
-	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "config file (default is $HOME/.az/config.json)")
+	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "config file (default is $HOME/.gov/config.json)")
 	rootCmd.PersistentFlags().StringVar(&privateURL, "private_url", "", "private url of soul")
 	rootCmd.PersistentFlags().StringVar(&publicURL, "public_url", "", "public url of soul")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "run in developer mode with verbose logging")
@@ -63,7 +64,7 @@ func initAfterFlags() {
 		}
 		base.AssertNoErr(err)
 
-		// search for config in ~/.az/ directory with name "config" (without extension).
+		// search for config in ~/.gov/ directory with name "config" (without extension).
 		viper.AddConfigPath(filepath.Join(home, proto.LocalAgentPath))
 		viper.SetConfigType("json")
 		viper.SetConfigName("config")
@@ -80,7 +81,6 @@ func initAfterFlags() {
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		base.Fatalf("command error (%v)", err)
-		base.Sync()
+		fmt.Fprintln(os.Stderr, err)
 	}
 }

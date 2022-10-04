@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"strings"
 
-	. "github.com/petar/gitty/lib/base"
-	"github.com/petar/gitty/lib/files"
+	. "github.com/petar/gov4git/lib/base"
+	"github.com/petar/gov4git/lib/files"
 )
 
 type Local struct {
@@ -106,13 +106,30 @@ func (x Local) Push(ctx context.Context) error {
 }
 
 func (x Local) Add(ctx context.Context, paths []string) error {
-	_, _, err := x.InvokeStdin(ctx, strings.Join(paths, "\n"), "add", "--pathspec-from-file=-")
+	_, _, err := x.InvokeStdin(ctx, strings.Join(files.MakeNonAbsPaths(paths), "\n"), "add", "--pathspec-from-file=-")
 	return err
 }
 
 func (x Local) Remove(ctx context.Context, paths []string) error {
-	_, _, err := x.InvokeStdin(ctx, strings.Join(paths, "\n"), "rm", "--pathspec-from-file=-")
+	_, _, err := x.InvokeStdin(ctx, strings.Join(files.MakeNonAbsPaths(paths), "\n"), "rm", "--pathspec-from-file=-")
 	return err
+}
+
+func (x Local) CheckoutNewBranch(ctx context.Context, branch string) error {
+	_, _, err := x.Invoke(ctx, "checkout", "-b", branch)
+	return err
+}
+
+func (x Local) HeadCommitHash(ctx context.Context) (string, error) {
+	stdout, _, err := x.Invoke(ctx, "rev-parse", "HEAD")
+	if err != nil {
+		return "", err
+	}
+	h := strings.Trim(stdout, " \t\n\r")
+	if h == "" {
+		return "", fmt.Errorf("head commit missing")
+	}
+	return h, nil
 }
 
 func (x Local) CloneBranch(ctx context.Context, remoteURL, branch string) error {

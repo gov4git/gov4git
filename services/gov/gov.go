@@ -1,7 +1,7 @@
 package gov
 
 import (
-	"github.com/petar/gitty/proto"
+	"github.com/petar/gov4git/proto"
 )
 
 type GovService struct {

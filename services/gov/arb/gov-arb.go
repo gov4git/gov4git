@@ -1,7 +1,7 @@
-package user
+package arb
 
 import "github.com/petar/gov4git/proto"
 
-type GovUserService struct {
+type GovArbService struct {
 	GovConfig proto.GovConfig
 }

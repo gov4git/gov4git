@@ -1,19 +1,29 @@
-# A framework for decentralized social applications based on the git protocol
+# Gov4git: A decentralized social governance app for git
+
+## Installation
+
+[Install Git.](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
+[Install the Go programming language.](https://go.dev/doc/install)
+
+Run `go install github.com/petar/gov4git`.
+
+## Quick start
 
 ## Motivation
 
 ## Roadmap
 
-- A general framework for building decentralized social applications, based on the git protocol
-  - Identity and soul management
+- A framework for building decentralized social applications, based on the git protocol
+  - Identity management
   - Signed and encrypted messaging across repos
-- A set of applications
+- Applications
   - Governance for community source projects
     - Membership management
     - Verifiable record of referendum proceedings
+    - Verifiable polling
     - Directory-level configurability of governance policies
     - Supported arbitration policies
       - Vote (members vote, using a custom weighting function and threshold)
       - Quorum (at least N approvals out of M members)
-      - Owner (any listed owner can approve)
-  - Gwitter: Prototype of a decentralized twitter service over git
+  - Gwitter: Social broadcasting service over git

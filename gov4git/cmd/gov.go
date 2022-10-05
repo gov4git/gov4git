@@ -27,4 +27,5 @@ func init() {
 	govCmd.AddCommand(memberCmd)
 	govCmd.AddCommand(policyCmd)
 	govCmd.AddCommand(pollCmd)
+	govCmd.AddCommand(voteCmd)
 }

@@ -3,7 +3,6 @@ package proto
 import (
 	"context"
 	"crypto/ed25519"
-	"encoding/json"
 
 	"github.com/petar/gov4git/lib/form"
 )
@@ -27,36 +26,21 @@ func GenerateCredentials(publicURL, privateURL string) (*PrivateCredentials, err
 	}, nil
 }
 
-func Sign[Statement form.Form](ctx context.Context, priv *PrivateCredentials, stmt Statement) (*Signed[Statement], error) {
-	data, err := form.EncodeForm(ctx, stmt)
-	if err != nil {
-		return nil, err
-	}
-	signature := ed25519.Sign(ed25519.PrivateKey(priv.PrivateKeyEd25519), data)
-	return &Signed[Statement]{
-		Statement:        stmt,
-		PublicKeyEd25519: Ed25519PublicKey(priv.PublicCredentials.PublicKeyEd25519),
-		Signature:        form.Bytes(signature),
-		Original:         string(data),
+type SignedPlaintext struct {
+	Plaintext        form.Bytes       `json:"plaintext"`
+	Signature        form.Bytes       `json:"signature"`
+	PublicKeyEd25519 Ed25519PublicKey `json:"ed25519_public_key"`
+}
+
+func SignPlaintext(ctx context.Context, priv *PrivateCredentials, plaintext []byte) (*SignedPlaintext, error) {
+	signature := ed25519.Sign(ed25519.PrivateKey(priv.PrivateKeyEd25519), plaintext)
+	return &SignedPlaintext{
+		Plaintext:        plaintext,
+		Signature:        signature,
+		PublicKeyEd25519: priv.PublicCredentials.PublicKeyEd25519,
 	}, nil
 }
 
-type Signed[Statement form.Form] signed[Statement]
-
-type signed[Statement form.Form] struct {
-	Statement        Statement        `json:"-"`
-	PublicKeyEd25519 Ed25519PublicKey `json:"public_key_ed25519"`
-	Signature        form.Bytes       `json:"signature"`
-	Original         string           `json:"original"` // signed repn
-}
-
-func (x *Signed[Statement]) Verify() bool {
-	return ed25519.Verify(ed25519.PublicKey(x.PublicKeyEd25519), []byte(x.Original), x.Signature)
-}
-
-func (x *Signed[Statement]) UnmarshalJSON(d []byte) error {
-	if err := json.Unmarshal(d, (*signed[Statement])(x)); err != nil {
-		return err
-	}
-	return json.Unmarshal([]byte(x.Original), &x.Statement)
+func (signed *SignedPlaintext) Verify() bool {
+	return ed25519.Verify(ed25519.PublicKey(signed.PublicKeyEd25519), signed.Plaintext, signed.Signature)
 }

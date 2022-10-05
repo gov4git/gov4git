@@ -125,6 +125,16 @@ func (x Local) CheckoutNewBranch(ctx context.Context, branch string) error {
 	return err
 }
 
+func (x Local) CheckoutNewOrphan(ctx context.Context, branch string) error {
+	_, _, err := x.Invoke(ctx, "checkout", "--orphan", branch)
+	return err
+}
+
+func (x Local) ResetHard(ctx context.Context) error {
+	_, _, err := x.Invoke(ctx, "reset", "--hard")
+	return err
+}
+
 func (x Local) LogOneline(ctx context.Context) (string, error) {
 	stdout, _, err := x.Invoke(ctx, "log", "--pretty=oneline")
 	return stdout, err

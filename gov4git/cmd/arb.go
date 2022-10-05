@@ -41,6 +41,37 @@ var (
 			return err
 		},
 	}
+
+	voteCmd = &cobra.Command{
+		Use:   "vote",
+		Short: "Vote on a referendum",
+		Long:  man.GovArbVote,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			s := arb.GovArbService{
+				GovConfig: proto.GovConfig{
+					CommunityURL: communityURL,
+				},
+				IdentityConfig: proto.IdentityConfig{
+					PublicURL:  publicURL,
+					PrivateURL: privateURL,
+				},
+			}
+			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-arb-vote")
+			base.AssertNoErr(err)
+			ctx := files.WithWorkDir(cmd.Context(), workDir)
+			r, err := s.Vote(ctx, &arb.VoteIn{
+				ReferendumBranch: voteReferendumBranch,
+				VoteChoice:       voteChoice,
+				VoteStrength:     voteStrength,
+			})
+			if err == nil {
+				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
+			} else {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+			return err
+		},
+	}
 )
 
 var (
@@ -49,12 +80,20 @@ var (
 	pollGroup           string
 	pollStrategy        string
 	pollGoverningBranch string
+
+	voteReferendumBranch string
+	voteChoice           string
+	voteStrength         float64
 )
 
 func init() {
 	pollCmd.Flags().StringVar(&pollPath, "path", "", "community repo path for poll results and proofs")
 	pollCmd.Flags().StringArrayVar(&pollChoices, "choices", nil, "poll choices")
 	pollCmd.Flags().StringVar(&pollGroup, "group", "", "group of users participating in poll")
-	pollCmd.Flags().StringVar(&pollStrategy, "strategy", "", "polling strategy (XXX)")
+	pollCmd.Flags().StringVar(&pollStrategy, "strategy", "", "polling strategy (available strategy: prioritize)")
 	pollCmd.Flags().StringVar(&pollGoverningBranch, "branch", "", "branch governing the poll")
+
+	voteCmd.Flags().StringVar(&voteReferendumBranch, "--refm-branch", "", "referendum branch (e.g. poll branch)")
+	voteCmd.Flags().StringVar(&voteChoice, "--choice", "", "vote choice")
+	voteCmd.Flags().Float64Var(&voteStrength, "--strength", 0, "vote strength")
 }

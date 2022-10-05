@@ -17,7 +17,7 @@ type IdentityService struct {
 type IdentityInitIn struct{}
 
 type IdentityInitOut struct {
-	PrivateCredentials proto.PrivateCredentials
+	PrivateCredentials proto.PrivateCredentials `json:"private_credentials"`
 }
 
 func (x IdentityInitOut) Human(context.Context) string {

@@ -10,7 +10,7 @@ import (
 	"github.com/petar/gov4git/proto"
 )
 
-type GovArbPollIn struct {
+type PollIn struct {
 	Path            string   `json:"path"` // path where poll will be persisted
 	Choices         []string `json:"choices"`
 	Group           string   `json:"group"`
@@ -18,7 +18,7 @@ type GovArbPollIn struct {
 	GoverningBranch string   `json:"governing_branch"`
 }
 
-func (x *GovArbPollIn) Sanitize() error {
+func (x *PollIn) Sanitize() error {
 	// sanitize path
 	x.Path = git.MakeNonAbs(x.Path)
 	if x.Path == "" {
@@ -27,7 +27,7 @@ func (x *GovArbPollIn) Sanitize() error {
 	return nil
 }
 
-type GovArbPollOut struct {
+type PollOut struct {
 	CommunityURL      string `json:"community_url"`
 	GoverningBranch   string `json:"governing_branch"`
 	Path              string `json:"path"`
@@ -35,7 +35,7 @@ type GovArbPollOut struct {
 	PollGenesisCommit string `json:"poll_genesis_commit"`
 }
 
-func (x GovArbPollOut) Human(context.Context) string {
+func (x PollOut) Human(context.Context) string {
 	return fmt.Sprintf(`
 community_url=%v
 governing_branch=%v
@@ -52,7 +52,7 @@ Vote using:
 	)
 }
 
-func (x GovArbService) Poll(ctx context.Context, in *GovArbPollIn) (*GovArbPollOut, error) {
+func (x GovArbService) Poll(ctx context.Context, in *PollIn) (*PollOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.GoverningBranch); err != nil {
@@ -70,7 +70,7 @@ func (x GovArbService) Poll(ctx context.Context, in *GovArbPollIn) (*GovArbPollO
 	return out, nil
 }
 
-func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *GovArbPollIn) (*GovArbPollOut, error) {
+func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *PollIn) (*PollOut, error) {
 	// XXX: verify path is not in use
 	// XXX: verify poll branch is not in use
 	// XXX: verify group exists
@@ -120,7 +120,7 @@ func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *G
 	}
 
 	// commit changes and include poll ad in commit message
-	out := &GovArbPollOut{
+	out := &PollOut{
 		CommunityURL:      x.GovConfig.CommunityURL,
 		GoverningBranch:   in.GoverningBranch,
 		Path:              pollAd.Path,

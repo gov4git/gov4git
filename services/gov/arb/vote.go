@@ -19,12 +19,18 @@ type VoteIn struct {
 }
 
 type VoteOut struct {
-	VoteRepo   string `json:"vote_repo"`
-	VoteBranch string `json:"vote_branch"`
+	VoteRepo         string `json:"vote_repo"`
+	VoteBranch       string `json:"vote_branch"`
+	ReferendumRepo   string `json:"referendum_repo"`
+	ReferendumBranch string `json:"referendum_branch"`
 }
 
 func (x VoteOut) Human(context.Context) string {
-	return fmt.Sprintf("Vote placed in repo %v at branch %v", x.VoteRepo, x.VoteBranch)
+	return fmt.Sprintf("Vote placed in repo %v at branch %v.\n"+
+		"Regarding referendum in repo %v and branch %v",
+		x.VoteRepo, x.VoteBranch,
+		x.ReferendumRepo, x.ReferendumBranch,
+	)
 }
 
 func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
@@ -119,7 +125,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 		return nil, err
 	}
 	msg := proto.PollVoteCommitHeader(x.GovConfig.CommunityURL, in.ReferendumBranch)
-	if err := community.Commit(ctx, msg); err != nil {
+	if err := voter.Commit(ctx, msg); err != nil {
 		return nil, err
 	}
 
@@ -129,7 +135,9 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	return &VoteOut{
-		VoteRepo:   x.GovConfig.CommunityURL,
-		VoteBranch: in.ReferendumBranch,
+		VoteRepo:         x.IdentityConfig.PublicURL,
+		VoteBranch:       voteBranch,
+		ReferendumRepo:   x.GovConfig.CommunityURL,
+		ReferendumBranch: in.ReferendumBranch,
 	}, nil
 }

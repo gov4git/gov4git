@@ -24,7 +24,7 @@ func TestPoll(t *testing.T) {
 	svc := arb.GovArbService{GovConfig: testCommunity.CommunityGovConfig()}
 	out, err := svc.Poll(
 		testCommunity.WithWorkDir(context.Background(), "test"),
-		&arb.GovArbPollIn{
+		&arb.PollIn{
 			Path:            "test_poll",
 			Choices:         []string{"a", "b", "c"},
 			Group:           "participants",

@@ -1,4 +1,4 @@
-module github.com/petar/gov4git
+module github.com/gov4git/gov4git
 
 go 1.19
 

@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/petar/gov4git/lib/base"
-	"github.com/petar/gov4git/lib/files"
-	"github.com/petar/gov4git/lib/git"
-	"github.com/petar/gov4git/proto"
+	"github.com/gov4git/gov4git/lib/base"
+	"github.com/gov4git/gov4git/lib/files"
+	"github.com/gov4git/gov4git/lib/git"
+	"github.com/gov4git/gov4git/proto"
 )
 
 func TestSoulInit(t *testing.T) {

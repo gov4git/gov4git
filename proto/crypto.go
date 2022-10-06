@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/ed25519"
 
-	"github.com/petar/gov4git/lib/form"
+	"github.com/gov4git/gov4git/lib/form"
 )
 
 type Ed25519PublicKey = form.Bytes

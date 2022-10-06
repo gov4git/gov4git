@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/petar/gov4git/proto"
-	"github.com/petar/gov4git/services/gov/arb"
-	"github.com/petar/gov4git/testutil"
+	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/services/gov/arb"
+	"github.com/gov4git/gov4git/testutil"
 )
 
 func TestPoll(t *testing.T) {

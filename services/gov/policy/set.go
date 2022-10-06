@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/petar/gov4git/lib/files"
-	"github.com/petar/gov4git/lib/git"
-	"github.com/petar/gov4git/proto"
+	"github.com/gov4git/gov4git/lib/files"
+	"github.com/gov4git/gov4git/lib/git"
+	"github.com/gov4git/gov4git/proto"
 )
 
 type GovPolicySetIn struct {

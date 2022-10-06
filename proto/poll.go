@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/petar/gov4git/lib/form"
+	"github.com/gov4git/gov4git/lib/form"
 )
 
 type GovPollAd struct {

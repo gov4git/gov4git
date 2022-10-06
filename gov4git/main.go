@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/petar/gov4git/gov4git/cmd"
+	"github.com/gov4git/gov4git/gov4git/cmd"
 )
 
 func main() {

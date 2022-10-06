@@ -6,7 +6,7 @@
 
 [Install the Go programming language.](https://go.dev/doc/install)
 
-Run `go install github.com/petar/gov4git`.
+Run `go install github.com/gov4git/gov4git`.
 
 ## Quick start
 

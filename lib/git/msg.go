@@ -5,7 +5,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/petar/gov4git/lib/form"
+	"github.com/gov4git/gov4git/lib/form"
 )
 
 func PrepareCommitMsg(ctx context.Context, human string, embed form.Form) (string, error) {

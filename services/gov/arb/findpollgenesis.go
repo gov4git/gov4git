@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/petar/gov4git/lib/git"
-	"github.com/petar/gov4git/proto"
+	"github.com/gov4git/gov4git/lib/git"
+	"github.com/gov4git/gov4git/proto"
 )
 
 type FindPollGenesisIn struct {

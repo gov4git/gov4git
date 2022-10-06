@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/petar/gov4git/lib/base"
-	"github.com/petar/gov4git/lib/files"
-	man "github.com/petar/gov4git/man/user"
-	"github.com/petar/gov4git/proto"
-	"github.com/petar/gov4git/services/gov/user"
+	"github.com/gov4git/gov4git/lib/base"
+	"github.com/gov4git/gov4git/lib/files"
+	man "github.com/gov4git/gov4git/man/user"
+	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/services/gov/user"
 	"github.com/spf13/cobra"
 )
 

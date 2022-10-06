@@ -12,6 +12,7 @@ import (
 )
 
 type Local struct {
+	// Path is an absolute local path to the git repository
 	Path string
 }
 

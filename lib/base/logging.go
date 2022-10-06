@@ -1,7 +1,9 @@
 package base
 
 import (
+	"fmt"
 	"os"
+	"runtime"
 
 	"go.uber.org/zap"
 )
@@ -44,15 +46,26 @@ func AssertNoErr(err error) {
 }
 
 func Infof(template string, args ...interface{}) {
-	logger.Sugar().Infof(template, args...)
+	_, file, line, _ := runtime.Caller(1)
+	msg := fmt.Sprintf(template, args...)
+	src := fmt.Sprintf("%s:%d", file, line)
+	logger.Sugar().Info(src + msg)
 }
 
 func Fatalf(template string, args ...interface{}) {
-	logger.Sugar().Fatalf(template, args...)
+	_, file, line, _ := runtime.Caller(1)
+	msg := fmt.Sprintf(template, args...)
+	src := fmt.Sprintf("%s:%d", file, line)
+	logger.Sugar().Fatal(src + msg)
+	// logger.Sugar().Fatalf(template, args...)
 }
 
 func Errorf(template string, args ...interface{}) {
-	logger.Sugar().Errorf(template, args...)
+	_, file, line, _ := runtime.Caller(1)
+	msg := fmt.Sprintf(template, args...)
+	src := fmt.Sprintf("%s:%d", file, line)
+	logger.Sugar().Error(src + msg)
+	// logger.Sugar().Errorf(template, args...)
 }
 
 func Sync() error {

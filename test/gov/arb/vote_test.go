@@ -7,12 +7,15 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/petar/gov4git/lib/base"
 	"github.com/petar/gov4git/proto"
 	"github.com/petar/gov4git/services/gov/arb"
 	"github.com/petar/gov4git/testutil"
 )
 
 func TestVote(t *testing.T) {
+	base.LogVerbosely()
+
 	// create test community
 	dir := filepath.Join(os.TempDir(), "gov4git_test") // t.TempDir()
 	testCommunity, err := testutil.CreateTestCommunity(dir, 1)

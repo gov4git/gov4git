@@ -1,6 +1,6 @@
 package arb
 
-const GovArbPoll = `
+const Poll = `
 SYNOPSIS
 Create a new poll.
 

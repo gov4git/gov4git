@@ -16,7 +16,7 @@ var (
 	pollCmd = &cobra.Command{
 		Use:   "poll",
 		Short: "Create a new poll",
-		Long:  man.GovArbPoll,
+		Long:  man.Poll,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := arb.GovArbService{
 				GovConfig: proto.GovConfig{
@@ -45,7 +45,7 @@ var (
 	voteCmd = &cobra.Command{
 		Use:   "vote",
 		Short: "Vote on a referendum",
-		Long:  man.GovArbVote,
+		Long:  man.Vote,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := arb.GovArbService{
 				GovConfig: proto.GovConfig{
@@ -72,6 +72,35 @@ var (
 			return err
 		},
 	}
+
+	tallyCmd = &cobra.Command{
+		Use:   "tally",
+		Short: "Tally votes on a referendum",
+		Long:  man.Tally,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			s := arb.GovArbService{
+				GovConfig: proto.GovConfig{
+					CommunityURL: communityURL,
+				},
+				IdentityConfig: proto.IdentityConfig{
+					PublicURL:  publicURL,
+					PrivateURL: privateURL,
+				},
+			}
+			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-arb-tally")
+			base.AssertNoErr(err)
+			ctx := files.WithWorkDir(cmd.Context(), workDir)
+			r, err := s.Tally(ctx, &arb.TallyIn{
+				ReferendumBranch: tallyReferendumBranch,
+			})
+			if err == nil {
+				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
+			} else {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+			return err
+		},
+	}
 )
 
 var (
@@ -84,6 +113,8 @@ var (
 	voteReferendumBranch string
 	voteChoice           string
 	voteStrength         float64
+
+	tallyReferendumBranch string
 )
 
 func init() {
@@ -96,4 +127,6 @@ func init() {
 	voteCmd.Flags().StringVar(&voteReferendumBranch, "--refm-branch", "", "referendum branch (e.g. poll branch)")
 	voteCmd.Flags().StringVar(&voteChoice, "--choice", "", "vote choice")
 	voteCmd.Flags().Float64Var(&voteStrength, "--strength", 0, "vote strength")
+
+	tallyCmd.Flags().StringVar(&tallyReferendumBranch, "--refm-branch", "", "referendum branch (e.g. poll branch)")
 }

@@ -1,6 +1,6 @@
 package arb
 
-const GovArbVote = `
+const Vote = `
 SYNOPSIS
 Update vote on a referendum. A referendum can be a poll or an approval proposal.
 

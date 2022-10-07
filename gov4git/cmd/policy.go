@@ -35,7 +35,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-policy-set")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.PolicySet(ctx, &policy.GovPolicySetIn{
+			r, err := s.Set(ctx, &policy.SetIn{
 				Dir:             policyDir,
 				Arb:             policyArb,
 				Group:           policyGroup,
@@ -64,7 +64,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-policy-get")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.PolicyGet(ctx, &policy.GovPolicyGetIn{
+			r, err := s.Get(ctx, &policy.GetIn{
 				Dir:             policyDir,
 				CommunityBranch: communityBranch,
 			})

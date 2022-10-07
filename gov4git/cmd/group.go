@@ -35,7 +35,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-group-add")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.GroupAdd(ctx, &group.GovGroupAddIn{
+			r, err := s.Add(ctx, &group.AddIn{
 				Name:            groupName,
 				CommunityBranch: communityBranch,
 			})
@@ -61,7 +61,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-group-rm")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.GroupRemove(ctx, &group.GovGroupRemoveIn{
+			r, err := s.Remove(ctx, &group.RemoveIn{
 				Name:            groupName,
 				CommunityBranch: communityBranch,
 			})
@@ -87,7 +87,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-group-set")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.GroupSet(ctx, &group.GovGroupSetIn{
+			r, err := s.Set(ctx, &group.SetIn{
 				Name:            groupName,
 				Key:             groupKey,
 				Value:           groupValue,
@@ -115,7 +115,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-group-get")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.GroupGet(ctx, &group.GovGroupGetIn{
+			r, err := s.Get(ctx, &group.GetIn{
 				Name:            groupName,
 				Key:             groupKey,
 				CommunityBranch: communityBranch,
@@ -142,7 +142,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-group-list")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.GroupList(ctx, &group.GovGroupListIn{
+			r, err := s.List(ctx, &group.ListIn{
 				CommunityBranch: communityBranch,
 			})
 			if err == nil {

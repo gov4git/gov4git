@@ -9,35 +9,35 @@ import (
 	"github.com/gov4git/gov4git/proto"
 )
 
-type GovGroupRemoveIn struct {
+type RemoveIn struct {
 	Name            string `json:"name"`             // community unique handle for this group
 	CommunityBranch string `json:"community_branch"` // branch in community repo where group will be added
 }
 
-type GovGroupRemoveOut struct{}
+type RemoveOut struct{}
 
-func (x GovGroupRemoveOut) Human(context.Context) string {
+func (x RemoveOut) Human(context.Context) string {
 	return ""
 }
 
-func (x GovGroupService) GroupRemove(ctx context.Context, in *GovGroupRemoveIn) (*GovGroupRemoveOut, error) {
+func (x GovGroupService) Remove(ctx context.Context, in *RemoveIn) (*RemoveOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
 		return nil, err
 	}
 	// make changes to repo
-	if err := GovRemoveGroup(ctx, community, in.Name); err != nil {
+	if err := Remove(ctx, community, in.Name); err != nil {
 		return nil, err
 	}
 	// push to origin
 	if err := community.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
-	return &GovGroupRemoveOut{}, nil
+	return &RemoveOut{}, nil
 }
 
-func GovRemoveGroup(ctx context.Context, community git.Local, name string) error {
+func Remove(ctx context.Context, community git.Local, name string) error {
 	groupFile := filepath.Join(proto.GovGroupsDir, name, proto.GovGroupInfoFilebase)
 	// remove group file
 	if err := community.Dir().Remove(groupFile); err != nil {

@@ -9,39 +9,39 @@ import (
 	"github.com/gov4git/gov4git/proto"
 )
 
-type GovUserSetIn struct {
+type SetIn struct {
 	Name            string `json:"name"`             // community unique handle for this user
 	Key             string `json:"key"`              // user property key
 	Value           string `json:"value"`            // user property value
 	CommunityBranch string `json:"community_branch"` // branch in community repo where user will be added
 }
 
-type GovUserSetOut struct{}
+type SetOut struct{}
 
-func (x GovUserSetOut) Human(context.Context) string {
+func (x SetOut) Human(context.Context) string {
 	return ""
 }
 
-func (x GovUserService) UserSet(ctx context.Context, in *GovUserSetIn) (*GovUserSetOut, error) {
+func (x GovUserService) Set(ctx context.Context, in *SetIn) (*SetOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
 		return nil, err
 	}
 	// make changes to repo
-	if err := GovUserSet(ctx, community, in.Name, in.Key, in.Value); err != nil {
+	if err := Set(ctx, community, in.Name, in.Key, in.Value); err != nil {
 		return nil, err
 	}
 	// push to origin
 	if err := community.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
-	return &GovUserSetOut{}, nil
+	return &SetOut{}, nil
 }
 
 // XXX: sanitize key
 // XXX: prevent overwrite
-func GovUserSet(ctx context.Context, community git.Local, name string, key string, value string) error {
+func Set(ctx context.Context, community git.Local, name string, key string, value string) error {
 	propFile := filepath.Join(proto.GovUsersDir, name, proto.GovUserMetaDirbase, key)
 	// write user file
 	stage := files.ByteFiles{

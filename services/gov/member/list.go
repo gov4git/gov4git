@@ -11,22 +11,22 @@ import (
 	"github.com/gov4git/gov4git/proto"
 )
 
-type GovMemberListIn struct {
+type ListIn struct {
 	User            string `json:"user"`
 	Group           string `json:"group"`
 	CommunityBranch string `json:"community_branch"` // branch in community repo where group will be added
 }
 
-type GovMemberListOut struct {
-	Memberships []GovMemberListMembership `json:"membership"`
+type ListOut struct {
+	Memberships []ListMembership `json:"membership"`
 }
 
-type GovMemberListMembership struct {
+type ListMembership struct {
 	User  string `json:"user"`
 	Group string `json:"group"`
 }
 
-func (x GovMemberListOut) Human(context.Context) string {
+func (x ListOut) Human(context.Context) string {
 	var w bytes.Buffer
 	for _, u := range x.Memberships {
 		fmt.Fprintln(&w, u.User, u.Group)
@@ -34,14 +34,14 @@ func (x GovMemberListOut) Human(context.Context) string {
 	return w.String()
 }
 
-func (x GovMemberService) MemberList(ctx context.Context, in *GovMemberListIn) (*GovMemberListOut, error) {
+func (x GovMemberService) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
 		return nil, err
 	}
 	// make changes to repo
-	memberships, err := GovMemberList(ctx, community, in.User, in.Group)
+	memberships, err := List(ctx, community, in.User, in.Group)
 	if err != nil {
 		return nil, err
 	}
@@ -49,10 +49,10 @@ func (x GovMemberService) MemberList(ctx context.Context, in *GovMemberListIn) (
 	if err := community.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
-	return &GovMemberListOut{Memberships: memberships}, nil
+	return &ListOut{Memberships: memberships}, nil
 }
 
-func GovMemberList(ctx context.Context, community git.Local, user string, group string) (memberships []GovMemberListMembership, err error) {
+func List(ctx context.Context, community git.Local, user string, group string) (memberships []ListMembership, err error) {
 	userGlob, groupGlob := user, group
 	if user == "" {
 		userGlob = "*"
@@ -67,7 +67,7 @@ func GovMemberList(ctx context.Context, community git.Local, user string, group 
 		return nil, err
 	}
 	// extract user names
-	memberships = make([]GovMemberListMembership, len(m))
+	memberships = make([]ListMembership, len(m))
 	for i := range m {
 		x1, _ := filepath.Split(m[i])
 		x2, _ := filepath.Split(x1)

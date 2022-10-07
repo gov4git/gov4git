@@ -9,36 +9,36 @@ import (
 	"github.com/gov4git/gov4git/proto"
 )
 
-type GovMemberAddIn struct {
+type AddIn struct {
 	User            string `json:"user"`
 	Group           string `json:"group"`
 	CommunityBranch string `json:"community_branch"` // branch in community repo where group will be added
 }
 
-type GovMemberAddOut struct{}
+type AddOut struct{}
 
-func (x GovMemberAddOut) Human(context.Context) string {
+func (x AddOut) Human(context.Context) string {
 	return ""
 }
 
-func (x GovMemberService) MemberAdd(ctx context.Context, in *GovMemberAddIn) (*GovMemberAddOut, error) {
+func (x GovMemberService) Add(ctx context.Context, in *AddIn) (*AddOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
 		return nil, err
 	}
 	// make changes to repo
-	if err := GovMemberAdd(ctx, community, in.User, in.Group); err != nil {
+	if err := Add(ctx, community, in.User, in.Group); err != nil {
 		return nil, err
 	}
 	// push to origin
 	if err := community.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
-	return &GovMemberAddOut{}, nil
+	return &AddOut{}, nil
 }
 
-func GovMemberAdd(ctx context.Context, community git.Local, user string, group string) error {
+func Add(ctx context.Context, community git.Local, user string, group string) error {
 	mFile := filepath.Join(proto.GovGroupsDir, group, proto.GovMembersDirbase, user)
 	// write group file
 	stage := files.ByteFiles{

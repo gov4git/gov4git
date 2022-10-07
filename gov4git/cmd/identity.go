@@ -25,7 +25,7 @@ var (
 			}
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "init")
 			base.AssertNoErr(err)
-			r, err := s.Init(files.WithWorkDir(cmd.Context(), workDir), &identity.IdentityInitIn{})
+			r, err := s.Init(files.WithWorkDir(cmd.Context(), workDir), &identity.InitIn{})
 			if err == nil {
 				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
 			} else {

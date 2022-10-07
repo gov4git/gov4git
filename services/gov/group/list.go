@@ -11,15 +11,15 @@ import (
 	"github.com/gov4git/gov4git/proto"
 )
 
-type GovGroupListIn struct {
+type ListIn struct {
 	CommunityBranch string `json:"community_branch"` // branch in community repo where group will be added
 }
 
-type GovGroupListOut struct {
+type ListOut struct {
 	Groups []string
 }
 
-func (x GovGroupListOut) Human(context.Context) string {
+func (x ListOut) Human(context.Context) string {
 	var w bytes.Buffer
 	for _, u := range x.Groups {
 		fmt.Fprintln(&w, u)
@@ -27,14 +27,14 @@ func (x GovGroupListOut) Human(context.Context) string {
 	return w.String()
 }
 
-func (x GovGroupService) GroupList(ctx context.Context, in *GovGroupListIn) (*GovGroupListOut, error) {
+func (x GovGroupService) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
 		return nil, err
 	}
 	// make changes to repo
-	groups, err := GovGroupList(ctx, community)
+	groups, err := List(ctx, community)
 	if err != nil {
 		return nil, err
 	}
@@ -42,10 +42,10 @@ func (x GovGroupService) GroupList(ctx context.Context, in *GovGroupListIn) (*Go
 	if err := community.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
-	return &GovGroupListOut{Groups: groups}, nil
+	return &ListOut{Groups: groups}, nil
 }
 
-func GovGroupList(ctx context.Context, community git.Local) ([]string, error) {
+func List(ctx context.Context, community git.Local) ([]string, error) {
 	groupFileGlob := filepath.Join(proto.GovGroupsDir, "*", proto.GovGroupInfoFilebase)
 	// glob for group files
 	m, err := community.Dir().Glob(groupFileGlob)

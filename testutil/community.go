@@ -103,7 +103,7 @@ func (x *TestCommunity) initUserRepos(ctx context.Context, i int) error {
 			PrivateURL: x.UserPrivateRepoURL(i),
 		},
 	}
-	if _, err := idService.Init(ctx, &identity.IdentityInitIn{}); err != nil {
+	if _, err := idService.Init(ctx, &identity.InitIn{}); err != nil {
 		return err
 	}
 

@@ -10,7 +10,7 @@ import (
 	"github.com/gov4git/gov4git/proto"
 )
 
-type GovPolicySetIn struct {
+type SetIn struct {
 	Dir             string  `json:"dir"`
 	Arb             string  `json:"arb"`
 	Group           string  `json:"group"`
@@ -18,30 +18,30 @@ type GovPolicySetIn struct {
 	CommunityBranch string  `json:"community_branch"` // branch in community repo where policy will be added
 }
 
-type GovPolicySetOut struct{}
+type SetOut struct{}
 
-func (x GovPolicySetOut) Human(context.Context) string {
+func (x SetOut) Human(context.Context) string {
 	return ""
 }
 
-func (x GovPolicyService) PolicySet(ctx context.Context, in *GovPolicySetIn) (*GovPolicySetOut, error) {
+func (x GovPolicyService) Set(ctx context.Context, in *SetIn) (*SetOut, error) {
 	// clone community repo locally
 	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
 		return nil, err
 	}
 	// make changes to repo
-	if err := GovPolicySet(ctx, community, in.Dir, in.Arb, in.Group, in.Threshold); err != nil {
+	if err := Set(ctx, community, in.Dir, in.Arb, in.Group, in.Threshold); err != nil {
 		return nil, err
 	}
 	// push to origin
 	if err := community.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
-	return &GovPolicySetOut{}, nil
+	return &SetOut{}, nil
 }
 
-func GovPolicySet(ctx context.Context, community git.Local, dir string, arb string, group string, threshold float64) error {
+func Set(ctx context.Context, community git.Local, dir string, arb string, group string, threshold float64) error {
 	// TODO: verify group and threshold
 
 	// build policy

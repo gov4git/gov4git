@@ -14,18 +14,18 @@ type IdentityService struct {
 	IdentityConfig proto.IdentityConfig
 }
 
-type IdentityInitIn struct{}
+type InitIn struct{}
 
-type IdentityInitOut struct {
+type InitOut struct {
 	PrivateCredentials proto.PrivateCredentials `json:"private_credentials"`
 }
 
-func (x IdentityInitOut) Human(context.Context) string {
+func (x InitOut) Human(context.Context) string {
 	data, _ := json.MarshalIndent(x.PrivateCredentials, "", "   ")
 	return string(data)
 }
 
-func (x IdentityService) Init(ctx context.Context, in *IdentityInitIn) (*IdentityInitOut, error) {
+func (x IdentityService) Init(ctx context.Context, in *InitIn) (*InitOut, error) {
 
 	// generate private credentials
 
@@ -90,5 +90,5 @@ func (x IdentityService) Init(ctx context.Context, in *IdentityInitIn) (*Identit
 		return nil, err
 	}
 
-	return &IdentityInitOut{PrivateCredentials: *privateCredentials}, nil
+	return &InitOut{PrivateCredentials: *privateCredentials}, nil
 }

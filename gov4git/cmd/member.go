@@ -35,7 +35,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-member-add")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.MemberAdd(ctx, &member.GovMemberAddIn{
+			r, err := s.Add(ctx, &member.AddIn{
 				Group:           memberGroup,
 				User:            memberUser,
 				CommunityBranch: communityBranch,
@@ -62,7 +62,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-member-rm")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.MemberRemove(ctx, &member.GovMemberRemoveIn{
+			r, err := s.Remove(ctx, &member.RemoveIn{
 				Group:           memberGroup,
 				User:            memberUser,
 				CommunityBranch: communityBranch,
@@ -89,7 +89,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-member-list-members")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.MemberList(ctx, &member.GovMemberListIn{
+			r, err := s.List(ctx, &member.ListIn{
 				User:            memberUser,
 				Group:           memberGroup,
 				CommunityBranch: communityBranch,

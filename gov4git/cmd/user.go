@@ -35,7 +35,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-add")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.UserAdd(ctx, &user.GovUserAddIn{
+			r, err := s.Add(ctx, &user.AddIn{
 				Name:            userName,
 				URL:             userURL,
 				CommunityBranch: communityBranch,
@@ -62,7 +62,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-rm")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.UserRemove(ctx, &user.GovUserRemoveIn{
+			r, err := s.Remove(ctx, &user.RemoveIn{
 				Name:            userName,
 				CommunityBranch: communityBranch,
 			})
@@ -88,7 +88,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-set")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.UserSet(ctx, &user.GovUserSetIn{
+			r, err := s.Set(ctx, &user.SetIn{
 				Name:            userName,
 				Key:             userKey,
 				Value:           userValue,
@@ -116,7 +116,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-get")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.UserGet(ctx, &user.GovUserGetIn{
+			r, err := s.Get(ctx, &user.GetIn{
 				Name:            userName,
 				Key:             userKey,
 				CommunityBranch: communityBranch,
@@ -143,7 +143,7 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-list")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.UserList(ctx, &user.GovUserListIn{
+			r, err := s.List(ctx, &user.ListIn{
 				CommunityBranch: communityBranch,
 			})
 			if err == nil {

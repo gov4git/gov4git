@@ -3,7 +3,6 @@ package arb
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
@@ -42,23 +41,9 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 		return nil, err
 	}
 
-	// find the genesis commit of the referendum
-	findGenesis, err := x.FindPollGenesisLocal(ctx, community, &FindPollGenesisIn{PollBranch: in.ReferendumBranch})
+	// find poll ad
+	findAd, err := x.FindPollAdLocal(ctx, community, &FindPollAdIn{PollBranch: in.ReferendumBranch})
 	if err != nil {
-		return nil, err
-	}
-
-	// read the poll advertisement
-	pollPath, err := proto.PollPathFromBranch(in.ReferendumBranch)
-	if err != nil {
-		return nil, err
-	}
-	pollAdPath := filepath.Join(pollPath, proto.GovPollAdFilebase)
-	if err := community.CheckoutBranch(ctx, findGenesis.PollGenesisCommit); err != nil {
-		return nil, err
-	}
-	var pollAd proto.GovPollAd
-	if _, err := community.Dir().ReadFormFile(ctx, pollAdPath, &pollAd); err != nil {
 		return nil, err
 	}
 
@@ -78,7 +63,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	// compute the name of the vote branch
-	voteBranch, err := proto.PollVoteBranch(ctx, pollAd)
+	voteBranch, err := proto.PollVoteBranch(ctx, findAd.PollAd)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +80,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 
 	// add vote to vote branch
 	vote := proto.GovPollVote{
-		PollAd:   pollAd,
+		PollAd:   findAd.PollAd,
 		Choice:   in.VoteChoice,
 		Strength: in.VoteStrength,
 	}

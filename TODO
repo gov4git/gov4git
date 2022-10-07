@@ -1,3 +1,6 @@
+FRAMEWORK
+- [ ] automate temporary clone directory naming, simplify "git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))"
+
 DOC
 - [ ] terminal-cast type video tutorials
 

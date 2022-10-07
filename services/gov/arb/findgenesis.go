@@ -44,5 +44,6 @@ func (x GovArbService) FindPollGenesisLocal(ctx context.Context, repo git.Local,
 	if genesisCommit == "" {
 		return nil, fmt.Errorf("cannot find poll genesis commit")
 	}
+
 	return &FindPollGenesisOut{PollGenesisCommit: genesisCommit}, nil
 }

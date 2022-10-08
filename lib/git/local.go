@@ -16,7 +16,7 @@ type Local struct {
 	Path string
 }
 
-func MakeLocalCtx(ctx context.Context, label string) (Local, error) {
+func MakeLocalInCtx(ctx context.Context, label string) (Local, error) {
 	eph, err := files.WorkDir(ctx).MkEphemeralDir(label, "")
 	if err != nil {
 		return Local{}, err

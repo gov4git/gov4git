@@ -22,7 +22,7 @@ func (x RemoveOut) Human(context.Context) string {
 
 func (x GovMemberService) Remove(ctx context.Context, in *RemoveIn) (*RemoveOut, error) {
 	// clone community repo locally
-	community, err := git.MakeLocalCtx(ctx, "community")
+	community, err := git.MakeLocalInCtx(ctx, "community")
 	if err != nil {
 		return nil, err
 	}

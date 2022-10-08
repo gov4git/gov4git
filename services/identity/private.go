@@ -21,7 +21,7 @@ func (x GetPrivateCredentialsOut) Human(context.Context) string {
 
 func (x IdentityService) GetPrivateCredentials(ctx context.Context, in *GetPrivateCredentialsIn) (*GetPrivateCredentialsOut, error) {
 	// clone private identity repo locally
-	private, err := git.MakeLocalCtx(ctx, "private")
+	private, err := git.MakeLocalInCtx(ctx, "private")
 	if err != nil {
 		return nil, err
 	}

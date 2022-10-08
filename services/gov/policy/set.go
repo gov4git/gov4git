@@ -26,7 +26,7 @@ func (x SetOut) Human(context.Context) string {
 
 func (x GovPolicyService) Set(ctx context.Context, in *SetIn) (*SetOut, error) {
 	// clone community repo locally
-	community, err := git.MakeLocalCtx(ctx, "community")
+	community, err := git.MakeLocalInCtx(ctx, "community")
 	if err != nil {
 		return nil, err
 	}

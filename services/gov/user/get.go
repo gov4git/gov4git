@@ -24,7 +24,7 @@ func (x GetOut) Human(context.Context) string {
 
 func (x GovUserService) Get(ctx context.Context, in *GetIn) (*GetOut, error) {
 	// clone community repo locally
-	community, err := git.MakeLocalCtx(ctx, "community")
+	community, err := git.MakeLocalInCtx(ctx, "community")
 	if err != nil {
 		return nil, err
 	}

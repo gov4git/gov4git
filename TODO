@@ -4,7 +4,6 @@ PRODUCT
 - [ ] generalize the poll/vote/tally flow to work for different types of referendums
 
 FRAMEWORK
-- [ ] automate temporary clone directory naming, simplify "git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))"
 
 DOC
 - [ ] terminal-cast type video tutorials

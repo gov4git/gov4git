@@ -27,7 +27,7 @@ func (x TallyOut) Human(ctx context.Context) string {
 
 func (x GovArbService) Tally(ctx context.Context, in *TallyIn) (*TallyOut, error) {
 	// clone community repo locally
-	community, err := git.MakeLocalCtx(ctx, "community")
+	community, err := git.MakeLocalInCtx(ctx, "community")
 	if err != nil {
 		return nil, err
 	}

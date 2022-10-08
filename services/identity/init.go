@@ -29,7 +29,7 @@ func (x IdentityService) Init(ctx context.Context, in *InitIn) (*InitOut, error)
 
 	// generate private credentials
 
-	localPrivate, err := git.MakeLocalCtx(ctx, "private")
+	localPrivate, err := git.MakeLocalInCtx(ctx, "private")
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (x IdentityService) Init(ctx context.Context, in *InitIn) (*InitOut, error)
 
 	// generate public credentials
 
-	localPublic, err := git.MakeLocalCtx(ctx, "public")
+	localPublic, err := git.MakeLocalInCtx(ctx, "public")
 	if err != nil {
 		return nil, err
 	}

@@ -29,7 +29,10 @@ func (x IdentityService) Init(ctx context.Context, in *InitIn) (*InitOut, error)
 
 	// generate private credentials
 
-	localPrivate := git.LocalInDir(files.WorkDir(ctx).Subdir("private"))
+	localPrivate, err := git.MakeLocalCtx(ctx, "private")
+	if err != nil {
+		return nil, err
+	}
 	// clone or init repo
 	if err := localPrivate.CloneOrInitBranch(ctx, x.IdentityConfig.PrivateURL, proto.IdentityBranch); err != nil {
 		return nil, err
@@ -65,7 +68,10 @@ func (x IdentityService) Init(ctx context.Context, in *InitIn) (*InitOut, error)
 
 	// generate public credentials
 
-	localPublic := git.LocalInDir(files.WorkDir(ctx).Subdir("public"))
+	localPublic, err := git.MakeLocalCtx(ctx, "public")
+	if err != nil {
+		return nil, err
+	}
 	// clone or init repo
 	if err := localPublic.CloneOrInitBranch(ctx, x.IdentityConfig.PublicURL, proto.IdentityBranch); err != nil {
 		return nil, err

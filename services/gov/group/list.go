@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
 )
@@ -29,7 +28,10 @@ func (x ListOut) Human(context.Context) string {
 
 func (x GovGroupService) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	// clone community repo locally
-	community := git.LocalInDir(files.WorkDir(ctx).Subdir("community"))
+	community, err := git.MakeLocalCtx(ctx, "community")
+	if err != nil {
+		return nil, err
+	}
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
 		return nil, err
 	}

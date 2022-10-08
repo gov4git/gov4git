@@ -4,7 +4,6 @@ import (
 	"context"
 	"path/filepath"
 
-	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
@@ -26,7 +25,10 @@ func (x GetOut) Human(ctx context.Context) string {
 
 func (x GovPolicyService) Get(ctx context.Context, in *GetIn) (*GetOut, error) {
 	// clone community repo locally
-	community := git.LocalInDir(files.WorkDir(ctx).Subdir("community"))
+	community, err := git.MakeLocalCtx(ctx, "community")
+	if err != nil {
+		return nil, err
+	}
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
 		return nil, err
 	}

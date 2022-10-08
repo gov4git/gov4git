@@ -3,7 +3,6 @@ package arb
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/services/gov/member"
@@ -28,7 +27,10 @@ func (x TallyOut) Human(ctx context.Context) string {
 
 func (x GovArbService) Tally(ctx context.Context, in *TallyIn) (*TallyOut, error) {
 	// clone community repo locally
-	community := git.LocalInDir(files.WorkDir(ctx).Subdir("community"))
+	community, err := git.MakeLocalCtx(ctx, "community")
+	if err != nil {
+		return nil, err
+	}
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.ReferendumBranch); err != nil {
 		return nil, err
 	}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
 )
@@ -22,7 +21,10 @@ func (x GetPrivateCredentialsOut) Human(context.Context) string {
 
 func (x IdentityService) GetPrivateCredentials(ctx context.Context, in *GetPrivateCredentialsIn) (*GetPrivateCredentialsOut, error) {
 	// clone private identity repo locally
-	private := git.LocalInDir(files.WorkDir(ctx).Subdir("private"))
+	private, err := git.MakeLocalCtx(ctx, "private")
+	if err != nil {
+		return nil, err
+	}
 	if err := private.CloneBranch(ctx, x.IdentityConfig.PrivateURL, proto.IdentityBranch); err != nil {
 		return nil, err
 	}

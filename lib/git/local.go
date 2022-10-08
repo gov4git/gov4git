@@ -16,7 +16,15 @@ type Local struct {
 	Path string
 }
 
-func LocalFromDir(d files.Dir) Local {
+func MakeLocalCtx(ctx context.Context, label string) (Local, error) {
+	eph, err := files.WorkDir(ctx).MkEphemeralDir(label, "")
+	if err != nil {
+		return Local{}, err
+	}
+	return LocalInDir(eph), nil
+}
+
+func LocalInDir(d files.Dir) Local {
 	return Local{Path: d.Path}
 }
 

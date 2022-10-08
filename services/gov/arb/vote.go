@@ -36,7 +36,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	// find poll advertisement in community repo
 
 	// clone community repo at referendum branch locally
-	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
+	community := git.LocalInDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.ReferendumBranch); err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	// cast vote in voters public identity repo
 
 	// clone voter identity public repo at the main identity branch
-	voter := git.LocalFromDir(files.WorkDir(ctx).Subdir("voter"))
+	voter := git.LocalInDir(files.WorkDir(ctx).Subdir("voter"))
 	if err := voter.CloneBranch(ctx, x.IdentityConfig.PublicURL, proto.IdentityBranch); err != nil {
 		return nil, err
 	}

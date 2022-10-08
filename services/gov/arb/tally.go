@@ -28,7 +28,7 @@ func (x TallyOut) Human(ctx context.Context) string {
 
 func (x GovArbService) Tally(ctx context.Context, in *TallyIn) (*TallyOut, error) {
 	// clone community repo locally
-	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
+	community := git.LocalInDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.ReferendumBranch); err != nil {
 		return nil, err
 	}

@@ -23,7 +23,7 @@ func (x RemoveOut) Human(context.Context) string {
 
 func (x GovMemberService) Remove(ctx context.Context, in *RemoveIn) (*RemoveOut, error) {
 	// clone community repo locally
-	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
+	community := git.LocalInDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
 		return nil, err
 	}

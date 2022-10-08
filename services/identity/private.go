@@ -22,7 +22,7 @@ func (x GetPrivateCredentialsOut) Human(context.Context) string {
 
 func (x IdentityService) GetPrivateCredentials(ctx context.Context, in *GetPrivateCredentialsIn) (*GetPrivateCredentialsOut, error) {
 	// clone private identity repo locally
-	private := git.LocalFromDir(files.WorkDir(ctx).Subdir("private"))
+	private := git.LocalInDir(files.WorkDir(ctx).Subdir("private"))
 	if err := private.CloneBranch(ctx, x.IdentityConfig.PrivateURL, proto.IdentityBranch); err != nil {
 		return nil, err
 	}

@@ -16,8 +16,8 @@ func TestSoulInit(t *testing.T) {
 	base.Infof("using temp dir %v", t.TempDir())
 	testPrivDir := files.PathDir(t.TempDir()).Subdir("private")
 	testPubDir := files.PathDir(t.TempDir()).Subdir("public")
-	testPriv := git.LocalFromDir(testPrivDir)
-	testPub := git.LocalFromDir(testPubDir)
+	testPriv := git.LocalInDir(testPrivDir)
+	testPub := git.LocalInDir(testPubDir)
 
 	// make bare test public and private repos
 	if err := testPriv.InitBare(ctx); err != nil {

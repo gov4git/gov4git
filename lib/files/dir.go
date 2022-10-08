@@ -118,7 +118,7 @@ func EphemeralPath(prefix, suffix string) string {
 		"ephemeral",
 		t.Format("2006-01-02"),
 		t.Format("15:04:05"),
-		strconv.FormatUint(uint64(rand.Int63()), 36),
+		prefix+"-"+strconv.FormatUint(uint64(rand.Int63()), 36)+"-"+suffix,
 	)
 }
 

@@ -29,7 +29,7 @@ func (x ListOut) Human(context.Context) string {
 
 func (x GovGroupService) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	// clone community repo locally
-	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
+	community := git.LocalInDir(files.WorkDir(ctx).Subdir("community"))
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
 		return nil, err
 	}

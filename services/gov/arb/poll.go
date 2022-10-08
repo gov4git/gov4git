@@ -54,7 +54,11 @@ Vote using:
 
 func (x GovArbService) Poll(ctx context.Context, in *PollIn) (*PollOut, error) {
 	// clone community repo locally
-	community := git.LocalFromDir(files.WorkDir(ctx).Subdir("community"))
+	// community := git.LocalInDir(files.WorkDir(ctx).Subdir("community"))
+	community, err := git.MakeLocalCtx(ctx, "community")
+	if err != nil {
+		return nil, err
+	}
 	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.GoverningBranch); err != nil {
 		return nil, err
 	}

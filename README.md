@@ -26,4 +26,10 @@ Run `go install github.com/gov4git/gov4git`.
     - Supported arbitration policies
       - Vote (members vote, using a custom weighting function and threshold)
       - Quorum (at least N approvals out of M members)
-  - Gwitter: Social broadcasting service over git
+
+## Vision
+
+We think our framework for social applications over git has a huge potential in a variety of domains, e.g.
+  - Auctions over git
+  - Twitter over git
+  - Gaming over git (e.g. chess, go)

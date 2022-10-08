@@ -14,7 +14,7 @@ import (
 type ListIn struct {
 	User            string `json:"user"`
 	Group           string `json:"group"`
-	CommunityBranch string `json:"community_branch"` // branch in community repo where group will be added
+	CommunityBranch string `json:"community_branch"`
 }
 
 type ListOut struct {
@@ -41,18 +41,14 @@ func (x GovMemberService) List(ctx context.Context, in *ListIn) (*ListOut, error
 		return nil, err
 	}
 	// make changes to repo
-	memberships, err := List(ctx, community, in.User, in.Group)
+	memberships, err := x.ListLocal(ctx, community, in.User, in.Group)
 	if err != nil {
-		return nil, err
-	}
-	// push to origin
-	if err := community.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
 	return &ListOut{Memberships: memberships}, nil
 }
 
-func List(ctx context.Context, community git.Local, user string, group string) (memberships []ListMembership, err error) {
+func (x GovMemberService) ListLocal(ctx context.Context, community git.Local, user string, group string) (memberships []ListMembership, err error) {
 	userGlob, groupGlob := user, group
 	if user == "" {
 		userGlob = "*"

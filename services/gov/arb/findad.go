@@ -17,6 +17,8 @@ type FindPollAdOut struct {
 	PollAd            proto.GovPollAd `json:"poll_ad"`
 }
 
+// FindPollAdLocal finds the advertisement of a poll in a local clone of community repo (at the poll branch) and
+// leaves the local repo checked out at the genesis commit.
 func (x GovArbService) FindPollAdLocal(ctx context.Context, repo git.Local, in *FindPollAdIn) (*FindPollAdOut, error) {
 	// find the genesis commit of the referendum
 	findGenesis, err := x.FindPollGenesisLocal(ctx, repo, &FindPollGenesisIn{PollBranch: in.PollBranch})

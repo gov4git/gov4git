@@ -13,7 +13,7 @@ import (
 
 type Local struct {
 	// Path is an absolute local path to the git repository
-	Path string
+	Path string `json:"path"`
 }
 
 func MakeLocalInCtx(ctx context.Context, label string) (Local, error) {

@@ -3,14 +3,14 @@ package proto
 import "path/filepath"
 
 const (
-	RootPath           = ".gov"
-	LocalAgentPath     = ".gov"
-	LocalAgentTempPath = "gov"
+	LocalAgentPath     = ".gov4git"
+	LocalAgentTempPath = "gov4git"
 )
 
 var (
-	PublicCredentialsPath  = filepath.Join(RootPath, "public_credentials")
-	PrivateCredentialsPath = filepath.Join(RootPath, "private_credentials")
+	IdentityRoot           = ".gov"
+	PublicCredentialsPath  = filepath.Join(IdentityRoot, "public_credentials")
+	PrivateCredentialsPath = filepath.Join(IdentityRoot, "private_credentials")
 )
 
 // governance-related constants
@@ -32,3 +32,7 @@ var (
 
 	GovDirPolicyFilebase = "policy"
 )
+
+func SnapshotDir(repo string, commit string) string {
+	return filepath.Join(GovRoot, "snapshot", repo, commit)
+}

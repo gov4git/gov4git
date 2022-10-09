@@ -63,7 +63,7 @@ func (d Dir) Remove(path string) error {
 }
 
 func (d Dir) RemoveAll(path string) error {
-	return os.Remove(d.Abs(path))
+	return os.RemoveAll(d.Abs(path))
 }
 
 func (d Dir) Glob(pattern string) ([]string, error) {
@@ -128,4 +128,8 @@ func (d Dir) MkEphemeralDir(prefix, suffix string) (Dir, error) {
 		return Dir{}, err
 	}
 	return eph, nil
+}
+
+func Rename(from Dir, to Dir) error {
+	return os.Rename(from.Path, to.Path)
 }

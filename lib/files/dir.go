@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"time"
 
 	"github.com/gov4git/gov4git/lib/form"
 )
@@ -113,13 +112,14 @@ func (d Dir) ReadFormFile(ctx context.Context, path string, f any) (FormFile, er
 
 // EphemeralPath returns /prefix/YYYY-MM-DD/HH:MM:SS/suffix/nonce
 func EphemeralPath(prefix, suffix string) string {
-	t := time.Now()
-	return filepath.Join(
-		"ephemeral",
-		t.Format("2006-01-02"),
-		t.Format("15:04:05"),
-		prefix+"-"+strconv.FormatUint(uint64(rand.Int63()), 36)+"-"+suffix,
-	)
+	return prefix + "-" + strconv.FormatUint(uint64(rand.Int63()), 36) + "-" + suffix
+	// t := time.Now()
+	// return filepath.Join(
+	// 	"ephemeral",
+	// 	t.Format("2006-01-02"),
+	// 	t.Format("15:04:05"),
+	// 	prefix+"-"+strconv.FormatUint(uint64(rand.Int63()), 36)+"-"+suffix,
+	// )
 }
 
 func (d Dir) MkEphemeralDir(prefix, suffix string) (Dir, error) {

@@ -46,7 +46,7 @@ func (x GovService) SnapshotBranchLatest(ctx context.Context, in *SnapshotBranch
 	}
 
 	// directory inside community where snapshot lives
-	srcPath := proto.SnapshotDir(in.SourceRepo, latestCommit)
+	srcPath := proto.SnapshotDir(in.SourceRepo, latestCommit) //XXX: when SourceRepo has directory separators???
 	srcParent, _ := filepath.Split(srcPath)
 
 	// if the community repo already has a snapshot of the source commit, remove it.

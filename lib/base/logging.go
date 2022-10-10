@@ -55,7 +55,7 @@ func Infof(template string, args ...interface{}) {
 func Fatalf(template string, args ...interface{}) {
 	_, file, line, _ := runtime.Caller(1)
 	msg := fmt.Sprintf(template, args...)
-	src := fmt.Sprintf("%s:%d", file, line)
+	src := fmt.Sprintf("%s:%d ", file, line)
 	logger.Sugar().Fatal(src + msg)
 	// logger.Sugar().Fatalf(template, args...)
 }
@@ -63,7 +63,7 @@ func Fatalf(template string, args ...interface{}) {
 func Errorf(template string, args ...interface{}) {
 	_, file, line, _ := runtime.Caller(1)
 	msg := fmt.Sprintf(template, args...)
-	src := fmt.Sprintf("%s:%d", file, line)
+	src := fmt.Sprintf("%s:%d ", file, line)
 	logger.Sugar().Error(src + msg)
 	// logger.Sugar().Errorf(template, args...)
 }

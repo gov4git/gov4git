@@ -25,11 +25,11 @@ func TestVote(t *testing.T) {
 	ctx := context.Background()
 
 	// create poll
-	govService := arb.GovArbService{
+	arbService := arb.GovArbService{
 		GovConfig:      testCommunity.CommunityGovConfig(),
 		IdentityConfig: testCommunity.UserIdentityConfig(0),
 	}
-	pollOut, err := govService.Poll(
+	pollOut, err := arbService.Poll(
 		testCommunity.WithWorkDir(ctx, "test_poll"),
 		&arb.PollIn{
 			Path:            "test_poll",
@@ -43,7 +43,7 @@ func TestVote(t *testing.T) {
 	}
 
 	// cast a vote
-	voteOut, err := govService.Vote(
+	voteOut, err := arbService.Vote(
 		testCommunity.WithWorkDir(ctx, "test_vote"),
 		&arb.VoteIn{
 			ReferendumBranch: pollOut.PollBranch,

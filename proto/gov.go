@@ -2,7 +2,6 @@ package proto
 
 type GovConfig struct {
 	CommunityURL string `json:"community_url"`
-	AdminURL     string `json:"admin_url"`
 }
 
 type GovUserInfo struct {

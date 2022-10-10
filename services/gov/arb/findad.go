@@ -2,7 +2,6 @@ package arb
 
 import (
 	"context"
-	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
@@ -31,7 +30,7 @@ func (x GovArbService) FindPollAdLocal(ctx context.Context, repo git.Local, in *
 	if err != nil {
 		return nil, err
 	}
-	pollAdPath := filepath.Join(pollPath, proto.GovPollAdFilebase)
+	pollAdPath := proto.PollAdPath(pollPath)
 	if err := repo.CheckoutBranch(ctx, findGenesis.PollGenesisCommit); err != nil {
 		return nil, err
 	}

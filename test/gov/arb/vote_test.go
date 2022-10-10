@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/services/gov/arb"
 	"github.com/gov4git/gov4git/testutil"
 )
 
 func TestVote(t *testing.T) {
-	base.LogVerbosely()
+	// base.LogVerbosely()
 
 	// create test community
 	// dir := testutil.MakeStickyTestDir()

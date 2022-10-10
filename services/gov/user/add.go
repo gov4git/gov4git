@@ -68,3 +68,22 @@ func GetInfo(ctx context.Context, community git.Local, name string) (*proto.GovU
 	}
 	return &info, nil
 }
+
+type UserInfo struct {
+	UserName string            `json:"user_name"`
+	UserInfo proto.GovUserInfo `json:"user_info"`
+}
+
+type UserInfos []UserInfo
+
+func GetInfos(ctx context.Context, community git.Local, usernames []string) (UserInfos, error) {
+	userInfo := make(UserInfos, len(usernames))
+	for i, n := range usernames {
+		u, err := GetInfo(ctx, community, n)
+		if err != nil {
+			return nil, err
+		}
+		userInfo[i] = UserInfo{UserName: n, UserInfo: *u}
+	}
+	return userInfo, nil
+}

@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/form"
 )
@@ -25,7 +26,10 @@ type GovPollStrategy struct {
 type GovPollStrategyPrioritize struct{}
 
 var (
-	GovPollAdFilebase   = "poll_advertisement"
+	GovPollAdFilebase    = "advertisement"
+	GovPollTallyFilebase = "tally"
+
+	GovPollRoot         = filepath.Join(GovRoot, "polls")
 	GovPollBranchPrefix = "poll#"
 
 	GovPollVoteFilepath          = "vote"
@@ -34,6 +38,14 @@ var (
 
 func PollBranch(path string) string {
 	return GovPollBranchPrefix + path
+}
+
+func PollAdPath(pollPath string) string {
+	return filepath.Join(GovPollRoot, pollPath, GovPollAdFilebase)
+}
+
+func PollTallyPath(pollPath string) string {
+	return filepath.Join(GovPollRoot, pollPath, GovPollTallyFilebase)
 }
 
 func PollPathFromBranch(branch string) (string, error) {
@@ -74,4 +86,50 @@ func PollVoteBranch(ctx context.Context, pollAd GovPollAd) (string, error) {
 		return "", err
 	}
 	return GovPollVoteBranchPrefix + base64.StdEncoding.EncodeToString(h.Sum(nil)), nil
+}
+
+// tally results
+
+type GovPollTally struct {
+	Ad         GovPollAd     `json:"ad"`
+	TallyVotes GovTallyVotes `json:"tally_votes"`
+}
+
+type GovTallyVote struct {
+	UserName      string       `json:"user_name"`
+	UserPublicURL string       `json:"user_public_url"`
+	UserVote      *GovPollVote `json:"user_vote"` // nil indicates vote was not accessible
+}
+
+type GovTallyVotes []GovTallyVote
+
+// vote aggregation to choices
+
+type GovChoiceTally struct {
+	Choice        string  `json:"choice"`
+	TallyStrength float64 `json:"tally_strength"`
+}
+
+type GovChoiceTallies []GovChoiceTally
+
+func AggregateVotes(tallyVotes GovTallyVotes) GovChoiceTallies {
+	s := map[string]float64{} // choice -> strength
+	for _, tv := range tallyVotes {
+		if tv.UserVote == nil {
+			continue
+		}
+		choice, strength := tv.UserVote.Choice, tv.UserVote.Strength
+		t, ok := s[choice]
+		if !ok {
+			t = 0.0
+		}
+		t += strength
+		s[choice] = t
+	}
+	tallies := make(GovChoiceTallies, 0, len(s))
+	for choice, strength := range s {
+		tallies = append(tallies, GovChoiceTally{Choice: choice, TallyStrength: strength})
+	}
+	// sort.Sort(tallies)
+	return tallies
 }

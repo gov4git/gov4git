@@ -3,7 +3,6 @@ package arb
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
@@ -94,7 +93,7 @@ func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *P
 	}
 
 	// create and stage poll advertisement
-	pollAdPath := filepath.Join(in.Path, proto.GovPollAdFilebase)
+	pollAdPath := proto.PollAdPath(in.Path)
 	var pollAd proto.GovPollAd
 	switch in.Strategy {
 	case "prioritize":

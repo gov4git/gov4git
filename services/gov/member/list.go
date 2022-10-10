@@ -25,6 +25,14 @@ type ListMembership struct {
 	Group string `json:"group"`
 }
 
+func ExtractUsersFromMembership(ms []ListMembership) []string {
+	u := make([]string, len(ms))
+	for i, m := range ms {
+		u[i] = m.User
+	}
+	return u
+}
+
 func (x ListOut) Human(context.Context) string {
 	var w bytes.Buffer
 	for _, u := range x.Memberships {

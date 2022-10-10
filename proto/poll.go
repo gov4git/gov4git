@@ -91,28 +91,29 @@ func PollVoteBranch(ctx context.Context, pollAd GovPollAd) (string, error) {
 // tally results
 
 type GovPollTally struct {
-	Ad         GovPollAd     `json:"ad"`
-	TallyVotes GovTallyVotes `json:"tally_votes"`
+	Ad           GovPollAd       `json:"ad"`
+	TallyUsers   GovTallyUsers   `json:"tally_users"`
+	TallyChoices GovTallyChoices `json:"tally_choices"`
 }
 
-type GovTallyVote struct {
+type GovTallyUser struct {
 	UserName      string       `json:"user_name"`
 	UserPublicURL string       `json:"user_public_url"`
 	UserVote      *GovPollVote `json:"user_vote"` // nil indicates vote was not accessible
 }
 
-type GovTallyVotes []GovTallyVote
+type GovTallyUsers []GovTallyUser
 
 // vote aggregation to choices
 
-type GovChoiceTally struct {
+type GovTallyChoice struct {
 	Choice        string  `json:"choice"`
 	TallyStrength float64 `json:"tally_strength"`
 }
 
-type GovChoiceTallies []GovChoiceTally
+type GovTallyChoices []GovTallyChoice
 
-func AggregateVotes(tallyVotes GovTallyVotes) GovChoiceTallies {
+func AggregateVotes(tallyVotes GovTallyUsers) GovTallyChoices {
 	s := map[string]float64{} // choice -> strength
 	for _, tv := range tallyVotes {
 		if tv.UserVote == nil {
@@ -126,9 +127,9 @@ func AggregateVotes(tallyVotes GovTallyVotes) GovChoiceTallies {
 		t += strength
 		s[choice] = t
 	}
-	tallies := make(GovChoiceTallies, 0, len(s))
+	tallies := make(GovTallyChoices, 0, len(s))
 	for choice, strength := range s {
-		tallies = append(tallies, GovChoiceTally{Choice: choice, TallyStrength: strength})
+		tallies = append(tallies, GovTallyChoice{Choice: choice, TallyStrength: strength})
 	}
 	// sort.Sort(tallies)
 	return tallies

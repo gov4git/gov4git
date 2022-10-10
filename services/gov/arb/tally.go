@@ -99,7 +99,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 		ReferendumBranch: in.ReferendumBranch,
 		ReferendumTally: proto.GovPollTally{
 			Ad:         ad,
-			TallyVotes: make(proto.GovTallyVotes, len(userInfo)),
+			TallyUsers: make(proto.GovTallyUsers, len(userInfo)),
 		},
 	}
 
@@ -107,8 +107,8 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	// TODO: parallelize snapshots
 	govService := gov.GovService{GovConfig: x.GovConfig}
 	for i, info := range userInfo {
-		out.ReferendumTally.TallyVotes[i].UserName = info.UserName
-		out.ReferendumTally.TallyVotes[i].UserPublicURL = info.UserInfo.URL
+		out.ReferendumTally.TallyUsers[i].UserName = info.UserName
+		out.ReferendumTally.TallyUsers[i].UserPublicURL = info.UserInfo.URL
 
 		// compute the name of the vote branch in the user's repo
 		voteBranch, err := proto.PollVoteBranch(ctx, ad)
@@ -131,7 +131,8 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 		// out.ReferendumTally.TallyVotes[i].UserVote = userVoteXXX
 	}
 
-	// XXX: aggregate votes to choices
+	// aggregate votes to choices
+	out.ReferendumTally.TallyChoices = proto.AggregateVotes(out.ReferendumTally.TallyUsers)
 
 	// write/stage snapshots and tally to community repo
 	tallyPath := proto.PollTallyPath(ad.Path)

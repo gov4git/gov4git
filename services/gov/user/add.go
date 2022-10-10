@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
@@ -42,7 +41,7 @@ func (x GovUserService) Add(ctx context.Context, in *AddIn) (*AddOut, error) {
 }
 
 func Add(ctx context.Context, community git.Local, name string, url string) error {
-	userFile := filepath.Join(proto.GovUsersDir, name, proto.GovUserInfoFilebase)
+	userFile := proto.UserInfoFilepath(name)
 	// write user file
 	stage := files.FormFiles{
 		files.FormFile{Path: userFile, Form: proto.GovUserInfo{URL: url}},
@@ -59,4 +58,13 @@ func Add(ctx context.Context, community git.Local, name string, url string) erro
 		return err
 	}
 	return nil
+}
+
+func GetInfo(ctx context.Context, community git.Local, name string) (*proto.GovUserInfo, error) {
+	userInfoPath := proto.UserInfoFilepath(name)
+	var info proto.GovUserInfo
+	if _, err := community.Dir().ReadFormFile(ctx, userInfoPath, &info); err != nil {
+		return nil, err
+	}
+	return &info, nil
 }

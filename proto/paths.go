@@ -7,13 +7,15 @@ const (
 	LocalAgentTempPath = "gov4git"
 )
 
+// identity repo paths
+
 var (
 	IdentityRoot           = ".gov"
 	PublicCredentialsPath  = filepath.Join(IdentityRoot, "public_credentials")
 	PrivateCredentialsPath = filepath.Join(IdentityRoot, "private_credentials")
 )
 
-// governance-related constants
+// governance repo paths
 
 const (
 	GovRoot = ".gov"
@@ -32,6 +34,10 @@ var (
 
 	GovDirPolicyFilebase = "policy"
 )
+
+func UserInfoFilepath(user string) string {
+	return filepath.Join(GovUsersDir, user, GovUserInfoFilebase)
+}
 
 func SnapshotDir(repo string, commit string) string {
 	return filepath.Join(GovRoot, "snapshot", repo, commit)

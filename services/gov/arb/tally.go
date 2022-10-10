@@ -5,7 +5,9 @@ import (
 
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
+	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/services/gov/member"
+	"github.com/gov4git/gov4git/services/gov/user"
 )
 
 type TallyIn struct {
@@ -55,9 +57,16 @@ func (x GovArbService) TallyLocal(ctx context.Context, community git.Local, in *
 	if err != nil {
 		return nil, err
 	}
-	_ = participants
 
-	//XXX: get user info (public_url, etc.)
+	// get participants' user infos (public_url, etc.)
+	userInfo := map[string]*proto.GovUserInfo{} // user name -> info
+	for _, p := range participants {
+		u, err := user.GetInfo(ctx, community, p.User)
+		if err != nil {
+			return nil, err
+		}
+		userInfo[p.User] = u
+	}
 
 	//XXX
 

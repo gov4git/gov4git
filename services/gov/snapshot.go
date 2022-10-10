@@ -26,9 +26,13 @@ func (x SnapshotBranchLatestOut) Human(context.Context) string {
 		x.In.SourceRepo, x.In.SourceBranch, x.SourceCommit, x.In.Community.Path)
 }
 
+func GetSnapshotDirLocal(community *git.Local, sourceRepo string, sourceCommit string) files.Dir {
+	return community.Dir().Subdir(proto.SnapshotDir(sourceRepo, sourceCommit))
+}
+
 // SnapshotBranchLatest downloads the latest commit on a given branch at a remote source repo, and
 // places it into a local community repo.
-// SnapshotBranchLatest stages but does not commit the changes made to the local community repo.
+// It stages but does not commit the changes made to the local community repo.
 func (x GovService) SnapshotBranchLatest(ctx context.Context, in *SnapshotBranchLatestIn) (*SnapshotBranchLatestOut, error) {
 	// clone source repo locally at the branch
 	source, err := git.MakeLocalInCtx(ctx, "source")
@@ -46,7 +50,7 @@ func (x GovService) SnapshotBranchLatest(ctx context.Context, in *SnapshotBranch
 	}
 
 	// directory inside community where snapshot lives
-	srcPath := proto.SnapshotDir(in.SourceRepo, latestCommit) //XXX: when SourceRepo has directory separators???
+	srcPath := proto.SnapshotDir(in.SourceRepo, latestCommit)
 	srcParent, _ := filepath.Split(srcPath)
 
 	// if the community repo already has a snapshot of the source commit, remove it.

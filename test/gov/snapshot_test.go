@@ -2,24 +2,21 @@ package gov
 
 import (
 	"context"
-	"os"
-	"path/filepath"
+	"fmt"
 	"testing"
 
-	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/services/gov"
 	"github.com/gov4git/gov4git/testutil"
 )
 
-// XXX: test taking snapshot twice in the same community repo
-
 func TestSnapshot(t *testing.T) {
-	base.LogVerbosely()
+	// base.LogVerbosely()
 
 	// create test community
-	dir := filepath.Join(os.TempDir(), "gov4git_test") // t.TempDir()
+	// dir := testutil.MakeStickyTestDir()
+	dir := t.TempDir()
 	testCommunity, err := testutil.CreateTestCommunity(dir, 1)
 	if err != nil {
 		t.Fatal(err)
@@ -32,6 +29,7 @@ func TestSnapshot(t *testing.T) {
 
 	// create a local clone of the community
 	communityClone, err := git.MakeLocalInCtx(ctx, "community_clone")
+	fmt.Println("community clone in", communityClone.Path)
 	if err != nil {
 		t.Fatal(err)
 	}

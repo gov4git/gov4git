@@ -3,8 +3,6 @@ package arb
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/gov4git/gov4git/proto"
@@ -14,7 +12,8 @@ import (
 
 func TestPoll(t *testing.T) {
 	// create test community
-	dir := filepath.Join(os.TempDir(), "gov4git_test") // t.TempDir()
+	// dir := testutil.MakeStickyTestDir()
+	dir := t.TempDir()
 	testCommunity, err := testutil.CreateTestCommunity(dir, 2)
 	if err != nil {
 		t.Fatal(err)

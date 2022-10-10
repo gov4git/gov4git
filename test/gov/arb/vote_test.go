@@ -3,8 +3,6 @@ package arb
 import (
 	"context"
 	"fmt"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/gov4git/gov4git/lib/base"
@@ -17,7 +15,8 @@ func TestVote(t *testing.T) {
 	base.LogVerbosely()
 
 	// create test community
-	dir := filepath.Join(os.TempDir(), "gov4git_test") // t.TempDir()
+	// dir := testutil.MakeStickyTestDir()
+	dir := t.TempDir()
 	testCommunity, err := testutil.CreateTestCommunity(dir, 1)
 	if err != nil {
 		t.Fatal(err)

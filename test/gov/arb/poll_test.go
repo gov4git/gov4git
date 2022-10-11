@@ -1,7 +1,6 @@
 package arb
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
@@ -18,11 +17,11 @@ func TestPoll(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	ctx := testCommunity.Background()
 
 	// invoke service
 	svc := arb.GovArbService{GovConfig: testCommunity.CommunityGovConfig()}
-	out, err := svc.Poll(
-		testCommunity.WithWorkDir(context.Background(), "test"),
+	out, err := svc.Poll(ctx,
 		&arb.PollIn{
 			Path:            "test_poll",
 			Choices:         []string{"a", "b", "c"},

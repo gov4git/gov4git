@@ -110,6 +110,10 @@ func (x *TestCommunity) initUserRepos(ctx context.Context, i int) error {
 	return nil
 }
 
+func (x *TestCommunity) Background() context.Context {
+	return x.WithWorkDir(context.Background())
+}
+
 func (x *TestCommunity) WithWorkDir(ctx context.Context, suffix ...string) context.Context {
 	return files.WithWorkDir(ctx, files.Dir{Path: filepath.Join(x.Dir, "working", filepath.Join(suffix...))})
 }

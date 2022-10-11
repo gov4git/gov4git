@@ -125,8 +125,11 @@ func (x Local) Remove(ctx context.Context, paths []string) error {
 }
 
 func (x Local) CheckoutBranch(ctx context.Context, branch string) error {
-	_, _, err := x.Invoke(ctx, "checkout", branch)
-	return err
+	_, stderr, err1 := x.Invoke(ctx, "checkout", branch)
+	if err2 := ParseCheckoutError(stderr); err2 != nil && err2 != ErrAlreadyOnBranch {
+		return err2
+	}
+	return err1
 }
 
 func (x Local) CheckoutNewBranch(ctx context.Context, branch string) error {

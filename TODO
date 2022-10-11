@@ -1,14 +1,19 @@
 PRODUCT
 - [ ] support multiple referendums in a branch
-  - [ ] how to identify a referendum (if not by branch)? commit? tag? branch+name?<--
+  - [ ] branch+name
+
+- [ ] derive vote branch hash from ad's raw bytes:
+  - [ ] when voting
+  - [ ] when tallying
+
 - [ ] generalize the poll/vote/tally flow to work for different types of referendums
+  - [ ] rename referendum -> ballot
+
 - [ ] a vote can contain a batch of choices
 
 FRAMEWORK
 - [ ] log git version
-- [ ] derive vote branch hash from ad's raw bytes:
-  - [ ] when voting
-  - [ ] when tallying
+- [ ] output only pure json
 
 DOC
 - [ ] terminal-cast type video tutorials

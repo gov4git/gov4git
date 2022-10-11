@@ -9,6 +9,7 @@ import (
 var (
 	ErrRemoteBranchNotFound = errors.New("remote branch not found")
 	ErrNothingToCommit      = errors.New("nothing to commit")
+	ErrAlreadyOnBranch      = errors.New("already on branch")
 )
 
 func ParseCloneError(stderr string, branch string, upstream string) error {
@@ -19,11 +20,16 @@ func ParseCloneError(stderr string, branch string, upstream string) error {
 	return nil
 }
 
-const patternNothingToCommit = "nothing to commit, working tree clean"
-
 func ParseCommitError(stderr string) error {
-	if strings.Index(string(stderr), patternNothingToCommit) >= 0 {
+	if strings.Index(stderr, "nothing to commit, working tree clean") >= 0 {
 		return ErrNothingToCommit
+	}
+	return nil
+}
+
+func ParseCheckoutError(stderr string) error {
+	if strings.Index(stderr, "Already on") >= 0 {
+		return ErrAlreadyOnBranch
 	}
 	return nil
 }

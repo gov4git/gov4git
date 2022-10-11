@@ -1,7 +1,6 @@
 package arb
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
@@ -20,15 +19,14 @@ func TestVote(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx := context.Background()
+	ctx := testCommunity.Background()
 
 	// create poll
 	arbService := arb.GovArbService{
 		GovConfig:      testCommunity.CommunityGovConfig(),
 		IdentityConfig: testCommunity.UserIdentityConfig(0),
 	}
-	pollOut, err := arbService.Poll(
-		testCommunity.WithWorkDir(ctx, "test_poll"),
+	pollOut, err := arbService.Poll(ctx,
 		&arb.PollIn{
 			Path:            "test_poll",
 			Choices:         []string{"a", "b", "c"},
@@ -41,8 +39,7 @@ func TestVote(t *testing.T) {
 	}
 
 	// cast a vote
-	voteOut, err := arbService.Vote(
-		testCommunity.WithWorkDir(ctx, "test_vote"),
+	voteOut, err := arbService.Vote(ctx,
 		&arb.VoteIn{
 			ReferendumBranch: pollOut.PollBranch,
 			VoteChoice:       "a",

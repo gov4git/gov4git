@@ -97,9 +97,10 @@ type GovPollTally struct {
 }
 
 type GovTallyUser struct {
-	UserName      string       `json:"user_name"`
-	UserPublicURL string       `json:"user_public_url"`
-	UserVote      *GovPollVote `json:"user_vote"` // nil indicates vote was not accessible
+	UserName       string       `json:"user_name"`
+	UserPublicURL  string       `json:"user_public_url"`
+	UserVote       *GovPollVote `json:"user_vote"` // nil indicates vote was not accessible
+	UserFetchError error        `json:"user_fetch_error"`
 }
 
 type GovTallyUsers []GovTallyUser

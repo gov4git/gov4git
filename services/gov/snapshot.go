@@ -26,7 +26,7 @@ func (x SnapshotBranchLatestOut) Human(context.Context) string {
 		x.In.SourceRepo, x.In.SourceBranch, x.SourceCommit, x.In.Community.Path)
 }
 
-func GetSnapshotDirLocal(community *git.Local, sourceRepo string, sourceCommit string) files.Dir {
+func GetSnapshotDirLocal(community git.Local, sourceRepo string, sourceCommit string) files.Dir {
 	return community.Dir().Subdir(proto.SnapshotDir(sourceRepo, sourceCommit))
 }
 

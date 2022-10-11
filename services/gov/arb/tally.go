@@ -2,6 +2,7 @@ package arb
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
@@ -105,30 +106,14 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 
 	// snapshot votes from user repos
 	// TODO: parallelize snapshots
-	govService := gov.GovService{GovConfig: x.GovConfig}
 	for i, info := range userInfo {
-		out.ReferendumTally.TallyUsers[i].UserName = info.UserName
-		out.ReferendumTally.TallyUsers[i].UserPublicURL = info.UserInfo.URL
-
-		// compute the name of the vote branch in the user's repo
-		voteBranch, err := proto.PollVoteBranch(ctx, ad)
-		if err != nil {
-			return nil, err
+		userVote, err := x.snapshotParseVerifyUserVote(ctx, community, ad, info)
+		out.ReferendumTally.TallyUsers[i] = proto.GovTallyUser{
+			UserName:       info.UserName,
+			UserPublicURL:  info.UserInfo.URL,
+			UserVote:       userVote,
+			UserFetchError: err,
 		}
-
-		snapOut, err := govService.SnapshotBranchLatest(ctx, &gov.SnapshotBranchLatestIn{
-			SourceRepo:   info.UserInfo.URL,
-			SourceBranch: voteBranch,
-			Community:    community,
-		})
-		if err != nil {
-			// skip snapshotting unresponsive user repos
-			continue
-		}
-
-		// XXX: prepare the votes tally
-		_ = snapOut
-		// out.ReferendumTally.TallyVotes[i].UserVote = userVoteXXX
 	}
 
 	// aggregate votes to choices
@@ -152,4 +137,48 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	}
 
 	return out, nil
+}
+
+func (x GovArbService) snapshotParseVerifyUserVote(
+	ctx context.Context,
+	community git.Local,
+	ad proto.GovPollAd,
+	userInfo user.UserInfo,
+) (*proto.GovPollVote, error) {
+
+	// compute the name of the vote branch in the user's repo
+	voteBranch, err := proto.PollVoteBranch(ctx, ad)
+	if err != nil {
+		return nil, err
+	}
+
+	// snapshot user's vote branch into the community repo
+	snap, err := x.GovService().SnapshotBranchLatest(ctx,
+		&gov.SnapshotBranchLatestIn{
+			SourceRepo:   userInfo.UserInfo.URL,
+			SourceBranch: voteBranch,
+			Community:    community,
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	// parse and verify user's vote
+	snapDir := gov.GetSnapshotDirLocal(community, snap.In.SourceRepo, snap.SourceCommit)
+	var signature proto.SignedPlaintext
+
+	if _, err := snapDir.ReadFormFile(ctx, proto.GovPollVoteSignatureFilepath, &signature); err != nil {
+		return nil, err
+	}
+	if !signature.Verify() {
+		return nil, fmt.Errorf("signature is not valid")
+	}
+	var vote proto.GovPollVote
+	if err := form.DecodeForm(ctx, signature.Plaintext, &vote); err != nil {
+		return nil, err
+	}
+
+	// TODO: verify the user's vote is for this poll
+
+	return &vote, nil
 }

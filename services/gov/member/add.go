@@ -2,7 +2,6 @@ package member
 
 import (
 	"context"
-	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
@@ -31,7 +30,7 @@ func (x GovMemberService) Add(ctx context.Context, in *AddIn) (*AddOut, error) {
 		return nil, err
 	}
 	// make changes to repo
-	if err := Add(ctx, community, in.User, in.Group); err != nil {
+	if err := x.AddLocal(ctx, community, in.User, in.Group); err != nil {
 		return nil, err
 	}
 	// push to origin
@@ -41,21 +40,27 @@ func (x GovMemberService) Add(ctx context.Context, in *AddIn) (*AddOut, error) {
 	return &AddOut{}, nil
 }
 
-func Add(ctx context.Context, community git.Local, user string, group string) error {
-	mFile := filepath.Join(proto.GovGroupsDir, group, proto.GovMembersDirbase, user)
+func (x GovMemberService) AddLocal(ctx context.Context, community git.Local, user string, group string) error {
+	if err := x.AddLocalStageOnly(ctx, community, user, group); err != nil {
+		return err
+	}
+	if err := community.Commitf(ctx, "gov: add member user %v to group %v", user, group); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (x GovMemberService) AddLocalStageOnly(ctx context.Context, community git.Local, user string, group string) error {
+	file := proto.GroupMemberFilepath(group, user)
 	// write group file
 	stage := files.ByteFiles{
-		files.ByteFile{Path: mFile},
+		files.ByteFile{Path: file},
 	}
 	if err := community.Dir().WriteByteFiles(stage); err != nil {
 		return err
 	}
 	// stage changes
 	if err := community.Add(ctx, stage.Paths()); err != nil {
-		return err
-	}
-	// commit changes
-	if err := community.Commitf(ctx, "gov: add member user %v to group %v", user, group); err != nil {
 		return err
 	}
 	return nil

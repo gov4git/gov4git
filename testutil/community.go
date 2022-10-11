@@ -5,10 +5,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/services/gov/group"
+	"github.com/gov4git/gov4git/services/gov/member"
+	"github.com/gov4git/gov4git/services/gov/user"
 	"github.com/gov4git/gov4git/services/identity"
 )
 
@@ -35,16 +39,16 @@ func (x *TestCommunity) Init(ctx context.Context) error {
 		return err
 	}
 
-	// init community repo
-	if err := x.initCommunityRepo(ctx); err != nil {
-		return err
-	}
-
 	// init user repos
 	for i := 0; i < x.NumUsers; i++ {
 		if err := x.initUserRepos(ctx, i); err != nil {
 			return err
 		}
+	}
+
+	// init community repo
+	if err := x.initCommunityRepo(ctx); err != nil {
+		return err
 	}
 
 	return nil
@@ -79,6 +83,11 @@ func (x *TestCommunity) initCommunityRepo(ctx context.Context) error {
 		return err
 	}
 
+	// add users to group all
+	if err := x.addUsersToGroupAll(ctx, clonedCommunityRepo); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -110,6 +119,35 @@ func (x *TestCommunity) initUserRepos(ctx context.Context, i int) error {
 	return nil
 }
 
+func (x *TestCommunity) addUsersToGroupAll(ctx context.Context, clonedCommunityRepo git.Local) error {
+
+	// make group "all"
+	if err := x.CommunityGroupService().AddLocalStageOnly(ctx, clonedCommunityRepo, "all"); err != nil {
+		return err
+	}
+
+	// create users
+	for i := 0; i < x.NumUsers; i++ {
+		user := strconv.Itoa(i)
+		if err := x.CommunityUserService().AddLocalStageOnly(ctx, clonedCommunityRepo, user, x.UserPublicRepoURL(i)); err != nil {
+			return err
+		}
+		if err := x.CommunityMemberService().AddLocalStageOnly(ctx, clonedCommunityRepo, user, "all"); err != nil {
+			return err
+		}
+	}
+
+	// commit changes
+	if err := clonedCommunityRepo.Commit(ctx, "add users and groups"); err != nil {
+		return err
+	}
+	if err := clonedCommunityRepo.PushUpstream(ctx); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (x *TestCommunity) Background() context.Context {
 	return x.WithWorkDir(context.Background())
 }
@@ -135,6 +173,24 @@ func (x *TestCommunity) CommunityRepoURL() string {
 func (x *TestCommunity) CommunityGovConfig() proto.GovConfig {
 	return proto.GovConfig{
 		CommunityURL: x.CommunityRepoURL(),
+	}
+}
+
+func (x *TestCommunity) CommunityUserService() user.GovUserService {
+	return user.GovUserService{
+		GovConfig: x.CommunityGovConfig(),
+	}
+}
+
+func (x *TestCommunity) CommunityGroupService() group.GovGroupService {
+	return group.GovGroupService{
+		GovConfig: x.CommunityGovConfig(),
+	}
+}
+
+func (x *TestCommunity) CommunityMemberService() member.GovMemberService {
+	return member.GovMemberService{
+		GovConfig: x.CommunityGovConfig(),
 	}
 }
 

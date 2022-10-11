@@ -2,7 +2,6 @@ package member
 
 import (
 	"context"
-	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
@@ -41,13 +40,13 @@ func (x GovMemberService) Remove(ctx context.Context, in *RemoveIn) (*RemoveOut,
 }
 
 func Remove(ctx context.Context, community git.Local, user string, group string) error {
-	mFile := filepath.Join(proto.GovGroupsDir, group, proto.GovMembersDirbase, user)
+	file := proto.GroupMemberFilepath(group, user)
 	// remove group file
-	if err := community.Dir().Remove(mFile); err != nil {
+	if err := community.Dir().Remove(file); err != nil {
 		return err
 	}
 	// stage changes
-	if err := community.Remove(ctx, []string{mFile}); err != nil {
+	if err := community.Remove(ctx, []string{file}); err != nil {
 		return err
 	}
 	// commit changes

@@ -30,7 +30,7 @@ func (x GovUserService) Add(ctx context.Context, in *AddIn) (*AddOut, error) {
 		return nil, err
 	}
 	// make changes to repo
-	if err := Add(ctx, community, in.Name, in.URL); err != nil {
+	if err := x.AddLocal(ctx, community, in.Name, in.URL); err != nil {
 		return nil, err
 	}
 	// push to origin
@@ -40,7 +40,17 @@ func (x GovUserService) Add(ctx context.Context, in *AddIn) (*AddOut, error) {
 	return &AddOut{}, nil
 }
 
-func Add(ctx context.Context, community git.Local, name string, url string) error {
+func (x GovUserService) AddLocal(ctx context.Context, community git.Local, name string, url string) error {
+	if err := x.AddLocalStageOnly(ctx, community, name, url); err != nil {
+		return err
+	}
+	if err := community.Commitf(ctx, "gov: add user %v", name); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (x GovUserService) AddLocalStageOnly(ctx context.Context, community git.Local, name string, url string) error {
 	userFile := proto.UserInfoFilepath(name)
 	// write user file
 	stage := files.FormFiles{
@@ -51,10 +61,6 @@ func Add(ctx context.Context, community git.Local, name string, url string) erro
 	}
 	// stage changes
 	if err := community.Add(ctx, stage.Paths()); err != nil {
-		return err
-	}
-	// commit changes
-	if err := community.Commitf(ctx, "gov: add user %v", name); err != nil {
 		return err
 	}
 	return nil

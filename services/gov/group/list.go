@@ -48,9 +48,8 @@ func (x GovGroupService) List(ctx context.Context, in *ListIn) (*ListOut, error)
 }
 
 func List(ctx context.Context, community git.Local) ([]string, error) {
-	groupFileGlob := filepath.Join(proto.GovGroupsDir, "*", proto.GovGroupInfoFilebase)
 	// glob for group files
-	m, err := community.Dir().Glob(groupFileGlob)
+	m, err := community.Dir().Glob(proto.GroupInfoFilepath("*"))
 	if err != nil {
 		return nil, err
 	}

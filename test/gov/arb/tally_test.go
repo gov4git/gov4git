@@ -37,7 +37,7 @@ func TestTally(t *testing.T) {
 		&arb.PollIn{
 			Path:            "test_poll",
 			Choices:         []string{"a", "b", "c"},
-			Group:           "participants",
+			Group:           "all",
 			Strategy:        "prioritize",
 			GoverningBranch: proto.MainBranch,
 		})

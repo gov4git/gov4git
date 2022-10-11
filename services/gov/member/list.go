@@ -66,7 +66,7 @@ func (x GovMemberService) ListLocal(ctx context.Context, community git.Local, us
 	if group == "" {
 		groupGlob = "*"
 	}
-	userFileGlob := filepath.Join(proto.GovGroupsDir, groupGlob, proto.GovMembersDirbase, userGlob)
+	userFileGlob := proto.GroupMemberFilepath(groupGlob, userGlob)
 	// glob for group files
 	m, err := community.Dir().Glob(userFileGlob)
 	if err != nil {

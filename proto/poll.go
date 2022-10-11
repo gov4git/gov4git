@@ -9,12 +9,12 @@ import (
 )
 
 type GovPollAd struct {
-	Path         string          `json:"path"`          // path within repo where poll will be persisted, also unique poll name
-	Choices      []string        `json:"choices"`       // ballot choices
-	Group        string          `json:"group"`         // community group eligible to participate
-	Strategy     GovPollStrategy `json:"strategy"`      // polling strategy
-	Branch       string          `json:"branch"`        // branch governing the poll
-	ParentCommit string          `json:"parent_commit"` // commit before poll
+	Path            string          `json:"path"`          // path within repo where poll will be persisted, also unique poll name
+	Choices         []string        `json:"choices"`       // ballot choices
+	Group           string          `json:"group"`         // community group eligible to participate
+	Strategy        GovPollStrategy `json:"strategy"`      // polling strategy
+	GoverningBranch string          `json:"branch"`        // branch governing the poll
+	ParentCommit    string          `json:"parent_commit"` // commit before poll
 }
 
 type GovPollStrategy struct {
@@ -24,19 +24,14 @@ type GovPollStrategy struct {
 type GovPollStrategyPrioritize struct{}
 
 var (
-	GovPollAdFilebase    = "advertisement"
-	GovPollTallyFilebase = "tally"
+	GovPollAdFilebase    = "poll_advertisement"
+	GovPollTallyFilebase = "poll_tally"
 
-	GovPollRoot         = filepath.Join(GovRoot, "polls")
-	GovPollBranchPrefix = "poll#"
+	GovPollRoot = filepath.Join(GovRoot, "polls")
 
 	GovPollVoteFilepath          = "vote"
 	GovPollVoteSignatureFilepath = "vote.signature.ed25519"
 )
-
-func PollBranch(path string) string {
-	return GovPollBranchPrefix + path
-}
 
 func PollAdPath(pollPath string) string {
 	return filepath.Join(GovPollRoot, pollPath, GovPollAdFilebase)
@@ -44,13 +39,6 @@ func PollAdPath(pollPath string) string {
 
 func PollTallyPath(pollPath string) string {
 	return filepath.Join(GovPollRoot, pollPath, GovPollTallyFilebase)
-}
-
-func PollPathFromBranch(branch string) (string, error) {
-	if len(branch) < len(GovPollBranchPrefix) {
-		return "", fmt.Errorf("invalid poll branch")
-	}
-	return branch[len(GovPollBranchPrefix):], nil
 }
 
 func PollGenesisCommitHeader(pollBranch string) string {

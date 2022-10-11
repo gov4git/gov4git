@@ -15,6 +15,7 @@ import (
 
 type TallyIn struct {
 	ReferendumBranch string `json:"referendum_branch"`
+	ReferendumPath   string `json:"referendum_path"`
 }
 
 type TallyOut struct {
@@ -42,7 +43,8 @@ func (x GovArbService) Tally(ctx context.Context, in *TallyIn) (*TallyOut, error
 
 func (x GovArbService) TallyLocal(ctx context.Context, community git.Local, in *TallyIn) (*TallyOut, error) {
 	// find poll ad and leave local repo checked out at the genesis commit
-	findAd, err := x.FindPollAdLocal(ctx, community, &FindPollAdIn{PollBranch: in.ReferendumBranch})
+	findAd, err := x.FindPollAdLocal(ctx, community,
+		&FindPollAdIn{PollBranch: in.ReferendumBranch, PollPath: in.ReferendumPath})
 	if err != nil {
 		return nil, err
 	}

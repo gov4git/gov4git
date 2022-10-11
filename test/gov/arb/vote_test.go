@@ -43,6 +43,7 @@ func TestVote(t *testing.T) {
 	voteOut, err := arbService.Vote(ctx,
 		&arb.VoteIn{
 			ReferendumBranch: pollOut.PollBranch,
+			ReferendumPath:   "test_poll",
 			VoteChoice:       "a",
 			VoteStrength:     1.0,
 		},

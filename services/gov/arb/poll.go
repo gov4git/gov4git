@@ -3,6 +3,7 @@ package arb
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
@@ -15,23 +16,14 @@ type PollIn struct {
 	Group           string   `json:"group"`
 	Strategy        string   `json:"strategy"`
 	GoverningBranch string   `json:"governing_branch"`
-}
-
-func (x *PollIn) Sanitize() error {
-	// sanitize path
-	x.Path = git.MakeNonAbs(x.Path)
-	if x.Path == "" {
-		return fmt.Errorf("missing poll path")
-	}
-	return nil
+	PollBranch      string   `json:"poll_branch"`
 }
 
 type PollOut struct {
-	CommunityURL      string `json:"community_url"`
-	GoverningBranch   string `json:"governing_branch"`
-	Path              string `json:"path"`
-	PollBranch        string `json:"poll_branch"`
-	PollGenesisCommit string `json:"poll_genesis_commit"`
+	PollIn            *PollIn `json:"poll_in"`
+	PollCommunityURL  string  `json:"poll_community_url"`
+	PollBranch        string  `json:"poll_branch"`
+	PollGenesisCommit string  `json:"poll_genesis_commit"`
 }
 
 func (x GovArbService) Poll(ctx context.Context, in *PollIn) (*PollOut, error) {
@@ -55,6 +47,15 @@ func (x GovArbService) Poll(ctx context.Context, in *PollIn) (*PollOut, error) {
 	return out, nil
 }
 
+func (x *PollIn) Sanitize() error {
+	// sanitize path
+	x.Path = git.MakeNonAbs(x.Path)
+	if x.Path == "" {
+		return fmt.Errorf("missing poll path")
+	}
+	return nil
+}
+
 func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *PollIn) (*PollOut, error) {
 	// XXX: verify path is not in use
 	// XXX: verify poll branch is not in use
@@ -69,10 +70,14 @@ func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *P
 		return nil, err
 	}
 
-	// checkout a new poll branch
-	pollBranch := proto.PollBranch(in.Path)
-	if err := community.CheckoutNewBranch(ctx, pollBranch); err != nil {
-		return nil, err
+	// checkout the poll branch
+	pollBranch := strings.TrimSpace(in.PollBranch)
+	if pollBranch == "" { // use governing branch
+		pollBranch = in.GoverningBranch
+	} else {
+		if err := community.CheckoutNewBranch(ctx, pollBranch); err != nil {
+			return nil, err
+		}
 	}
 
 	// create and stage poll advertisement
@@ -81,21 +86,18 @@ func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *P
 	switch in.Strategy {
 	case "prioritize":
 		pollAd = proto.GovPollAd{
-			Path:         in.Path,
-			Choices:      in.Choices,
-			Group:        in.Group,
-			Strategy:     proto.GovPollStrategy{Prioritize: &proto.GovPollStrategyPrioritize{}},
-			Branch:       in.GoverningBranch,
-			ParentCommit: head,
+			Path:            in.Path,
+			Choices:         in.Choices,
+			Group:           in.Group,
+			Strategy:        proto.GovPollStrategy{Prioritize: &proto.GovPollStrategyPrioritize{}},
+			GoverningBranch: in.GoverningBranch,
+			ParentCommit:    head,
 		}
 	default:
 		return nil, fmt.Errorf("unknown poll strategy %v", in.Strategy)
 	}
 	stage := files.FormFiles{
-		files.FormFile{
-			Path: pollAdPath,
-			Form: pollAd,
-		},
+		files.FormFile{Path: pollAdPath, Form: pollAd},
 	}
 	if err := community.Dir().WriteFormFiles(ctx, stage); err != nil {
 		return nil, err
@@ -106,19 +108,12 @@ func (x GovArbService) PollLocal(ctx context.Context, community git.Local, in *P
 
 	// commit changes and include poll ad in commit message
 	out := &PollOut{
-		CommunityURL:      x.GovConfig.CommunityURL,
-		GoverningBranch:   in.GoverningBranch,
-		Path:              pollAd.Path,
+		PollIn:            in,
+		PollCommunityURL:  x.GovConfig.CommunityURL,
 		PollBranch:        pollBranch,
 		PollGenesisCommit: "", // populate after commit
 	}
-	hum := fmt.Sprintf(proto.PollGenesisCommitHeader(pollBranch)+`
-
-Vote using:
-
-   gov4git vote --community=%v --branch=%v
-
-   `, out.CommunityURL, out.PollBranch)
+	hum := proto.PollGenesisCommitHeader(pollBranch)
 	msg, err := git.PrepareCommitMsg(ctx, hum, pollAd)
 	if err != nil {
 		return nil, err

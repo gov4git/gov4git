@@ -33,6 +33,7 @@ var (
 				Group:           pollGroup,
 				Strategy:        pollStrategy,
 				GoverningBranch: pollGoverningBranch,
+				PollBranch:      pollBranch,
 			})
 			if err == nil {
 				fmt.Fprint(os.Stdout, form.Pretty(r))
@@ -62,6 +63,7 @@ var (
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Vote(ctx, &arb.VoteIn{
 				ReferendumBranch: voteReferendumBranch,
+				ReferendumPath:   voteReferendumPath,
 				VoteChoice:       voteChoice,
 				VoteStrength:     voteStrength,
 			})
@@ -93,6 +95,7 @@ var (
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Tally(ctx, &arb.TallyIn{
 				ReferendumBranch: tallyReferendumBranch,
+				ReferendumPath:   tallyReferendumPath,
 			})
 			if err == nil {
 				fmt.Fprint(os.Stdout, form.Pretty(r))
@@ -110,12 +113,15 @@ var (
 	pollGroup           string
 	pollStrategy        string
 	pollGoverningBranch string
+	pollBranch          string
 
 	voteReferendumBranch string
+	voteReferendumPath   string
 	voteChoice           string
 	voteStrength         float64
 
 	tallyReferendumBranch string
+	tallyReferendumPath   string
 )
 
 func init() {
@@ -123,11 +129,14 @@ func init() {
 	pollCmd.Flags().StringArrayVar(&pollChoices, "choices", nil, "poll choices")
 	pollCmd.Flags().StringVar(&pollGroup, "group", "", "group of users participating in poll")
 	pollCmd.Flags().StringVar(&pollStrategy, "strategy", "", "polling strategy (available strategy: prioritize)")
-	pollCmd.Flags().StringVar(&pollGoverningBranch, "branch", "", "branch governing the poll")
+	pollCmd.Flags().StringVar(&pollGoverningBranch, "govern-branch", "", "branch governing the poll")
+	pollCmd.Flags().StringVar(&pollBranch, "poll-branch", "", "branch where poll is created (if empty, use governing branch)")
 
 	voteCmd.Flags().StringVar(&voteReferendumBranch, "--refm-branch", "", "referendum branch (e.g. poll branch)")
+	voteCmd.Flags().StringVar(&voteReferendumPath, "--refm-path", "", "referendum path")
 	voteCmd.Flags().StringVar(&voteChoice, "--choice", "", "vote choice")
 	voteCmd.Flags().Float64Var(&voteStrength, "--strength", 0, "vote strength")
 
 	tallyCmd.Flags().StringVar(&tallyReferendumBranch, "--refm-branch", "", "referendum branch (e.g. poll branch)")
+	tallyCmd.Flags().StringVar(&tallyReferendumPath, "--refm-path", "", "referendum path")
 }

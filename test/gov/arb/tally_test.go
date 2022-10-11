@@ -50,6 +50,7 @@ func TestTally(t *testing.T) {
 	voteOut, err := arbService1.Vote(ctx,
 		&arb.VoteIn{
 			ReferendumBranch: pollOut.PollBranch,
+			ReferendumPath:   "test_poll",
 			VoteChoice:       "a",
 			VoteStrength:     1.0,
 		},
@@ -60,7 +61,8 @@ func TestTally(t *testing.T) {
 
 	// tally the results
 	base.Infof("tallying")
-	tallyOut, err := arbService0.Tally(ctx, &arb.TallyIn{ReferendumBranch: pollOut.PollBranch})
+	tallyOut, err := arbService0.Tally(ctx,
+		&arb.TallyIn{ReferendumBranch: pollOut.PollBranch, ReferendumPath: "test_poll"})
 	if err != nil {
 		t.Fatal(err)
 	}

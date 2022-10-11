@@ -12,6 +12,7 @@ import (
 
 type VoteIn struct {
 	ReferendumBranch string  `json:"referendum_branch"`
+	ReferendumPath   string  `json:"referendum_path"`
 	VoteChoice       string  `json:"vote_choice"`
 	VoteStrength     float64 `json:"vote_strength"`
 }
@@ -36,7 +37,8 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	// find poll ad
-	findAd, err := x.FindPollAdLocal(ctx, community, &FindPollAdIn{PollBranch: in.ReferendumBranch})
+	findAd, err := x.FindPollAdLocal(ctx, community,
+		&FindPollAdIn{PollBranch: in.ReferendumBranch, PollPath: in.ReferendumPath})
 	if err != nil {
 		return nil, err
 	}

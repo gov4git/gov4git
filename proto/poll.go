@@ -6,8 +6,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"path/filepath"
-
-	"github.com/gov4git/gov4git/lib/form"
 )
 
 type GovPollAd struct {
@@ -74,15 +72,9 @@ var (
 	GovPollVoteBranchPrefix = "vote#"
 )
 
-// TODO: if PollVoteBranch depands on the pollAd byte representation,
-// it will enable interoperation between different program versions at the voter and the community
-func PollVoteBranch(ctx context.Context, pollAd GovPollAd) (string, error) {
-	data, err := form.EncodeForm(ctx, pollAd)
-	if err != nil {
-		return "", err
-	}
+func PollVoteBranch(ctx context.Context, pollAdBytes []byte) (string, error) {
 	h := sha256.New()
-	if _, err := h.Write(data); err != nil {
+	if _, err := h.Write(pollAdBytes); err != nil {
 		return "", err
 	}
 	return GovPollVoteBranchPrefix + base64.StdEncoding.EncodeToString(h.Sum(nil)), nil

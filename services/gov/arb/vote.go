@@ -69,7 +69,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	// compute the name of the vote branch
-	voteBranch, err := proto.PollVoteBranch(ctx, findAd.PollAd)
+	voteBranch, err := proto.PollVoteBranch(ctx, findAd.PollAdBytes)
 	if err != nil {
 		return nil, err
 	}

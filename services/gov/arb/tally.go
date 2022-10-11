@@ -74,7 +74,7 @@ func (x GovArbService) TallyLocal(ctx context.Context, community git.Local, in *
 	}
 
 	// fetch votes and compute tally
-	out, err := x.FetchVotesAndTallyLocal(ctx, community, in, findAd.PollAd, userInfo)
+	out, err := x.FetchVotesAndTallyLocal(ctx, community, in, findAd, userInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	ctx context.Context,
 	community git.Local,
 	in *TallyIn,
-	ad proto.GovPollAd,
+	findPoll *FindPollAdOut,
 	userInfo user.UserInfos,
 ) (*TallyOut, error) {
 
@@ -99,7 +99,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 		ReferendumRepo:   x.GovConfig.CommunityURL,
 		ReferendumBranch: in.ReferendumBranch,
 		ReferendumTally: proto.GovPollTally{
-			Ad:         ad,
+			Ad:         findPoll.PollAd,
 			TallyUsers: make(proto.GovTallyUsers, len(userInfo)),
 		},
 	}
@@ -107,7 +107,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	// snapshot votes from user repos
 	// TODO: parallelize snapshots
 	for i, info := range userInfo {
-		userVote, err := x.snapshotParseVerifyUserVote(ctx, community, ad, info)
+		userVote, err := x.snapshotParseVerifyUserVote(ctx, community, findPoll, info)
 		out.ReferendumTally.TallyUsers[i] = proto.GovTallyUser{
 			UserName:       info.UserName,
 			UserPublicURL:  info.UserInfo.URL,
@@ -120,7 +120,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	out.ReferendumTally.TallyChoices = proto.AggregateVotes(out.ReferendumTally.TallyUsers)
 
 	// write/stage snapshots and tally to community repo
-	tallyPath := proto.PollTallyPath(ad.Path)
+	tallyPath := proto.PollTallyPath(findPoll.PollAd.Path)
 	stage := files.FormFiles{
 		files.FormFile{Path: tallyPath, Form: out.ReferendumTally},
 	}
@@ -142,12 +142,12 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 func (x GovArbService) snapshotParseVerifyUserVote(
 	ctx context.Context,
 	community git.Local,
-	ad proto.GovPollAd,
+	findPoll *FindPollAdOut,
 	userInfo user.UserInfo,
 ) (*proto.GovPollVote, error) {
 
 	// compute the name of the vote branch in the user's repo
-	voteBranch, err := proto.PollVoteBranch(ctx, ad)
+	voteBranch, err := proto.PollVoteBranch(ctx, findPoll.PollAdBytes)
 	if err != nil {
 		return nil, err
 	}

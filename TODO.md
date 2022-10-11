@@ -2,10 +2,6 @@ PRODUCT
 - [ ] support multiple referendums in a branch
   - [ ] branch+name
 
-- [ ] derive vote branch hash from ad's raw bytes:
-  - [ ] when voting
-  - [ ] when tallying
-
 - [ ] generalize the poll/vote/tally flow to work for different types of referendums
   - [ ] rename referendum -> ballot
 

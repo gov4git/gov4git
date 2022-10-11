@@ -3,6 +3,7 @@ package arb
 import (
 	"context"
 
+	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
 )
@@ -14,6 +15,7 @@ type FindPollAdIn struct {
 type FindPollAdOut struct {
 	PollGenesisCommit string          `json:"poll_genesis_commit"`
 	PollAd            proto.GovPollAd `json:"poll_ad"`
+	PollAdBytes       form.Bytes      `json:"poll_ad_bytes"`
 }
 
 // FindPollAdLocal finds the advertisement of a poll in a local clone of community repo (at the poll branch) and
@@ -34,13 +36,20 @@ func (x GovArbService) FindPollAdLocal(ctx context.Context, repo git.Local, in *
 	if err := repo.CheckoutBranch(ctx, findGenesis.PollGenesisCommit); err != nil {
 		return nil, err
 	}
+
+	pollAdFile, err := repo.Dir().ReadByteFile(pollAdPath)
+	if err != nil {
+		return nil, err
+	}
+
 	var pollAd proto.GovPollAd
-	if _, err := repo.Dir().ReadFormFile(ctx, pollAdPath, &pollAd); err != nil {
+	if err := form.DecodeForm(ctx, pollAdFile.Bytes, &pollAd); err != nil {
 		return nil, err
 	}
 
 	return &FindPollAdOut{
 		PollGenesisCommit: findGenesis.PollGenesisCommit,
 		PollAd:            pollAd,
+		PollAdBytes:       pollAdFile.Bytes,
 	}, nil
 }

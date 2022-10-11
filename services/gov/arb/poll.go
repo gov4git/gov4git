@@ -34,23 +34,6 @@ type PollOut struct {
 	PollGenesisCommit string `json:"poll_genesis_commit"`
 }
 
-func (x PollOut) Human(context.Context) string {
-	return fmt.Sprintf(`
-community_url=%v
-governing_branch=%v
-poll_path=%v
-poll_branch=%v
-poll_genesis_commit=%v
-
-Vote using:
-
-   gov4git vote --community=%v --branch=%v
-`,
-		x.CommunityURL, x.GoverningBranch, x.Path, x.PollBranch, x.PollGenesisCommit,
-		x.CommunityURL, x.PollBranch,
-	)
-}
-
 func (x GovArbService) Poll(ctx context.Context, in *PollIn) (*PollOut, error) {
 	// clone community repo locally
 	community, err := git.MakeLocalInCtx(ctx, "community")

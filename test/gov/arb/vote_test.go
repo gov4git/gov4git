@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/services/gov/arb"
 	"github.com/gov4git/gov4git/testutil"
@@ -50,5 +51,5 @@ func TestVote(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("poll: %v\nvote: %v\n", pollOut.Human(ctx), voteOut.Human(ctx))
+	fmt.Printf("poll: %v\nvote: %v\n", form.Pretty(pollOut), form.Pretty(voteOut))
 }

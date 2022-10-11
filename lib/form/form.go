@@ -8,8 +8,12 @@ import (
 
 type Form interface{}
 
-type Human interface {
-	Human(context.Context) string
+func Pretty(form Form) string {
+	data, err := json.MarshalIndent(form, "", "   ")
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
 }
 
 func EncodeForm(ctx context.Context, form Form) ([]byte, error) {

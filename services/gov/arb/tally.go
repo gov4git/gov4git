@@ -23,14 +23,6 @@ type TallyOut struct {
 	ReferendumTally  proto.GovPollTally `json:"referendum_tally"`
 }
 
-func (x TallyOut) Human(ctx context.Context) string {
-	data, err := form.EncodeForm(ctx, x)
-	if err != nil {
-		panic(err)
-	}
-	return string(data)
-}
-
 func (x GovArbService) Tally(ctx context.Context, in *TallyIn) (*TallyOut, error) {
 	// clone community repo locally
 	community, err := git.MakeLocalInCtx(ctx, "community")

@@ -1,9 +1,7 @@
 package member
 
 import (
-	"bytes"
 	"context"
-	"fmt"
 	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/git"
@@ -31,14 +29,6 @@ func ExtractUsersFromMembership(ms []ListMembership) []string {
 		u[i] = m.User
 	}
 	return u
-}
-
-func (x ListOut) Human(context.Context) string {
-	var w bytes.Buffer
-	for _, u := range x.Memberships {
-		fmt.Fprintln(&w, u.User, u.Group)
-	}
-	return w.String()
 }
 
 func (x GovMemberService) List(ctx context.Context, in *ListIn) (*ListOut, error) {

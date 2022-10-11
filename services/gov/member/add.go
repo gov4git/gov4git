@@ -16,10 +16,6 @@ type AddIn struct {
 
 type AddOut struct{}
 
-func (x AddOut) Human(context.Context) string {
-	return ""
-}
-
 func (x GovMemberService) Add(ctx context.Context, in *AddIn) (*AddOut, error) {
 	// clone community repo locally
 	community, err := git.MakeLocalInCtx(ctx, "community")

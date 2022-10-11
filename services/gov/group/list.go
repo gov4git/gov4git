@@ -1,9 +1,7 @@
 package group
 
 import (
-	"bytes"
 	"context"
-	"fmt"
 	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/git"
@@ -16,14 +14,6 @@ type ListIn struct {
 
 type ListOut struct {
 	Groups []string
-}
-
-func (x ListOut) Human(context.Context) string {
-	var w bytes.Buffer
-	for _, u := range x.Groups {
-		fmt.Fprintln(&w, u)
-	}
-	return w.String()
 }
 
 func (x GovGroupService) List(ctx context.Context, in *ListIn) (*ListOut, error) {

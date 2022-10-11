@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/files"
+	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/services/identity"
 	"github.com/spf13/cobra"
@@ -27,7 +28,7 @@ var (
 			base.AssertNoErr(err)
 			r, err := s.Init(files.WithWorkDir(cmd.Context(), workDir), &identity.InitIn{})
 			if err == nil {
-				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
+				fmt.Fprint(os.Stdout, form.Pretty(r))
 			} else {
 				fmt.Fprint(os.Stderr, err.Error())
 			}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"path/filepath"
 
-	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
 )
@@ -16,11 +15,6 @@ type GetIn struct {
 
 type GetOut struct {
 	Policy proto.GovDirPolicy `json:"policy"`
-}
-
-func (x GetOut) Human(ctx context.Context) string {
-	data, _ := form.EncodeForm(ctx, x.Policy)
-	return string(data)
 }
 
 func (x GovPolicyService) Get(ctx context.Context, in *GetIn) (*GetOut, error) {

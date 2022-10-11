@@ -18,10 +18,6 @@ type GetOut struct {
 	Value string `json:"value"` // user property value
 }
 
-func (x GetOut) Human(context.Context) string {
-	return x.Value
-}
-
 func (x GovUserService) Get(ctx context.Context, in *GetIn) (*GetOut, error) {
 	// clone community repo locally
 	community, err := git.MakeLocalInCtx(ctx, "community")

@@ -20,10 +20,6 @@ type SetIn struct {
 
 type SetOut struct{}
 
-func (x SetOut) Human(context.Context) string {
-	return ""
-}
-
 func (x GovPolicyService) Set(ctx context.Context, in *SetIn) (*SetOut, error) {
 	// clone community repo locally
 	community, err := git.MakeLocalInCtx(ctx, "community")

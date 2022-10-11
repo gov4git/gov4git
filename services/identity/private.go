@@ -2,7 +2,6 @@ package identity
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
@@ -12,11 +11,6 @@ type GetPrivateCredentialsIn struct{}
 
 type GetPrivateCredentialsOut struct {
 	PrivateCredentials proto.PrivateCredentials `json:"private_credentials"`
-}
-
-func (x GetPrivateCredentialsOut) Human(context.Context) string {
-	data, _ := json.MarshalIndent(x.PrivateCredentials, "", "   ")
-	return string(data)
 }
 
 func (x IdentityService) GetPrivateCredentials(ctx context.Context, in *GetPrivateCredentialsIn) (*GetPrivateCredentialsOut, error) {

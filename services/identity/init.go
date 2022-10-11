@@ -2,7 +2,6 @@ package identity
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/gov4git/gov4git/lib/files"
@@ -18,11 +17,6 @@ type InitIn struct{}
 
 type InitOut struct {
 	PrivateCredentials proto.PrivateCredentials `json:"private_credentials"`
-}
-
-func (x InitOut) Human(context.Context) string {
-	data, _ := json.MarshalIndent(x.PrivateCredentials, "", "   ")
-	return string(data)
 }
 
 func (x IdentityService) Init(ctx context.Context, in *InitIn) (*InitOut, error) {

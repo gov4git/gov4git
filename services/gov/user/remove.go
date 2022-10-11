@@ -15,10 +15,6 @@ type RemoveIn struct {
 
 type RemoveOut struct{}
 
-func (x RemoveOut) Human(context.Context) string {
-	return ""
-}
-
 func (x GovUserService) Remove(ctx context.Context, in *RemoveIn) (*RemoveOut, error) {
 	// clone community repo locally
 	community, err := git.MakeLocalInCtx(ctx, "community")

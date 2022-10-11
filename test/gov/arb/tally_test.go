@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/lib/base"
+	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/services/gov/arb"
 	"github.com/gov4git/gov4git/testutil"
@@ -64,5 +65,5 @@ func TestTally(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("poll: %v\nvote: %v\ntally: %v\n", pollOut.Human(ctx), voteOut.Human(ctx), tallyOut.Human(ctx))
+	fmt.Printf("poll: %v\nvote: %v\ntally: %v\n", form.Pretty(pollOut), form.Pretty(voteOut), form.Pretty(tallyOut))
 }

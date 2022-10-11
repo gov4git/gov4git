@@ -2,7 +2,6 @@ package gov
 
 import (
 	"context"
-	"fmt"
 	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/files"
@@ -17,13 +16,8 @@ type SnapshotBranchLatestIn struct {
 }
 
 type SnapshotBranchLatestOut struct {
-	In           *SnapshotBranchLatestIn
-	SourceCommit string `json:"source_commit"` // latest commit found at source
-}
-
-func (x SnapshotBranchLatestOut) Human(context.Context) string {
-	return fmt.Sprintf("Took a snapshot of %v on branch %v at commit %v, into local clone of community at %v.",
-		x.In.SourceRepo, x.In.SourceBranch, x.SourceCommit, x.In.Community.Path)
+	In           *SnapshotBranchLatestIn `json:"in"`
+	SourceCommit string                  `json:"source_commit"` // latest commit found at source
 }
 
 func GetSnapshotDirLocal(community git.Local, sourceRepo string, sourceCommit string) files.Dir {

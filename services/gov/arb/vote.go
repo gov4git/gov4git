@@ -2,7 +2,6 @@ package arb
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
@@ -22,14 +21,6 @@ type VoteOut struct {
 	VoteBranch       string `json:"vote_branch"`
 	ReferendumRepo   string `json:"referendum_repo"`
 	ReferendumBranch string `json:"referendum_branch"`
-}
-
-func (x VoteOut) Human(context.Context) string {
-	return fmt.Sprintf("Vote placed in repo %v at branch %v.\n"+
-		"Regarding referendum in repo %v and branch %v",
-		x.VoteRepo, x.VoteBranch,
-		x.ReferendumRepo, x.ReferendumBranch,
-	)
 }
 
 func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {

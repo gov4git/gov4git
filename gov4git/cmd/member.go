@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/files"
+	"github.com/gov4git/gov4git/lib/form"
 	man "github.com/gov4git/gov4git/man/member"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/services/gov/member"
@@ -41,7 +42,7 @@ var (
 				CommunityBranch: communityBranch,
 			})
 			if err == nil {
-				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
+				fmt.Fprint(os.Stdout, form.Pretty(r))
 			} else {
 				fmt.Fprint(os.Stderr, err.Error())
 			}
@@ -68,7 +69,7 @@ var (
 				CommunityBranch: communityBranch,
 			})
 			if err == nil {
-				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
+				fmt.Fprint(os.Stdout, form.Pretty(r))
 			} else {
 				fmt.Fprint(os.Stderr, err.Error())
 			}
@@ -95,7 +96,7 @@ var (
 				CommunityBranch: communityBranch,
 			})
 			if err == nil {
-				fmt.Fprint(os.Stdout, r.Human(cmd.Context()))
+				fmt.Fprint(os.Stdout, form.Pretty(r))
 			} else {
 				fmt.Fprint(os.Stderr, err.Error())
 			}

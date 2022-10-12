@@ -78,19 +78,17 @@ func (x GovArbService) CreateBallotLocal(ctx context.Context, community git.Loca
 	}
 
 	// create and stage ballot advertisement
-	var ballotAd proto.GovBallotAd
-	switch in.Strategy {
-	case "prioritize":
-		ballotAd = proto.GovBallotAd{
-			Path:            ballotPath,
-			Choices:         in.Choices,
-			Group:           in.Group,
-			Strategy:        proto.GovBallotStrategy{Prioritize: &proto.GovBallotStrategyPollPrioritize{}},
-			GoverningBranch: in.GoverningBranch,
-			ParentCommit:    head,
-		}
-	default:
-		return nil, fmt.Errorf("unknown ballot strategy %v", in.Strategy)
+	strategy, err := proto.ParseBallotStrategy(in.Strategy)
+	if err != nil {
+		return nil, err
+	}
+	ballotAd := proto.GovBallotAd{
+		Path:            ballotPath,
+		Choices:         in.Choices,
+		Group:           in.Group,
+		Strategy:        strategy,
+		GoverningBranch: in.GoverningBranch,
+		ParentCommit:    head,
 	}
 	stage := files.FormFiles{
 		files.FormFile{Path: ballotAdPath, Form: ballotAd},

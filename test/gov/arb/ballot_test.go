@@ -26,7 +26,7 @@ func TestBallot(t *testing.T) {
 			Path:            "test_ballot",
 			Choices:         []string{"a", "b", "c"},
 			Group:           "all",
-			Strategy:        "prioritize",
+			Strategy:        proto.PriorityPollStrategyName,
 			GoverningBranch: proto.MainBranch,
 		})
 	if err != nil {

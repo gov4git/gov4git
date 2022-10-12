@@ -1,0 +1,21 @@
+package strategy
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/gov4git/gov4git/lib/git"
+	"github.com/gov4git/gov4git/proto"
+)
+
+type BallotStrategy interface {
+	Tally(ctx context.Context, community git.Local, ad proto.GovBallotTally) error
+}
+
+func ParseStrategy(s proto.GovBallotStrategy) (BallotStrategy, error) {
+	switch {
+	case s.PriorityPoll != nil:
+		return PriorityPoll(*s.PriorityPoll), nil
+	}
+	return nil, fmt.Errorf("cannot parse ballot strategy")
+}

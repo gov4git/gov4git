@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/services/gov"
+	"github.com/gov4git/gov4git/services/gov/arb/strategy"
 	"github.com/gov4git/gov4git/services/gov/member"
 	"github.com/gov4git/gov4git/services/gov/user"
 )
@@ -112,6 +113,15 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 
 	// aggregate votes to choices
 	out.BallotTally.TallyChoices = proto.AggregateVotes(out.BallotTally.TallyUsers)
+
+	// invoke ballot strategy
+	strat, err := strategy.ParseStrategy(findBallot.BallotAd.Strategy)
+	if err != nil {
+		return nil, err
+	}
+	if err := strat.Tally(ctx, community, out.BallotTally); err != nil {
+		return nil, err
+	}
 
 	// write/stage snapshots and tally to community repo
 	tallyPath := proto.BallotTallyPath(findBallot.BallotAd.Path)

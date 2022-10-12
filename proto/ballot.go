@@ -17,12 +17,6 @@ type GovBallotAd struct {
 	ParentCommit    string            `json:"parent_commit"` // commit before ballot
 }
 
-type GovBallotStrategy struct {
-	Prioritize *GovBallotStrategyPollPrioritize `json:"prioritize"`
-}
-
-type GovBallotStrategyPollPrioritize struct{}
-
 var (
 	GovBallotAdFilebase    = "ballot_advertisement"
 	GovBallotTallyFilebase = "ballot_tally"

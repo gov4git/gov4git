@@ -1,6 +1,7 @@
 PRODUCT
 - [ ] generalize the ballot/vote/tally flow to work for different types of referendums
 
+- [ ] split proto package in service subpackages
 - [ ] a vote can contain a batch of choices
 
 FRAMEWORK

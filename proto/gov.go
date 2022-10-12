@@ -5,7 +5,7 @@ type GovConfig struct {
 }
 
 type GovUserInfo struct {
-	URL string `json:"url"` // url of user's public soul repository
+	PublicURL string `json:"public_url"`
 }
 
 type GovGroupInfo struct {

@@ -14,26 +14,26 @@ import (
 )
 
 var (
-	pollCmd = &cobra.Command{
-		Use:   "poll",
-		Short: "Create a new poll",
-		Long:  man.Poll,
+	ballotCmd = &cobra.Command{
+		Use:   "ballot",
+		Short: "Create a new ballot (poll, merge proposal, etc.)",
+		Long:  man.Ballot,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := arb.GovArbService{
 				GovConfig: proto.GovConfig{
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-arb-poll")
+			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-arb-ballot")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
-			r, err := s.Poll(ctx, &arb.PollIn{
-				Path:            pollPath,
-				Choices:         pollChoices,
-				Group:           pollGroup,
-				Strategy:        pollStrategy,
-				GoverningBranch: pollGoverningBranch,
-				PollBranch:      pollBranch,
+			r, err := s.CreateBallot(ctx, &arb.CreateBallotIn{
+				Path:            ballotPath,
+				Choices:         ballotChoices,
+				Group:           ballotGroup,
+				Strategy:        ballotStrategy,
+				GoverningBranch: ballotGoverningBranch,
+				BallotBranch:    ballotBranch,
 			})
 			if err == nil {
 				fmt.Fprint(os.Stdout, form.Pretty(r))
@@ -62,10 +62,10 @@ var (
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Vote(ctx, &arb.VoteIn{
-				ReferendumBranch: voteReferendumBranch,
-				ReferendumPath:   voteReferendumPath,
-				VoteChoice:       voteChoice,
-				VoteStrength:     voteStrength,
+				BallotBranch: voteBallotBranch,
+				BallotPath:   voteBallotPath,
+				VoteChoice:   voteChoice,
+				VoteStrength: voteStrength,
 			})
 			if err == nil {
 				fmt.Fprint(os.Stdout, form.Pretty(r))
@@ -94,8 +94,8 @@ var (
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Tally(ctx, &arb.TallyIn{
-				ReferendumBranch: tallyReferendumBranch,
-				ReferendumPath:   tallyReferendumPath,
+				BallotBranch: tallyBallotBranch,
+				BallotPath:   tallyBallotPath,
 			})
 			if err == nil {
 				fmt.Fprint(os.Stdout, form.Pretty(r))
@@ -108,35 +108,35 @@ var (
 )
 
 var (
-	pollPath            string
-	pollChoices         []string
-	pollGroup           string
-	pollStrategy        string
-	pollGoverningBranch string
-	pollBranch          string
+	ballotPath            string
+	ballotChoices         []string
+	ballotGroup           string
+	ballotStrategy        string
+	ballotGoverningBranch string
+	ballotBranch          string
 
-	voteReferendumBranch string
-	voteReferendumPath   string
-	voteChoice           string
-	voteStrength         float64
+	voteBallotBranch string
+	voteBallotPath   string
+	voteChoice       string
+	voteStrength     float64
 
-	tallyReferendumBranch string
-	tallyReferendumPath   string
+	tallyBallotBranch string
+	tallyBallotPath   string
 )
 
 func init() {
-	pollCmd.Flags().StringVar(&pollPath, "path", "", "community repo path for poll results and proofs")
-	pollCmd.Flags().StringArrayVar(&pollChoices, "choices", nil, "poll choices")
-	pollCmd.Flags().StringVar(&pollGroup, "group", "", "group of users participating in poll")
-	pollCmd.Flags().StringVar(&pollStrategy, "strategy", "", "polling strategy (available strategy: prioritize)")
-	pollCmd.Flags().StringVar(&pollGoverningBranch, "govern-branch", "", "branch governing the poll")
-	pollCmd.Flags().StringVar(&pollBranch, "poll-branch", "", "branch where poll is created (if empty, use governing branch)")
+	ballotCmd.Flags().StringVar(&ballotPath, "path", "", "community repo path for ballot results and proofs")
+	ballotCmd.Flags().StringArrayVar(&ballotChoices, "choices", nil, "ballot choices")
+	ballotCmd.Flags().StringVar(&ballotGroup, "group", "", "group of users participating in ballot")
+	ballotCmd.Flags().StringVar(&ballotStrategy, "strategy", "", "balloting strategy (available strategy: prioritize)")
+	ballotCmd.Flags().StringVar(&ballotGoverningBranch, "govern-branch", "", "branch governing the ballot")
+	ballotCmd.Flags().StringVar(&ballotBranch, "ballot-branch", "", "branch where ballot is created (if empty, use governing branch)")
 
-	voteCmd.Flags().StringVar(&voteReferendumBranch, "--refm-branch", "", "referendum branch (e.g. poll branch)")
-	voteCmd.Flags().StringVar(&voteReferendumPath, "--refm-path", "", "referendum path")
+	voteCmd.Flags().StringVar(&voteBallotBranch, "--ballot-branch", "", "referendum branch")
+	voteCmd.Flags().StringVar(&voteBallotPath, "--ballot-path", "", "referendum path")
 	voteCmd.Flags().StringVar(&voteChoice, "--choice", "", "vote choice")
 	voteCmd.Flags().Float64Var(&voteStrength, "--strength", 0, "vote strength")
 
-	tallyCmd.Flags().StringVar(&tallyReferendumBranch, "--refm-branch", "", "referendum branch (e.g. poll branch)")
-	tallyCmd.Flags().StringVar(&tallyReferendumPath, "--refm-path", "", "referendum path")
+	tallyCmd.Flags().StringVar(&tallyBallotBranch, "--ballot-branch", "", "referendum branch")
+	tallyCmd.Flags().StringVar(&tallyBallotPath, "--ballot-path", "", "referendum path")
 }

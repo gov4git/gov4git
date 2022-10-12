@@ -50,7 +50,7 @@ func (x GovUserService) AddLocalStageOnly(ctx context.Context, community git.Loc
 	userFile := proto.UserInfoFilepath(name)
 	// write user file
 	stage := files.FormFiles{
-		files.FormFile{Path: userFile, Form: proto.GovUserInfo{URL: url}},
+		files.FormFile{Path: userFile, Form: proto.GovUserInfo{PublicURL: url}},
 	}
 	if err := community.Dir().WriteFormFiles(ctx, stage); err != nil {
 		return err

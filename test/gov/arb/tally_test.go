@@ -33,10 +33,10 @@ func TestTally(t *testing.T) {
 		IdentityConfig: testCommunity.UserIdentityConfig(1),
 	}
 
-	// create poll
-	pollOut, err := arbService0.Poll(ctx,
-		&arb.PollIn{
-			Path:            "test_poll",
+	// create ballot
+	ballotOut, err := arbService0.CreateBallot(ctx,
+		&arb.CreateBallotIn{
+			Path:            "test_ballot",
 			Choices:         []string{"a", "b", "c"},
 			Group:           "all",
 			Strategy:        "prioritize",
@@ -49,10 +49,10 @@ func TestTally(t *testing.T) {
 	// cast two votes
 	voteOut, err := arbService1.Vote(ctx,
 		&arb.VoteIn{
-			ReferendumBranch: pollOut.PollBranch,
-			ReferendumPath:   "test_poll",
-			VoteChoice:       "a",
-			VoteStrength:     1.0,
+			BallotBranch: ballotOut.BallotBranch,
+			BallotPath:   "test_ballot",
+			VoteChoice:   "a",
+			VoteStrength: 1.0,
 		},
 	)
 	if err != nil {
@@ -62,10 +62,10 @@ func TestTally(t *testing.T) {
 	// tally the results
 	base.Infof("tallying")
 	tallyOut, err := arbService0.Tally(ctx,
-		&arb.TallyIn{ReferendumBranch: pollOut.PollBranch, ReferendumPath: "test_poll"})
+		&arb.TallyIn{BallotBranch: ballotOut.BallotBranch, BallotPath: "test_ballot"})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("poll: %v\nvote: %v\ntally: %v\n", form.Pretty(pollOut), form.Pretty(voteOut), form.Pretty(tallyOut))
+	fmt.Printf("ballot: %v\nvote: %v\ntally: %v\n", form.Pretty(ballotOut), form.Pretty(voteOut), form.Pretty(tallyOut))
 }

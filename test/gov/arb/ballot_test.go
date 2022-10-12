@@ -9,7 +9,7 @@ import (
 	"github.com/gov4git/gov4git/testutil"
 )
 
-func TestPoll(t *testing.T) {
+func TestBallot(t *testing.T) {
 	// create test community
 	// dir := testutil.MakeStickyTestDir()
 	dir := t.TempDir()
@@ -21,11 +21,11 @@ func TestPoll(t *testing.T) {
 
 	// invoke service
 	svc := arb.GovArbService{GovConfig: testCommunity.CommunityGovConfig()}
-	out, err := svc.Poll(ctx,
-		&arb.PollIn{
-			Path:            "test_poll",
+	out, err := svc.CreateBallot(ctx,
+		&arb.CreateBallotIn{
+			Path:            "test_ballot",
 			Choices:         []string{"a", "b", "c"},
-			Group:           "participants",
+			Group:           "all",
 			Strategy:        "prioritize",
 			GoverningBranch: proto.MainBranch,
 		})

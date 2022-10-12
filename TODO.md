@@ -1,6 +1,5 @@
 PRODUCT
-- [ ] generalize the poll/vote/tally flow to work for different types of referendums
-  - [ ] rename referendum -> ballot
+- [ ] generalize the ballot/vote/tally flow to work for different types of referendums
 
 - [ ] a vote can contain a batch of choices
 

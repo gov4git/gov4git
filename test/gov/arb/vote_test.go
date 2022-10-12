@@ -22,16 +22,16 @@ func TestVote(t *testing.T) {
 	}
 	ctx := testCommunity.Background()
 
-	// create poll
+	// create ballot
 	arbService := arb.GovArbService{
 		GovConfig:      testCommunity.CommunityGovConfig(),
 		IdentityConfig: testCommunity.UserIdentityConfig(0),
 	}
-	pollOut, err := arbService.Poll(ctx,
-		&arb.PollIn{
-			Path:            "test_poll",
+	ballotOut, err := arbService.CreateBallot(ctx,
+		&arb.CreateBallotIn{
+			Path:            "test_ballot",
 			Choices:         []string{"a", "b", "c"},
-			Group:           "participants",
+			Group:           "all",
 			Strategy:        "prioritize",
 			GoverningBranch: proto.MainBranch,
 		})
@@ -42,15 +42,15 @@ func TestVote(t *testing.T) {
 	// cast a vote
 	voteOut, err := arbService.Vote(ctx,
 		&arb.VoteIn{
-			ReferendumBranch: pollOut.PollBranch,
-			ReferendumPath:   "test_poll",
-			VoteChoice:       "a",
-			VoteStrength:     1.0,
+			BallotBranch: ballotOut.BallotBranch,
+			BallotPath:   "test_ballot",
+			VoteChoice:   "a",
+			VoteStrength: 1.0,
 		},
 	)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	fmt.Printf("poll: %v\nvote: %v\n", form.Pretty(pollOut), form.Pretty(voteOut))
+	fmt.Printf("ballot: %v\nvote: %v\n", form.Pretty(ballotOut), form.Pretty(voteOut))
 }

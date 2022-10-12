@@ -14,14 +14,14 @@ import (
 )
 
 type TallyIn struct {
-	ReferendumBranch string `json:"referendum_branch"`
-	ReferendumPath   string `json:"referendum_path"`
+	BallotBranch string `json:"ballot_branch"`
+	BallotPath   string `json:"ballot_path"`
 }
 
 type TallyOut struct {
-	ReferendumRepo   string             `json:"referendum_repo"`
-	ReferendumBranch string             `json:"referendum_branch"`
-	ReferendumTally  proto.GovPollTally `json:"referendum_tally"`
+	BallotRepo   string               `json:"ballot_repo"`
+	BallotBranch string               `json:"ballot_branch"`
+	BallotTally  proto.GovBallotTally `json:"ballot_tally"`
 }
 
 func (x GovArbService) Tally(ctx context.Context, in *TallyIn) (*TallyOut, error) {
@@ -30,7 +30,7 @@ func (x GovArbService) Tally(ctx context.Context, in *TallyIn) (*TallyOut, error
 	if err != nil {
 		return nil, err
 	}
-	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.ReferendumBranch); err != nil {
+	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.BallotBranch); err != nil {
 		return nil, err
 	}
 	// make changes to repo
@@ -42,16 +42,16 @@ func (x GovArbService) Tally(ctx context.Context, in *TallyIn) (*TallyOut, error
 }
 
 func (x GovArbService) TallyLocal(ctx context.Context, community git.Local, in *TallyIn) (*TallyOut, error) {
-	// find poll ad and leave local repo checked out at the genesis commit
-	findAd, err := x.FindPollAdLocal(ctx, community,
-		&FindPollAdIn{PollBranch: in.ReferendumBranch, PollPath: in.ReferendumPath})
+	// find ballot ad and leave local repo checked out at the genesis commit
+	findAd, err := x.FindBallotAdLocal(ctx, community,
+		&FindBallotAdIn{BallotBranch: in.BallotBranch, BallotPath: in.BallotPath})
 	if err != nil {
 		return nil, err
 	}
 
-	// list users participating in poll
+	// list users participating in ballot
 	memberService := member.GovMemberService{GovConfig: x.GovConfig}
-	participants, err := memberService.ListLocal(ctx, community, "", findAd.PollAd.Group)
+	participants, err := memberService.ListLocal(ctx, community, "", findAd.BallotAd.Group)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (x GovArbService) TallyLocal(ctx context.Context, community git.Local, in *
 	}
 
 	// checkout referendum branch latest
-	if err := community.CheckoutBranch(ctx, in.ReferendumBranch); err != nil {
+	if err := community.CheckoutBranch(ctx, in.BallotBranch); err != nil {
 		return nil, err
 	}
 
@@ -85,15 +85,15 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	ctx context.Context,
 	community git.Local,
 	in *TallyIn,
-	findPoll *FindPollAdOut,
+	findBallot *FindBallotAdOut,
 	userInfo user.UserInfos,
 ) (*TallyOut, error) {
 
 	out := &TallyOut{
-		ReferendumRepo:   x.GovConfig.CommunityURL,
-		ReferendumBranch: in.ReferendumBranch,
-		ReferendumTally: proto.GovPollTally{
-			Ad:         findPoll.PollAd,
+		BallotRepo:   x.GovConfig.CommunityURL,
+		BallotBranch: in.BallotBranch,
+		BallotTally: proto.GovBallotTally{
+			Ad:         findBallot.BallotAd,
 			TallyUsers: make(proto.GovTallyUsers, len(userInfo)),
 		},
 	}
@@ -101,22 +101,22 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	// snapshot votes from user repos
 	// TODO: parallelize snapshots
 	for i, info := range userInfo {
-		userVote, err := x.snapshotParseVerifyUserVote(ctx, community, findPoll, info)
-		out.ReferendumTally.TallyUsers[i] = proto.GovTallyUser{
+		userVote, err := x.snapshotParseVerifyUserVote(ctx, community, findBallot, info)
+		out.BallotTally.TallyUsers[i] = proto.GovTallyUser{
 			UserName:       info.UserName,
-			UserPublicURL:  info.UserInfo.URL,
+			UserPublicURL:  info.UserInfo.PublicURL,
 			UserVote:       userVote,
 			UserFetchError: err,
 		}
 	}
 
 	// aggregate votes to choices
-	out.ReferendumTally.TallyChoices = proto.AggregateVotes(out.ReferendumTally.TallyUsers)
+	out.BallotTally.TallyChoices = proto.AggregateVotes(out.BallotTally.TallyUsers)
 
 	// write/stage snapshots and tally to community repo
-	tallyPath := proto.PollTallyPath(findPoll.PollAd.Path)
+	tallyPath := proto.BallotTallyPath(findBallot.BallotAd.Path)
 	stage := files.FormFiles{
-		files.FormFile{Path: tallyPath, Form: out.ReferendumTally},
+		files.FormFile{Path: tallyPath, Form: out.BallotTally},
 	}
 	if err := community.Dir().WriteFormFiles(ctx, stage); err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	}
 
 	// commit snapshots and tally to community repo
-	if err := community.Commitf(ctx, "tally votes on referendum branch %v", in.ReferendumBranch); err != nil {
+	if err := community.Commitf(ctx, "tally votes on referendum branch %v", in.BallotBranch); err != nil {
 		return nil, err
 	}
 
@@ -136,12 +136,12 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 func (x GovArbService) snapshotParseVerifyUserVote(
 	ctx context.Context,
 	community git.Local,
-	findPoll *FindPollAdOut,
+	findBallot *FindBallotAdOut,
 	userInfo user.UserInfo,
-) (*proto.GovPollVote, error) {
+) (*proto.GovBallotVote, error) {
 
 	// compute the name of the vote branch in the user's repo
-	voteBranch, err := proto.PollVoteBranch(ctx, findPoll.PollAdBytes)
+	voteBranch, err := proto.BallotVoteBranch(ctx, findBallot.BallotAdBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (x GovArbService) snapshotParseVerifyUserVote(
 	// snapshot user's vote branch into the community repo
 	snap, err := x.GovService().SnapshotBranchLatest(ctx,
 		&gov.SnapshotBranchLatestIn{
-			SourceRepo:   userInfo.UserInfo.URL,
+			SourceRepo:   userInfo.UserInfo.PublicURL,
 			SourceBranch: voteBranch,
 			Community:    community,
 		})
@@ -161,18 +161,18 @@ func (x GovArbService) snapshotParseVerifyUserVote(
 	snapDir := gov.GetSnapshotDirLocal(community, snap.In.SourceRepo, snap.SourceCommit)
 	var signature proto.SignedPlaintext
 
-	if _, err := snapDir.ReadFormFile(ctx, proto.GovPollVoteSignatureFilepath, &signature); err != nil {
+	if _, err := snapDir.ReadFormFile(ctx, proto.GovBallotVoteSignatureFilepath, &signature); err != nil {
 		return nil, err
 	}
 	if !signature.Verify() {
 		return nil, fmt.Errorf("signature is not valid")
 	}
-	var vote proto.GovPollVote
+	var vote proto.GovBallotVote
 	if err := form.DecodeForm(ctx, signature.Plaintext, &vote); err != nil {
 		return nil, err
 	}
 
-	// TODO: verify the user's vote is for this poll
+	// TODO: verify the user's vote is for this ballot
 
 	return &vote, nil
 }

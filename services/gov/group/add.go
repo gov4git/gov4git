@@ -59,3 +59,17 @@ func (x GovGroupService) AddLocalStageOnly(ctx context.Context, community git.Lo
 	}
 	return nil
 }
+
+func GetInfo(ctx context.Context, community git.Local, name string) (*proto.GovGroupInfo, error) {
+	groupInfoPath := proto.GroupInfoFilepath(name)
+	var info proto.GovGroupInfo
+	if _, err := community.Dir().ReadFormFile(ctx, groupInfoPath, &info); err != nil {
+		return nil, err
+	}
+	return &info, nil
+}
+
+type UserInfo struct {
+	UserName string            `json:"user_name"`
+	UserInfo proto.GovUserInfo `json:"user_info"`
+}

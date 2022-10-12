@@ -8,33 +8,33 @@ import (
 	"github.com/gov4git/gov4git/proto"
 )
 
-type FindPollAdIn struct {
-	PollBranch string `json:"poll_branch"`
-	PollPath   string `json:"poll_path"`
+type FindBallotAdIn struct {
+	BallotBranch string `json:"ballot_branch"`
+	BallotPath   string `json:"ballot_path"`
 }
 
-type FindPollAdOut struct {
-	PollAd      proto.GovPollAd `json:"poll_ad"`
-	PollAdBytes form.Bytes      `json:"poll_ad_bytes"`
+type FindBallotAdOut struct {
+	BallotAd      proto.GovBallotAd `json:"ballot_ad"`
+	BallotAdBytes form.Bytes        `json:"ballot_ad_bytes"`
 }
 
-// FindPollAdLocal finds the advertisement of a poll in a local clone of community repo (at the poll branch) and
+// FindBallotAdLocal finds the advertisement of a ballot in a local clone of community repo (at the ballot branch) and
 // leaves the local repo checked out at the genesis commit.
-func (x GovArbService) FindPollAdLocal(ctx context.Context, repo git.Local, in *FindPollAdIn) (*FindPollAdOut, error) {
-	// read the poll advertisement
-	pollAdPath := proto.PollAdPath(in.PollPath)
-	pollAdFile, err := repo.Dir().ReadByteFile(pollAdPath)
+func (x GovArbService) FindBallotAdLocal(ctx context.Context, repo git.Local, in *FindBallotAdIn) (*FindBallotAdOut, error) {
+	// read the ballot advertisement
+	ballotAdPath := proto.BallotAdPath(in.BallotPath)
+	ballotAdFile, err := repo.Dir().ReadByteFile(ballotAdPath)
 	if err != nil {
 		return nil, err
 	}
 
-	var pollAd proto.GovPollAd
-	if err := form.DecodeForm(ctx, pollAdFile.Bytes, &pollAd); err != nil {
+	var ballotAd proto.GovBallotAd
+	if err := form.DecodeForm(ctx, ballotAdFile.Bytes, &ballotAd); err != nil {
 		return nil, err
 	}
 
-	return &FindPollAdOut{
-		PollAd:      pollAd,
-		PollAdBytes: pollAdFile.Bytes,
+	return &FindBallotAdOut{
+		BallotAd:      ballotAd,
+		BallotAdBytes: ballotAdFile.Bytes,
 	}, nil
 }

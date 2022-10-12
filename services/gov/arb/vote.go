@@ -11,34 +11,34 @@ import (
 )
 
 type VoteIn struct {
-	ReferendumBranch string  `json:"referendum_branch"`
-	ReferendumPath   string  `json:"referendum_path"`
-	VoteChoice       string  `json:"vote_choice"`
-	VoteStrength     float64 `json:"vote_strength"`
+	BallotBranch string  `json:"ballot_branch"`
+	BallotPath   string  `json:"ballot_path"`
+	VoteChoice   string  `json:"vote_choice"`
+	VoteStrength float64 `json:"vote_strength"`
 }
 
 type VoteOut struct {
-	VoteRepo         string `json:"vote_repo"`
-	VoteBranch       string `json:"vote_branch"`
-	ReferendumRepo   string `json:"referendum_repo"`
-	ReferendumBranch string `json:"referendum_branch"`
+	VoteRepo     string `json:"vote_repo"`
+	VoteBranch   string `json:"vote_branch"`
+	BallotRepo   string `json:"ballot_repo"`
+	BallotBranch string `json:"ballot_branch"`
 }
 
 func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
-	// find poll advertisement in community repo
+	// find ballot advertisement in community repo
 
 	// clone community repo at referendum branch locally
 	community, err := git.MakeLocalInCtx(ctx, "community")
 	if err != nil {
 		return nil, err
 	}
-	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.ReferendumBranch); err != nil {
+	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.BallotBranch); err != nil {
 		return nil, err
 	}
 
-	// find poll ad
-	findAd, err := x.FindPollAdLocal(ctx, community,
-		&FindPollAdIn{PollBranch: in.ReferendumBranch, PollPath: in.ReferendumPath})
+	// find ballot ad
+	findAd, err := x.FindBallotAdLocal(ctx, community,
+		&FindBallotAdIn{BallotBranch: in.BallotBranch, BallotPath: in.BallotPath})
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	// compute the name of the vote branch
-	voteBranch, err := proto.PollVoteBranch(ctx, findAd.PollAdBytes)
+	voteBranch, err := proto.BallotVoteBranch(ctx, findAd.BallotAdBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +78,8 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	// add vote to vote branch
-	vote := proto.GovPollVote{
-		PollAd:   findAd.PollAd,
+	vote := proto.GovBallotVote{
+		BallotAd: findAd.BallotAd,
 		Choice:   in.VoteChoice,
 		Strength: in.VoteStrength,
 	}
@@ -99,8 +99,8 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 
 	// write vote and signature
 	stage := files.ByteFiles{
-		files.ByteFile{Path: proto.GovPollVoteFilepath, Bytes: voteData},
-		files.ByteFile{Path: proto.GovPollVoteSignatureFilepath, Bytes: signatureData},
+		files.ByteFile{Path: proto.GovBallotVoteFilepath, Bytes: voteData},
+		files.ByteFile{Path: proto.GovBallotVoteSignatureFilepath, Bytes: signatureData},
 	}
 	if err := voter.Dir().WriteByteFiles(stage); err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	if err := voter.Add(ctx, stage.Paths()); err != nil {
 		return nil, err
 	}
-	msg := proto.PollVoteCommitHeader(x.GovConfig.CommunityURL, in.ReferendumBranch)
+	msg := proto.BallotVoteCommitHeader(x.GovConfig.CommunityURL, in.BallotBranch, in.BallotPath)
 	if err := voter.Commit(ctx, msg); err != nil {
 		return nil, err
 	}
@@ -119,9 +119,9 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	return &VoteOut{
-		VoteRepo:         x.IdentityConfig.PublicURL,
-		VoteBranch:       voteBranch,
-		ReferendumRepo:   x.GovConfig.CommunityURL,
-		ReferendumBranch: in.ReferendumBranch,
+		VoteRepo:     x.IdentityConfig.PublicURL,
+		VoteBranch:   voteBranch,
+		BallotRepo:   x.GovConfig.CommunityURL,
+		BallotBranch: in.BallotBranch,
 	}, nil
 }

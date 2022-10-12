@@ -7,7 +7,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto/govproto"
+	"github.com/gov4git/gov4git/proto/cmdproto"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -65,7 +65,7 @@ func initAfterFlags() {
 		base.AssertNoErr(err)
 
 		// search for config in ~/.gov/ directory with name "config" (without extension).
-		viper.AddConfigPath(filepath.Join(home, govproto.LocalAgentPath))
+		viper.AddConfigPath(filepath.Join(home, cmdproto.LocalAgentPath))
 		viper.SetConfigType("json")
 		viper.SetConfigName("config")
 	}

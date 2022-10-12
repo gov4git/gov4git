@@ -2,11 +2,6 @@ package govproto
 
 import "path/filepath"
 
-const (
-	LocalAgentPath     = ".gov4git"
-	LocalAgentTempPath = "gov4git"
-)
-
 // governance repo paths
 
 const (
@@ -14,30 +9,8 @@ const (
 )
 
 var (
-	GovUsersDir         = filepath.Join(GovRoot, "users")
-	GovUserInfoFilebase = "info"
-	GovUserMetaDirbase  = "meta"
-
-	GovGroupsDir         = filepath.Join(GovRoot, "groups")
-	GovGroupInfoFilebase = "info"
-	GovGroupMetaDirbase  = "meta"
-
-	GovMembersDirbase = "members"
-
 	GovDirPolicyFilebase = "policy"
 )
-
-func UserInfoFilepath(user string) string {
-	return filepath.Join(GovUsersDir, user, GovUserInfoFilebase)
-}
-
-func GroupInfoFilepath(group string) string {
-	return filepath.Join(GovGroupsDir, group, GovGroupInfoFilebase)
-}
-
-func GroupMemberFilepath(group string, user string) string {
-	return filepath.Join(GovGroupsDir, group, GovMembersDirbase, user)
-}
 
 func SnapshotDir(repo string, commit string) string {
 	return filepath.Join(GovRoot, "snapshot", repo, commit)

@@ -7,7 +7,7 @@ import (
 	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
-	"github.com/gov4git/gov4git/proto/govproto"
+	"github.com/gov4git/gov4git/proto/cmdproto"
 	"github.com/gov4git/gov4git/proto/identityproto"
 	"github.com/gov4git/gov4git/services/identity"
 	"github.com/spf13/cobra"
@@ -25,7 +25,7 @@ var (
 					PrivateURL: privateURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "init")
+			workDir, err := files.TempDir().MkEphemeralDir(cmdproto.LocalAgentTempPath, "init")
 			base.AssertNoErr(err)
 			r, err := s.Init(files.WithWorkDir(cmd.Context(), workDir), &identity.InitIn{})
 			if err == nil {

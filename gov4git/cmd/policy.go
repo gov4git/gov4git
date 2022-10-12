@@ -8,7 +8,6 @@ import (
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
 	man "github.com/gov4git/gov4git/man/policy"
-	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/services/gov/policy"
 	"github.com/spf13/cobra"
@@ -30,7 +29,7 @@ var (
 		Long:  man.GovPolicySet,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := policy.GovPolicyService{
-				GovConfig: proto.GovConfig{
+				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
 			}
@@ -59,7 +58,7 @@ var (
 		Long:  man.GovPolicyGet,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := policy.GovPolicyService{
-				GovConfig: proto.GovConfig{
+				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
 			}

@@ -10,6 +10,7 @@ import (
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/proto/identityproto"
 	"github.com/gov4git/gov4git/services/gov/group"
 	"github.com/gov4git/gov4git/services/gov/member"
@@ -171,8 +172,8 @@ func (x *TestCommunity) CommunityRepoURL() string {
 	return x.CommunityRepoDir()
 }
 
-func (x *TestCommunity) CommunityGovConfig() proto.GovConfig {
-	return proto.GovConfig{
+func (x *TestCommunity) CommunityGovConfig() govproto.GovConfig {
+	return govproto.GovConfig{
 		CommunityURL: x.CommunityRepoURL(),
 	}
 }

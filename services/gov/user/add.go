@@ -5,7 +5,6 @@ import (
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/govproto"
 )
 
@@ -51,7 +50,7 @@ func (x GovUserService) AddLocalStageOnly(ctx context.Context, community git.Loc
 	userFile := govproto.UserInfoFilepath(name)
 	// write user file
 	stage := files.FormFiles{
-		files.FormFile{Path: userFile, Form: proto.GovUserInfo{PublicURL: url}},
+		files.FormFile{Path: userFile, Form: govproto.GovUserInfo{PublicURL: url}},
 	}
 	if err := community.Dir().WriteFormFiles(ctx, stage); err != nil {
 		return err
@@ -63,9 +62,9 @@ func (x GovUserService) AddLocalStageOnly(ctx context.Context, community git.Loc
 	return nil
 }
 
-func GetInfo(ctx context.Context, community git.Local, name string) (*proto.GovUserInfo, error) {
+func GetInfo(ctx context.Context, community git.Local, name string) (*govproto.GovUserInfo, error) {
 	userInfoPath := govproto.UserInfoFilepath(name)
-	var info proto.GovUserInfo
+	var info govproto.GovUserInfo
 	if _, err := community.Dir().ReadFormFile(ctx, userInfoPath, &info); err != nil {
 		return nil, err
 	}
@@ -73,8 +72,8 @@ func GetInfo(ctx context.Context, community git.Local, name string) (*proto.GovU
 }
 
 type UserInfo struct {
-	UserName string            `json:"user_name"`
-	UserInfo proto.GovUserInfo `json:"user_info"`
+	UserName string               `json:"user_name"`
+	UserInfo govproto.GovUserInfo `json:"user_info"`
 }
 
 type UserInfos []UserInfo

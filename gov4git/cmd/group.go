@@ -8,7 +8,6 @@ import (
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
 	man "github.com/gov4git/gov4git/man/group"
-	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/services/gov/group"
 	"github.com/spf13/cobra"
@@ -30,7 +29,7 @@ var (
 		Long:  man.GovGroupAdd,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := group.GovGroupService{
-				GovConfig: proto.GovConfig{
+				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
 			}
@@ -56,7 +55,7 @@ var (
 		Long:  man.GovGroupRemove,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := group.GovGroupService{
-				GovConfig: proto.GovConfig{
+				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
 			}
@@ -82,7 +81,7 @@ var (
 		Long:  man.GovGroupSet,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := group.GovGroupService{
-				GovConfig: proto.GovConfig{
+				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
 			}
@@ -110,7 +109,7 @@ var (
 		Long:  man.GovGroupGet,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := group.GovGroupService{
-				GovConfig: proto.GovConfig{
+				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
 			}
@@ -137,7 +136,7 @@ var (
 		Long:  man.GovGroupList,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := group.GovGroupService{
-				GovConfig: proto.GovConfig{
+				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
 			}

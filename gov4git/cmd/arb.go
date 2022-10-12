@@ -8,7 +8,6 @@ import (
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
 	man "github.com/gov4git/gov4git/man/arb"
-	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/proto/identityproto"
 	"github.com/gov4git/gov4git/services/gov/arb"
@@ -22,7 +21,7 @@ var (
 		Long:  man.Ballot,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := arb.GovArbService{
-				GovConfig: proto.GovConfig{
+				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
 			}
@@ -52,7 +51,7 @@ var (
 		Long:  man.Vote,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := arb.GovArbService{
-				GovConfig: proto.GovConfig{
+				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
 				IdentityConfig: identityproto.IdentityConfig{
@@ -84,7 +83,7 @@ var (
 		Long:  man.Tally,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := arb.GovArbService{
-				GovConfig: proto.GovConfig{
+				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
 				IdentityConfig: identityproto.IdentityConfig{

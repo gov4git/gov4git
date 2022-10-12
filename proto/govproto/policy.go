@@ -1,4 +1,4 @@
-package proto
+package govproto
 
 type GovDirPolicy struct {
 	Change GovArbitration `json:"change"`

@@ -9,6 +9,8 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	man "github.com/gov4git/gov4git/man/arb"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
+	"github.com/gov4git/gov4git/proto/identityproto"
 	"github.com/gov4git/gov4git/services/gov/arb"
 	"github.com/spf13/cobra"
 )
@@ -24,7 +26,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-arb-ballot")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-arb-ballot")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.CreateBallot(ctx, &arb.CreateBallotIn{
@@ -53,12 +55,12 @@ var (
 				GovConfig: proto.GovConfig{
 					CommunityURL: communityURL,
 				},
-				IdentityConfig: proto.IdentityConfig{
+				IdentityConfig: identityproto.IdentityConfig{
 					PublicURL:  publicURL,
 					PrivateURL: privateURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-arb-vote")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-arb-vote")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Vote(ctx, &arb.VoteIn{
@@ -85,12 +87,12 @@ var (
 				GovConfig: proto.GovConfig{
 					CommunityURL: communityURL,
 				},
-				IdentityConfig: proto.IdentityConfig{
+				IdentityConfig: identityproto.IdentityConfig{
 					PublicURL:  publicURL,
 					PrivateURL: privateURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-arb-tally")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-arb-tally")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Tally(ctx, &arb.TallyIn{

@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	man "github.com/gov4git/gov4git/man/member"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/services/gov/member"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +34,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-member-add")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-member-add")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Add(ctx, &member.AddIn{
@@ -60,7 +61,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-member-rm")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-member-rm")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Remove(ctx, &member.RemoveIn{
@@ -87,7 +88,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-member-list-members")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-member-list-members")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.List(ctx, &member.ListIn{

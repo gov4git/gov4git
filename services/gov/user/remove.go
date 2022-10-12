@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type RemoveIn struct {
@@ -36,7 +36,7 @@ func (x GovUserService) Remove(ctx context.Context, in *RemoveIn) (*RemoveOut, e
 }
 
 func Remove(ctx context.Context, community git.Local, name string) error {
-	userFile := filepath.Join(proto.GovUsersDir, name, proto.GovUserInfoFilebase)
+	userFile := filepath.Join(govproto.GovUsersDir, name, govproto.GovUserInfoFilebase)
 	// remove user file
 	if err := community.Dir().Remove(userFile); err != nil {
 		return err

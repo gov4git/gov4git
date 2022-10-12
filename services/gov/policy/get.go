@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type GetIn struct {
@@ -14,7 +14,7 @@ type GetIn struct {
 }
 
 type GetOut struct {
-	Policy proto.GovDirPolicy `json:"policy"`
+	Policy govproto.GovDirPolicy `json:"policy"`
 }
 
 func (x GovPolicyService) Get(ctx context.Context, in *GetIn) (*GetOut, error) {
@@ -34,10 +34,10 @@ func (x GovPolicyService) Get(ctx context.Context, in *GetIn) (*GetOut, error) {
 	return &GetOut{Policy: *policy}, nil
 }
 
-func Get(ctx context.Context, community git.Local, dir string) (*proto.GovDirPolicy, error) {
-	policyFile := filepath.Join(dir, proto.GovRoot, proto.GovDirPolicyFilebase)
+func Get(ctx context.Context, community git.Local, dir string) (*govproto.GovDirPolicy, error) {
+	policyFile := filepath.Join(dir, govproto.GovRoot, govproto.GovDirPolicyFilebase)
 	// read policy file
-	var policy proto.GovDirPolicy
+	var policy govproto.GovDirPolicy
 	if _, err := community.Dir().ReadFormFile(ctx, policyFile, &policy); err != nil {
 		return nil, err
 	}

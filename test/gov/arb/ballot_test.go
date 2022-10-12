@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/services/gov/arb"
 	"github.com/gov4git/gov4git/testutil"
 )
@@ -26,7 +27,7 @@ func TestBallot(t *testing.T) {
 			Path:            "test_ballot",
 			Choices:         []string{"a", "b", "c"},
 			Group:           "all",
-			Strategy:        proto.PriorityPollStrategyName,
+			Strategy:        govproto.PriorityPollStrategyName,
 			GoverningBranch: proto.MainBranch,
 		})
 	if err != nil {

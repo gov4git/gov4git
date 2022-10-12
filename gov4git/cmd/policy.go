@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	man "github.com/gov4git/gov4git/man/policy"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/services/gov/policy"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +34,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-policy-set")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-policy-set")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Set(ctx, &policy.SetIn{
@@ -62,7 +63,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-policy-get")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-policy-get")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Get(ctx, &policy.GetIn{

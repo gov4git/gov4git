@@ -6,7 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type SnapshotBranchLatestIn struct {
@@ -21,7 +21,7 @@ type SnapshotBranchLatestOut struct {
 }
 
 func GetSnapshotDirLocal(community git.Local, sourceRepo string, sourceCommit string) files.Dir {
-	return community.Dir().Subdir(proto.SnapshotDir(sourceRepo, sourceCommit))
+	return community.Dir().Subdir(govproto.SnapshotDir(sourceRepo, sourceCommit))
 }
 
 // SnapshotBranchLatest downloads the latest commit on a given branch at a remote source repo, and
@@ -44,7 +44,7 @@ func (x GovService) SnapshotBranchLatest(ctx context.Context, in *SnapshotBranch
 	}
 
 	// directory inside community where snapshot lives
-	srcPath := proto.SnapshotDir(in.SourceRepo, latestCommit)
+	srcPath := govproto.SnapshotDir(in.SourceRepo, latestCommit)
 	srcParent, _ := filepath.Split(srcPath)
 
 	// if the community repo already has a snapshot of the source commit, remove it.

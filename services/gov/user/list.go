@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type ListIn struct {
@@ -38,7 +38,7 @@ func (x GovUserService) List(ctx context.Context, in *ListIn) (*ListOut, error) 
 }
 
 func List(ctx context.Context, community git.Local) ([]string, error) {
-	userFileGlob := filepath.Join(proto.GovUsersDir, "*", proto.GovUserInfoFilebase)
+	userFileGlob := filepath.Join(govproto.GovUsersDir, "*", govproto.GovUserInfoFilebase)
 	// glob for user files
 	m, err := community.Dir().Glob(userFileGlob)
 	if err != nil {

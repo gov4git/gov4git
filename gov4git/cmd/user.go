@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	man "github.com/gov4git/gov4git/man/user"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/services/gov/user"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +34,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-add")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-user-add")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Add(ctx, &user.AddIn{
@@ -60,7 +61,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-rm")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-user-rm")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Remove(ctx, &user.RemoveIn{
@@ -86,7 +87,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-set")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-user-set")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Set(ctx, &user.SetIn{
@@ -114,7 +115,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-get")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-user-get")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Get(ctx, &user.GetIn{
@@ -141,7 +142,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-user-list")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-user-list")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.List(ctx, &user.ListIn{

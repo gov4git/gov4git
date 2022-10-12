@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type ListIn struct {
@@ -39,7 +39,7 @@ func (x GovGroupService) List(ctx context.Context, in *ListIn) (*ListOut, error)
 
 func List(ctx context.Context, community git.Local) ([]string, error) {
 	// glob for group files
-	m, err := community.Dir().Glob(proto.GroupInfoFilepath("*"))
+	m, err := community.Dir().Glob(govproto.GroupInfoFilepath("*"))
 	if err != nil {
 		return nil, err
 	}

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type GetIn struct {
@@ -36,7 +36,7 @@ func (x GovGroupService) Get(ctx context.Context, in *GetIn) (*GetOut, error) {
 }
 
 func Get(ctx context.Context, community git.Local, name string, key string) (string, error) {
-	propFile := filepath.Join(proto.GovGroupsDir, name, proto.GovGroupMetaDirbase, key)
+	propFile := filepath.Join(govproto.GovGroupsDir, name, govproto.GovGroupMetaDirbase, key)
 	// read group property file
 	data, err := community.Dir().ReadByteFile(propFile)
 	if err != nil {

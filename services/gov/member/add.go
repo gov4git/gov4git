@@ -5,7 +5,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type AddIn struct {
@@ -47,7 +47,7 @@ func (x GovMemberService) AddLocal(ctx context.Context, community git.Local, use
 }
 
 func (x GovMemberService) AddLocalStageOnly(ctx context.Context, community git.Local, user string, group string) error {
-	file := proto.GroupMemberFilepath(group, user)
+	file := govproto.GroupMemberFilepath(group, user)
 	// write group file
 	stage := files.ByteFiles{
 		files.ByteFile{Path: file},

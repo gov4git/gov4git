@@ -5,12 +5,13 @@ import (
 
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/identityproto"
 )
 
 type GetPrivateCredentialsIn struct{}
 
 type GetPrivateCredentialsOut struct {
-	PrivateCredentials proto.PrivateCredentials `json:"private_credentials"`
+	PrivateCredentials identityproto.PrivateCredentials `json:"private_credentials"`
 }
 
 func (x IdentityService) GetPrivateCredentials(ctx context.Context, in *GetPrivateCredentialsIn) (*GetPrivateCredentialsOut, error) {
@@ -33,8 +34,8 @@ func (x IdentityService) GetPrivateCredentials(ctx context.Context, in *GetPriva
 }
 
 func (x IdentityService) GetPrivateCredentialsLocal(ctx context.Context, private git.Local, in *GetPrivateCredentialsIn) (*GetPrivateCredentialsOut, error) {
-	var credentials proto.PrivateCredentials
-	if _, err := private.Dir().ReadFormFile(ctx, proto.PrivateCredentialsPath, &credentials); err != nil {
+	var credentials identityproto.PrivateCredentials
+	if _, err := private.Dir().ReadFormFile(ctx, identityproto.PrivateCredentialsPath, &credentials); err != nil {
 		return nil, err
 	}
 	return &GetPrivateCredentialsOut{PrivateCredentials: credentials}, nil

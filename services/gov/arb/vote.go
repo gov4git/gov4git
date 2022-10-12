@@ -7,6 +7,8 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
+	"github.com/gov4git/gov4git/proto/identityproto"
 	"github.com/gov4git/gov4git/services/identity"
 )
 
@@ -62,7 +64,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	// compute the name of the vote branch
-	voteBranch, err := proto.BallotVoteBranch(ctx, findAd.BallotAdBytes)
+	voteBranch, err := govproto.BallotVoteBranch(ctx, findAd.BallotAdBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +80,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	// add vote to vote branch
-	vote := proto.GovBallotVote{
+	vote := govproto.GovBallotVote{
 		BallotAd: findAd.BallotAd,
 		Choice:   in.VoteChoice,
 		Strength: in.VoteStrength,
@@ -88,7 +90,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	if err != nil {
 		return nil, err
 	}
-	signature, err := proto.SignPlaintext(ctx, &voterCredentials.PrivateCredentials, voteData)
+	signature, err := identityproto.SignPlaintext(ctx, &voterCredentials.PrivateCredentials, voteData)
 	if err != nil {
 		return nil, err
 	}
@@ -99,8 +101,8 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 
 	// write vote and signature
 	stage := files.ByteFiles{
-		files.ByteFile{Path: proto.GovBallotVoteFilepath, Bytes: voteData},
-		files.ByteFile{Path: proto.GovBallotVoteSignatureFilepath, Bytes: signatureData},
+		files.ByteFile{Path: govproto.GovBallotVoteFilepath, Bytes: voteData},
+		files.ByteFile{Path: govproto.GovBallotVoteSignatureFilepath, Bytes: signatureData},
 	}
 	if err := voter.Dir().WriteByteFiles(stage); err != nil {
 		return nil, err
@@ -108,7 +110,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	if err := voter.Add(ctx, stage.Paths()); err != nil {
 		return nil, err
 	}
-	msg := proto.BallotVoteCommitHeader(x.GovConfig.CommunityURL, in.BallotBranch, in.BallotPath)
+	msg := govproto.BallotVoteCommitHeader(x.GovConfig.CommunityURL, in.BallotBranch, in.BallotPath)
 	if err := voter.Commit(ctx, msg); err != nil {
 		return nil, err
 	}

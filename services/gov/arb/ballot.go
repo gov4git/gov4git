@@ -7,7 +7,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/services/gov/group"
 )
 
@@ -51,7 +51,7 @@ func (x GovArbService) CreateBallot(ctx context.Context, in *CreateBallotIn) (*C
 func (x GovArbService) CreateBallotLocal(ctx context.Context, community git.Local, in *CreateBallotIn) (*CreateBallotOut, error) {
 	// verify path is not in use
 	ballotPath := strings.TrimSpace(git.MakeNonAbs(in.Path))
-	ballotAdPath := proto.BallotAdPath(ballotPath)
+	ballotAdPath := govproto.BallotAdPath(ballotPath)
 	if _, err := community.Dir().Stat(ballotAdPath); err == nil {
 		return nil, fmt.Errorf("ballot already exists")
 	}
@@ -78,11 +78,11 @@ func (x GovArbService) CreateBallotLocal(ctx context.Context, community git.Loca
 	}
 
 	// create and stage ballot advertisement
-	strategy, err := proto.ParseBallotStrategy(in.Strategy)
+	strategy, err := govproto.ParseBallotStrategy(in.Strategy)
 	if err != nil {
 		return nil, err
 	}
-	ballotAd := proto.GovBallotAd{
+	ballotAd := govproto.GovBallotAd{
 		Path:            ballotPath,
 		Choices:         in.Choices,
 		Group:           in.Group,
@@ -107,7 +107,7 @@ func (x GovArbService) CreateBallotLocal(ctx context.Context, community git.Loca
 		BallotBranch:        ballotBranch,
 		BallotGenesisCommit: "", // populate after commit
 	}
-	hum := proto.BallotGenesisCommitHeader(ballotBranch)
+	hum := govproto.BallotGenesisCommitHeader(ballotBranch)
 	msg, err := git.PrepareCommitMsg(ctx, hum, ballotAd)
 	if err != nil {
 		return nil, err

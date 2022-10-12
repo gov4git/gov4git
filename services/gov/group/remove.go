@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type RemoveIn struct {
@@ -35,7 +35,7 @@ func (x GovGroupService) Remove(ctx context.Context, in *RemoveIn) (*RemoveOut, 
 }
 
 func Remove(ctx context.Context, community git.Local, name string) error {
-	groupFile := proto.GroupInfoFilepath(name)
+	groupFile := govproto.GroupInfoFilepath(name)
 	// remove group file
 	if err := community.Dir().Remove(groupFile); err != nil {
 		return err

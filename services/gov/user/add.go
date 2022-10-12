@@ -6,6 +6,7 @@ import (
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type AddIn struct {
@@ -47,7 +48,7 @@ func (x GovUserService) AddLocal(ctx context.Context, community git.Local, name 
 }
 
 func (x GovUserService) AddLocalStageOnly(ctx context.Context, community git.Local, name string, url string) error {
-	userFile := proto.UserInfoFilepath(name)
+	userFile := govproto.UserInfoFilepath(name)
 	// write user file
 	stage := files.FormFiles{
 		files.FormFile{Path: userFile, Form: proto.GovUserInfo{PublicURL: url}},
@@ -63,7 +64,7 @@ func (x GovUserService) AddLocalStageOnly(ctx context.Context, community git.Loc
 }
 
 func GetInfo(ctx context.Context, community git.Local, name string) (*proto.GovUserInfo, error) {
-	userInfoPath := proto.UserInfoFilepath(name)
+	userInfoPath := govproto.UserInfoFilepath(name)
 	var info proto.GovUserInfo
 	if _, err := community.Dir().ReadFormFile(ctx, userInfoPath, &info); err != nil {
 		return nil, err

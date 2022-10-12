@@ -7,7 +7,8 @@ import (
 	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
+	"github.com/gov4git/gov4git/proto/identityproto"
 	"github.com/gov4git/gov4git/services/identity"
 	"github.com/spf13/cobra"
 )
@@ -19,12 +20,12 @@ var (
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := identity.IdentityService{
-				IdentityConfig: proto.IdentityConfig{
+				IdentityConfig: identityproto.IdentityConfig{
 					PublicURL:  publicURL,
 					PrivateURL: privateURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "init")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "init")
 			base.AssertNoErr(err)
 			r, err := s.Init(files.WithWorkDir(cmd.Context(), workDir), &identity.InitIn{})
 			if err == nil {

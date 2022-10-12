@@ -7,7 +7,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type SetIn struct {
@@ -44,12 +44,12 @@ func Set(ctx context.Context, community git.Local, dir string, arb string, group
 	// TODO: verify group and threshold
 
 	// build policy
-	var policy proto.GovDirPolicy
+	var policy govproto.GovDirPolicy
 	switch arb {
 	case "quorum":
-		policy = proto.GovDirPolicy{
-			Change: proto.GovArbitration{
-				Quorum: &proto.GovQuorum{
+		policy = govproto.GovDirPolicy{
+			Change: govproto.GovArbitration{
+				Quorum: &govproto.GovQuorum{
 					Group:     group,
 					Threshold: uint32(threshold),
 				},
@@ -59,7 +59,7 @@ func Set(ctx context.Context, community git.Local, dir string, arb string, group
 		return fmt.Errorf("unknown directory policy")
 	}
 
-	policyFile := filepath.Join(dir, proto.GovRoot, proto.GovDirPolicyFilebase)
+	policyFile := filepath.Join(dir, govproto.GovRoot, govproto.GovDirPolicyFilebase)
 	// write policy file
 	stage := files.FormFiles{
 		files.FormFile{Path: policyFile, Form: policy},

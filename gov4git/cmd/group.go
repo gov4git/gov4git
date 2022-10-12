@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	man "github.com/gov4git/gov4git/man/group"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/services/gov/group"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +34,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-group-add")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-group-add")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Add(ctx, &group.AddIn{
@@ -59,7 +60,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-group-rm")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-group-rm")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Remove(ctx, &group.RemoveIn{
@@ -85,7 +86,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-group-set")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-group-set")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Set(ctx, &group.SetIn{
@@ -113,7 +114,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-group-get")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-group-get")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Get(ctx, &group.GetIn{
@@ -140,7 +141,7 @@ var (
 					CommunityURL: communityURL,
 				},
 			}
-			workDir, err := files.TempDir().MkEphemeralDir(proto.LocalAgentTempPath, "gov-group-list")
+			workDir, err := files.TempDir().MkEphemeralDir(govproto.LocalAgentTempPath, "gov-group-list")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.List(ctx, &group.ListIn{

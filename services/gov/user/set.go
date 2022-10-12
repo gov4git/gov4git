@@ -6,7 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type SetIn struct {
@@ -41,7 +41,7 @@ func (x GovUserService) Set(ctx context.Context, in *SetIn) (*SetOut, error) {
 // XXX: sanitize key
 // XXX: prevent overwrite
 func Set(ctx context.Context, community git.Local, name string, key string, value string) error {
-	propFile := filepath.Join(proto.GovUsersDir, name, proto.GovUserMetaDirbase, key)
+	propFile := filepath.Join(govproto.GovUsersDir, name, govproto.GovUserMetaDirbase, key)
 	// write user file
 	stage := files.ByteFiles{
 		files.ByteFile{Path: propFile, Bytes: []byte(value)},

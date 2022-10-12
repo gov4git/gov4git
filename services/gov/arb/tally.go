@@ -7,7 +7,8 @@ import (
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
+	"github.com/gov4git/gov4git/proto/identityproto"
 	"github.com/gov4git/gov4git/services/gov"
 	"github.com/gov4git/gov4git/services/gov/arb/strategy"
 	"github.com/gov4git/gov4git/services/gov/member"
@@ -20,9 +21,9 @@ type TallyIn struct {
 }
 
 type TallyOut struct {
-	BallotRepo   string               `json:"ballot_repo"`
-	BallotBranch string               `json:"ballot_branch"`
-	BallotTally  proto.GovBallotTally `json:"ballot_tally"`
+	BallotRepo   string                  `json:"ballot_repo"`
+	BallotBranch string                  `json:"ballot_branch"`
+	BallotTally  govproto.GovBallotTally `json:"ballot_tally"`
 }
 
 func (x GovArbService) Tally(ctx context.Context, in *TallyIn) (*TallyOut, error) {
@@ -93,9 +94,9 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	out := &TallyOut{
 		BallotRepo:   x.GovConfig.CommunityURL,
 		BallotBranch: in.BallotBranch,
-		BallotTally: proto.GovBallotTally{
+		BallotTally: govproto.GovBallotTally{
 			Ad:         findBallot.BallotAd,
-			TallyUsers: make(proto.GovTallyUsers, len(userInfo)),
+			TallyUsers: make(govproto.GovTallyUsers, len(userInfo)),
 		},
 	}
 
@@ -103,7 +104,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	// TODO: parallelize snapshots
 	for i, info := range userInfo {
 		userVote, err := x.snapshotParseVerifyUserVote(ctx, community, findBallot, info)
-		out.BallotTally.TallyUsers[i] = proto.GovTallyUser{
+		out.BallotTally.TallyUsers[i] = govproto.GovTallyUser{
 			UserName:       info.UserName,
 			UserPublicURL:  info.UserInfo.PublicURL,
 			UserVote:       userVote,
@@ -112,7 +113,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	}
 
 	// aggregate votes to choices
-	out.BallotTally.TallyChoices = proto.AggregateVotes(out.BallotTally.TallyUsers)
+	out.BallotTally.TallyChoices = govproto.AggregateVotes(out.BallotTally.TallyUsers)
 
 	// invoke ballot strategy
 	strat, err := strategy.ParseStrategy(findBallot.BallotAd.Strategy)
@@ -124,7 +125,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	}
 
 	// write/stage snapshots and tally to community repo
-	tallyPath := proto.BallotTallyPath(findBallot.BallotAd.Path)
+	tallyPath := govproto.BallotTallyPath(findBallot.BallotAd.Path)
 	stage := files.FormFiles{
 		files.FormFile{Path: tallyPath, Form: out.BallotTally},
 	}
@@ -148,10 +149,10 @@ func (x GovArbService) snapshotParseVerifyUserVote(
 	community git.Local,
 	findBallot *FindBallotAdOut,
 	userInfo user.UserInfo,
-) (*proto.GovBallotVote, error) {
+) (*govproto.GovBallotVote, error) {
 
 	// compute the name of the vote branch in the user's repo
-	voteBranch, err := proto.BallotVoteBranch(ctx, findBallot.BallotAdBytes)
+	voteBranch, err := govproto.BallotVoteBranch(ctx, findBallot.BallotAdBytes)
 	if err != nil {
 		return nil, err
 	}
@@ -169,15 +170,15 @@ func (x GovArbService) snapshotParseVerifyUserVote(
 
 	// parse and verify user's vote
 	snapDir := gov.GetSnapshotDirLocal(community, snap.In.SourceRepo, snap.SourceCommit)
-	var signature proto.SignedPlaintext
+	var signature identityproto.SignedPlaintext
 
-	if _, err := snapDir.ReadFormFile(ctx, proto.GovBallotVoteSignatureFilepath, &signature); err != nil {
+	if _, err := snapDir.ReadFormFile(ctx, govproto.GovBallotVoteSignatureFilepath, &signature); err != nil {
 		return nil, err
 	}
 	if !signature.Verify() {
 		return nil, fmt.Errorf("signature is not valid")
 	}
-	var vote proto.GovBallotVote
+	var vote govproto.GovBallotVote
 	if err := form.DecodeForm(ctx, signature.Plaintext, &vote); err != nil {
 		return nil, err
 	}

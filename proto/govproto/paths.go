@@ -1,18 +1,10 @@
-package proto
+package govproto
 
 import "path/filepath"
 
 const (
 	LocalAgentPath     = ".gov4git"
 	LocalAgentTempPath = "gov4git"
-)
-
-// identity repo paths
-
-var (
-	IdentityRoot           = ".gov"
-	PublicCredentialsPath  = filepath.Join(IdentityRoot, "public_credentials")
-	PrivateCredentialsPath = filepath.Join(IdentityRoot, "private_credentials")
 )
 
 // governance repo paths

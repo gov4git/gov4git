@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/govproto"
 )
 
 type FindBallotGenesisIn struct {
@@ -27,7 +27,7 @@ func (x GovArbService) FindBallotGenesisLocal(ctx context.Context, repo git.Loca
 	}
 	// find the ballot genesis commit going in reverse chrono order
 	genesisCommit := ""
-	header := strings.TrimSpace(proto.BallotGenesisCommitHeader(in.BallotBranch))
+	header := strings.TrimSpace(govproto.BallotGenesisCommitHeader(in.BallotBranch))
 	for _, line := range strings.Split(commitLog, "\n") {
 		line = strings.TrimSpace(line)
 		commitHash, commitHeader, found := strings.Cut(line, " ")

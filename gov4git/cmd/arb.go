@@ -48,7 +48,7 @@ var (
 
 	voteCmd = &cobra.Command{
 		Use:   "vote",
-		Short: "Vote on a referendum",
+		Short: "Vote on a ballot",
 		Long:  man.Vote,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := arb.GovArbService{
@@ -80,7 +80,7 @@ var (
 
 	tallyCmd = &cobra.Command{
 		Use:   "tally",
-		Short: "Tally votes on a referendum",
+		Short: "Tally votes on a ballot",
 		Long:  man.Tally,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := arb.GovArbService{
@@ -130,15 +130,15 @@ func init() {
 	ballotCmd.Flags().StringVar(&ballotPath, "path", "", "community repo path for ballot results and proofs")
 	ballotCmd.Flags().StringArrayVar(&ballotChoices, "choices", nil, "ballot choices")
 	ballotCmd.Flags().StringVar(&ballotGroup, "group", "", "group of users participating in ballot")
-	ballotCmd.Flags().StringVar(&ballotStrategy, "strategy", "", "balloting strategy (available strategy: prioritize)")
+	ballotCmd.Flags().StringVar(&ballotStrategy, "strategy", "", "balloting strategy (available strategy: priority-poll)")
 	ballotCmd.Flags().StringVar(&ballotGoverningBranch, "govern-branch", "", "branch governing the ballot")
 	ballotCmd.Flags().StringVar(&ballotBranch, "ballot-branch", "", "branch where ballot is created (if empty, use governing branch)")
 
-	voteCmd.Flags().StringVar(&voteBallotBranch, "--ballot-branch", "", "referendum branch")
-	voteCmd.Flags().StringVar(&voteBallotPath, "--ballot-path", "", "referendum path")
-	voteCmd.Flags().StringVar(&voteChoice, "--choice", "", "vote choice")
-	voteCmd.Flags().Float64Var(&voteStrength, "--strength", 0, "vote strength")
+	voteCmd.Flags().StringVar(&voteBallotBranch, "ballot-branch", "", "ballot branch")
+	voteCmd.Flags().StringVar(&voteBallotPath, "ballot-path", "", "ballot path")
+	voteCmd.Flags().StringVar(&voteChoice, "choice", "", "vote choice")
+	voteCmd.Flags().Float64Var(&voteStrength, "strength", 0, "vote strength")
 
-	tallyCmd.Flags().StringVar(&tallyBallotBranch, "--ballot-branch", "", "referendum branch")
-	tallyCmd.Flags().StringVar(&tallyBallotPath, "--ballot-path", "", "referendum path")
+	tallyCmd.Flags().StringVar(&tallyBallotBranch, "ballot-branch", "", "ballot branch")
+	tallyCmd.Flags().StringVar(&tallyBallotPath, "ballot-path", "", "ballot path")
 }

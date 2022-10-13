@@ -1,5 +1,4 @@
 PRODUCT
-- [ ] split proto package in service subpackages
 - [ ] a vote can contain a batch of choices
 
 FRAMEWORK

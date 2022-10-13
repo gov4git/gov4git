@@ -1,15 +1,16 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/gov4git/gov4git/lib/base"
+	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto/cmdproto"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -34,14 +35,14 @@ func init() {
 
 	rootCmd.SilenceUsage = true
 	rootCmd.SilenceErrors = true
-	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "config file (default is $HOME/.gov/config.json)")
+	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "config file (default is $HOME/.gov4git/config.json)")
 	rootCmd.PersistentFlags().StringVar(&privateURL, "private_url", "", "private url of soul")
 	rootCmd.PersistentFlags().StringVar(&publicURL, "public_url", "", "public url of soul")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "run in developer mode with verbose logging")
 	// rootCmd.MarkPersistentFlagRequired("private_url")
 	// rootCmd.MarkPersistentFlagRequired("public_url")
-	viper.BindPFlag("private_url", rootCmd.PersistentFlags().Lookup("private_url"))
-	viper.BindPFlag("public_url", rootCmd.PersistentFlags().Lookup("public_url"))
+	// viper.BindPFlag("private_url", rootCmd.PersistentFlags().Lookup("private_url"))
+	// viper.BindPFlag("public_url", rootCmd.PersistentFlags().Lookup("public_url"))
 
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(govCmd)
@@ -54,9 +55,7 @@ func initAfterFlags() {
 		base.LogQuietly()
 	}
 
-	if configPath != "" {
-		viper.SetConfigFile(configPath) // use config file from the flag
-	} else {
+	if configPath == "" {
 		// find home directory
 		home, err := os.UserHomeDir()
 		if err != nil {
@@ -64,17 +63,27 @@ func initAfterFlags() {
 		}
 		base.AssertNoErr(err)
 
-		// search for config in ~/.gov/ directory with name "config" (without extension).
-		viper.AddConfigPath(filepath.Join(home, cmdproto.LocalAgentPath))
-		viper.SetConfigType("json")
-		viper.SetConfigName("config")
+		// search for config in ~/.gov4git/ directory with name "config" (without extension).
+		configPath = filepath.Join(home, cmdproto.LocalAgentPath, "config.json")
 	}
 
-	viper.AutomaticEnv()
-
-	if err := viper.ReadInConfig(); err == nil {
-		base.Infof("using config file %v", viper.ConfigFileUsed())
+	var config cmdproto.Config
+	if err := form.DecodeFormFromFile(context.Background(), configPath, &config); err == nil {
+		if publicURL == "" {
+			publicURL = config.PublicURL
+		}
+		if privateURL == "" {
+			privateURL = config.PrivateURL
+		}
+		if communityURL == "" {
+			communityURL = config.CommunityURL
+		}
+		if communityBranch == "" {
+			communityBranch = config.CommunityBranch
+		}
 	}
+
+	base.Infof("private_url=%v public_url=%v community_url=%v", privateURL, publicURL, communityURL)
 
 	git.Init()
 }

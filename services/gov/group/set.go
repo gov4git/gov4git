@@ -28,7 +28,7 @@ func (x GovGroupService) Set(ctx context.Context, in *SetIn) (*SetOut, error) {
 		return nil, err
 	}
 	// make changes to repo
-	if err := Set(ctx, community, in.Name, in.Key, in.Value); err != nil {
+	if err := x.SetLocal(ctx, community, in.Name, in.Key, in.Value); err != nil {
 		return nil, err
 	}
 	// push to origin
@@ -40,7 +40,7 @@ func (x GovGroupService) Set(ctx context.Context, in *SetIn) (*SetOut, error) {
 
 // XXX: sanitize key
 // XXX: prevent overwrite
-func Set(ctx context.Context, community git.Local, name string, key string, value string) error {
+func (x GovGroupService) SetLocal(ctx context.Context, community git.Local, name string, key string, value string) error {
 	propFile := filepath.Join(govproto.GovGroupsDir, name, govproto.GovGroupMetaDirbase, key)
 	// write group file
 	stage := files.ByteFiles{

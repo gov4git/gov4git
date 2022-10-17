@@ -28,14 +28,14 @@ func (x GovGroupService) Get(ctx context.Context, in *GetIn) (*GetOut, error) {
 		return nil, err
 	}
 	// read from repo
-	value, err := Get(ctx, community, in.Name, in.Key)
+	value, err := x.GetLocal(ctx, community, in.Name, in.Key)
 	if err != nil {
 		return nil, err
 	}
 	return &GetOut{Value: value}, nil
 }
 
-func Get(ctx context.Context, community git.Local, name string, key string) (string, error) {
+func (x GovGroupService) GetLocal(ctx context.Context, community git.Local, name string, key string) (string, error) {
 	propFile := filepath.Join(govproto.GovGroupsDir, name, govproto.GovGroupMetaDirbase, key)
 	// read group property file
 	data, err := community.Dir().ReadByteFile(propFile)

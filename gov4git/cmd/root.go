@@ -67,7 +67,6 @@ func initAfterFlags() {
 		configPath = filepath.Join(home, cmdproto.LocalAgentPath, "config.json")
 	}
 
-	var config cmdproto.Config
 	if err := form.DecodeFormFromFile(context.Background(), configPath, &config); err == nil {
 		if publicURL == "" {
 			publicURL = config.PublicURL
@@ -87,6 +86,8 @@ func initAfterFlags() {
 
 	git.Init()
 }
+
+var config cmdproto.Config // used directly by some commands
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {

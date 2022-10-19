@@ -63,11 +63,21 @@ var (
 			workDir, err := files.TempDir().MkEphemeralDir(cmdproto.LocalAgentTempPath, "gov-arb-vote")
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
+
+			if len(voteChoice) != len(voteStrength) {
+				err := fmt.Errorf("number of choices much match number of strengths")
+				fmt.Fprint(os.Stderr, err.Error())
+				return err
+			}
+			votes := make([]govproto.Election, len(voteChoice))
+			for i := 0; i < len(voteChoice); i++ {
+				votes[i] = govproto.Election{Choice: voteChoice[i], Strength: voteStrength[i]}
+			}
+
 			r, err := s.Vote(ctx, &arb.VoteIn{
 				BallotBranch: voteBallotBranch,
 				BallotPath:   voteBallotPath,
-				VoteChoice:   voteChoice,
-				VoteStrength: voteStrength,
+				Votes:        votes,
 			})
 			if err == nil {
 				fmt.Fprint(os.Stdout, form.Pretty(r))
@@ -119,8 +129,8 @@ var (
 
 	voteBallotBranch string
 	voteBallotPath   string
-	voteChoice       string
-	voteStrength     float64
+	voteChoice       []string
+	voteStrength     []float64
 
 	tallyBallotBranch string
 	tallyBallotPath   string
@@ -136,8 +146,8 @@ func init() {
 
 	voteCmd.Flags().StringVar(&voteBallotBranch, "ballot-branch", "", "ballot branch")
 	voteCmd.Flags().StringVar(&voteBallotPath, "ballot-path", "", "ballot path")
-	voteCmd.Flags().StringVar(&voteChoice, "choice", "", "vote choice")
-	voteCmd.Flags().Float64Var(&voteStrength, "strength", 0, "vote strength")
+	voteCmd.Flags().StringSliceVar(&voteChoice, "choice", nil, "vote choice")
+	voteCmd.Flags().Float64SliceVar(&voteStrength, "strength", nil, "vote strength")
 
 	tallyCmd.Flags().StringVar(&tallyBallotBranch, "ballot-branch", "", "ballot branch")
 	tallyCmd.Flags().StringVar(&tallyBallotPath, "ballot-path", "", "ballot path")

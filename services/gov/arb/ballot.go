@@ -82,7 +82,7 @@ func (x GovArbService) CreateBallotLocal(ctx context.Context, community git.Loca
 	if err != nil {
 		return nil, err
 	}
-	ballotAd := govproto.GovBallotAd{
+	ballotAd := govproto.BallotAd{
 		Path:            ballotPath,
 		Choices:         in.Choices,
 		Group:           in.Group,

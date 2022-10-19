@@ -14,8 +14,8 @@ type FindBallotAdIn struct {
 }
 
 type FindBallotAdOut struct {
-	BallotAd      govproto.GovBallotAd `json:"ballot_ad"`
-	BallotAdBytes form.Bytes           `json:"ballot_ad_bytes"`
+	BallotAd      govproto.BallotAd `json:"ballot_ad"`
+	BallotAdBytes form.Bytes        `json:"ballot_ad_bytes"`
 }
 
 // FindBallotAdLocal finds the advertisement of a ballot in a local clone of community repo (at the ballot branch) and
@@ -28,7 +28,7 @@ func (x GovArbService) FindBallotAdLocal(ctx context.Context, repo git.Local, in
 		return nil, err
 	}
 
-	var ballotAd govproto.GovBallotAd
+	var ballotAd govproto.BallotAd
 	if err := form.DecodeForm(ctx, ballotAdFile.Bytes, &ballotAd); err != nil {
 		return nil, err
 	}

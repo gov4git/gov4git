@@ -45,8 +45,9 @@ func TestVote(t *testing.T) {
 		&arb.VoteIn{
 			BallotBranch: ballotOut.BallotBranch,
 			BallotPath:   "test_ballot",
-			VoteChoice:   "a",
-			VoteStrength: 1.0,
+			Votes: []govproto.Election{
+				{Choice: "a", Strength: 1.0},
+			},
 		},
 	)
 	if err != nil {

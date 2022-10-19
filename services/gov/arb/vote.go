@@ -13,17 +13,16 @@ import (
 )
 
 type VoteIn struct {
-	BallotBranch string  `json:"ballot_branch"`
-	BallotPath   string  `json:"ballot_path"`
-	VoteChoice   string  `json:"vote_choice"`
-	VoteStrength float64 `json:"vote_strength"`
+	BallotBranch string              `json:"ballot_branch"`
+	BallotPath   string              `json:"ballot_path"`
+	Votes        []govproto.Election `json:"votes"`
 }
 
 type VoteOut struct {
-	VoteRepo     string `json:"vote_repo"`
-	VoteBranch   string `json:"vote_branch"`
-	BallotRepo   string `json:"ballot_repo"`
-	BallotBranch string `json:"ballot_branch"`
+	In         *VoteIn `json:"in"`
+	VoteRepo   string  `json:"vote_repo"`
+	VoteBranch string  `json:"vote_branch"`
+	BallotRepo string  `json:"ballot_repo"`
 }
 
 func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
@@ -80,10 +79,9 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	// add vote to vote branch
-	vote := govproto.GovBallotVote{
-		BallotAd: findAd.BallotAd,
-		Choice:   in.VoteChoice,
-		Strength: in.VoteStrength,
+	vote := govproto.BallotVote{
+		BallotAd:  findAd.BallotAd,
+		Elections: in.Votes,
 	}
 	// sign vote
 	voteData, err := form.EncodeForm(ctx, vote)
@@ -101,8 +99,8 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 
 	// write vote and signature
 	stage := files.ByteFiles{
-		files.ByteFile{Path: govproto.GovBallotVoteFilepath, Bytes: voteData},
-		files.ByteFile{Path: govproto.GovBallotVoteSignatureFilepath, Bytes: signatureData},
+		files.ByteFile{Path: govproto.BallotVoteFilepath, Bytes: voteData},
+		files.ByteFile{Path: govproto.BallotVoteSignatureFilepath, Bytes: signatureData},
 	}
 	if err := voter.Dir().WriteByteFiles(stage); err != nil {
 		return nil, err
@@ -121,9 +119,9 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	return &VoteOut{
-		VoteRepo:     x.IdentityConfig.PublicURL,
-		VoteBranch:   voteBranch,
-		BallotRepo:   x.GovConfig.CommunityURL,
-		BallotBranch: in.BallotBranch,
+		In:         in,
+		VoteRepo:   x.IdentityConfig.PublicURL,
+		VoteBranch: voteBranch,
+		BallotRepo: x.GovConfig.CommunityURL,
 	}, nil
 }

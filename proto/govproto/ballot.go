@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-type GovBallotAd struct {
+type BallotAd struct {
 	Path            string            `json:"path"`          // path within repo where ballot will be persisted, also unique ballot name
 	Choices         []string          `json:"choices"`       // ballot choices
 	Group           string            `json:"group"`         // community group eligible to participate
@@ -18,21 +18,21 @@ type GovBallotAd struct {
 }
 
 var (
-	GovBallotAdFilebase    = "ballot_advertisement"
-	GovBallotTallyFilebase = "ballot_tally"
+	BallotAdFilebase    = "ballot_advertisement"
+	BallotTallyFilebase = "ballot_tally"
 
-	GovBallotRoot = filepath.Join(GovRoot, "ballots")
+	BallotRootpath = filepath.Join(GovRoot, "ballots")
 
-	GovBallotVoteFilepath          = "vote"
-	GovBallotVoteSignatureFilepath = "vote.signature.ed25519"
+	BallotVoteFilepath          = "vote"
+	BallotVoteSignatureFilepath = "vote.signature.ed25519"
 )
 
 func BallotAdPath(ballotPath string) string {
-	return filepath.Join(GovBallotRoot, ballotPath, GovBallotAdFilebase)
+	return filepath.Join(BallotRootpath, ballotPath, BallotAdFilebase)
 }
 
 func BallotTallyPath(ballotPath string) string {
-	return filepath.Join(GovBallotRoot, ballotPath, GovBallotTallyFilebase)
+	return filepath.Join(BallotRootpath, ballotPath, BallotTallyFilebase)
 }
 
 func BallotGenesisCommitHeader(ballotBranch string) string {
@@ -43,11 +43,15 @@ func BallotVoteCommitHeader(communityURL string, ballotBranch string, ballotPath
 	return fmt.Sprintf("Submitted vote in community %v at branch %v on ballot %v", communityURL, ballotBranch, ballotPath)
 }
 
-// GovBallotVote describes the contents of a vote on a ballot.
-type GovBallotVote struct {
-	BallotAd GovBallotAd `json:"ballot_advertisement"`
-	Choice   string      `json:"vote_choice"`
-	Strength float64     `json:"vote_strength"`
+// BallotVote describes the contents of a vote on a ballot.
+type BallotVote struct {
+	BallotAd  BallotAd   `json:"ballot_advertisement"`
+	Elections []Election `json:"elections"`
+}
+
+type Election struct {
+	Choice   string  `json:"vote_choice"`
+	Strength float64 `json:"vote_strength"`
 }
 
 var (
@@ -65,16 +69,16 @@ func BallotVoteBranch(ctx context.Context, ballotAdBytes []byte) (string, error)
 // tally results
 
 type GovBallotTally struct {
-	Ad           GovBallotAd     `json:"ballot_ad"`
+	Ad           BallotAd        `json:"ballot_ad"`
 	TallyUsers   GovTallyUsers   `json:"tally_users"`
 	TallyChoices GovTallyChoices `json:"tally_choices"`
 }
 
 type GovTallyUser struct {
-	UserName       string         `json:"user_name"`
-	UserPublicURL  string         `json:"user_public_url"`
-	UserVote       *GovBallotVote `json:"user_vote"` // nil indicates vote was not accessible
-	UserFetchError error          `json:"user_fetch_error"`
+	UserName       string      `json:"user_name"`
+	UserPublicURL  string      `json:"user_public_url"`
+	UserVote       *BallotVote `json:"user_vote"` // nil indicates vote was not accessible
+	UserFetchError error       `json:"user_fetch_error"`
 }
 
 type GovTallyUsers []GovTallyUser
@@ -94,13 +98,14 @@ func AggregateVotes(tallyVotes GovTallyUsers) GovTallyChoices {
 		if tv.UserVote == nil {
 			continue
 		}
-		choice, strength := tv.UserVote.Choice, tv.UserVote.Strength
-		t, ok := s[choice]
-		if !ok {
-			t = 0.0
+		for _, v := range tv.UserVote.Elections {
+			t, ok := s[v.Choice]
+			if !ok {
+				t = 0.0
+			}
+			t += v.Strength
+			s[v.Choice] = t
 		}
-		t += strength
-		s[choice] = t
 	}
 	tallies := make(GovTallyChoices, 0, len(s))
 	for choice, strength := range s {

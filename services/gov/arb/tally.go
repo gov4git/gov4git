@@ -149,7 +149,7 @@ func (x GovArbService) snapshotParseVerifyUserVote(
 	community git.Local,
 	findBallot *FindBallotAdOut,
 	userInfo user.UserInfo,
-) (*govproto.GovBallotVote, error) {
+) (*govproto.BallotVote, error) {
 
 	// compute the name of the vote branch in the user's repo
 	voteBranch, err := govproto.BallotVoteBranch(ctx, findBallot.BallotAdBytes)
@@ -172,13 +172,13 @@ func (x GovArbService) snapshotParseVerifyUserVote(
 	snapDir := gov.GetSnapshotDirLocal(community, snap.In.SourceRepo, snap.SourceCommit)
 	var signature identityproto.SignedPlaintext
 
-	if _, err := snapDir.ReadFormFile(ctx, govproto.GovBallotVoteSignatureFilepath, &signature); err != nil {
+	if _, err := snapDir.ReadFormFile(ctx, govproto.BallotVoteSignatureFilepath, &signature); err != nil {
 		return nil, err
 	}
 	if !signature.Verify() {
 		return nil, fmt.Errorf("signature is not valid")
 	}
-	var vote govproto.GovBallotVote
+	var vote govproto.BallotVote
 	if err := form.DecodeForm(ctx, signature.Plaintext, &vote); err != nil {
 		return nil, err
 	}

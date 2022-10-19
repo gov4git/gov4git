@@ -9,6 +9,7 @@ import (
 
 	. "github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/files"
+	"github.com/gov4git/gov4git/proto"
 )
 
 type Local struct {
@@ -79,7 +80,7 @@ func (x Local) RenameBranch(ctx context.Context, newBranchName string) error {
 }
 
 func (x Local) Commit(ctx context.Context, msg string) error {
-	_, stderr, err1 := x.InvokeStdin(ctx, msg, "commit", "-F", "-")
+	_, stderr, err1 := x.InvokeStdin(ctx, proto.CommitMsgHeader+msg, "commit", "-F", "-")
 	if err2 := ParseCommitError(stderr); err2 != nil {
 		return err2
 	}
@@ -87,7 +88,7 @@ func (x Local) Commit(ctx context.Context, msg string) error {
 }
 
 func (x Local) Commitf(ctx context.Context, f string, args ...any) error {
-	_, _, err := x.InvokeStdin(ctx, fmt.Sprintf(f, args...), "commit", "-F", "-")
+	_, _, err := x.InvokeStdin(ctx, proto.CommitMsgHeader+fmt.Sprintf(f, args...), "commit", "-F", "-")
 	return err
 }
 

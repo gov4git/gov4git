@@ -40,7 +40,7 @@ func (x GovMemberService) AddLocal(ctx context.Context, community git.Local, use
 	if err := x.AddLocalStageOnly(ctx, community, user, group); err != nil {
 		return err
 	}
-	if err := community.Commitf(ctx, "gov: add member user %v to group %v", user, group); err != nil {
+	if err := community.Commitf(ctx, "Add member user %v to group %v", user, group); err != nil {
 		return err
 	}
 	return nil

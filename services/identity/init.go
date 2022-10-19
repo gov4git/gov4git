@@ -53,7 +53,7 @@ func (x IdentityService) Init(ctx context.Context, in *InitIn) (*InitOut, error)
 		return nil, err
 	}
 	// commit changes
-	if err = localPrivate.Commit(ctx, "initializing private credentials"); err != nil {
+	if err = localPrivate.Commit(ctx, "Initializing private credentials."); err != nil {
 		return nil, err
 	}
 	// push repo
@@ -83,7 +83,7 @@ func (x IdentityService) Init(ctx context.Context, in *InitIn) (*InitOut, error)
 		return nil, err
 	}
 	// commit changes
-	if err = localPublic.Commit(ctx, "initializing public credentials"); err != nil {
+	if err = localPublic.Commit(ctx, "Initializing public credentials."); err != nil {
 		return nil, err
 	}
 	// push repo

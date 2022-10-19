@@ -44,7 +44,7 @@ func (x GovUserService) SetLocal(ctx context.Context, community git.Local, name 
 		return err
 	}
 	// commit changes
-	if err := community.Commitf(ctx, "gov: change property %v of user %v", key, name); err != nil {
+	if err := community.Commitf(ctx, "Change property %v of user %v", key, name); err != nil {
 		return err
 	}
 	return nil

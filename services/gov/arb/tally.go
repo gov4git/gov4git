@@ -137,7 +137,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	}
 
 	// commit snapshots and tally to community repo
-	if err := community.Commitf(ctx, "tally votes on referendum branch %v", in.BallotBranch); err != nil {
+	if err := community.Commitf(ctx, "Tally votes on referendum branch %v", in.BallotBranch); err != nil {
 		return nil, err
 	}
 

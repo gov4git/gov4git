@@ -1,8 +1,6 @@
 PRODUCT
-- [ ] a vote can contain a batch of choices
 
 FRAMEWORK
-- [ ] all commit messages start with "gov4git: "
 - [ ] log git version
 
 DOC

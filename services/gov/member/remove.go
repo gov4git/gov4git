@@ -46,7 +46,7 @@ func Remove(ctx context.Context, community git.Local, user string, group string)
 		return err
 	}
 	// commit changes
-	if err := community.Commitf(ctx, "gov: remove member user %v from group %v", user, group); err != nil {
+	if err := community.Commitf(ctx, "Remove member user %v from group %v", user, group); err != nil {
 		return err
 	}
 	return nil

@@ -72,7 +72,7 @@ func Set(ctx context.Context, community git.Local, dir string, arb string, group
 		return err
 	}
 	// commit changes
-	if err := community.Commitf(ctx, "gov: change directory %v policy to %v in group %v", dir, arb, group); err != nil {
+	if err := community.Commitf(ctx, "Change directory %v policy to %v in group %v", dir, arb, group); err != nil {
 		return err
 	}
 	return nil

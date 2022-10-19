@@ -47,23 +47,23 @@ func AssertNoErr(err error) {
 
 func Infof(template string, args ...interface{}) {
 	_, file, line, _ := runtime.Caller(1)
+	src := fmt.Sprintf("%s:%d ", file, line)
 	msg := fmt.Sprintf(template, args...)
-	src := fmt.Sprintf("%s:%d", file, line)
 	logger.Sugar().Info(src + msg)
 }
 
 func Fatalf(template string, args ...interface{}) {
 	_, file, line, _ := runtime.Caller(1)
-	msg := fmt.Sprintf(template, args...)
 	src := fmt.Sprintf("%s:%d ", file, line)
+	msg := fmt.Sprintf(template, args...)
 	logger.Sugar().Fatal(src + msg)
 	// logger.Sugar().Fatalf(template, args...)
 }
 
 func Errorf(template string, args ...interface{}) {
 	_, file, line, _ := runtime.Caller(1)
-	msg := fmt.Sprintf(template, args...)
 	src := fmt.Sprintf("%s:%d ", file, line)
+	msg := fmt.Sprintf(template, args...)
 	logger.Sugar().Error(src + msg)
 	// logger.Sugar().Errorf(template, args...)
 }

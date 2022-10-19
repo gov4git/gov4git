@@ -56,6 +56,14 @@ func (x Local) InvokeStdin(ctx context.Context, stdin string, args ...string) (s
 	return stdout, stderr, err
 }
 
+func (x Local) Version(ctx context.Context) (string, error) {
+	stdout, _, err := x.Invoke(ctx, "version")
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(stdout), nil
+}
+
 func (x Local) Init(ctx context.Context) error {
 	err := x.Dir().Mk()
 	if err != nil {
@@ -214,8 +222,12 @@ func (x Local) InitWithRemoteBranch(ctx context.Context, remoteURL, branch strin
 func Init() {
 	p, err := exec.LookPath("git")
 	if err != nil {
-		Fatalf("did not find git in path")
-	} else {
-		Infof("using %s", p)
+		Fatalf("no path to git")
 	}
+	r := Local{Path: "."}
+	v, err := r.Version(context.Background())
+	if err != nil {
+		Fatalf("cannot determine git version")
+	}
+	Infof("using %v, %v", p, v)
 }

@@ -53,14 +53,14 @@ func (x GovArbService) SealLocal(ctx context.Context, community git.Local, in *S
 
 func (x GovArbService) SealLocalStageOnly(ctx context.Context, community git.Local, in *SealIn) (*SealOut, error) {
 	// verify tally file is present
-	ballotDirpath := govproto.BallotDirpath(in.BallotPath)
-	tallyFilepath := govproto.BallotTallyFilepath(in.BallotPath)
+	ballotDirpath := govproto.OpenBallotDirpath(in.BallotPath)
+	tallyFilepath := govproto.OpenBallotTallyFilepath(in.BallotPath)
 	var tally govproto.GovBallotTally
 	if _, err := community.Dir().ReadFormFile(ctx, tallyFilepath, &tally); err != nil {
 		return nil, err
 	}
 
-	sealedDirpath := govproto.SealedBallotDirpath(in.BallotPath)
+	sealedDirpath := govproto.ClosedBallotDirpath(in.BallotPath)
 	parent, _ := filepath.Split(sealedDirpath)
 	if err := community.Dir().Mkdir(parent); err != nil {
 		return nil, err

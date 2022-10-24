@@ -6,6 +6,9 @@ import (
 	"encoding/base64"
 	"fmt"
 	"path/filepath"
+	"strings"
+
+	"github.com/gov4git/gov4git/lib/files"
 )
 
 type BallotAd struct {
@@ -21,28 +24,58 @@ var (
 	BallotAdFilebase    = "ballot_advertisement"
 	BallotTallyFilebase = "ballot_tally"
 
-	BallotRootpath       = filepath.Join(GovRoot, "open_ballots")
-	SealedBallotRootpath = filepath.Join(GovRoot, "closed_ballots")
+	OpenBallotRootpath   = filepath.Join(GovRoot, "open_ballots")
+	ClosedBallotRootpath = filepath.Join(GovRoot, "closed_ballots")
 
 	BallotVoteFilepath          = "vote"
 	BallotVoteSignatureFilepath = "vote.signature.ed25519"
 )
 
-func BallotAdPath(ballotPath string) string {
-	return filepath.Join(BallotRootpath, ballotPath, BallotAdFilebase)
+// open ballots
+
+func OpenBallotDirpath(ballotPath string) string {
+	return filepath.Join(OpenBallotRootpath, ballotPath)
 }
 
-func BallotDirpath(ballotPath string) string {
-	return filepath.Join(BallotRootpath, ballotPath)
+func OpenBallotAdFilepath(ballotPath string) string {
+	return filepath.Join(OpenBallotDirpath(ballotPath), BallotAdFilebase)
 }
 
-func BallotTallyFilepath(ballotPath string) string {
-	return filepath.Join(BallotRootpath, ballotPath, BallotTallyFilebase)
+func OpenBallotTallyFilepath(ballotPath string) string {
+	return filepath.Join(OpenBallotDirpath(ballotPath), BallotTallyFilebase)
 }
 
-func SealedBallotDirpath(ballotPath string) string {
-	return filepath.Join(SealedBallotRootpath, ballotPath)
+func ExtractOpenBallotPathFromTally(tallyFilepath string) (string, error) {
+	dir, _ := filepath.Split(tallyFilepath)
+	if !strings.HasPrefix(dir, OpenBallotRootpath) {
+		return "", fmt.Errorf("missing open ballot dir prefix: %v", dir)
+	}
+	return files.TrimSlashes(dir[len(OpenBallotRootpath):]), nil
 }
+
+// closed ballots
+
+func ClosedBallotDirpath(ballotPath string) string {
+	return filepath.Join(ClosedBallotRootpath, ballotPath)
+}
+
+func ClosedBallotAdFilepath(ballotPath string) string {
+	return filepath.Join(ClosedBallotDirpath(ballotPath), BallotAdFilebase)
+}
+
+func ClosedBallotTallyFilepath(ballotPath string) string {
+	return filepath.Join(ClosedBallotDirpath(ballotPath), BallotTallyFilebase)
+}
+
+func ExtractClosedBallotPathFromTally(tallyFilepath string) (string, error) {
+	dir, _ := filepath.Split(tallyFilepath)
+	if !strings.HasPrefix(dir, ClosedBallotRootpath) {
+		return "", fmt.Errorf("missing closed ballot dir prefix")
+	}
+	return files.TrimSlashes(dir[len(ClosedBallotRootpath):]), nil
+}
+
+// other
 
 func BallotGenesisCommitHeader(ballotBranch string) string {
 	return fmt.Sprintf("Create ballot on branch %v", ballotBranch)

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gov4git/gov4git/lib/base"
+	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/services/gov/arb"
@@ -11,18 +13,20 @@ import (
 )
 
 func TestBallot(t *testing.T) {
+	base.LogVerbosely()
+
 	// create test community
-	// dir := testutil.MakeStickyTestDir()
-	dir := t.TempDir()
+	dir := testutil.MakeStickyTestDir()
+	// dir := t.TempDir()
 	testCommunity, err := testutil.CreateTestCommunity(dir, 2)
 	if err != nil {
 		t.Fatal(err)
 	}
 	ctx := testCommunity.Background()
 
-	// invoke service
+	// create a ballot
 	svc := arb.GovArbService{GovConfig: testCommunity.CommunityGovConfig()}
-	out, err := svc.CreateBallot(ctx,
+	createOut, err := svc.CreateBallot(ctx,
 		&arb.CreateBallotIn{
 			Path:            "test_ballot",
 			Choices:         []string{"a", "b", "c"},
@@ -33,5 +37,16 @@ func TestBallot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Printf("%#v\n", out)
+
+	// list open ballots
+	listOut, err := svc.List(ctx, &arb.ListIn{BallotBranch: proto.MainBranch})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(listOut.OpenBallots) != 1 || listOut.OpenBallots[0] != "test_ballot" {
+		t.Errorf("expecting one open ballot, got %v", form.Pretty(listOut))
+	}
+
+	fmt.Printf("%#v\n", createOut)
 }

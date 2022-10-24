@@ -21,7 +21,7 @@ type FindBallotAdOut struct {
 // FindBallotAdLocal finds the advertisement of a ballot in a local clone of community repo (at the ballot branch)
 func (x GovArbService) FindBallotAdLocal(ctx context.Context, repo git.Local, in *FindBallotAdIn) (*FindBallotAdOut, error) {
 	// read the ballot advertisement
-	ballotAdPath := govproto.BallotAdPath(in.BallotPath)
+	ballotAdPath := govproto.OpenBallotAdFilepath(in.BallotPath)
 	ballotAdFile, err := repo.Dir().ReadByteFile(ballotAdPath)
 	if err != nil {
 		return nil, err

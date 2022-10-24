@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/gov4git/gov4git/lib/form"
 )
@@ -65,13 +66,17 @@ func (d Dir) RemoveAll(path string) error {
 	return os.RemoveAll(d.Abs(path))
 }
 
+func TrimSlashes(p string) string {
+	return strings.Trim(filepath.Clean(p), string(filepath.Separator))
+}
+
 func (d Dir) Glob(pattern string) ([]string, error) {
 	m, err := filepath.Glob(filepath.Join(d.Path, pattern))
 	if err != nil {
 		return nil, err
 	}
 	for i := range m {
-		m[i] = m[i][len(d.Path):] // remove dir prefix
+		m[i] = TrimSlashes(m[i][len(d.Path):]) // remove dir prefix
 	}
 	return m, nil
 }

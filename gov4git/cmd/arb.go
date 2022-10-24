@@ -147,6 +147,35 @@ var (
 			return err
 		},
 	}
+
+	listCmd = &cobra.Command{
+		Use:   "list",
+		Short: "List currently open and closed ballots.",
+		Long:  man.List,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			s := arb.GovArbService{
+				GovConfig: govproto.GovConfig{
+					CommunityURL: communityURL,
+				},
+				IdentityConfig: identityproto.IdentityConfig{
+					PublicURL:  publicURL,
+					PrivateURL: privateURL,
+				},
+			}
+			workDir, err := files.TempDir().MkEphemeralDir(cmdproto.LocalAgentTempPath, "gov-arb-list")
+			base.AssertNoErr(err)
+			ctx := files.WithWorkDir(cmd.Context(), workDir)
+			r, err := s.List(ctx, &arb.ListIn{
+				BallotBranch: tallyBallotBranch,
+			})
+			if err == nil {
+				fmt.Fprint(os.Stdout, form.Pretty(r))
+			} else {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+			return err
+		},
+	}
 )
 
 var (
@@ -167,6 +196,8 @@ var (
 
 	sealBallotBranch string
 	sealBallotPath   string
+
+	listBallotBranch string
 )
 
 func init() {
@@ -187,4 +218,6 @@ func init() {
 
 	sealCmd.Flags().StringVar(&sealBallotBranch, "ballot-branch", "", "ballot branch")
 	sealCmd.Flags().StringVar(&sealBallotPath, "ballot-path", "", "ballot path")
+
+	listCmd.Flags().StringVar(&listBallotBranch, "ballot-branch", "", "ballot branch")
 }

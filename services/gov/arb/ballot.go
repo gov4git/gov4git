@@ -51,7 +51,7 @@ func (x GovArbService) CreateBallot(ctx context.Context, in *CreateBallotIn) (*C
 func (x GovArbService) CreateBallotLocal(ctx context.Context, community git.Local, in *CreateBallotIn) (*CreateBallotOut, error) {
 	// verify path is not in use
 	ballotPath := strings.TrimSpace(git.MakeNonAbs(in.Path))
-	ballotAdPath := govproto.BallotAdPath(ballotPath)
+	ballotAdPath := govproto.OpenBallotAdFilepath(ballotPath)
 	if _, err := community.Dir().Stat(ballotAdPath); err == nil {
 		return nil, fmt.Errorf("ballot already exists")
 	}

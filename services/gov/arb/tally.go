@@ -130,7 +130,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	}
 
 	// write/stage snapshots and tally to community repo
-	tallyPath := govproto.BallotTallyFilepath(findBallot.BallotAd.Path)
+	tallyPath := govproto.OpenBallotTallyFilepath(findBallot.BallotAd.Path)
 	stage := files.FormFiles{
 		files.FormFile{Path: tallyPath, Form: out.BallotTally},
 	}

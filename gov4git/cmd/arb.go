@@ -117,6 +117,36 @@ var (
 			return err
 		},
 	}
+
+	sealCmd = &cobra.Command{
+		Use:   "seal",
+		Short: "Seal a ballot at the current tally.",
+		Long:  man.Seal,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			s := arb.GovArbService{
+				GovConfig: govproto.GovConfig{
+					CommunityURL: communityURL,
+				},
+				IdentityConfig: identityproto.IdentityConfig{
+					PublicURL:  publicURL,
+					PrivateURL: privateURL,
+				},
+			}
+			workDir, err := files.TempDir().MkEphemeralDir(cmdproto.LocalAgentTempPath, "gov-arb-seal")
+			base.AssertNoErr(err)
+			ctx := files.WithWorkDir(cmd.Context(), workDir)
+			r, err := s.Seal(ctx, &arb.SealIn{
+				BallotBranch: tallyBallotBranch,
+				BallotPath:   tallyBallotPath,
+			})
+			if err == nil {
+				fmt.Fprint(os.Stdout, form.Pretty(r))
+			} else {
+				fmt.Fprint(os.Stderr, err.Error())
+			}
+			return err
+		},
+	}
 )
 
 var (
@@ -134,6 +164,9 @@ var (
 
 	tallyBallotBranch string
 	tallyBallotPath   string
+
+	sealBallotBranch string
+	sealBallotPath   string
 )
 
 func init() {
@@ -151,4 +184,7 @@ func init() {
 
 	tallyCmd.Flags().StringVar(&tallyBallotBranch, "ballot-branch", "", "ballot branch")
 	tallyCmd.Flags().StringVar(&tallyBallotPath, "ballot-path", "", "ballot path")
+
+	sealCmd.Flags().StringVar(&sealBallotBranch, "ballot-branch", "", "ballot branch")
+	sealCmd.Flags().StringVar(&sealBallotPath, "ballot-path", "", "ballot path")
 }

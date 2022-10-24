@@ -21,7 +21,8 @@ var (
 	BallotAdFilebase    = "ballot_advertisement"
 	BallotTallyFilebase = "ballot_tally"
 
-	BallotRootpath = filepath.Join(GovRoot, "ballots")
+	BallotRootpath       = filepath.Join(GovRoot, "open_ballots")
+	SealedBallotRootpath = filepath.Join(GovRoot, "closed_ballots")
 
 	BallotVoteFilepath          = "vote"
 	BallotVoteSignatureFilepath = "vote.signature.ed25519"
@@ -31,8 +32,16 @@ func BallotAdPath(ballotPath string) string {
 	return filepath.Join(BallotRootpath, ballotPath, BallotAdFilebase)
 }
 
-func BallotTallyPath(ballotPath string) string {
+func BallotDirpath(ballotPath string) string {
+	return filepath.Join(BallotRootpath, ballotPath)
+}
+
+func BallotTallyFilepath(ballotPath string) string {
 	return filepath.Join(BallotRootpath, ballotPath, BallotTallyFilebase)
+}
+
+func SealedBallotDirpath(ballotPath string) string {
+	return filepath.Join(SealedBallotRootpath, ballotPath)
 }
 
 func BallotGenesisCommitHeader(ballotBranch string) string {
@@ -78,7 +87,7 @@ type GovTallyUser struct {
 	UserName       string      `json:"user_name"`
 	UserPublicURL  string      `json:"user_public_url"`
 	UserVote       *BallotVote `json:"user_vote"` // nil indicates vote was not accessible
-	UserFetchError error       `json:"user_fetch_error"`
+	UserFetchError string      `json:"user_fetch_error"`
 }
 
 type GovTallyUsers []GovTallyUser

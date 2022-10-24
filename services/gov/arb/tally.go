@@ -44,7 +44,7 @@ func (x GovArbService) Tally(ctx context.Context, in *TallyIn) (*TallyOut, error
 }
 
 func (x GovArbService) TallyLocal(ctx context.Context, community git.Local, in *TallyIn) (*TallyOut, error) {
-	// find ballot ad and leave local repo checked out at the genesis commit
+	// find ballot ad
 	findAd, err := x.FindBallotAdLocal(ctx, community,
 		&FindBallotAdIn{BallotBranch: in.BallotBranch, BallotPath: in.BallotPath})
 	if err != nil {
@@ -65,6 +65,7 @@ func (x GovArbService) TallyLocal(ctx context.Context, community git.Local, in *
 	}
 
 	// checkout referendum branch latest
+	// TODO: already on this branch?
 	if err := community.CheckoutBranch(ctx, in.BallotBranch); err != nil {
 		return nil, err
 	}
@@ -104,11 +105,15 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	// TODO: parallelize snapshots
 	for i, info := range userInfo {
 		userVote, err := x.snapshotParseVerifyUserVote(ctx, community, findBallot, info)
+		errstr := ""
+		if err != nil {
+			errstr = err.Error()
+		}
 		out.BallotTally.TallyUsers[i] = govproto.GovTallyUser{
 			UserName:       info.UserName,
 			UserPublicURL:  info.UserInfo.PublicURL,
 			UserVote:       userVote,
-			UserFetchError: err,
+			UserFetchError: errstr,
 		}
 	}
 
@@ -125,7 +130,7 @@ func (x GovArbService) FetchVotesAndTallyLocal(
 	}
 
 	// write/stage snapshots and tally to community repo
-	tallyPath := govproto.BallotTallyPath(findBallot.BallotAd.Path)
+	tallyPath := govproto.BallotTallyFilepath(findBallot.BallotAd.Path)
 	stage := files.FormFiles{
 		files.FormFile{Path: tallyPath, Form: out.BallotTally},
 	}

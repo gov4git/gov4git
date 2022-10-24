@@ -56,6 +56,8 @@ func (x GovArbService) CreateBallotLocal(ctx context.Context, community git.Loca
 		return nil, fmt.Errorf("ballot already exists")
 	}
 
+	// XXX: verify no closed ballots with same name
+
 	// verify group exists
 	if _, err := group.GetInfo(ctx, community, in.Group); err != nil {
 		return nil, fmt.Errorf("ballot group does not exist")

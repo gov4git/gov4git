@@ -18,8 +18,7 @@ type FindBallotAdOut struct {
 	BallotAdBytes form.Bytes        `json:"ballot_ad_bytes"`
 }
 
-// FindBallotAdLocal finds the advertisement of a ballot in a local clone of community repo (at the ballot branch) and
-// leaves the local repo checked out at the genesis commit.
+// FindBallotAdLocal finds the advertisement of a ballot in a local clone of community repo (at the ballot branch)
 func (x GovArbService) FindBallotAdLocal(ctx context.Context, repo git.Local, in *FindBallotAdIn) (*FindBallotAdOut, error) {
 	// read the ballot advertisement
 	ballotAdPath := govproto.BallotAdPath(in.BallotPath)

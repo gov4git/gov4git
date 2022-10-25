@@ -10,9 +10,9 @@ import (
 )
 
 type GetIn struct {
-	Name            string `json:"name"`             // community unique handle for this user
-	Key             string `json:"key"`              // user property key
-	CommunityBranch string `json:"community_branch"` // branch in community repo where user will be added
+	Name   string `json:"name"`   // community unique handle for this user
+	Key    string `json:"key"`    // user property key
+	Branch string `json:"branch"` // branch in community repo where user will be added
 }
 
 type GetOut struct {
@@ -20,15 +20,10 @@ type GetOut struct {
 }
 
 func (x GovUserService) Get(ctx context.Context, in *GetIn) (*GetOut, error) {
-	// clone community repo locally
-	community, err := git.MakeLocalInCtx(ctx, "community")
+	community, err := git.CloneBranch(ctx, x.GovConfig.CommunityURL, in.Branch)
 	if err != nil {
 		return nil, err
 	}
-	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
-		return nil, err
-	}
-	// read from repo
 	value, err := x.GetLocal(ctx, community, in.Name, in.Key)
 	if err != nil {
 		return nil, err

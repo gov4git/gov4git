@@ -91,10 +91,10 @@ var (
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Set(ctx, &user.SetIn{
-				Name:            userName,
-				Key:             userKey,
-				Value:           userValue,
-				CommunityBranch: communityBranch,
+				Name:   userName,
+				Key:    userKey,
+				Value:  userValue,
+				Branch: communityBranch,
 			})
 			if err == nil {
 				fmt.Fprint(os.Stdout, form.Pretty(r))
@@ -119,9 +119,9 @@ var (
 			base.AssertNoErr(err)
 			ctx := files.WithWorkDir(cmd.Context(), workDir)
 			r, err := s.Get(ctx, &user.GetIn{
-				Name:            userName,
-				Key:             userKey,
-				CommunityBranch: communityBranch,
+				Name:   userName,
+				Key:    userKey,
+				Branch: communityBranch,
 			})
 			if err == nil {
 				fmt.Fprint(os.Stdout, form.Pretty(r))
@@ -171,6 +171,7 @@ func init() {
 	userCmd.AddCommand(userSetCmd)
 	userCmd.AddCommand(userGetCmd)
 	userCmd.AddCommand(userListCmd)
+	userCmd.AddCommand(balanceCmd)
 
 	userAddCmd.Flags().StringVar(&userName, "name", "", "name of user, unique for the community")
 	userAddCmd.Flags().StringVar(&userURL, "url", "", "URL of user")

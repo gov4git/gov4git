@@ -11,28 +11,22 @@ import (
 )
 
 type SetIn struct {
-	Name            string `json:"name"`             // community unique handle for this user
-	Key             string `json:"key"`              // user property key
-	Value           string `json:"value"`            // user property value
-	CommunityBranch string `json:"community_branch"` // branch in community repo where user will be added
+	Name   string `json:"name"`   // community unique handle for this user
+	Key    string `json:"key"`    // user property key
+	Value  string `json:"value"`  // user property value
+	Branch string `json:"branch"` // branch in community repo where user will be added
 }
 
 type SetOut struct{}
 
 func (x GovUserService) Set(ctx context.Context, in *SetIn) (*SetOut, error) {
-	// clone community repo locally
-	community, err := git.MakeLocalInCtx(ctx, "community")
+	community, err := git.CloneBranch(ctx, x.GovConfig.CommunityURL, in.Branch)
 	if err != nil {
 		return nil, err
 	}
-	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
-		return nil, err
-	}
-	// make changes to repo
 	if err := x.SetLocal(ctx, community, in.Name, in.Key, in.Value); err != nil {
 		return nil, err
 	}
-	// push to origin
 	if err := community.PushUpstream(ctx); err != nil {
 		return nil, err
 	}

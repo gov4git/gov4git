@@ -25,6 +25,17 @@ func MakeLocalInCtx(ctx context.Context, label string) (Local, error) {
 	return LocalInDir(eph), nil
 }
 
+func CloneBranch(ctx context.Context, repo string, branch string) (Local, error) {
+	clone, err := MakeLocalInCtx(ctx, "clone_branch")
+	if err != nil {
+		return Local{}, err
+	}
+	if err := clone.CloneBranch(ctx, repo, branch); err != nil {
+		return Local{}, err
+	}
+	return clone, nil
+}
+
 func LocalInDir(d files.Dir) Local {
 	return Local{Path: d.Path}
 }

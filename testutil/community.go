@@ -130,7 +130,7 @@ func (x *TestCommunity) addUsersToGroupAll(ctx context.Context, clonedCommunityR
 
 	// create users
 	for i := 0; i < x.NumUsers; i++ {
-		user := strconv.Itoa(i)
+		user := x.User(i)
 		if err := x.CommunityUserService().AddLocalStageOnly(ctx, clonedCommunityRepo, user, x.UserPublicRepoURL(i)); err != nil {
 			return err
 		}
@@ -197,6 +197,10 @@ func (x *TestCommunity) CommunityMemberService() member.GovMemberService {
 }
 
 // user public repos
+
+func (x *TestCommunity) User(i int) string {
+	return strconv.Itoa(i)
+}
 
 func (x *TestCommunity) UserPublicRepoDir(u int) string {
 	return filepath.Join(x.Dir, fmt.Sprintf("%d_public_repo", u))

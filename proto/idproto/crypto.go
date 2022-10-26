@@ -1,4 +1,4 @@
-package identityproto
+package idproto
 
 import (
 	"context"

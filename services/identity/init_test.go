@@ -7,7 +7,7 @@ import (
 	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto/identityproto"
+	"github.com/gov4git/gov4git/proto/idproto"
 )
 
 func TestSoulInit(t *testing.T) {
@@ -29,7 +29,7 @@ func TestSoulInit(t *testing.T) {
 
 	// init soul
 	apiCtx := files.WithWorkDir(ctx, files.PathDir(t.TempDir()).Subdir("soul_api"))
-	api := IdentityService{IdentityConfig: identityproto.IdentityConfig{PublicURL: testPubDir.Path, PrivateURL: testPrivDir.Path}}
+	api := IdentityService{IdentityConfig: idproto.IdentityConfig{PublicURL: testPubDir.Path, PrivateURL: testPrivDir.Path}}
 	if _, err := api.Init(apiCtx, &InitIn{}); err != nil {
 		t.Fatal(err)
 	}

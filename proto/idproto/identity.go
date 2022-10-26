@@ -1,4 +1,4 @@
-package identityproto
+package idproto
 
 type IdentityConfig struct {
 	PublicURL  string `json:"public_url"`

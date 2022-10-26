@@ -2,14 +2,14 @@ package arb
 
 import (
 	"github.com/gov4git/gov4git/proto/govproto"
-	"github.com/gov4git/gov4git/proto/identityproto"
+	"github.com/gov4git/gov4git/proto/idproto"
 	"github.com/gov4git/gov4git/services/gov"
 	"github.com/gov4git/gov4git/services/gov/group"
 )
 
 type GovArbService struct {
 	GovConfig      govproto.GovConfig
-	IdentityConfig identityproto.IdentityConfig
+	IdentityConfig idproto.IdentityConfig
 }
 
 func (x GovArbService) GovService() gov.GovService {

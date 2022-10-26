@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/proto/cmdproto"
-	"github.com/gov4git/gov4git/proto/identityproto"
+	"github.com/gov4git/gov4git/proto/idproto"
 	"github.com/gov4git/gov4git/services/identity"
 	"github.com/spf13/cobra"
 )
@@ -20,7 +20,7 @@ var (
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			s := identity.IdentityService{
-				IdentityConfig: identityproto.IdentityConfig{
+				IdentityConfig: idproto.IdentityConfig{
 					PublicURL:  publicURL,
 					PrivateURL: privateURL,
 				},

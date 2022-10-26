@@ -11,7 +11,7 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/govproto"
-	"github.com/gov4git/gov4git/proto/identityproto"
+	"github.com/gov4git/gov4git/proto/idproto"
 	"github.com/gov4git/gov4git/services/gov/group"
 	"github.com/gov4git/gov4git/services/gov/member"
 	"github.com/gov4git/gov4git/services/gov/user"
@@ -109,7 +109,7 @@ func (x *TestCommunity) initUserRepos(ctx context.Context, i int) error {
 
 	// initialize user
 	idService := identity.IdentityService{
-		IdentityConfig: identityproto.IdentityConfig{
+		IdentityConfig: idproto.IdentityConfig{
 			PublicURL:  x.UserPublicRepoURL(i),
 			PrivateURL: x.UserPrivateRepoURL(i),
 		},
@@ -214,8 +214,8 @@ func (x *TestCommunity) UserPublicRepoURL(u int) string {
 	return x.UserPublicRepoDir(u)
 }
 
-func (x *TestCommunity) UserIdentityConfig(i int) identityproto.IdentityConfig {
-	return identityproto.IdentityConfig{
+func (x *TestCommunity) UserIdentityConfig(i int) idproto.IdentityConfig {
+	return idproto.IdentityConfig{
 		PublicURL:  x.UserPublicRepoURL(i),
 		PrivateURL: x.UserPrivateRepoURL(i),
 	}

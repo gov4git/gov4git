@@ -8,6 +8,7 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/govproto"
+	"github.com/gov4git/gov4git/proto/idproto"
 	"github.com/gov4git/gov4git/services/gov"
 	"github.com/gov4git/gov4git/testutil"
 )
@@ -41,7 +42,7 @@ func TestSnapshot(t *testing.T) {
 	// snapshot a user's public identity repo
 	_, err = govService.SnapshotBranchLatest(ctx, &gov.SnapshotBranchLatestIn{
 		SourceRepo:   testCommunity.UserPublicRepoURL(0),
-		SourceBranch: proto.IdentityBranch,
+		SourceBranch: idproto.IdentityBranch,
 		Community:    communityClone,
 	})
 	if err != nil {
@@ -51,7 +52,7 @@ func TestSnapshot(t *testing.T) {
 	// snapshot again
 	_, err = govService.SnapshotBranchLatest(ctx, &gov.SnapshotBranchLatestIn{
 		SourceRepo:   testCommunity.UserPublicRepoURL(0),
-		SourceBranch: proto.IdentityBranch,
+		SourceBranch: idproto.IdentityBranch,
 		Community:    communityClone,
 	})
 	if err != nil {

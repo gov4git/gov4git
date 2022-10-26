@@ -4,14 +4,13 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
-	"github.com/gov4git/gov4git/proto/identityproto"
+	"github.com/gov4git/gov4git/proto/idproto"
 )
 
 type GetPrivateCredentialsIn struct{}
 
 type GetPrivateCredentialsOut struct {
-	PrivateCredentials identityproto.PrivateCredentials `json:"private_credentials"`
+	PrivateCredentials idproto.PrivateCredentials `json:"private_credentials"`
 }
 
 func (x IdentityService) GetPrivateCredentials(ctx context.Context, in *GetPrivateCredentialsIn) (*GetPrivateCredentialsOut, error) {
@@ -20,7 +19,7 @@ func (x IdentityService) GetPrivateCredentials(ctx context.Context, in *GetPriva
 	if err != nil {
 		return nil, err
 	}
-	if err := private.CloneBranch(ctx, x.IdentityConfig.PrivateURL, proto.IdentityBranch); err != nil {
+	if err := private.CloneBranch(ctx, x.IdentityConfig.PrivateURL, idproto.IdentityBranch); err != nil {
 		return nil, err
 	}
 
@@ -34,8 +33,8 @@ func (x IdentityService) GetPrivateCredentials(ctx context.Context, in *GetPriva
 }
 
 func (x IdentityService) GetPrivateCredentialsLocal(ctx context.Context, private git.Local, in *GetPrivateCredentialsIn) (*GetPrivateCredentialsOut, error) {
-	var credentials identityproto.PrivateCredentials
-	if _, err := private.Dir().ReadFormFile(ctx, identityproto.PrivateCredentialsPath, &credentials); err != nil {
+	var credentials idproto.PrivateCredentials
+	if _, err := private.Dir().ReadFormFile(ctx, idproto.PrivateCredentialsPath, &credentials); err != nil {
 		return nil, err
 	}
 	return &GetPrivateCredentialsOut{PrivateCredentials: credentials}, nil

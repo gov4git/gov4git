@@ -10,7 +10,7 @@ import (
 	man "github.com/gov4git/gov4git/man/arb"
 	"github.com/gov4git/gov4git/proto/cmdproto"
 	"github.com/gov4git/gov4git/proto/govproto"
-	"github.com/gov4git/gov4git/proto/identityproto"
+	"github.com/gov4git/gov4git/proto/idproto"
 	"github.com/gov4git/gov4git/services/gov/arb"
 	"github.com/spf13/cobra"
 )
@@ -55,7 +55,7 @@ var (
 				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
-				IdentityConfig: identityproto.IdentityConfig{
+				IdentityConfig: idproto.IdentityConfig{
 					PublicURL:  publicURL,
 					PrivateURL: privateURL,
 				},
@@ -97,7 +97,7 @@ var (
 				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
-				IdentityConfig: identityproto.IdentityConfig{
+				IdentityConfig: idproto.IdentityConfig{
 					PublicURL:  publicURL,
 					PrivateURL: privateURL,
 				},
@@ -127,7 +127,7 @@ var (
 				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
-				IdentityConfig: identityproto.IdentityConfig{
+				IdentityConfig: idproto.IdentityConfig{
 					PublicURL:  publicURL,
 					PrivateURL: privateURL,
 				},
@@ -157,7 +157,7 @@ var (
 				GovConfig: govproto.GovConfig{
 					CommunityURL: communityURL,
 				},
-				IdentityConfig: identityproto.IdentityConfig{
+				IdentityConfig: idproto.IdentityConfig{
 					PublicURL:  publicURL,
 					PrivateURL: privateURL,
 				},

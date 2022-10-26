@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto/govproto"
-	"github.com/gov4git/gov4git/proto/identityproto"
+	"github.com/gov4git/gov4git/proto/idproto"
 	"github.com/gov4git/gov4git/services/gov"
 	"github.com/gov4git/gov4git/services/gov/arb/strategy"
 	"github.com/gov4git/gov4git/services/gov/member"
@@ -175,7 +175,7 @@ func (x GovArbService) snapshotParseVerifyUserVote(
 
 	// parse and verify user's vote
 	snapDir := gov.GetSnapshotDirLocal(community, snap.In.SourceRepo, snap.SourceCommit)
-	var signature identityproto.SignedPlaintext
+	var signature idproto.SignedPlaintext
 
 	if _, err := snapDir.ReadFormFile(ctx, govproto.BallotVoteSignatureFilepath, &signature); err != nil {
 		return nil, err

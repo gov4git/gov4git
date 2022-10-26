@@ -6,9 +6,8 @@ import (
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/govproto"
-	"github.com/gov4git/gov4git/proto/identityproto"
+	"github.com/gov4git/gov4git/proto/idproto"
 	"github.com/gov4git/gov4git/services/identity"
 )
 
@@ -51,7 +50,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := voter.CloneBranch(ctx, x.IdentityConfig.PublicURL, proto.IdentityBranch); err != nil {
+	if err := voter.CloneBranch(ctx, x.IdentityConfig.PublicURL, idproto.IdentityBranch); err != nil {
 		return nil, err
 	}
 
@@ -88,7 +87,7 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	if err != nil {
 		return nil, err
 	}
-	signature, err := identityproto.SignPlaintext(ctx, &voterCredentials.PrivateCredentials, voteData)
+	signature, err := idproto.SignPlaintext(ctx, &voterCredentials.PrivateCredentials, voteData)
 	if err != nil {
 		return nil, err
 	}

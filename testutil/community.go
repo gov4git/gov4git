@@ -15,7 +15,7 @@ import (
 	"github.com/gov4git/gov4git/services/gov/group"
 	"github.com/gov4git/gov4git/services/gov/member"
 	"github.com/gov4git/gov4git/services/gov/user"
-	"github.com/gov4git/gov4git/services/identity"
+	"github.com/gov4git/gov4git/services/id"
 )
 
 func CreateTestCommunity(dir string, numUsers int) (*TestCommunity, error) {
@@ -108,13 +108,13 @@ func (x *TestCommunity) initUserRepos(ctx context.Context, i int) error {
 	}
 
 	// initialize user
-	idService := identity.IdentityService{
+	idService := id.IdentityService{
 		IdentityConfig: idproto.IdentityConfig{
 			PublicURL:  x.UserPublicRepoURL(i),
 			PrivateURL: x.UserPrivateRepoURL(i),
 		},
 	}
-	if _, err := idService.Init(ctx, &identity.InitIn{}); err != nil {
+	if _, err := idService.Init(ctx, &id.InitIn{}); err != nil {
 		return err
 	}
 

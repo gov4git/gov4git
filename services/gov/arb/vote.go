@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto/govproto"
 	"github.com/gov4git/gov4git/proto/idproto"
-	"github.com/gov4git/gov4git/services/identity"
+	"github.com/gov4git/gov4git/services/id"
 )
 
 type VoteIn struct {
@@ -55,8 +55,8 @@ func (x GovArbService) Vote(ctx context.Context, in *VoteIn) (*VoteOut, error) {
 	}
 
 	// retrieve the voter's private keys from the private identity repo
-	idService := identity.IdentityService{IdentityConfig: x.IdentityConfig}
-	voterCredentials, err := idService.GetPrivateCredentials(ctx, &identity.GetPrivateCredentialsIn{})
+	idService := id.IdentityService{IdentityConfig: x.IdentityConfig}
+	voterCredentials, err := idService.GetPrivateCredentials(ctx, &id.GetPrivateCredentialsIn{})
 	if err != nil {
 		return nil, err
 	}

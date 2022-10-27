@@ -7,7 +7,7 @@ import (
 	"github.com/gov4git/gov4git/testutil"
 )
 
-func TestSendReceive(t *testing.T) {
+func TestSignedSendReceive(t *testing.T) {
 	// base.LogVerbosely()
 
 	// create test community
@@ -25,12 +25,12 @@ func TestSendReceive(t *testing.T) {
 	testMsg := "hello world"
 	testTopic := "topic"
 
-	_, err = svc0.SendMail(ctx, &id.SendMailIn{Topic: testTopic, Message: testMsg})
+	_, err = svc0.SendSignedMail(ctx, &id.SendMailIn{Topic: testTopic, Message: testMsg})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	receiveOut, err := svc1.ReceiveMail(ctx,
+	receiveOut, err := svc1.ReceiveSignedMail(ctx,
 		&id.ReceiveMailIn{
 			SenderRepo: testCommunity.UserPublicRepoURL(0),
 			Topic:      testTopic,

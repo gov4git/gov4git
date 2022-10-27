@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto/idproto"
 )
@@ -79,4 +80,20 @@ func (x IdentityService) SendMailLocalStageOnly(ctx context.Context, public git.
 		return nil, err
 	}
 	return &SendMailOut{SeqNo: nextSeqNo}, nil
+}
+
+func (x IdentityService) SendSignedMail(ctx context.Context, in *SendMailIn) (*SendMailOut, error) {
+	cred, err := x.GetPrivateCredentials(ctx, &GetPrivateCredentialsIn{})
+	if err != nil {
+		return nil, err
+	}
+	signed, err := idproto.SignPlaintext(ctx, &cred.PrivateCredentials, []byte(in.Message))
+	if err != nil {
+		return nil, err
+	}
+	signedData, err := form.EncodeForm(ctx, signed)
+	if err != nil {
+		return nil, err
+	}
+	return x.SendMail(ctx, &SendMailIn{Topic: in.Topic, Message: string(signedData)})
 }

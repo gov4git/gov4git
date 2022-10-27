@@ -32,6 +32,14 @@ type SignedPlaintext struct {
 	PublicKeyEd25519 Ed25519PublicKey `json:"ed25519_public_key"`
 }
 
+func ParseSignedPlaintext(ctx context.Context, data []byte) (*SignedPlaintext, error) {
+	var signed SignedPlaintext
+	if err := form.DecodeForm(ctx, data, &signed); err != nil {
+		return nil, err
+	}
+	return &signed, nil
+}
+
 func SignPlaintext(ctx context.Context, priv *PrivateCredentials, plaintext []byte) (*SignedPlaintext, error) {
 	signature := ed25519.Sign(ed25519.PrivateKey(priv.PrivateKeyEd25519), plaintext)
 	return &SignedPlaintext{

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto/idproto"
 )
@@ -15,7 +16,8 @@ type ReceiveMailIn struct {
 }
 
 type ReceiveMailOut struct {
-	Messages []string `json:"messages"`
+	Messages                []string                  `json:"messages"`
+	SenderPublicCredentials idproto.PublicCredentials `json:"sender_public_credentials"`
 }
 
 func (x IdentityService) ReceiveMail(ctx context.Context, in *ReceiveMailIn) (*ReceiveMailOut, error) {
@@ -77,7 +79,8 @@ func (x IdentityService) ReceiveMailLocalStageOnly(ctx context.Context, receiver
 		msgFileBase := strconv.Itoa(int(i))
 		byteFile, err := senderTopicDir.ReadByteFile(msgFileBase)
 		if err != nil {
-			return nil, err
+			base.Infof("reading message %d in sender repo (%v)", i, err)
+			continue
 		}
 		msgs = append(msgs, string(byteFile.Bytes))
 		receiverLatestNextSeqNo = i + 1
@@ -93,5 +96,35 @@ func (x IdentityService) ReceiveMailLocalStageOnly(ctx context.Context, receiver
 		return nil, err
 	}
 
-	return &ReceiveMailOut{Messages: msgs}, nil
+	// read sender's public credentials
+	publicOut, err := GetPublicCredentialsLocal(ctx, sender, &GetPublicCredentialsIn{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &ReceiveMailOut{Messages: msgs, SenderPublicCredentials: publicOut.PublicCredentials}, nil
+}
+
+func (x IdentityService) ReceiveSignedMail(ctx context.Context, in *ReceiveMailIn) (*ReceiveMailOut, error) {
+	receiveOut, err := x.ReceiveMail(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	verifiedMsgs := []string{}
+	for _, m := range receiveOut.Messages {
+		signed, err := idproto.ParseSignedPlaintext(ctx, []byte(m))
+		if err != nil {
+			base.Infof("decoding signed message from sender (%v)", err)
+			continue
+		}
+		if !signed.Verify() {
+			base.Infof("message signature verification (%v)", err)
+			continue
+		}
+		verifiedMsgs = append(verifiedMsgs, string(signed.Plaintext))
+	}
+	return &ReceiveMailOut{
+		Messages:                verifiedMsgs,
+		SenderPublicCredentials: receiveOut.SenderPublicCredentials,
+	}, nil
 }

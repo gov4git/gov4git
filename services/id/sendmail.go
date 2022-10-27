@@ -48,13 +48,16 @@ func (x IdentityService) SendMailLocal(ctx context.Context, public git.Local, in
 const nextFilebase = "next"
 
 func (x IdentityService) SendMailLocalStageOnly(ctx context.Context, public git.Local, in *SendMailIn) (*SendMailOut, error) {
-	topicDirpath := idproto.MailTopicDirpath(in.Topic)
+	topicDirpath := idproto.SendMailTopicDirpath(in.Topic)
 	topicDir := public.Dir().Subdir(topicDirpath)
+
 	if err := topicDir.Mk(); err != nil {
 		return nil, err
 	}
+
 	var nextSeqNo int64
 	topicDir.ReadFormFile(ctx, nextFilebase, &nextSeqNo) // if file is missing, nextSeqNo = 0
+
 	// write + stage message
 	msgFileBase := strconv.Itoa(int(nextSeqNo))
 	if err := topicDir.WriteByteFile(msgFileBase, []byte(in.Message)); err != nil {
@@ -63,6 +66,7 @@ func (x IdentityService) SendMailLocalStageOnly(ctx context.Context, public git.
 	if err := public.Add(ctx, []string{filepath.Join(topicDirpath, msgFileBase)}); err != nil {
 		return nil, err
 	}
+
 	// write + stage next file
 	var newNextSeqNo int64 = nextSeqNo + 1
 	if newNextSeqNo < nextSeqNo {

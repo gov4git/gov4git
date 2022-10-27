@@ -6,8 +6,12 @@ import (
 	"path/filepath"
 )
 
-func MailTopicDirpath(topic string) string {
-	return filepath.Join(IdentityRoot, "mail", topicHash(topic))
+func ReceiveMailTopicDirpath(topic string) string {
+	return filepath.Join(IdentityRoot, "mail", "receive", topicHash(topic))
+}
+
+func SendMailTopicDirpath(topic string) string {
+	return filepath.Join(IdentityRoot, "mail", "send", topicHash(topic))
 }
 
 func topicHash(topic string) string {

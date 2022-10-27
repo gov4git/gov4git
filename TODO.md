@@ -8,11 +8,14 @@ QV-based polling with balance updates
 
      - [ ] polling strategy decrements balances
 
+     - [ ] move voting interactions to identity main branch
+
 Merge approval workflow
      - [ ] ...
      - [ ] verify command
 
 FRAMEWORK
+     - [ ] Dir->interface, Local.Sub() returns DirWithinLocal with method RelPath (or AbsPath)
 
 DOC
 - [ ] terminal-cast type video tutorials

@@ -125,8 +125,17 @@ func (x Local) PushBranchUpstream(ctx context.Context, srcBranch string) error {
 	return err
 }
 
+func (x Local) PullBranchUpstream(ctx context.Context, srcBranch string) error {
+	_, _, err := x.Invoke(ctx, "pull", "origin", srcBranch)
+	return err
+}
+
 func (x Local) PushUpstream(ctx context.Context) error {
 	return x.PushBranchUpstream(ctx, "HEAD")
+}
+
+func (x Local) PullUpstream(ctx context.Context) error {
+	return x.PullBranchUpstream(ctx, "HEAD")
 }
 
 func (x Local) Push(ctx context.Context) error {
@@ -146,6 +155,14 @@ func (x Local) Remove(ctx context.Context, paths []string) error {
 
 func (x Local) CheckoutBranch(ctx context.Context, branch string) error {
 	_, stderr, err1 := x.Invoke(ctx, "checkout", branch)
+	if err2 := ParseCheckoutError(stderr); err2 != nil && err2 != ErrAlreadyOnBranch {
+		return err2
+	}
+	return err1
+}
+
+func (x Local) CheckoutBranchForce(ctx context.Context, branch string) error {
+	_, stderr, err1 := x.Invoke(ctx, "checkout", "-f", branch)
 	if err2 := ParseCheckoutError(stderr); err2 != nil && err2 != ErrAlreadyOnBranch {
 		return err2
 	}

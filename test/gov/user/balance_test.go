@@ -12,8 +12,8 @@ func TestBallot(t *testing.T) {
 	// base.LogVerbosely()
 
 	// create test community
-	dir := testutil.MakeStickyTestDir()
-	// dir := t.TempDir()
+	// dir := testutil.MakeStickyTestDir()
+	dir := t.TempDir()
 	testCommunity, err := testutil.CreateTestCommunity(dir, 1)
 	if err != nil {
 		t.Fatal(err)

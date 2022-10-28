@@ -87,7 +87,11 @@ func (x IdentityService) SendSignedMail(ctx context.Context, in *SendMailIn) (*S
 	if err != nil {
 		return nil, err
 	}
-	signed, err := idproto.SignPlaintext(ctx, &cred.PrivateCredentials, []byte(in.Message))
+	return x.SendSignedMailWithCredentials(ctx, &cred.PrivateCredentials, in)
+}
+
+func (x IdentityService) SendSignedMailWithCredentials(ctx context.Context, priv *idproto.PrivateCredentials, in *SendMailIn) (*SendMailOut, error) {
+	signed, err := idproto.SignPlaintext(ctx, priv, []byte(in.Message))
 	if err != nil {
 		return nil, err
 	}

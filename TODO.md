@@ -19,6 +19,7 @@ FRAMEWORK
 
 DOC
 - [ ] terminal-cast type video tutorials
+- [ ] documentation with mdBook https://github.com/rust-lang/mdBook
 
 FEATURES
 - [ ] semantic human-readable stack traces

@@ -101,3 +101,20 @@ func (x IdentityService) SendSignedMailWithCredentials(ctx context.Context, priv
 	}
 	return x.SendMail(ctx, &SendMailIn{Topic: in.Topic, Message: string(signedData)})
 }
+
+func (x IdentityService) SendSignedMailLocalStageOnlyWithCredentials(
+	ctx context.Context,
+	public git.Local,
+	priv *idproto.PrivateCredentials,
+	in *SendMailIn,
+) (*SendMailOut, error) {
+	signed, err := idproto.SignPlaintext(ctx, priv, []byte(in.Message))
+	if err != nil {
+		return nil, err
+	}
+	signedData, err := form.EncodeForm(ctx, signed)
+	if err != nil {
+		return nil, err
+	}
+	return x.SendMailLocalStageOnly(ctx, public, &SendMailIn{Topic: in.Topic, Message: string(signedData)})
+}

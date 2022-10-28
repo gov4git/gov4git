@@ -51,12 +51,33 @@ func (x IdentityService) ReceiveMailLocal(ctx context.Context, public git.Local,
 }
 
 func (x IdentityService) ReceiveMailLocalStageOnly(ctx context.Context, receiver git.Local, sender git.Local, in *ReceiveMailIn) (*ReceiveMailOut, error) {
+	var msgs []string
+	respondFunc := func(ctx context.Context, req []byte) ([]byte, error) {
+		msgs = append(msgs, string(req))
+		return req, nil
+	}
+	publicCred, err := x.ReceiveRespondMailLocalStageOnly(ctx, receiver, sender, in, respondFunc)
+	if err != nil {
+		return nil, err
+	}
+	return &ReceiveMailOut{Messages: msgs, SenderPublicCredentials: *publicCred}, nil
+}
+
+type RespondFunc func(context.Context, []byte) ([]byte, error)
+
+func (x IdentityService) ReceiveRespondMailLocalStageOnly(
+	ctx context.Context,
+	receiver git.Local,
+	sender git.Local,
+	in *ReceiveMailIn,
+	respond RespondFunc,
+) (*idproto.PublicCredentials, error) {
 	// sender-side
 	senderTopicDirpath := idproto.SendMailTopicDirpath(in.Topic)
 	senderTopicDir := sender.Dir().Subdir(senderTopicDirpath)
 
 	// receiver-side
-	receiverTopicDirpath := idproto.ReceiveMailTopicDirpath(in.Topic)
+	receiverTopicDirpath := idproto.ReceiveMailTopicDirpath(in.SenderRepo, in.Topic)
 	receiverTopicDir := receiver.Dir().Subdir(receiverTopicDirpath)
 
 	// read receiver-side 'next'
@@ -73,16 +94,25 @@ func (x IdentityService) ReceiveMailLocalStageOnly(ctx context.Context, receiver
 	}
 
 	// read unread messages
-	msgs := []string{}
 	receiverLatestNextSeqNo := receiverNextSeqNo
 	for i := receiverNextSeqNo; i < senderNextSeqNo; i++ {
-		msgFileBase := strconv.Itoa(int(i))
-		byteFile, err := senderTopicDir.ReadByteFile(msgFileBase)
+		msgFilebase := strconv.Itoa(int(i))
+		byteFile, err := senderTopicDir.ReadByteFile(msgFilebase)
 		if err != nil {
 			base.Infof("reading message %d in sender repo (%v)", i, err)
 			continue
 		}
-		msgs = append(msgs, string(byteFile.Bytes))
+		resp, err := respond(ctx, byteFile.Bytes)
+		if err != nil {
+			base.Infof("responding to message %d in sender repo (%v)", i, err)
+			continue
+		}
+		if err := receiverTopicDir.WriteByteFile(msgFilebase, resp); err != nil {
+			return nil, err
+		}
+		if err := receiver.Add(ctx, []string{filepath.Join(receiverTopicDirpath, msgFilebase)}); err != nil {
+			return nil, err
+		}
 		receiverLatestNextSeqNo = i + 1
 	}
 
@@ -102,7 +132,7 @@ func (x IdentityService) ReceiveMailLocalStageOnly(ctx context.Context, receiver
 		return nil, err
 	}
 
-	return &ReceiveMailOut{Messages: msgs, SenderPublicCredentials: publicOut.PublicCredentials}, nil
+	return &publicOut.PublicCredentials, nil
 }
 
 func (x IdentityService) ReceiveSignedMail(ctx context.Context, in *ReceiveMailIn) (*ReceiveMailOut, error) {

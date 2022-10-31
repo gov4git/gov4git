@@ -12,8 +12,9 @@ import (
 )
 
 type SendMailIn struct {
-	Topic   string `json:"topic"` // mail is sent to a topic and later picked up from the topic by the receiver
-	Message string `json:"message"`
+	ReceiverRepo string `json:"receiver_repo"`
+	Topic        string `json:"topic"` // mail is sent to a topic and later picked up from the topic by the receiver
+	Message      string `json:"message"`
 }
 
 type SendMailOut struct {
@@ -21,50 +22,65 @@ type SendMailOut struct {
 }
 
 func (x IdentityService) SendMail(ctx context.Context, in *SendMailIn) (*SendMailOut, error) {
-	public, err := git.CloneBranch(ctx, x.IdentityConfig.PublicURL, idproto.IdentityBranch)
+	sender, err := git.CloneBranch(ctx, x.IdentityConfig.PublicURL, idproto.IdentityBranch)
 	if err != nil {
 		return nil, err
 	}
-	out, err := x.SendMailLocal(ctx, public, in)
+	out, err := x.SendMailLocal(ctx, sender, in)
 	if err != nil {
 		return nil, err
 	}
-	if err := public.PushUpstream(ctx); err != nil {
+	if err := sender.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (x IdentityService) SendMailLocal(ctx context.Context, public git.Local, in *SendMailIn) (*SendMailOut, error) {
-	out, err := x.SendMailLocalStageOnly(ctx, public, in)
+func (x IdentityService) SendMailLocal(ctx context.Context, sender git.Local, in *SendMailIn) (*SendMailOut, error) {
+	out, err := SendMailLocalStageOnly(ctx, sender, in)
 	if err != nil {
 		return nil, err
 	}
-	if err := public.Commitf(ctx, "Sent mail on topic %v", in.Topic); err != nil {
+	if err := sender.Commitf(ctx, "Sent mail on topic %v", in.Topic); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-const nextFilebase = "next"
+func SendMailLocalStageOnly(ctx context.Context, sender git.Local, in *SendMailIn) (*SendMailOut, error) {
 
-func (x IdentityService) SendMailLocalStageOnly(ctx context.Context, public git.Local, in *SendMailIn) (*SendMailOut, error) {
-	topicDirpath := idproto.SendMailTopicDirpath(in.Topic)
-	topicDir := public.Dir().Subdir(topicDirpath)
+	// fetch receiver id
+	receiverCred, err := GetPublicCredentials(ctx, in.ReceiverRepo)
+	if err != nil {
+		return nil, err
+	}
+
+	// make outgoing mail directory in sender's repo
+	topicDirpath := idproto.SendMailTopicDirpath(receiverCred.ID, in.Topic)
+	topicDir := sender.Dir().Subdir(topicDirpath)
 
 	if err := topicDir.Mk(); err != nil {
 		return nil, err
 	}
+	// write receiver id + topic in plaintext file
+	info := idproto.SendBoxInfo{ReceiverID: receiverCred.ID, Topic: in.Topic}
+	if err := topicDir.WriteFormFile(ctx, idproto.BoxInfoFilebase, info); err != nil {
+		return nil, err
+	}
+	if err := sender.Add(ctx, []string{filepath.Join(topicDirpath, idproto.BoxInfoFilebase)}); err != nil {
+		return nil, err
+	}
 
+	// read the next message number
 	var nextSeqNo int64
-	topicDir.ReadFormFile(ctx, nextFilebase, &nextSeqNo) // if file is missing, nextSeqNo = 0
+	topicDir.ReadFormFile(ctx, idproto.NextFilebase, &nextSeqNo) // if file is missing, nextSeqNo = 0
 
 	// write + stage message
 	msgFileBase := strconv.Itoa(int(nextSeqNo))
 	if err := topicDir.WriteByteFile(msgFileBase, []byte(in.Message)); err != nil {
 		return nil, err
 	}
-	if err := public.Add(ctx, []string{filepath.Join(topicDirpath, msgFileBase)}); err != nil {
+	if err := sender.Add(ctx, []string{filepath.Join(topicDirpath, msgFileBase)}); err != nil {
 		return nil, err
 	}
 
@@ -73,10 +89,10 @@ func (x IdentityService) SendMailLocalStageOnly(ctx context.Context, public git.
 	if newNextSeqNo < nextSeqNo {
 		return nil, fmt.Errorf("mailbox size exceeded")
 	}
-	if err := topicDir.WriteFormFile(ctx, nextFilebase, newNextSeqNo); err != nil {
+	if err := topicDir.WriteFormFile(ctx, idproto.NextFilebase, newNextSeqNo); err != nil {
 		return nil, err
 	}
-	if err := public.Add(ctx, []string{filepath.Join(topicDirpath, nextFilebase)}); err != nil {
+	if err := sender.Add(ctx, []string{filepath.Join(topicDirpath, idproto.NextFilebase)}); err != nil {
 		return nil, err
 	}
 	return &SendMailOut{SeqNo: nextSeqNo}, nil
@@ -99,7 +115,7 @@ func (x IdentityService) SendSignedMailWithCredentials(ctx context.Context, priv
 	if err != nil {
 		return nil, err
 	}
-	return x.SendMail(ctx, &SendMailIn{Topic: in.Topic, Message: string(signedData)})
+	return x.SendMail(ctx, &SendMailIn{ReceiverRepo: in.ReceiverRepo, Topic: in.Topic, Message: string(signedData)})
 }
 
 func (x IdentityService) SendSignedMailLocalStageOnlyWithCredentials(
@@ -116,5 +132,5 @@ func (x IdentityService) SendSignedMailLocalStageOnlyWithCredentials(
 	if err != nil {
 		return nil, err
 	}
-	return x.SendMailLocalStageOnly(ctx, public, &SendMailIn{Topic: in.Topic, Message: string(signedData)})
+	return SendMailLocalStageOnly(ctx, public, &SendMailIn{Topic: in.Topic, Message: string(signedData)})
 }

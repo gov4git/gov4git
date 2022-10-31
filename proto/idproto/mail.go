@@ -6,18 +6,33 @@ import (
 	"path/filepath"
 )
 
-func ReceiveMailTopicDirpath(senderRepo string, topic string) string {
-	return filepath.Join(IdentityRoot, "mail", "respond", senderRepo, topicHash(topic))
+type SendBoxInfo struct {
+	ReceiverID ID     `json:"receiver_id"`
+	Topic      string `json:"topic"`
 }
 
-func SendMailTopicDirpath(topic string) string {
-	return filepath.Join(IdentityRoot, "mail", "request", topicHash(topic))
+type ReceiveBoxInfo struct {
+	SenderID ID     `json:"sender_id"`
+	Topic    string `json:"topic"`
 }
 
-func topicHash(topic string) string {
+const (
+	BoxInfoFilebase = "info.json"
+	NextFilebase    = "next"
+)
+
+func ReceiveMailTopicDirpath(senderID ID, topic string) string {
+	return filepath.Join(IdentityRoot, "mail", "response", stringHash(string(senderID)), stringHash(topic))
+}
+
+func SendMailTopicDirpath(receiverID ID, topic string) string {
+	return filepath.Join(IdentityRoot, "mail", "request", stringHash(string(receiverID)), stringHash(topic))
+}
+
+func stringHash(s string) string {
 	h := sha256.New()
-	if _, err := h.Write([]byte(topic)); err != nil {
+	if _, err := h.Write([]byte(s)); err != nil {
 		panic(err)
 	}
-	return base64.StdEncoding.EncodeToString(h.Sum(nil))
+	return base64.URLEncoding.EncodeToString(h.Sum(nil))
 }

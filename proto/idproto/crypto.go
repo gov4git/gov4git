@@ -20,6 +20,7 @@ func GenerateCredentials(publicURL, privateURL string) (*PrivateCredentials, err
 		PrivateURL:        privateURL,
 		PrivateKeyEd25519: Ed25519PrivateKey(privKey),
 		PublicCredentials: PublicCredentials{
+			ID:               GenerateUniqueID(),
 			PublicURL:        publicURL,
 			PublicKeyEd25519: Ed25519PublicKey(pubKey),
 		},

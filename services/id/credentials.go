@@ -61,18 +61,29 @@ func (x IdentityService) GetPublicCredentials(ctx context.Context, in *GetPublic
 	}
 
 	// read from the local clone
-	out, err := GetPublicCredentialsLocal(ctx, public, in)
+	out, err := GetPublicCredentialsLocal(ctx, public)
 	if err != nil {
 		return nil, err
 	}
 
-	return out, nil
+	return &GetPublicCredentialsOut{PublicCredentials: *out}, nil
 }
 
-func GetPublicCredentialsLocal(ctx context.Context, public git.Local, in *GetPublicCredentialsIn) (*GetPublicCredentialsOut, error) {
+func GetPublicCredentials(ctx context.Context, publicRepoURL string) (*idproto.PublicCredentials, error) {
+	repo, err := git.MakeLocalInCtx(ctx, "")
+	if err != nil {
+		return nil, err
+	}
+	if err := repo.CloneBranch(ctx, publicRepoURL, idproto.IdentityBranch); err != nil {
+		return nil, err
+	}
+	return GetPublicCredentialsLocal(ctx, repo)
+}
+
+func GetPublicCredentialsLocal(ctx context.Context, public git.Local) (*idproto.PublicCredentials, error) {
 	var credentials idproto.PublicCredentials
 	if _, err := public.Dir().ReadFormFile(ctx, idproto.PublicCredentialsPath, &credentials); err != nil {
 		return nil, err
 	}
-	return &GetPublicCredentialsOut{PublicCredentials: credentials}, nil
+	return &credentials, nil
 }

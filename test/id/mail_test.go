@@ -3,12 +3,13 @@ package id
 import (
 	"testing"
 
+	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/services/id"
 	"github.com/gov4git/gov4git/testutil"
 )
 
-func TestSendReceive(t *testing.T) {
-	// base.LogVerbosely()
+func TestSendReceivePlaintext(t *testing.T) {
+	base.LogVerbosely()
 
 	// create test community
 	// dir := testutil.MakeStickyTestDir()
@@ -20,13 +21,17 @@ func TestSendReceive(t *testing.T) {
 	ctx := testCommunity.Background()
 
 	svc0 := id.IdentityService{IdentityConfig: testCommunity.UserIdentityConfig(0)}
-	svc1 := id.IdentityService{IdentityConfig: testCommunity.UserIdentityConfig(0)}
+	svc1 := id.IdentityService{IdentityConfig: testCommunity.UserIdentityConfig(1)}
 
 	testMsg := []string{"a", "b", "c"}
 	testTopic := "topic"
 
 	// send msg 1
-	_, err = svc0.SendMail(ctx, &id.SendMailIn{Topic: testTopic, Message: testMsg[0]})
+	_, err = svc0.SendMail(ctx, &id.SendMailIn{
+		ReceiverRepo: testCommunity.UserPublicRepoURL(1),
+		Topic:        testTopic,
+		Message:      testMsg[0],
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,12 +55,20 @@ func TestSendReceive(t *testing.T) {
 	}
 
 	// send msg 2, 3
-	_, err = svc0.SendMail(ctx, &id.SendMailIn{Topic: testTopic, Message: testMsg[1]})
+	_, err = svc0.SendMail(ctx, &id.SendMailIn{
+		ReceiverRepo: testCommunity.UserPublicRepoURL(1),
+		Topic:        testTopic,
+		Message:      testMsg[1],
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = svc0.SendMail(ctx, &id.SendMailIn{Topic: testTopic, Message: testMsg[2]})
+	_, err = svc0.SendMail(ctx, &id.SendMailIn{
+		ReceiverRepo: testCommunity.UserPublicRepoURL(1),
+		Topic:        testTopic,
+		Message:      testMsg[2],
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

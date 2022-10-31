@@ -3,12 +3,13 @@ package id
 import (
 	"testing"
 
+	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/services/id"
 	"github.com/gov4git/gov4git/testutil"
 )
 
 func TestSignedSendReceive(t *testing.T) {
-	// base.LogVerbosely()
+	base.LogVerbosely()
 
 	// create test community
 	// dir := testutil.MakeStickyTestDir()
@@ -20,12 +21,16 @@ func TestSignedSendReceive(t *testing.T) {
 	ctx := testCommunity.Background()
 
 	svc0 := id.IdentityService{IdentityConfig: testCommunity.UserIdentityConfig(0)}
-	svc1 := id.IdentityService{IdentityConfig: testCommunity.UserIdentityConfig(0)}
+	svc1 := id.IdentityService{IdentityConfig: testCommunity.UserIdentityConfig(1)}
 
 	testMsg := "hello world"
 	testTopic := "topic"
 
-	_, err = svc0.SendSignedMail(ctx, &id.SendMailIn{Topic: testTopic, Message: testMsg})
+	_, err = svc0.SendSignedMail(ctx, &id.SendMailIn{
+		ReceiverRepo: testCommunity.UserPublicRepoURL(1),
+		Topic:        testTopic,
+		Message:      testMsg,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

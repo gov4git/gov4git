@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/files"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/proto"
@@ -36,7 +37,7 @@ func (x *TestCommunity) Init(ctx context.Context) error {
 	ctx = x.WithWorkDir(ctx, "TestCommunity")
 
 	// prep test directory
-	fmt.Printf("initializing a test community in %v\n", x.Dir)
+	base.Infof("initializing a test community in %v\n", x.Dir)
 	if err := os.RemoveAll(x.Dir); err != nil {
 		return err
 	}
@@ -95,7 +96,7 @@ func (x *TestCommunity) initCommunityRepo(ctx context.Context) error {
 
 func (x *TestCommunity) initUserRepos(ctx context.Context, i int) error {
 	ctx = x.WithWorkDir(ctx, fmt.Sprintf("TestCommunity/initUserRepos_%d", i))
-	fmt.Printf("initializing user %d repos\n", i)
+	fmt.Printf("initializing user %d with public repo %v and private repo %v\n", i, x.UserPublicRepoURL(i), x.UserPrivateRepoURL(i))
 
 	// create user identity repos
 	userPublicRepo := x.UserPublicRepoLocal(i)

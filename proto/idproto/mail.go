@@ -1,9 +1,9 @@
 package idproto
 
 import (
-	"crypto/sha256"
-	"encoding/base64"
 	"path/filepath"
+
+	"github.com/gov4git/gov4git/lib/form"
 )
 
 type SendBoxInfo struct {
@@ -22,17 +22,9 @@ const (
 )
 
 func ReceiveMailTopicDirpath(senderID ID, topic string) string {
-	return filepath.Join(IdentityRoot, "mail", "response", stringHash(string(senderID)), stringHash(topic))
+	return filepath.Join(IdentityRoot, "mail", "received", form.StringHashForFilename(string(senderID)), form.StringHashForFilename(topic))
 }
 
 func SendMailTopicDirpath(receiverID ID, topic string) string {
-	return filepath.Join(IdentityRoot, "mail", "request", stringHash(string(receiverID)), stringHash(topic))
-}
-
-func stringHash(s string) string {
-	h := sha256.New()
-	if _, err := h.Write([]byte(s)); err != nil {
-		panic(err)
-	}
-	return base64.URLEncoding.EncodeToString(h.Sum(nil))
+	return filepath.Join(IdentityRoot, "mail", "sent", form.StringHashForFilename(string(receiverID)), form.StringHashForFilename(topic))
 }

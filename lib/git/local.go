@@ -12,6 +12,10 @@ import (
 	"github.com/gov4git/gov4git/proto"
 )
 
+type Branch string
+
+type URL string
+
 type Local struct {
 	// Path is an absolute local path to the git repository
 	Path string `json:"path"`

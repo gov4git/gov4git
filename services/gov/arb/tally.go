@@ -65,7 +65,6 @@ func (x GovArbService) TallyLocal(ctx context.Context, community git.Local, in *
 	}
 
 	// checkout referendum branch latest
-	// TODO: already on this branch?
 	if err := community.CheckoutBranch(ctx, in.BallotBranch); err != nil {
 		return nil, err
 	}

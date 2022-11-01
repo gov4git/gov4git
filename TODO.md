@@ -15,6 +15,8 @@ Merge approval workflow
      - [ ] verify command
 
 FRAMEWORK
+     - [ ] identity and gov configs should include branch spec
+     - [ ] name services based on role
      - [ ] Dir->interface, Local.Sub() returns DirWithinLocal with method RelPath (or AbsPath)
 
 DOC

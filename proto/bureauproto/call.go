@@ -1,10 +1,10 @@
 package bureauproto
 
-// const xTopic = "bureau"
+const bureauTopic = "bureau"
 
-// func Topic(receiverRepo string) string {
-// 	return XXX // comty repo + bureau
-// }
+func Topic(topic string) string {
+	return bureauTopic + ":" + topic
+}
 
 type Request struct {
 	Identify *IdentifyRequest `json:"identify"`

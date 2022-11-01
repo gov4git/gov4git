@@ -1,6 +1,7 @@
 package form
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 )
@@ -30,4 +31,12 @@ func EncodeBytesToString(buf []byte) string {
 
 func DecodeBytesFromString(s string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(s)
+}
+
+func StringHashForFilename(s string) string {
+	h := sha256.New()
+	if _, err := h.Write([]byte(s)); err != nil {
+		panic(err)
+	}
+	return base64.URLEncoding.EncodeToString(h.Sum(nil))
 }

@@ -56,7 +56,7 @@ func ReceiveMailLocalStageOnly(ctx context.Context, receiver git.Local, sender g
 		msgs = append(msgs, string(req))
 		return req, nil
 	}
-	senderCred, err := ReceiveRespondMailLocalStageOnly(ctx, receiver, sender, in, respondFunc)
+	senderCred, err := ReceiveRespondMailLocalStageOnly(ctx, receiver, sender, in.Topic, respondFunc)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func ReceiveRespondMailLocalStageOnly(
 	ctx context.Context,
 	receiver git.Local,
 	sender git.Local,
-	in *ReceiveMailIn,
+	topic string,
 	respond RespondFunc,
 ) (*idproto.PublicCredentials, error) {
 
@@ -86,11 +86,11 @@ func ReceiveRespondMailLocalStageOnly(
 	}
 
 	// sender-side
-	senderTopicDirpath := idproto.SendMailTopicDirpath(receiverCred.ID, in.Topic)
+	senderTopicDirpath := idproto.SendMailTopicDirpath(receiverCred.ID, topic)
 	senderTopicDir := sender.Dir().Subdir(senderTopicDirpath)
 
 	// receiver-side
-	receiverTopicDirpath := idproto.ReceiveMailTopicDirpath(senderCred.ID, in.Topic)
+	receiverTopicDirpath := idproto.ReceiveMailTopicDirpath(senderCred.ID, topic)
 	receiverTopicDir := receiver.Dir().Subdir(receiverTopicDirpath)
 
 	// read receiver-side 'next'
@@ -106,7 +106,7 @@ func ReceiveRespondMailLocalStageOnly(
 		return nil, err
 	}
 	// write receiver id + topic in plaintext file
-	info := idproto.ReceiveBoxInfo{SenderID: senderCred.ID, Topic: in.Topic}
+	info := idproto.ReceiveBoxInfo{SenderID: senderCred.ID, Topic: topic}
 	if err := receiverTopicDir.WriteFormFile(ctx, idproto.BoxInfoFilebase, info); err != nil {
 		return nil, err
 	}

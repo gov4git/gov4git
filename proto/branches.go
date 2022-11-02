@@ -1,5 +1,5 @@
 package proto
 
 const (
-	MainBranch = "main"
+	MainBranch = "main" //XXX
 )

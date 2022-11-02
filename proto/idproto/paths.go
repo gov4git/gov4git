@@ -3,7 +3,7 @@ package idproto
 import "path/filepath"
 
 var (
-	IdentityBranch = "main" // for identity public and private repos
+// IdentityBranch = "main" // XXX: for identity public and private repos
 )
 
 // identity repo paths

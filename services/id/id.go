@@ -1,7 +1,7 @@
 package id
 
-import "github.com/gov4git/gov4git/proto/idproto"
+import "github.com/gov4git/gov4git/proto"
 
-type IdentityService struct {
-	IdentityConfig idproto.IdentityConfig
-}
+type IdentityPublicService proto.Address
+
+type IdentityPrivateService proto.PairAddress

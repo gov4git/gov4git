@@ -9,16 +9,30 @@ import (
 
 	. "github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/files"
-	"github.com/gov4git/gov4git/proto"
 )
 
 type Branch string
 
+var MainBranch = Branch("main")
+
 type URL string
+
+type Origin struct {
+	Repo   URL    `json:"repo"`
+	Branch Branch `json:"branch"`
+}
+
+const (
+	CommitMsgHeader = "gov4git: "
+)
 
 type Local struct {
 	// Path is an absolute local path to the git repository
 	Path string `json:"path"`
+}
+
+func MakeLocal(ctx context.Context) (Local, error) {
+	return MakeLocalInCtx(ctx, "")
 }
 
 func MakeLocalInCtx(ctx context.Context, label string) (Local, error) {
@@ -27,6 +41,10 @@ func MakeLocalInCtx(ctx context.Context, label string) (Local, error) {
 		return Local{}, err
 	}
 	return LocalInDir(eph), nil
+}
+
+func CloneOrigin(ctx context.Context, origin Origin) (Local, error) {
+	return CloneBranch(ctx, string(origin.Repo), string(origin.Branch))
 }
 
 func CloneBranch(ctx context.Context, repo string, branch string) (Local, error) {
@@ -103,7 +121,7 @@ func (x Local) RenameBranch(ctx context.Context, newBranchName string) error {
 }
 
 func (x Local) Commit(ctx context.Context, msg string) error {
-	_, stderr, err1 := x.InvokeStdin(ctx, proto.CommitMsgHeader+msg, "commit", "-F", "-")
+	_, stderr, err1 := x.InvokeStdin(ctx, CommitMsgHeader+msg, "commit", "-F", "-")
 	if err2 := ParseCommitError(stderr); err2 != nil {
 		return err2
 	}
@@ -111,7 +129,7 @@ func (x Local) Commit(ctx context.Context, msg string) error {
 }
 
 func (x Local) Commitf(ctx context.Context, f string, args ...any) error {
-	_, _, err := x.InvokeStdin(ctx, proto.CommitMsgHeader+fmt.Sprintf(f, args...), "commit", "-F", "-")
+	_, _, err := x.InvokeStdin(ctx, CommitMsgHeader+fmt.Sprintf(f, args...), "commit", "-F", "-")
 	return err
 }
 
@@ -203,6 +221,10 @@ func (x Local) HeadCommitHash(ctx context.Context) (string, error) {
 		return "", fmt.Errorf("head commit missing")
 	}
 	return h, nil
+}
+
+func (x Local) CloneOrigin(ctx context.Context, origin Origin) error {
+	return x.CloneBranch(ctx, string(origin.Repo), string(origin.Branch))
 }
 
 func (x Local) CloneBranch(ctx context.Context, remoteURL, branch string) error {

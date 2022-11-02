@@ -18,8 +18,7 @@ func (x IdentityPrivateService) Init(ctx context.Context) (*idproto.PrivateCrede
 		return nil, err
 	}
 	// clone or init repo
-	if err := localPrivate.CloneOrInitBranch(ctx, string(x.PrivateAddress.Repo), string(x.PrivateAddress.Branch)); err != nil {
-		// if err := localPrivate.CloneOrInitBranch(ctx, x.IdentityConfig.PrivateURL, idproto.IdentityBranch); err != nil {
+	if err := localPrivate.CloneOrInitOrigin(ctx, x.PrivateAddress); err != nil {
 		return nil, err
 	}
 	// check if key files already exist
@@ -58,7 +57,7 @@ func (x IdentityPrivateService) Init(ctx context.Context) (*idproto.PrivateCrede
 		return nil, err
 	}
 	// clone or init repo
-	if err := localPublic.CloneOrInitBranch(ctx, string(x.PublicAddress.Repo), string(x.PublicAddress.Branch)); err != nil {
+	if err := localPublic.CloneOrInitOrigin(ctx, x.PublicAddress); err != nil {
 		return nil, err
 	}
 	// write changes

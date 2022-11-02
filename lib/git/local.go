@@ -11,6 +11,8 @@ import (
 	"github.com/gov4git/gov4git/lib/files"
 )
 
+type Commit string
+
 type Branch string
 
 var MainBranch = Branch("main")
@@ -20,6 +22,10 @@ type URL string
 type Origin struct {
 	Repo   URL    `json:"repo"`
 	Branch Branch `json:"branch"`
+}
+
+func (o Origin) String() string {
+	return string(o.Repo) + "/" + string(o.Branch)
 }
 
 const (
@@ -44,15 +50,11 @@ func MakeLocalInCtx(ctx context.Context, label string) (Local, error) {
 }
 
 func CloneOrigin(ctx context.Context, origin Origin) (Local, error) {
-	return CloneBranch(ctx, string(origin.Repo), string(origin.Branch))
-}
-
-func CloneBranch(ctx context.Context, repo string, branch string) (Local, error) {
-	clone, err := MakeLocalInCtx(ctx, "clone_branch")
+	clone, err := MakeLocal(ctx)
 	if err != nil {
 		return Local{}, err
 	}
-	if err := clone.CloneBranch(ctx, repo, branch); err != nil {
+	if err := clone.CloneOrigin(ctx, origin); err != nil {
 		return Local{}, err
 	}
 	return clone, nil
@@ -223,27 +225,23 @@ func (x Local) HeadCommitHash(ctx context.Context) (string, error) {
 	return h, nil
 }
 
-func (x Local) CloneOrigin(ctx context.Context, origin Origin) error {
-	return x.CloneBranch(ctx, string(origin.Repo), string(origin.Branch))
-}
-
-func (x Local) CloneBranch(ctx context.Context, remoteURL, branch string) error {
+func (x *Local) CloneOrigin(ctx context.Context, origin Origin) error {
 	if err := x.Dir().Mk(); err != nil {
 		return nil
 	}
-	_, stderr, err1 := x.Invoke(ctx, "clone", "--branch", branch, "--single-branch", remoteURL, x.Path)
-	if err2 := ParseCloneError(stderr, branch, "origin"); err2 != nil {
+	_, stderr, err1 := x.Invoke(ctx, "clone", "--branch", string(origin.Branch), "--single-branch", string(origin.Repo), x.Path)
+	if err2 := ParseCloneError(stderr, string(origin.Branch), "origin"); err2 != nil {
 		return err2
 	}
 	return err1
 }
 
-func (x Local) CloneOrInitBranch(ctx context.Context, remoteURL, branch string) error {
-	if err := x.CloneBranch(ctx, remoteURL, branch); err != nil {
+func (x Local) CloneOrInitOrigin(ctx context.Context, origin Origin) error {
+	if err := x.CloneOrigin(ctx, origin); err != nil {
 		if err != ErrRemoteBranchNotFound {
 			return err
 		}
-		if err := x.InitWithRemoteBranch(ctx, remoteURL, branch); err != nil {
+		if err := x.InitWithRemoteOrigin(ctx, origin); err != nil {
 			return err
 		}
 	}
@@ -260,14 +258,14 @@ func (x Local) AddCommitPush(ctx context.Context, addPaths []string, commitMsg s
 	return x.PushUpstream(ctx)
 }
 
-func (x Local) InitWithRemoteBranch(ctx context.Context, remoteURL, branch string) error {
+func (x Local) InitWithRemoteOrigin(ctx context.Context, origin Origin) error {
 	if err := x.Init(ctx); err != nil {
 		return err
 	}
-	if err := x.RenameBranch(ctx, branch); err != nil {
+	if err := x.RenameBranch(ctx, string(origin.Branch)); err != nil {
 		return err
 	}
-	if err := x.AddRemoteOrigin(ctx, remoteURL); err != nil {
+	if err := x.AddRemoteOrigin(ctx, string(origin.Repo)); err != nil {
 		return err
 	}
 	return nil

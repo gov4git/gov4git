@@ -7,29 +7,31 @@ import (
 
 	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/git"
+	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/idproto"
+	"github.com/gov4git/gov4git/services/id"
 )
 
-type ReceiveMailIn struct {
-	SenderRepo string `json:"sender_repo"`
-	Topic      string `json:"topic"` // mail is sent to a topic and later picked up from the topic by the receiver
-}
-
-type ReceiveMailOut struct {
+type ReceiveMailResult struct {
 	Messages                []string                  `json:"messages"`
 	SenderPublicCredentials idproto.PublicCredentials `json:"sender_public_credentials"`
 }
 
-func (x IdentityService) ReceiveMail(ctx context.Context, in *ReceiveMailIn) (*ReceiveMailOut, error) {
-	receiver, err := git.CloneBranch(ctx, x.IdentityConfig.PublicURL, idproto.IdentityBranch)
+func ReceiveMail(
+	ctx context.Context,
+	receiverAddr proto.PairAddress,
+	senderAddr proto.Address,
+	topic string,
+) (*ReceiveMailResult, error) {
+	receiver, err := git.CloneOrigin(ctx, receiverAddr.PublicAddress)
 	if err != nil {
 		return nil, err
 	}
-	sender, err := git.CloneBranch(ctx, in.SenderRepo, idproto.IdentityBranch)
+	sender, err := git.CloneOrigin(ctx, senderAddr)
 	if err != nil {
 		return nil, err
 	}
-	out, err := ReceiveMailLocal(ctx, receiver, sender, in)
+	out, err := ReceiveMailLocal(ctx, receiver, sender, senderAddr, topic)
 	if err != nil {
 		return nil, err
 	}
@@ -39,31 +41,42 @@ func (x IdentityService) ReceiveMail(ctx context.Context, in *ReceiveMailIn) (*R
 	return out, nil
 }
 
-func ReceiveMailLocal(ctx context.Context, receiver git.Local, sender git.Local, in *ReceiveMailIn) (*ReceiveMailOut, error) {
-	out, err := ReceiveMailLocalStageOnly(ctx, receiver, sender, in)
+func ReceiveMailLocal(
+	ctx context.Context,
+	receiver git.Local,
+	sender git.Local,
+	senderAddr proto.Address,
+	topic string,
+) (*ReceiveMailResult, error) {
+	out, err := ReceiveMailLocalStageOnly(ctx, receiver, sender, topic)
 	if err != nil {
 		return nil, err
 	}
-	if err := receiver.Commitf(ctx, "Received mail on topic %v from %v", in.Topic, in.SenderRepo); err != nil {
+	if err := receiver.Commitf(ctx, "Received mail on topic %v from %v", topic, senderAddr); err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func ReceiveMailLocalStageOnly(ctx context.Context, receiver git.Local, sender git.Local, in *ReceiveMailIn) (*ReceiveMailOut, error) {
+func ReceiveMailLocalStageOnly(
+	ctx context.Context,
+	receiver git.Local,
+	sender git.Local,
+	topic string,
+) (*ReceiveMailResult, error) {
 	var msgs []string
-	respondFunc := func(ctx context.Context, req []byte) ([]byte, error) {
+	respondFn := func(ctx context.Context, req []byte) ([]byte, error) {
 		msgs = append(msgs, string(req))
 		return req, nil
 	}
-	senderCred, err := ReceiveRespondMailLocalStageOnly(ctx, receiver, sender, in.Topic, respondFunc)
+	senderCred, err := ReceiveRespondMailLocalStageOnly(ctx, receiver, sender, topic, respondFn)
 	if err != nil {
 		return nil, err
 	}
-	return &ReceiveMailOut{Messages: msgs, SenderPublicCredentials: *senderCred}, nil
+	return &ReceiveMailResult{Messages: msgs, SenderPublicCredentials: *senderCred}, nil
 }
 
-type RespondFunc func(context.Context, []byte) ([]byte, error)
+type RespondFunc func(ctx context.Context, req []byte) (resp []byte, err error)
 
 func ReceiveRespondMailLocalStageOnly(
 	ctx context.Context,
@@ -74,13 +87,13 @@ func ReceiveRespondMailLocalStageOnly(
 ) (*idproto.PublicCredentials, error) {
 
 	// get receiver credentials
-	receiverCred, err := GetPublicCredentialsLocal(ctx, receiver)
+	receiverCred, err := id.GetPublicCredentialsLocal(ctx, receiver)
 	if err != nil {
 		return nil, err
 	}
 
 	// get sender credentials
-	senderCred, err := GetPublicCredentialsLocal(ctx, sender)
+	senderCred, err := id.GetPublicCredentialsLocal(ctx, sender)
 	if err != nil {
 		return nil, err
 	}
@@ -151,8 +164,13 @@ func ReceiveRespondMailLocalStageOnly(
 	return senderCred, nil
 }
 
-func (x IdentityService) ReceiveSignedMail(ctx context.Context, in *ReceiveMailIn) (*ReceiveMailOut, error) {
-	receiveOut, err := x.ReceiveMail(ctx, in)
+func ReceiveSignedMail(
+	ctx context.Context,
+	receiverAddr proto.PairAddress,
+	senderAddr proto.Address,
+	topic string,
+) (*ReceiveMailResult, error) {
+	receiveOut, err := ReceiveMail(ctx, receiverAddr, senderAddr, topic)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +187,7 @@ func (x IdentityService) ReceiveSignedMail(ctx context.Context, in *ReceiveMailI
 		}
 		verifiedMsgs = append(verifiedMsgs, string(signed.Plaintext))
 	}
-	return &ReceiveMailOut{
+	return &ReceiveMailResult{
 		Messages:                verifiedMsgs,
 		SenderPublicCredentials: receiveOut.SenderPublicCredentials,
 	}, nil

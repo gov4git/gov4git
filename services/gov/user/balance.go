@@ -16,100 +16,95 @@ type BalanceSetIn struct {
 
 type BalanceSetOut struct{}
 
-func (x GovUserService) BalanceSet(ctx context.Context, in *BalanceSetIn) (*BalanceSetOut, error) {
-	community, err := git.CloneBranch(ctx, x.GovConfig.CommunityURL, in.Branch)
+func (x UserService) BalanceSet(
+	ctx context.Context,
+	user string,
+	balance string,
+	value float64,
+) error {
+	local, err := git.CloneOrigin(ctx, git.Origin(x))
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if err := x.SetFloat64Local(ctx, community, in.User, govproto.BalanceKey(in.Balance), in.Value); err != nil {
-		return nil, err
+	if err := x.SetFloat64Local(ctx, local, user, govproto.BalanceKey(balance), value); err != nil {
+		return err
 	}
-	if err := community.PushUpstream(ctx); err != nil {
-		return nil, err
+	if err := local.PushUpstream(ctx); err != nil {
+		return err
 	}
-	return &BalanceSetOut{}, nil
+	return nil
 }
 
-type BalanceGetIn struct {
-	User    string `json:"user"`
-	Balance string `json:"balance"`
-	Branch  string `json:"branch"`
-}
-
-type BalanceGetOut struct {
-	Value float64 `json:"value"`
-}
-
-func (x GovUserService) BalanceGet(ctx context.Context, in *BalanceGetIn) (*BalanceGetOut, error) {
-	community, err := git.CloneBranch(ctx, x.GovConfig.CommunityURL, in.Branch)
+func (x UserService) BalanceGet(
+	ctx context.Context,
+	user string,
+	balance string,
+) (float64, error) {
+	local, err := git.CloneOrigin(ctx, git.Origin(x))
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	value, err := x.GetFloat64Local(ctx, community, in.User, govproto.BalanceKey(in.Balance))
+	value, err := x.GetFloat64Local(ctx, local, user, govproto.BalanceKey(balance))
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	return &BalanceGetOut{Value: value}, nil
+	return value, nil
 }
 
-type BalanceAddIn struct {
-	User    string  `json:"user"`
-	Balance string  `json:"balance"`
-	Branch  string  `json:"branch"`
-	Value   float64 `json:"value"`
-}
-
-type BalanceAddOut struct {
+type BalanceAddResult struct {
 	ValueBefore float64 `json:"value_before"`
 	ValueAfter  float64 `json:"value_after"`
 }
 
-func (x GovUserService) BalanceAdd(ctx context.Context, in *BalanceAddIn) (*BalanceAddOut, error) {
-	community, err := git.CloneBranch(ctx, x.GovConfig.CommunityURL, in.Branch)
+func (x UserService) BalanceAdd(
+	ctx context.Context,
+	user string,
+	balance string,
+	value float64,
+) (*BalanceAddResult, error) {
+	local, err := git.CloneOrigin(ctx, git.Origin(x))
 	if err != nil {
 		return nil, err
 	}
-	valueBefore, err := x.GetFloat64Local(ctx, community, in.User, govproto.BalanceKey(in.Balance))
+	valueBefore, err := x.GetFloat64Local(ctx, local, user, govproto.BalanceKey(balance))
 	if err != nil {
 		return nil, err
 	}
-	valueAfter := valueBefore + in.Value
-	if err := x.SetFloat64Local(ctx, community, in.User, govproto.BalanceKey(in.Balance), valueAfter); err != nil {
+	valueAfter := valueBefore + value
+	if err := x.SetFloat64Local(ctx, local, user, govproto.BalanceKey(balance), valueAfter); err != nil {
 		return nil, err
 	}
-	if err := community.PushUpstream(ctx); err != nil {
+	if err := local.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
-	return &BalanceAddOut{ValueBefore: valueBefore, ValueAfter: valueAfter}, nil
+	return &BalanceAddResult{ValueBefore: valueBefore, ValueAfter: valueAfter}, nil
 }
 
-type BalanceMulIn struct {
-	User    string  `json:"user"`
-	Balance string  `json:"balance"`
-	Branch  string  `json:"branch"`
-	Value   float64 `json:"value"`
-}
-
-type BalanceMulOut struct {
+type BalanceMulResult struct {
 	ValueBefore float64 `json:"value_before"`
 	ValueAfter  float64 `json:"value_after"`
 }
 
-func (x GovUserService) BalanceMul(ctx context.Context, in *BalanceMulIn) (*BalanceMulOut, error) {
-	community, err := git.CloneBranch(ctx, x.GovConfig.CommunityURL, in.Branch)
+func (x UserService) BalanceMul(
+	ctx context.Context,
+	user string,
+	balance string,
+	value float64,
+) (*BalanceMulResult, error) {
+	local, err := git.CloneOrigin(ctx, git.Origin(x))
 	if err != nil {
 		return nil, err
 	}
-	valueBefore, err := x.GetFloat64Local(ctx, community, in.User, govproto.BalanceKey(in.Balance))
+	valueBefore, err := x.GetFloat64Local(ctx, local, user, govproto.BalanceKey(balance))
 	if err != nil {
 		return nil, err
 	}
-	valueAfter := valueBefore * in.Value
-	if err := x.SetFloat64Local(ctx, community, in.User, govproto.BalanceKey(in.Balance), valueAfter); err != nil {
+	valueAfter := valueBefore * value
+	if err := x.SetFloat64Local(ctx, local, user, govproto.BalanceKey(balance), valueAfter); err != nil {
 		return nil, err
 	}
-	if err := community.PushUpstream(ctx); err != nil {
+	if err := local.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
-	return &BalanceMulOut{ValueBefore: valueBefore, ValueAfter: valueAfter}, nil
+	return &BalanceMulResult{ValueBefore: valueBefore, ValueAfter: valueAfter}, nil
 }

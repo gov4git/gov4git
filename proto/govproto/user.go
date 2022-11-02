@@ -1,9 +1,13 @@
 package govproto
 
-import "path/filepath"
+import (
+	"path/filepath"
+
+	"github.com/gov4git/gov4git/proto"
+)
 
 type GovUserInfo struct {
-	PublicURL string `json:"public_url"`
+	Address proto.Address `json:"address"`
 }
 
 var (

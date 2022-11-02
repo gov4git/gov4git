@@ -9,42 +9,31 @@ import (
 	"github.com/gov4git/gov4git/proto/govproto"
 )
 
-type GetIn struct {
-	Name   string `json:"name"`   // community unique handle for this user
-	Key    string `json:"key"`    // user property key
-	Branch string `json:"branch"` // branch in community repo where user will be added
-}
-
-type GetOut struct {
-	Value string `json:"value"` // user property value
-}
-
-func (x GovUserService) Get(ctx context.Context, in *GetIn) (*GetOut, error) {
-	community, err := git.CloneBranch(ctx, x.GovConfig.CommunityURL, in.Branch)
+func (x UserService) Get(ctx context.Context, name string, key string) ([]byte, error) {
+	local, err := git.CloneOrigin(ctx, git.Origin(x))
 	if err != nil {
 		return nil, err
 	}
-	value, err := x.GetLocal(ctx, community, in.Name, in.Key)
+	value, err := x.GetLocal(ctx, local, name, key)
 	if err != nil {
 		return nil, err
 	}
-	return &GetOut{Value: value}, nil
+	return value, nil
 }
 
-func (x GovUserService) GetLocal(ctx context.Context, community git.Local, name string, key string) (string, error) {
+func (x UserService) GetLocal(ctx context.Context, local git.Local, name string, key string) ([]byte, error) {
 	propFile := filepath.Join(govproto.GovUsersDir, name, govproto.GovUserMetaDirbase, key)
-	// read user property file
-	data, err := community.Dir().ReadByteFile(propFile)
+	data, err := local.Dir().ReadByteFile(propFile)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(data.Bytes), nil
+	return data.Bytes, nil
 }
 
-func (x GovUserService) GetFloat64Local(ctx context.Context, community git.Local, name string, key string) (float64, error) {
-	v, err := x.GetLocal(ctx, community, name, key)
+func (x UserService) GetFloat64Local(ctx context.Context, local git.Local, name string, key string) (float64, error) {
+	v, err := x.GetLocal(ctx, local, name, key)
 	if err != nil {
 		return 0, err
 	}
-	return strconv.ParseFloat(v, 64)
+	return strconv.ParseFloat(string(v), 64)
 }

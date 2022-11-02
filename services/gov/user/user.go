@@ -1,7 +1,7 @@
 package user
 
-import "github.com/gov4git/gov4git/proto/govproto"
+import (
+	"github.com/gov4git/gov4git/proto"
+)
 
-type GovUserService struct {
-	GovConfig govproto.GovConfig
-}
+type UserService proto.Address

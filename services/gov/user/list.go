@@ -8,33 +8,22 @@ import (
 	"github.com/gov4git/gov4git/proto/govproto"
 )
 
-type ListIn struct {
-	CommunityBranch string `json:"community_branch"` // branch in community repo where user will be added
-}
-
-type ListOut struct {
-	Users []string
-}
-
-func (x GovUserService) List(ctx context.Context, in *ListIn) (*ListOut, error) {
-	// clone community repo locally
-	community, err := git.MakeLocalInCtx(ctx, "community")
+func (x UserService) List(ctx context.Context) ([]string, error) {
+	local, err := git.MakeLocal(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
+	if err := local.CloneOrigin(ctx, git.Origin(x)); err != nil {
 		return nil, err
 	}
-	// make changes to repo
-	users, err := List(ctx, community)
+	users, err := List(ctx, local)
 	if err != nil {
 		return nil, err
 	}
-	// push to origin
-	if err := community.PushUpstream(ctx); err != nil {
+	if err := local.PushUpstream(ctx); err != nil {
 		return nil, err
 	}
-	return &ListOut{Users: users}, nil
+	return users, nil
 }
 
 func List(ctx context.Context, community git.Local) ([]string, error) {

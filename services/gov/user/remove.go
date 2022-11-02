@@ -8,45 +8,32 @@ import (
 	"github.com/gov4git/gov4git/proto/govproto"
 )
 
-type RemoveIn struct {
-	Name            string `json:"name"`             // community unique handle for this user
-	CommunityBranch string `json:"community_branch"` // branch in community repo where user will be added
-}
-
-type RemoveOut struct{}
-
-func (x GovUserService) Remove(ctx context.Context, in *RemoveIn) (*RemoveOut, error) {
-	// clone community repo locally
-	community, err := git.MakeLocalInCtx(ctx, "community")
+func (x UserService) Remove(ctx context.Context, name string) error {
+	local, err := git.MakeLocal(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if err := community.CloneBranch(ctx, x.GovConfig.CommunityURL, in.CommunityBranch); err != nil {
-		return nil, err
+	if err := local.CloneOrigin(ctx, git.Origin(x)); err != nil {
+		return err
 	}
-	// make changes to repo
-	if err := Remove(ctx, community, in.Name); err != nil {
-		return nil, err
+	if err := Remove(ctx, local, name); err != nil {
+		return err
 	}
-	// push to origin
-	if err := community.PushUpstream(ctx); err != nil {
-		return nil, err
+	if err := local.PushUpstream(ctx); err != nil {
+		return err
 	}
-	return &RemoveOut{}, nil
+	return nil
 }
 
-func Remove(ctx context.Context, community git.Local, name string) error {
+func Remove(ctx context.Context, local git.Local, name string) error {
 	userFile := filepath.Join(govproto.GovUsersDir, name, govproto.GovUserInfoFilebase)
-	// remove user file
-	if err := community.Dir().Remove(userFile); err != nil {
+	if err := local.Dir().Remove(userFile); err != nil {
 		return err
 	}
-	// stage changes
-	if err := community.Remove(ctx, []string{userFile}); err != nil {
+	if err := local.Remove(ctx, []string{userFile}); err != nil {
 		return err
 	}
-	// commit changes
-	if err := community.Commitf(ctx, "Remove user %v", name); err != nil {
+	if err := local.Commitf(ctx, "Remove user %v", name); err != nil {
 		return err
 	}
 	return nil

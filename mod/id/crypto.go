@@ -12,12 +12,12 @@ type Ed25519PublicKey = form.Bytes
 
 type Ed25519PrivateKey = form.Bytes
 
-func GenerateCredentials(public git.Address, private git.Address) (*PrivateCredentials, error) {
+func GenerateCredentials(public git.Address, private git.Address) (PrivateCredentials, error) {
 	pubKey, privKey, err := ed25519.GenerateKey(nil)
 	if err != nil {
-		return nil, err
+		return PrivateCredentials{}, err
 	}
-	return &PrivateCredentials{
+	return PrivateCredentials{
 		PrivateAddress:    private,
 		PrivateKeyEd25519: Ed25519PrivateKey(privKey),
 		PublicCredentials: PublicCredentials{

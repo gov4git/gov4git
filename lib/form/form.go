@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/go-git/go-billy/v5"
+	"github.com/gov4git/gov4git/lib/must"
 )
 
 type Form interface{}
@@ -53,4 +54,18 @@ func DecodeFromFile[F Form](ctx context.Context, fs billy.Filesystem, path strin
 	}
 	defer file.Close()
 	return Decode[F](ctx, file)
+}
+
+func MustEncodeToFile[F Form](ctx context.Context, fs billy.Filesystem, path string, form F) {
+	if err := EncodeToFile(ctx, fs, path, form); err != nil {
+		must.Panic(ctx, err)
+	}
+}
+
+func MustDecodeFromFile[F Form](ctx context.Context, fs billy.Filesystem, path string) F {
+	f, err := DecodeFromFile[F](ctx, fs, path)
+	if err != nil {
+		must.Panic(ctx, err)
+	}
+	return f
 }

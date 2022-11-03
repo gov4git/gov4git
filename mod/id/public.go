@@ -13,6 +13,6 @@ type PublicMod struct {
 	Public git.Address
 }
 
-func (m PublicMod) GetPublicCredentials(ctx context.Context, wt *git.Worktree) (cred PublicCredentials, err error) {
-	return form.DecodeFromFile[PublicCredentials](ctx, wt.Filesystem, m.Subpath(PublicCredentialsFilebase))
+func (m PublicMod) GetPublicCredentials(ctx context.Context, wt *git.Worktree) PublicCredentials {
+	return form.MustDecodeFromFile[PublicCredentials](ctx, wt.Filesystem, m.Subpath(PublicCredentialsFilebase))
 }

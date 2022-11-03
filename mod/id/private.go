@@ -14,6 +14,6 @@ type PrivateMod struct {
 	Private git.Address
 }
 
-func (m PrivateMod) GetPrivateCredentials(ctx context.Context, wt *git.Worktree) (cred PrivateCredentials, err error) {
-	return form.DecodeFromFile[PrivateCredentials](ctx, wt.Filesystem, m.Subpath(PrivateCredentialsFilebase))
+func (m PrivateMod) GetPrivateCredentials(ctx context.Context, wt *git.Worktree) PrivateCredentials {
+	return form.MustDecodeFromFile[PrivateCredentials](ctx, wt.Filesystem, m.Subpath(PrivateCredentialsFilebase))
 }

@@ -71,7 +71,7 @@ func (x *ClonePool) Clone(ctx context.Context, repo string, branch string) (Clon
 		return cand, nil
 	}
 
-	local, err := CloneBranch(ctx, repo, branch)
+	local, err := CloneOrigin(ctx, Origin{Repo: URL(repo), Branch: Branch(branch)})
 	if err != nil {
 		return nil, err
 	}

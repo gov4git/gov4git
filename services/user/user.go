@@ -12,3 +12,5 @@ func Service(addr proto.Address) entity.EntityService[userproto.User] {
 		Namespace: userproto.EntityNamespace,
 	}
 }
+
+// XXX: must remove all memberships involving this user

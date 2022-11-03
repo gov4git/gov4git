@@ -1,4 +1,4 @@
-package idproto
+package id
 
 import (
 	"context"
@@ -12,17 +12,17 @@ type Ed25519PublicKey = form.Bytes
 
 type Ed25519PrivateKey = form.Bytes
 
-func GenerateCredentials(public git.Origin, private git.Origin) (*PrivateCredentials, error) {
+func GenerateCredentials(public git.Address, private git.Address) (*PrivateCredentials, error) {
 	pubKey, privKey, err := ed25519.GenerateKey(nil)
 	if err != nil {
 		return nil, err
 	}
 	return &PrivateCredentials{
-		PrivateOrigin:     private,
+		PrivateAddress:    private,
 		PrivateKeyEd25519: Ed25519PrivateKey(privKey),
 		PublicCredentials: PublicCredentials{
 			ID:               GenerateUniqueID(),
-			PublicOrigin:     public,
+			PublicAddress:    public,
 			PublicKeyEd25519: Ed25519PublicKey(pubKey),
 		},
 	}, nil
@@ -32,14 +32,6 @@ type SignedPlaintext struct {
 	Plaintext        form.Bytes       `json:"plaintext"`
 	Signature        form.Bytes       `json:"signature"`
 	PublicKeyEd25519 Ed25519PublicKey `json:"ed25519_public_key"`
-}
-
-func ParseSignedPlaintext(ctx context.Context, data []byte) (*SignedPlaintext, error) {
-	var signed SignedPlaintext
-	if err := form.DecodeForm(ctx, data, &signed); err != nil {
-		return nil, err
-	}
-	return &signed, nil
 }
 
 func SignPlaintext(ctx context.Context, priv *PrivateCredentials, plaintext []byte) (*SignedPlaintext, error) {

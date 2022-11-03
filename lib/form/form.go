@@ -3,7 +3,10 @@ package form
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"os"
+
+	"github.com/go-git/go-billy/v5"
 )
 
 type Form interface{}
@@ -16,26 +19,38 @@ func Pretty(form Form) string {
 	return string(data)
 }
 
-func EncodeForm(ctx context.Context, form Form) ([]byte, error) {
+func Encode[F Form](ctx context.Context, w io.Writer, f F) error {
+	return json.NewEncoder(w).Encode(f)
+}
+
+func Decode[F Form](ctx context.Context, r io.Reader) (form F, err error) {
+	err = json.NewDecoder(r).Decode(form)
+	return form, err
+}
+
+func EncodeBytes[F Form](ctx context.Context, form F) ([]byte, error) {
 	return json.MarshalIndent(form, "", "   ")
 }
 
-func DecodeForm(ctx context.Context, data []byte, form Form) error {
-	return json.Unmarshal(data, form)
+func DecodeBytes[F Form](ctx context.Context, data []byte) (form F, err error) {
+	err = json.Unmarshal(data, &form)
+	return form, err
 }
 
-func EncodeFormToFile(ctx context.Context, form Form, filepath string) error {
-	data, err := EncodeForm(ctx, form)
+func EncodeToFile[F Form](ctx context.Context, fs billy.Filesystem, path string, form F) error {
+	file, err := fs.OpenFile(path, os.O_CREATE, 0644)
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(filepath, data, 0644)
+	defer file.Close()
+	return Encode(ctx, file, form)
 }
 
-func DecodeFormFromFile(ctx context.Context, filepath string, form Form) error {
-	data, err := os.ReadFile(filepath)
+func DecodeFromFile[F Form](ctx context.Context, fs billy.Filesystem, path string) (form F, err error) {
+	file, err := fs.Open(path)
 	if err != nil {
-		return err
+		return form, err
 	}
-	return DecodeForm(ctx, data, form)
+	defer file.Close()
+	return Decode[F](ctx, file)
 }

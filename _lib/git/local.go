@@ -248,16 +248,6 @@ func (x Local) CloneOrInitOrigin(ctx context.Context, origin Origin) error {
 	return nil
 }
 
-func (x Local) AddCommitPush(ctx context.Context, addPaths []string, commitMsg string) error {
-	if err := x.Add(ctx, addPaths); err != nil {
-		return err
-	}
-	if err := x.Commit(ctx, commitMsg); err != nil {
-		return err
-	}
-	return x.PushUpstream(ctx)
-}
-
 func (x Local) InitWithRemoteOrigin(ctx context.Context, origin Origin) error {
 	if err := x.Init(ctx); err != nil {
 		return err
@@ -269,6 +259,16 @@ func (x Local) InitWithRemoteOrigin(ctx context.Context, origin Origin) error {
 		return err
 	}
 	return nil
+}
+
+func (x Local) AddCommitPush(ctx context.Context, addPaths []string, commitMsg string) error {
+	if err := x.Add(ctx, addPaths); err != nil {
+		return err
+	}
+	if err := x.Commit(ctx, commitMsg); err != nil {
+		return err
+	}
+	return x.PushUpstream(ctx)
 }
 
 func Init() {

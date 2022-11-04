@@ -39,7 +39,7 @@ func DecodeBytes[F Form](ctx context.Context, data []byte) (form F, err error) {
 }
 
 func EncodeToFile[F Form](ctx context.Context, fs billy.Filesystem, path string, form F) error {
-	file, err := fs.OpenFile(path, os.O_CREATE, 0644)
+	file, err := fs.OpenFile(path, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return err
 	}

@@ -4,15 +4,34 @@ import "context"
 
 type Error struct {
 	Ctx context.Context
-	Err error
+	error
 }
 
-func Err(ctx context.Context, err error) Error {
-	return Error{Ctx: ctx, Err: err}
+func mkErr(ctx context.Context, err error) Error {
+	return Error{Ctx: ctx, error: err}
 }
 
 func Panic(ctx context.Context, err error) {
-	panic(Err(ctx, err))
+	panic(mkErr(ctx, err))
 }
 
 // func Must[R any](ctx context.Context, )
+
+func Try0(f func()) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = r.(error)
+		}
+	}()
+	f()
+	return nil
+}
+
+func Try1[R1 any](f func() R1) (_ R1, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = r.(error)
+		}
+	}()
+	return f(), nil
+}

@@ -11,8 +11,8 @@ import (
 )
 
 func (m PrivateMod) Init(ctx context.Context) runtime.Change[PrivateCredentials] {
-	public := git.MustCloneBranch(ctx, m.Public)
-	private := git.MustCloneBranch(ctx, m.Private)
+	public := git.MustCloneOrInitBranch(ctx, m.Public)
+	private := git.MustCloneOrInitBranch(ctx, m.Private)
 	privateWt := git.MustWorktree(ctx, private)
 	publicWt := git.MustWorktree(ctx, public)
 	privChg := m.InitPrivate(ctx, privateWt)

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/lib/git"
+	"github.com/gov4git/gov4git/lib/must"
 	"github.com/gov4git/gov4git/mod"
 )
 
@@ -15,8 +16,8 @@ func TestInit(t *testing.T) {
 	publicDir := filepath.Join(t.TempDir(), "public")
 	privateDir := filepath.Join(t.TempDir(), "private")
 	fmt.Printf("public_dir=%v private_dir=%v\n", publicDir, privateDir)
-	git.InitPlain(ctx, publicDir, false)
-	git.InitPlain(ctx, privateDir, false)
+	git.InitPlain(ctx, publicDir, true)
+	git.InitPlain(ctx, privateDir, true)
 
 	publicAddr := git.NewAddress(git.URL(publicDir), git.MainBranch)
 	privateAddr := git.NewAddress(git.URL(privateDir), git.MainBranch)
@@ -27,10 +28,10 @@ func TestInit(t *testing.T) {
 	}
 
 	m.Init(ctx)
-	<-(chan int)(nil)
-	// if err := must.Try0(func() { m.Init(ctx) }); err != nil {
-	// 	t.Fatal(err)
-	// }
+
+	if err := must.Try0(func() { m.Init(ctx) }); err == nil {
+		t.Fatal("second init must fail")
+	}
 
 	// m.Init(ctx) // must fail
 }

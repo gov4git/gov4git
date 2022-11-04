@@ -21,7 +21,6 @@ func (m PrivateMod) Init(ctx context.Context) runtime.Change[PrivateCredentials]
 	git.Commit(ctx, publicWt, pubChg.Msg)
 	git.Push(ctx, private)
 	git.Push(ctx, public)
-
 	return privChg
 }
 

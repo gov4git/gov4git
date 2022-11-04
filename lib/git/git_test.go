@@ -11,6 +11,6 @@ func TestRenameMain(t *testing.T) {
 	dir := t.TempDir()
 	fmt.Println(dir)
 	repo := InitPlain(ctx, dir, false)
-	RenameMain(ctx, repo, MainBranch)
+	ChangeDefaultBranch(ctx, repo, MainBranch)
 	<-(chan int)(nil)
 }

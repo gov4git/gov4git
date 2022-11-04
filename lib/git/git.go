@@ -36,6 +36,9 @@ type Worktree = git.Worktree
 
 func CloneOrInitBranch(ctx context.Context, addr Address) *Repository {
 	repo, err := must.Try1(func() *Repository { return CloneBranch(ctx, addr) })
+	if err == nil {
+		return repo
+	}
 	if err != transport.ErrEmptyRemoteRepository {
 		must.Panic(ctx, err)
 	}
@@ -48,12 +51,12 @@ func CloneOrInitBranch(ctx context.Context, addr Address) *Repository {
 	err = repo.CreateBranch(&config.Branch{Name: string(addr.Branch), Remote: Origin})
 	must.NoError(ctx, err)
 
-	RenameMain(ctx, repo, addr.Branch)
+	ChangeDefaultBranch(ctx, repo, addr.Branch)
 
 	return repo
 }
 
-func RenameMain(ctx context.Context, repo *Repository, main Branch) {
+func ChangeDefaultBranch(ctx context.Context, repo *Repository, main Branch) {
 	// https://github.com/hairyhenderson/gomplate/pull/1217/files#diff-06d907e05a1688ce7548c3d8b4877a01a61b3db506755db4419761dbe9fe0a5bR232
 	branch := plumbing.NewBranchReferenceName(string(main))
 	h := plumbing.NewSymbolicReference(plumbing.HEAD, branch)
@@ -73,7 +76,7 @@ func InitPlain(ctx context.Context, path string, isBare bool) *Repository {
 	if err != nil {
 		must.Panic(ctx, err)
 	}
-	RenameMain(ctx, repo, MainBranch)
+	ChangeDefaultBranch(ctx, repo, MainBranch)
 	return repo
 }
 
@@ -88,6 +91,9 @@ func CloneBranch(ctx context.Context, addr Address) *Repository {
 		},
 	)
 	must.NoError(ctx, err)
+
+	Checkout(ctx, Tree(ctx, repo), addr.Branch) //XXX
+
 	return repo
 }
 
@@ -109,6 +115,15 @@ func Commit(ctx context.Context, wt *Worktree, msg string) {
 	if _, err := wt.Commit(msg, &git.CommitOptions{}); err != nil {
 		must.Panic(ctx, err)
 	}
+}
+
+func Checkout(ctx context.Context, wt *Worktree, branch Branch) {
+	err := wt.Checkout(
+		&git.CheckoutOptions{
+			Branch: plumbing.NewBranchReferenceName(string(branch)),
+		},
+	)
+	must.NoError(ctx, err)
 }
 
 func Push(ctx context.Context, r *Repository) {
@@ -144,9 +159,12 @@ func Branches(ctx context.Context, r *Repository) []*plumbing.Reference {
 }
 
 func Dump(ctx context.Context, r *Repository) {
-	fmt.Println("Log:")
 	iter, err := r.Log(&git.LogOptions{})
-	must.NoError(ctx, err)
+	if err != nil {
+		fmt.Println("HEAD not found")
+		return
+	}
+	fmt.Println("Log:")
 	for {
 		c, err := iter.Next()
 		if err != nil {

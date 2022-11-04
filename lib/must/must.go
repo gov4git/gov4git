@@ -15,7 +15,11 @@ func Panic(ctx context.Context, err error) {
 	panic(mkErr(ctx, err))
 }
 
-// func Must[R any](ctx context.Context, )
+func NoError(ctx context.Context, err error) {
+	if err != nil {
+		Panic(ctx, err)
+	}
+}
 
 func Try0(f func()) (err error) {
 	defer func() {

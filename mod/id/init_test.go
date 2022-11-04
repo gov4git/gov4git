@@ -15,8 +15,8 @@ func TestInit(t *testing.T) {
 	publicDir := filepath.Join(t.TempDir(), "public")
 	privateDir := filepath.Join(t.TempDir(), "private")
 	fmt.Printf("public_dir=%v private_dir=%v\n", publicDir, privateDir)
-	git.MustInitBare(ctx, publicDir)
-	git.MustInitBare(ctx, privateDir)
+	git.MustInitPlain(ctx, publicDir, false)
+	git.MustInitPlain(ctx, privateDir, false)
 
 	publicAddr := git.NewAddress(git.URL(publicDir), git.MainBranch)
 	privateAddr := git.NewAddress(git.URL(privateDir), git.MainBranch)
@@ -27,6 +27,7 @@ func TestInit(t *testing.T) {
 	}
 
 	m.Init(ctx)
+	<-(chan int)(nil)
 	// if err := must.Try0(func() { m.Init(ctx) }); err != nil {
 	// 	t.Fatal(err)
 	// }

@@ -33,58 +33,41 @@ type Repository = git.Repository
 
 type Worktree = git.Worktree
 
-func CloneOrInitBranch(ctx context.Context, addr Address) (*Repository, error) {
+func CloneOrInitBranch(ctx context.Context, addr Address) *Repository {
 	repo, err := CloneBranch(ctx, addr)
 	if err == nil {
-		return repo, nil
+		return repo
 	}
 	if err != transport.ErrEmptyRemoteRepository {
-		return nil, err
+		must.Panic(ctx, err)
 	}
-	if repo, err = git.Init(memory.NewStorage(), memfs.New()); err != nil {
-		println("A")
-		return nil, err
-	}
-	if _, err = repo.CreateRemote(&config.RemoteConfig{Name: Origin, URLs: []string{string(addr.Repo)}}); err != nil {
-		println("B")
-		return nil, err
-	}
-	if err = repo.CreateBranch(&config.Branch{Name: string(addr.Branch), Remote: Origin}); err != nil {
-		println("C")
-		return nil, err
-	}
-	wt, err := repo.Worktree()
-	if err != nil {
-		println("D")
-		return nil, err
-	}
-	//XXX
-	file, err := wt.Filesystem.Create("ok")
-	if err != nil {
-		panic(err)
-	}
-	file.Close()
-	wt.Add("ok")
-	h, err := wt.Commit("ok", &git.CommitOptions{})
-	if err != nil {
-		println("X")
-		return nil, err
-	}
-	println(h.String())
+	repo, err = git.Init(memory.NewStorage(), memfs.New())
+	must.NoError(ctx, err)
 
-	if err = wt.Checkout(&git.CheckoutOptions{Branch: plumbing.ReferenceName(addr.Branch), Create: true}); err != nil {
-		println("E", addr.Branch, "E")
-		return nil, err
-	}
+	_, err = repo.CreateRemote(&config.RemoteConfig{Name: Origin, URLs: []string{string(addr.Repo)}})
+	must.NoError(ctx, err)
 
-	g, err := repo.Head()
-	if err != nil {
-		println("Y")
-		return nil, err
-	}
-	println(g.String())
+	err = repo.CreateBranch(&config.Branch{Name: string(addr.Branch), Remote: Origin})
+	must.NoError(ctx, err)
 
-	return repo, nil
+	RenameMain(ctx, repo, addr.Branch)
+
+	return repo
+}
+
+func RenameMain(ctx context.Context, repo *Repository, main Branch) {
+	// https://github.com/hairyhenderson/gomplate/pull/1217/files#diff-06d907e05a1688ce7548c3d8b4877a01a61b3db506755db4419761dbe9fe0a5bR232
+	branch := plumbing.NewBranchReferenceName(string(main))
+	h := plumbing.NewSymbolicReference(plumbing.HEAD, branch)
+	err := repo.Storer.SetReference(h)
+	must.NoError(ctx, err)
+
+	c, err := repo.Config()
+	must.NoError(ctx, err)
+	c.Init.DefaultBranch = string(main)
+
+	err = repo.Storer.SetConfig(c)
+	must.NoError(ctx, err)
 }
 
 func CloneBranch(ctx context.Context, addr Address) (*Repository, error) {
@@ -93,7 +76,8 @@ func CloneBranch(ctx context.Context, addr Address) (*Repository, error) {
 		memfs.New(),
 		&git.CloneOptions{
 			URL:           string(addr.Repo),
-			ReferenceName: plumbing.ReferenceName(addr.Branch),
+			ReferenceName: plumbing.NewBranchReferenceName(string(addr.Branch)),
+			SingleBranch:  true,
 		},
 	)
 	if err != nil {
@@ -102,16 +86,8 @@ func CloneBranch(ctx context.Context, addr Address) (*Repository, error) {
 	return repo, nil
 }
 
-func MustInitBare(ctx context.Context, path string) *Repository {
-	repo, err := git.PlainInit(path, true)
-	if err != nil {
-		must.Panic(ctx, err)
-	}
-	return repo
-}
-
-func MustCloneOrInitBranch(ctx context.Context, addr Address) *Repository {
-	repo, err := CloneOrInitBranch(ctx, addr)
+func MustInitPlain(ctx context.Context, path string, isBare bool) *Repository {
+	repo, err := git.PlainInit(path, isBare)
 	if err != nil {
 		must.Panic(ctx, err)
 	}
@@ -150,4 +126,16 @@ func MustPush(ctx context.Context, r *Repository) {
 	if err := r.PushContext(ctx, &git.PushOptions{}); err != nil {
 		must.Panic(ctx, err)
 	}
+}
+
+func MustHead(ctx context.Context, r *Repository) *plumbing.Reference {
+	h, err := r.Head()
+	must.NoError(ctx, err)
+	return h
+}
+
+func MustRemotes(ctx context.Context, r *Repository) []*git.Remote {
+	h, err := r.Remotes()
+	must.NoError(ctx, err)
+	return h
 }

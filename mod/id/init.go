@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	gg "github.com/go-git/go-git/v5"
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
@@ -11,8 +12,8 @@ import (
 )
 
 func (m PrivateMod) Init(ctx context.Context) runtime.Change[PrivateCredentials] {
-	public := git.MustCloneOrInitBranch(ctx, m.Public)
-	private := git.MustCloneOrInitBranch(ctx, m.Private)
+	public := git.CloneOrInitBranch(ctx, m.Public)
+	private := git.CloneOrInitBranch(ctx, m.Private)
 	privateWt := git.MustWorktree(ctx, private)
 	publicWt := git.MustWorktree(ctx, public)
 	privChg := m.InitPrivate(ctx, privateWt)
@@ -21,6 +22,22 @@ func (m PrivateMod) Init(ctx context.Context) runtime.Change[PrivateCredentials]
 	git.MustCommit(ctx, publicWt, pubChg.Msg)
 	git.MustPush(ctx, private)
 	git.MustPush(ctx, public)
+
+	fmt.Println("LOG")
+	iter, err := public.Log(&gg.LogOptions{})
+	must.NoError(ctx, err)
+	for {
+		c, err := iter.Next()
+		if err != nil {
+			break
+		}
+		fmt.Println(c)
+	}
+	fmt.Println("HEAD", git.MustHead(ctx, public))
+	for _, r := range git.MustRemotes(ctx, public) {
+		fmt.Println("REM", r)
+	}
+
 	return privChg
 }
 

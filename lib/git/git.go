@@ -2,6 +2,7 @@ package git
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-git/v5"
@@ -34,10 +35,7 @@ type Repository = git.Repository
 type Worktree = git.Worktree
 
 func CloneOrInitBranch(ctx context.Context, addr Address) *Repository {
-	repo, err := CloneBranch(ctx, addr)
-	if err == nil {
-		return repo
-	}
+	repo, err := must.Try1(func() *Repository { return CloneBranch(ctx, addr) })
 	if err != transport.ErrEmptyRemoteRepository {
 		must.Panic(ctx, err)
 	}
@@ -70,7 +68,16 @@ func RenameMain(ctx context.Context, repo *Repository, main Branch) {
 	must.NoError(ctx, err)
 }
 
-func CloneBranch(ctx context.Context, addr Address) (*Repository, error) {
+func InitPlain(ctx context.Context, path string, isBare bool) *Repository {
+	repo, err := git.PlainInit(path, isBare)
+	if err != nil {
+		must.Panic(ctx, err)
+	}
+	RenameMain(ctx, repo, MainBranch)
+	return repo
+}
+
+func CloneBranch(ctx context.Context, addr Address) *Repository {
 	repo, err := git.CloneContext(ctx,
 		memory.NewStorage(),
 		memfs.New(),
@@ -80,29 +87,11 @@ func CloneBranch(ctx context.Context, addr Address) (*Repository, error) {
 			SingleBranch:  true,
 		},
 	)
-	if err != nil {
-		return nil, err
-	}
-	return repo, nil
-}
-
-func MustInitPlain(ctx context.Context, path string, isBare bool) *Repository {
-	repo, err := git.PlainInit(path, isBare)
-	if err != nil {
-		must.Panic(ctx, err)
-	}
+	must.NoError(ctx, err)
 	return repo
 }
 
-func MustCloneBranch(ctx context.Context, addr Address) *Repository {
-	repo, err := CloneBranch(ctx, addr)
-	if err != nil {
-		must.Panic(ctx, err)
-	}
-	return repo
-}
-
-func MustWorktree(ctx context.Context, repo *Repository) *Worktree {
+func Tree(ctx context.Context, repo *Repository) *Worktree {
 	wt, err := repo.Worktree()
 	if err != nil {
 		must.Panic(ctx, err)
@@ -110,32 +99,66 @@ func MustWorktree(ctx context.Context, repo *Repository) *Worktree {
 	return wt
 }
 
-func MustAdd(ctx context.Context, wt *Worktree, path string) {
+func Add(ctx context.Context, wt *Worktree, path string) {
 	if _, err := wt.Add(path); err != nil {
 		must.Panic(ctx, err)
 	}
 }
 
-func MustCommit(ctx context.Context, wt *Worktree, msg string) {
+func Commit(ctx context.Context, wt *Worktree, msg string) {
 	if _, err := wt.Commit(msg, &git.CommitOptions{}); err != nil {
 		must.Panic(ctx, err)
 	}
 }
 
-func MustPush(ctx context.Context, r *Repository) {
+func Push(ctx context.Context, r *Repository) {
 	if err := r.PushContext(ctx, &git.PushOptions{}); err != nil {
 		must.Panic(ctx, err)
 	}
 }
 
-func MustHead(ctx context.Context, r *Repository) *plumbing.Reference {
+func Head(ctx context.Context, r *Repository) *plumbing.Reference {
 	h, err := r.Head()
 	must.NoError(ctx, err)
 	return h
 }
 
-func MustRemotes(ctx context.Context, r *Repository) []*git.Remote {
+func Remotes(ctx context.Context, r *Repository) []*git.Remote {
 	h, err := r.Remotes()
 	must.NoError(ctx, err)
 	return h
+}
+
+func Branches(ctx context.Context, r *Repository) []*plumbing.Reference {
+	iter, err := r.Branches()
+	must.NoError(ctx, err)
+	refs := []*plumbing.Reference{}
+	for {
+		ref, err := iter.Next()
+		if err != nil {
+			break
+		}
+		refs = append(refs, ref)
+	}
+	return refs
+}
+
+func Dump(ctx context.Context, r *Repository) {
+	fmt.Println("Log:")
+	iter, err := r.Log(&git.LogOptions{})
+	must.NoError(ctx, err)
+	for {
+		c, err := iter.Next()
+		if err != nil {
+			break
+		}
+		fmt.Println(c)
+	}
+	fmt.Println("HEAD:", Head(ctx, r))
+	for _, r := range Remotes(ctx, r) {
+		fmt.Println("REMOTE:", r)
+	}
+	for _, r := range Branches(ctx, r) {
+		fmt.Println("BRANCH:", r)
+	}
 }

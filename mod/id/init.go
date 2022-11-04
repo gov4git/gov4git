@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	gg "github.com/go-git/go-git/v5"
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
@@ -14,29 +13,14 @@ import (
 func (m PrivateMod) Init(ctx context.Context) runtime.Change[PrivateCredentials] {
 	public := git.CloneOrInitBranch(ctx, m.Public)
 	private := git.CloneOrInitBranch(ctx, m.Private)
-	privateWt := git.MustWorktree(ctx, private)
-	publicWt := git.MustWorktree(ctx, public)
+	privateWt := git.Tree(ctx, private)
+	publicWt := git.Tree(ctx, public)
 	privChg := m.InitPrivate(ctx, privateWt)
 	pubChg := m.InitPublic(ctx, publicWt, privChg.Result.PublicCredentials)
-	git.MustCommit(ctx, privateWt, privChg.Msg)
-	git.MustCommit(ctx, publicWt, pubChg.Msg)
-	git.MustPush(ctx, private)
-	git.MustPush(ctx, public)
-
-	fmt.Println("LOG")
-	iter, err := public.Log(&gg.LogOptions{})
-	must.NoError(ctx, err)
-	for {
-		c, err := iter.Next()
-		if err != nil {
-			break
-		}
-		fmt.Println(c)
-	}
-	fmt.Println("HEAD", git.MustHead(ctx, public))
-	for _, r := range git.MustRemotes(ctx, public) {
-		fmt.Println("REM", r)
-	}
+	git.Commit(ctx, privateWt, privChg.Msg)
+	git.Commit(ctx, publicWt, pubChg.Msg)
+	git.Push(ctx, private)
+	git.Push(ctx, public)
 
 	return privChg
 }
@@ -51,7 +35,7 @@ func (m PrivateMod) InitPrivate(ctx context.Context, wt *git.Worktree) runtime.C
 		must.Panic(ctx, err)
 	}
 	form.MustEncodeToFile(ctx, wt.Filesystem, filepath, cred)
-	git.MustAdd(ctx, wt, filepath)
+	git.Add(ctx, wt, filepath)
 	return runtime.Change[PrivateCredentials]{
 		Result: cred,
 		Msg:    "Initialized private credentials.",
@@ -64,7 +48,7 @@ func (m PrivateMod) InitPublic(ctx context.Context, wt *git.Worktree, cred Publi
 		must.Panic(ctx, fmt.Errorf("public credentials file already exists"))
 	}
 	form.MustEncodeToFile(ctx, wt.Filesystem, filepath, cred)
-	git.MustAdd(ctx, wt, filepath)
+	git.Add(ctx, wt, filepath)
 	return runtime.Change[struct{}]{
 		Msg: "Initialized public credentials.",
 	}

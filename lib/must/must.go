@@ -24,7 +24,7 @@ func NoError(ctx context.Context, err error) {
 func Try0(f func()) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = r.(error)
+			err = r.(Error).error
 		}
 	}()
 	f()
@@ -34,7 +34,7 @@ func Try0(f func()) (err error) {
 func Try1[R1 any](f func() R1) (_ R1, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = r.(error)
+			err = r.(Error).error
 		}
 	}()
 	return f(), nil

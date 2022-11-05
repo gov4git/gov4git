@@ -9,7 +9,7 @@ import (
 )
 
 type PublicMod struct {
-	mod.Mod
+	mod.NS
 	Public git.Address
 }
 

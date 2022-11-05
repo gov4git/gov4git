@@ -22,7 +22,7 @@ func TestInit(t *testing.T) {
 	publicAddr := git.NewAddress(git.URL(publicDir), git.MainBranch)
 	privateAddr := git.NewAddress(git.URL(privateDir), git.MainBranch)
 	m := PrivateMod{
-		Mod:     mod.Mod{Namespace: ""},
+		NS:      mod.NS(""),
 		Public:  publicAddr,
 		Private: privateAddr,
 	}

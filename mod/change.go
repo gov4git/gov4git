@@ -1,4 +1,4 @@
-package runtime
+package mod
 
 type Change[R any] struct {
 	Result R

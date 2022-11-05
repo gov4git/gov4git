@@ -7,10 +7,10 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
-	"github.com/gov4git/gov4git/mod/runtime"
+	"github.com/gov4git/gov4git/mod"
 )
 
-func (m PrivateMod) Init(ctx context.Context) runtime.Change[PrivateCredentials] {
+func (m PrivateMod) Init(ctx context.Context) mod.Change[PrivateCredentials] {
 	public := git.CloneOrInitBranch(ctx, m.Public)
 	private := git.CloneOrInitBranch(ctx, m.Private)
 	privateWt := git.Worktree(ctx, private)
@@ -24,7 +24,7 @@ func (m PrivateMod) Init(ctx context.Context) runtime.Change[PrivateCredentials]
 	return privChg
 }
 
-func (m PrivateMod) InitPrivate(ctx context.Context, wt *git.Tree) runtime.Change[PrivateCredentials] {
+func (m PrivateMod) InitPrivate(ctx context.Context, wt *git.Tree) mod.Change[PrivateCredentials] {
 	filepath := m.Subpath(PrivateCredentialsFilebase)
 	if _, err := wt.Filesystem.Stat(filepath); err == nil {
 		must.Panic(ctx, fmt.Errorf("private credentials file already exists"))
@@ -35,20 +35,20 @@ func (m PrivateMod) InitPrivate(ctx context.Context, wt *git.Tree) runtime.Chang
 	}
 	form.MustEncodeToFile(ctx, wt.Filesystem, filepath, cred)
 	git.Add(ctx, wt, filepath)
-	return runtime.Change[PrivateCredentials]{
+	return mod.Change[PrivateCredentials]{
 		Result: cred,
 		Msg:    "Initialized private credentials.",
 	}
 }
 
-func (m PrivateMod) InitPublic(ctx context.Context, wt *git.Tree, cred PublicCredentials) runtime.Change[struct{}] {
+func (m PrivateMod) InitPublic(ctx context.Context, wt *git.Tree, cred PublicCredentials) mod.Change[struct{}] {
 	filepath := m.Subpath(PublicCredentialsFilebase)
 	if _, err := wt.Filesystem.Stat(filepath); err == nil {
 		must.Panic(ctx, fmt.Errorf("public credentials file already exists"))
 	}
 	form.MustEncodeToFile(ctx, wt.Filesystem, filepath, cred)
 	git.Add(ctx, wt, filepath)
-	return runtime.Change[struct{}]{
+	return mod.Change[struct{}]{
 		Msg: "Initialized public credentials.",
 	}
 }

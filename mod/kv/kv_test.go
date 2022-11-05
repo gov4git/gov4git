@@ -20,18 +20,28 @@ func TestSetGet(t *testing.T) {
 	ctx := context.Background()
 	repo := testInitRepo(t, ctx)
 
-	m := mod.Mod{Namespace: "ns"}
+	m := mod.NS("ns")
 	wt := git.Worktree(ctx, repo)
 
 	key := git.URL("a")
 	value := float64(3.14)
 	Set(ctx, m, wt, key, value)
-	git.Commit(ctx, wt, "ok")
 
 	got := Get[float64](ctx, m, wt, key)
 	if got != value {
 		t.Errorf("expecting %v, got %v", value, got)
 	}
 
-	<-(chan int)(nil)
+	keys := ListKeys(ctx, m, wt)
+	if len(keys) != 1 || keys[0] != key {
+		t.Errorf("listing keys")
+	}
+
+	Remove(ctx, m, wt, key)
+	keys = ListKeys(ctx, m, wt)
+	if len(keys) != 0 {
+		t.Errorf("list after remove")
+	}
+
+	// <-(chan int)(nil)
 }

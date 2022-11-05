@@ -25,7 +25,7 @@ func Encode[F Form](ctx context.Context, w io.Writer, f F) error {
 }
 
 func Decode[F Form](ctx context.Context, r io.Reader) (form F, err error) {
-	err = json.NewDecoder(r).Decode(form)
+	err = json.NewDecoder(r).Decode(&form)
 	return form, err
 }
 

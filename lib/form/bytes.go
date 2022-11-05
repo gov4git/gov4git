@@ -2,8 +2,10 @@ package form
 
 import (
 	"crypto/sha256"
+	"encoding/base32"
 	"encoding/base64"
 	"encoding/json"
+	"strings"
 )
 
 type Bytes []byte
@@ -38,5 +40,5 @@ func StringHashForFilename(s string) string {
 	if _, err := h.Write([]byte(s)); err != nil {
 		panic(err)
 	}
-	return base64.URLEncoding.EncodeToString(h.Sum(nil))
+	return strings.ToLower(base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(h.Sum(nil)))
 }

@@ -13,8 +13,8 @@ import (
 func (m PrivateMod) Init(ctx context.Context) runtime.Change[PrivateCredentials] {
 	public := git.CloneOrInitBranch(ctx, m.Public)
 	private := git.CloneOrInitBranch(ctx, m.Private)
-	privateWt := git.Tree(ctx, private)
-	publicWt := git.Tree(ctx, public)
+	privateWt := git.Worktree(ctx, private)
+	publicWt := git.Worktree(ctx, public)
 	privChg := m.InitPrivate(ctx, privateWt)
 	pubChg := m.InitPublic(ctx, publicWt, privChg.Result.PublicCredentials)
 	git.Commit(ctx, privateWt, privChg.Msg)
@@ -24,7 +24,7 @@ func (m PrivateMod) Init(ctx context.Context) runtime.Change[PrivateCredentials]
 	return privChg
 }
 
-func (m PrivateMod) InitPrivate(ctx context.Context, wt *git.Worktree) runtime.Change[PrivateCredentials] {
+func (m PrivateMod) InitPrivate(ctx context.Context, wt *git.Tree) runtime.Change[PrivateCredentials] {
 	filepath := m.Subpath(PrivateCredentialsFilebase)
 	if _, err := wt.Filesystem.Stat(filepath); err == nil {
 		must.Panic(ctx, fmt.Errorf("private credentials file already exists"))
@@ -41,7 +41,7 @@ func (m PrivateMod) InitPrivate(ctx context.Context, wt *git.Worktree) runtime.C
 	}
 }
 
-func (m PrivateMod) InitPublic(ctx context.Context, wt *git.Worktree, cred PublicCredentials) runtime.Change[struct{}] {
+func (m PrivateMod) InitPublic(ctx context.Context, wt *git.Tree, cred PublicCredentials) runtime.Change[struct{}] {
 	filepath := m.Subpath(PublicCredentialsFilebase)
 	if _, err := wt.Filesystem.Stat(filepath); err == nil {
 		must.Panic(ctx, fmt.Errorf("public credentials file already exists"))

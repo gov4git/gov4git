@@ -14,3 +14,5 @@ func TestRenameMain(t *testing.T) {
 	ChangeDefaultBranch(ctx, repo, MainBranch)
 	<-(chan int)(nil)
 }
+
+// TODO: test fetching from a private git

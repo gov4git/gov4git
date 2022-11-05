@@ -32,6 +32,4 @@ func TestInit(t *testing.T) {
 	if err := must.Try0(func() { m.Init(ctx) }); err == nil {
 		t.Fatal("second init must fail")
 	}
-
-	// m.Init(ctx) // must fail
 }

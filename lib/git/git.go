@@ -32,7 +32,7 @@ func NewAddress(repo URL, branch Branch) Address {
 
 type Repository = git.Repository
 
-type Worktree = git.Worktree
+type Tree = git.Worktree
 
 func CloneOrInitBranch(ctx context.Context, addr Address) *Repository {
 	repo, err := must.Try1(func() *Repository { return CloneBranch(ctx, addr) })
@@ -92,12 +92,10 @@ func CloneBranch(ctx context.Context, addr Address) *Repository {
 	)
 	must.NoError(ctx, err)
 
-	Checkout(ctx, Tree(ctx, repo), addr.Branch) //XXX
-
 	return repo
 }
 
-func Tree(ctx context.Context, repo *Repository) *Worktree {
+func Worktree(ctx context.Context, repo *Repository) *Tree {
 	wt, err := repo.Worktree()
 	if err != nil {
 		must.Panic(ctx, err)
@@ -105,19 +103,19 @@ func Tree(ctx context.Context, repo *Repository) *Worktree {
 	return wt
 }
 
-func Add(ctx context.Context, wt *Worktree, path string) {
+func Add(ctx context.Context, wt *Tree, path string) {
 	if _, err := wt.Add(path); err != nil {
 		must.Panic(ctx, err)
 	}
 }
 
-func Commit(ctx context.Context, wt *Worktree, msg string) {
+func Commit(ctx context.Context, wt *Tree, msg string) {
 	if _, err := wt.Commit(msg, &git.CommitOptions{}); err != nil {
 		must.Panic(ctx, err)
 	}
 }
 
-func Checkout(ctx context.Context, wt *Worktree, branch Branch) {
+func Checkout(ctx context.Context, wt *Tree, branch Branch) {
 	err := wt.Checkout(
 		&git.CheckoutOptions{
 			Branch: plumbing.NewBranchReferenceName(string(branch)),

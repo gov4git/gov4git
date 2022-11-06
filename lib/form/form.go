@@ -12,6 +12,8 @@ import (
 
 type Form interface{}
 
+type None struct{}
+
 func Pretty(form Form) string {
 	data, err := json.MarshalIndent(form, "", "   ")
 	if err != nil {

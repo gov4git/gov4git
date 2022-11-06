@@ -1,4 +1,5 @@
-# Gov4git: A decentralized social governance app for git
+# Gov4git: Decentralized governance for git communities
+
 
 ## Installation
 
@@ -11,21 +12,6 @@ Run `go install github.com/gov4git/gov4git`.
 ## Quick start
 
 ## Motivation
-
-## Roadmap
-
-- A framework for building decentralized social applications, based on the git protocol
-  - Identity management
-  - Signed and encrypted messaging across repos
-- Applications
-  - Governance for community source projects
-    - Membership management
-    - Verifiable record of referendum proceedings
-    - Verifiable polling
-    - Directory-level configurability of governance policies
-    - Supported arbitration policies
-      - Vote (members vote, using a custom weighting function and threshold)
-      - Quorum (at least N approvals out of M members)
 
 ## Vision
 

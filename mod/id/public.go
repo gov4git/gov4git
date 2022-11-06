@@ -14,5 +14,5 @@ type PublicMod struct {
 }
 
 func (m PublicMod) GetPublicCredentials(ctx context.Context, wt *git.Tree) PublicCredentials {
-	return form.MustDecodeFromFile[PublicCredentials](ctx, wt.Filesystem, m.Subpath(PublicCredentialsFilebase))
+	return form.FromFile[PublicCredentials](ctx, wt.Filesystem, m.Sub(PublicCredentialsFilebase).Path())
 }

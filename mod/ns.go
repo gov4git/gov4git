@@ -1,6 +1,10 @@
 package mod
 
-import "path/filepath"
+import (
+	"path/filepath"
+)
+
+const Root = ".gov"
 
 type NS string
 
@@ -8,8 +12,6 @@ func (ns NS) Path() string {
 	return filepath.Join(Root, filepath.Clean(string(ns)))
 }
 
-func (ns NS) Subpath(p ...string) string {
-	return filepath.Join(append([]string{ns.Path()}, p...)...)
+func (ns NS) Sub(path string) NS {
+	return NS(filepath.Join(string(ns), path))
 }
-
-const Root = ".gov"

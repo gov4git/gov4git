@@ -25,16 +25,16 @@ func (m PrivateMod) Init(ctx context.Context) mod.Change[PrivateCredentials] {
 }
 
 func (m PrivateMod) InitPrivate(ctx context.Context, wt *git.Tree) mod.Change[PrivateCredentials] {
-	filepath := m.Subpath(PrivateCredentialsFilebase)
-	if _, err := wt.Filesystem.Stat(filepath); err == nil {
+	fileNS := m.Sub(PrivateCredentialsFilebase)
+	if _, err := wt.Filesystem.Stat(fileNS.Path()); err == nil {
 		must.Panic(ctx, fmt.Errorf("private credentials file already exists"))
 	}
 	cred, err := GenerateCredentials(m.Public, m.Private)
 	if err != nil {
 		must.Panic(ctx, err)
 	}
-	form.MustEncodeToFile(ctx, wt.Filesystem, filepath, cred)
-	git.Add(ctx, wt, filepath)
+	form.ToFile(ctx, wt.Filesystem, fileNS.Path(), cred)
+	git.Add(ctx, wt, fileNS.Path())
 	return mod.Change[PrivateCredentials]{
 		Result: cred,
 		Msg:    "Initialized private credentials.",
@@ -42,12 +42,12 @@ func (m PrivateMod) InitPrivate(ctx context.Context, wt *git.Tree) mod.Change[Pr
 }
 
 func (m PrivateMod) InitPublic(ctx context.Context, wt *git.Tree, cred PublicCredentials) mod.Change[struct{}] {
-	filepath := m.Subpath(PublicCredentialsFilebase)
-	if _, err := wt.Filesystem.Stat(filepath); err == nil {
+	fileNS := m.Sub(PublicCredentialsFilebase)
+	if _, err := wt.Filesystem.Stat(fileNS.Path()); err == nil {
 		must.Panic(ctx, fmt.Errorf("public credentials file already exists"))
 	}
-	form.MustEncodeToFile(ctx, wt.Filesystem, filepath, cred)
-	git.Add(ctx, wt, filepath)
+	form.ToFile(ctx, wt.Filesystem, fileNS.Path(), cred)
+	git.Add(ctx, wt, fileNS.Path())
 	return mod.Change[struct{}]{
 		Msg: "Initialized public credentials.",
 	}

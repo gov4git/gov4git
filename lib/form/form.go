@@ -56,13 +56,13 @@ func DecodeFromFile[F Form](ctx context.Context, fs billy.Filesystem, path strin
 	return Decode[F](ctx, file)
 }
 
-func MustEncodeToFile[F Form](ctx context.Context, fs billy.Filesystem, path string, form F) {
+func ToFile[F Form](ctx context.Context, fs billy.Filesystem, path string, form F) {
 	if err := EncodeToFile(ctx, fs, path, form); err != nil {
 		must.Panic(ctx, err)
 	}
 }
 
-func MustDecodeFromFile[F Form](ctx context.Context, fs billy.Filesystem, path string) F {
+func FromFile[F Form](ctx context.Context, fs billy.Filesystem, path string) F {
 	f, err := DecodeFromFile[F](ctx, fs, path)
 	if err != nil {
 		must.Panic(ctx, err)

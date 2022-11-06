@@ -15,5 +15,5 @@ type PrivateMod struct {
 }
 
 func (m PrivateMod) GetPrivateCredentials(ctx context.Context, wt *git.Tree) PrivateCredentials {
-	return form.MustDecodeFromFile[PrivateCredentials](ctx, wt.Filesystem, m.Subpath(PrivateCredentialsFilebase))
+	return form.FromFile[PrivateCredentials](ctx, wt.Filesystem, m.Sub(PrivateCredentialsFilebase).Path())
 }

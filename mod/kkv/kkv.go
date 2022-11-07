@@ -37,6 +37,10 @@ func (x KKV[K1, K2, V]) Remove(ctx context.Context, ns mod.NS, t *git.Tree, k1 K
 	return x.Secondary().Remove(ctx, x.Primary().KeyNS(ns, k1), t, k2)
 }
 
+func (x KKV[K1, K2, V]) RemovePrimary(ctx context.Context, ns mod.NS, t *git.Tree, k1 K1) mod.Change[form.None] {
+	return x.Primary().Remove(ctx, ns, t, k1)
+}
+
 func (x KKV[K1, K2, V]) ListPrimaryKeys(ctx context.Context, ns mod.NS, t *git.Tree) []K1 {
 	return x.Primary().ListKeys(ctx, ns, t)
 }

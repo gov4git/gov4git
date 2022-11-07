@@ -12,7 +12,8 @@ import (
 )
 
 func SetUser(ctx context.Context, t *git.Tree, name User, url git.URL) mod.Change[form.None] {
-	// XXX: add user to group everybody
+	AddGroup(ctx, t, Everybody)
+	AddMember(ctx, t, name, Everybody)
 	return usersKV.Set(ctx, usersNS, t, name, url)
 }
 
@@ -29,7 +30,7 @@ func AddUser(ctx context.Context, t *git.Tree, name User, url git.URL) mod.Chang
 
 func RemoveUser(ctx context.Context, t *git.Tree, name User) mod.Change[form.None] {
 	usersKV.Remove(ctx, usersNS, t, name)
-	//XXX: remove memberships
+	userGroupsKKV.RemovePrimary(ctx, userGroupsNS, t, name) // remove memberships
 	return mod.Change[form.None]{
 		Msg: fmt.Sprintf("Remove user %v", name),
 	}

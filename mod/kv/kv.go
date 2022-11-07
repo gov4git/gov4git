@@ -63,9 +63,13 @@ func (x KV[K, V]) Remove(ctx context.Context, ns mod.NS, t *git.Tree, key K) mod
 func (x KV[K, V]) ListKeys(ctx context.Context, ns mod.NS, t *git.Tree) []K {
 	infos, err := t.Filesystem.ReadDir(ns.Path())
 	must.NoError(ctx, err)
-	r := make([]K, len(infos))
-	for i, info := range infos {
-		r[i] = form.FromFile[K](ctx, t.Filesystem, filepath.Join(ns.Path(), info.Name(), keyFilebase))
+	r := []K{}
+	for _, info := range infos {
+		if !info.IsDir() { // TODO: filter dirs with key hashes?
+			continue
+		}
+		k := form.FromFile[K](ctx, t.Filesystem, filepath.Join(ns.Path(), info.Name(), keyFilebase))
+		r = append(r, k)
 	}
 	return r
 }

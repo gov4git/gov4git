@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	everybody = "everybody"
+	Everybody = Group("everybody")
 )
 
 type User string
@@ -43,13 +43,14 @@ func AddMember(ctx context.Context, t *git.Tree, user User, group Group) mod.Cha
 }
 
 func IsMember(ctx context.Context, t *git.Tree, user User, group Group) bool {
-	var yes bool
-	if err := must.Try0(
-		func() { yes = userGroupsKKV.Get(ctx, userGroupsNS, t, user, group) },
-	); err != nil {
-		return false
-	}
-	return yes
+	var userHasGroup, groupHasUser bool
+	must.Try0(
+		func() { userHasGroup = userGroupsKKV.Get(ctx, userGroupsNS, t, user, group) },
+	)
+	must.Try0(
+		func() { groupHasUser = groupUsersKKV.Get(ctx, groupUsersNS, t, group, user) },
+	)
+	return userHasGroup && groupHasUser
 }
 
 func RemoveMember(ctx context.Context, t *git.Tree, user User, group Group) mod.Change[form.None] {

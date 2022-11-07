@@ -27,7 +27,7 @@ func AddGroup(ctx context.Context, t *git.Tree, name Group) mod.Change[form.None
 
 func RemoveGroup(ctx context.Context, t *git.Tree, name Group) mod.Change[form.None] {
 	groupsKV.Remove(ctx, groupsNS, t, name)
-	//XXX: remove memberships
+	groupUsersKKV.RemovePrimary(ctx, groupUsersNS, t, name) // remove memberships
 	return mod.Change[form.None]{
 		Msg: fmt.Sprintf("Remove group %v", name),
 	}

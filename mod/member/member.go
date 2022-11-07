@@ -9,7 +9,6 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
 	"github.com/gov4git/gov4git/mod"
-	"github.com/gov4git/gov4git/mod/kkv"
 	"github.com/gov4git/gov4git/mod/kv"
 )
 
@@ -28,10 +27,10 @@ var (
 	groupsKV = kv.KV[Group, form.None]{}
 
 	userGroupsNS  = mod.NS("user_groups")
-	userGroupsKKV = kkv.KKV[User, Group, bool]{}
+	userGroupsKKV = kv.KKV[User, Group, bool]{}
 
 	groupUsersNS  = mod.NS("group_users")
-	groupUsersKKV = kkv.KKV[Group, User, bool]{}
+	groupUsersKKV = kv.KKV[Group, User, bool]{}
 )
 
 func AddMember(ctx context.Context, t *git.Tree, user User, group Group) mod.Change[form.None] {

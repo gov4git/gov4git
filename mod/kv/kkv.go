@@ -1,4 +1,4 @@
-package kkv
+package kv
 
 import (
 	"context"
@@ -7,17 +7,16 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/mod"
-	"github.com/gov4git/gov4git/mod/kv"
 )
 
-type KKV[K1 kv.Key, K2 kv.Key, V kv.Value] struct{}
+type KKV[K1 Key, K2 Key, V Value] struct{}
 
-func (x KKV[K1, K2, V]) Primary() kv.KV[K1, form.None] {
-	return kv.KV[K1, form.None]{}
+func (x KKV[K1, K2, V]) Primary() KV[K1, form.None] {
+	return KV[K1, form.None]{}
 }
 
-func (x KKV[K1, K2, V]) Secondary() kv.KV[K2, V] {
-	return kv.KV[K2, V]{}
+func (x KKV[K1, K2, V]) Secondary() KV[K2, V] {
+	return KV[K2, V]{}
 }
 
 func (x KKV[K1, K2, V]) Set(ctx context.Context, ns mod.NS, t *git.Tree, k1 K1, k2 K2, v V) mod.Change[form.None] {

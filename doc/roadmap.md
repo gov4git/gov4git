@@ -31,10 +31,17 @@ This milestone completed at end of Oct 2022.
 #### Develop
 - Decentralized apps over git framework:
      - [ ] Rewrite to enable easy extensibility and rapid feature development
+       - [ ] Identity
+       - [ ] Basic data structures over git
+       - [ ] User and group management
+       - [ ] Mail
+       - [ ] RPC over git
      - [x] Generic data structures over git (key-value, etc)
      - [ ] Remote governance invocation (an analog of smart contract method calls). This enables app features like user-initiated balance transfers.
 - Community management:
-  - [ ] User-initiated balance transfers
+  - [ ] Bureau: governance operation proposals by users
+    - [ ] User-initiated balance transfers
+  - [ ] User balance credit/debit on ballot closure
 - Governance:
   - [ ] Balance holds during ballots
   - [ ] Balance deductions on clearance
@@ -42,7 +49,10 @@ This milestone completed at end of Oct 2022.
 #### Validation
 - Dogfood deployment on gov4git repo
 
-### Milestone 3: Web app and browser extension for voting
+
+### Milestone 3a: Document and socialize
+
+### Milestone 3b: Web app and browser extension for voting
 
 #### Develop
 - Stand-alone TypeScript client library:
@@ -56,6 +66,7 @@ This milestone completed at end of Oct 2022.
 
 #### Validation
 - Dogfood on gov4git repo
+- Dogfood on libp2p/IPFS/Filecoin?
 - Dogfood on Plurality Book project
 
 ### Milestone 4: Verifiable change arbitration and approval

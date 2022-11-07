@@ -16,6 +16,5 @@ Run `go install github.com/gov4git/gov4git`.
 ## Vision
 
 We think our framework for social applications over git has a huge potential in a variety of domains, e.g.
-  - Auctions over git
   - Twitter over git
-  - Gaming over git (e.g. chess, go)
+  - Content-indexing/DHT over git

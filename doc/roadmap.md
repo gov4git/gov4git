@@ -1,7 +1,7 @@
 
 ## Roadmap
 
-### Milestone 1: Barebone QV prioritization polling
+### Milestone 1: Barebone QV prioritization polling (finished, end of Oct 2022)
 
 This milestone completed at end of Oct 2022.
 
@@ -26,7 +26,7 @@ This milestone completed at end of Oct 2022.
       - PR/issue closure credits/debits user voting accounts
   - Web UI required for live deployment with Plurality Book users
 
-### Milestone 2: 
+### Milestone 2: Framework rewrite + community features (targeting end of Nov 2022)
 
 #### Develop
 - Decentralized apps over git framework:

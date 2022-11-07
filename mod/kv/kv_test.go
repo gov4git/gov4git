@@ -23,22 +23,23 @@ func TestSetGet(t *testing.T) {
 	m := mod.NS("ns")
 	wt := git.Worktree(ctx, repo)
 
-	key := git.URL("a")
+	x := KV[string, float64]{}
+	key := "a"
 	value := float64(3.14)
-	Set(ctx, m, wt, key, value)
+	x.Set(ctx, m, wt, key, value)
 
-	got := Get[float64](ctx, m, wt, key)
+	got := x.Get(ctx, m, wt, key)
 	if got != value {
 		t.Errorf("expecting %v, got %v", value, got)
 	}
 
-	keys := ListKeys(ctx, m, wt)
+	keys := x.ListKeys(ctx, m, wt)
 	if len(keys) != 1 || keys[0] != key {
 		t.Errorf("listing keys")
 	}
 
-	Remove(ctx, m, wt, key)
-	keys = ListKeys(ctx, m, wt)
+	x.Remove(ctx, m, wt, key)
+	keys = x.ListKeys(ctx, m, wt)
 	if len(keys) != 0 {
 		t.Errorf("list after remove")
 	}

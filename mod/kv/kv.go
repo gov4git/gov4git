@@ -16,15 +16,20 @@ const (
 	valueFilebase = "value.json"
 )
 
-type Key = git.URL
+type Key interface {
+	~string
+}
+
 type Value = form.Form
 
-func KeyNS(ns mod.NS, key Key) mod.NS {
+type KV[K Key, V Value] struct{}
+
+func (KV[K, V]) KeyNS(ns mod.NS, key K) mod.NS {
 	return ns.Sub(form.StringHashForFilename(string(key)))
 }
 
-func Set[V Value](ctx context.Context, ns mod.NS, t *git.Tree, key Key, value V) mod.Change[form.None] {
-	keyNS := KeyNS(ns, key)
+func (x KV[K, V]) Set(ctx context.Context, ns mod.NS, t *git.Tree, key K, value V) mod.Change[form.None] {
+	keyNS := x.KeyNS(ns, key)
 	err := t.Filesystem.MkdirAll(keyNS.Path(), 0755)
 	must.NoError(ctx, err)
 	form.ToFile(ctx, t.Filesystem, filepath.Join(keyNS.Path(), keyFilebase), key)
@@ -35,32 +40,32 @@ func Set[V Value](ctx context.Context, ns mod.NS, t *git.Tree, key Key, value V)
 	}
 }
 
-func Get[V Value](ctx context.Context, ns mod.NS, t *git.Tree, key Key) V {
-	return form.FromFile[V](ctx, t.Filesystem, filepath.Join(KeyNS(ns, key).Path(), valueFilebase))
+func (x KV[K, V]) Get(ctx context.Context, ns mod.NS, t *git.Tree, key K) V {
+	return form.FromFile[V](ctx, t.Filesystem, filepath.Join(x.KeyNS(ns, key).Path(), valueFilebase))
 }
 
-func GetMany[V Value](ctx context.Context, ns mod.NS, t *git.Tree, keys []Key) []V {
+func (x KV[K, V]) GetMany(ctx context.Context, ns mod.NS, t *git.Tree, keys []K) []V {
 	r := make([]V, len(keys))
 	for i, k := range keys {
-		r[i] = Get[V](ctx, ns, t, k)
+		r[i] = x.Get(ctx, ns, t, k)
 	}
 	return r
 }
 
-func Remove(ctx context.Context, ns mod.NS, t *git.Tree, key Key) mod.Change[form.None] {
-	_, err := t.Remove(KeyNS(ns, key).Path())
+func (x KV[K, V]) Remove(ctx context.Context, ns mod.NS, t *git.Tree, key K) mod.Change[form.None] {
+	_, err := t.Remove(x.KeyNS(ns, key).Path())
 	must.NoError(ctx, err)
 	return mod.Change[form.None]{
 		Msg: fmt.Sprintf("Remove value for %v in namespace %v", key, ns),
 	}
 }
 
-func ListKeys(ctx context.Context, ns mod.NS, t *git.Tree) []Key {
+func (x KV[K, V]) ListKeys(ctx context.Context, ns mod.NS, t *git.Tree) []K {
 	infos, err := t.Filesystem.ReadDir(ns.Path())
 	must.NoError(ctx, err)
-	r := make([]Key, len(infos))
+	r := make([]K, len(infos))
 	for i, info := range infos {
-		r[i] = form.FromFile[Key](ctx, t.Filesystem, filepath.Join(ns.Path(), info.Name(), keyFilebase))
+		r[i] = form.FromFile[K](ctx, t.Filesystem, filepath.Join(ns.Path(), info.Name(), keyFilebase))
 	}
 	return r
 }

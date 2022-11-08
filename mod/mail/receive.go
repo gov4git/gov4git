@@ -11,7 +11,15 @@ import (
 	"github.com/gov4git/gov4git/mod/id"
 )
 
-type Responder[Request form.Form, Response form.Form] func(ctx context.Context, req Request) (resp Response, err error)
+type RequestResponse[Request form.Form, Response form.Form] struct {
+	Request  Request
+	Response Response
+}
+
+type Responder[Request form.Form, Response form.Form] func(
+	ctx context.Context,
+	req Request,
+) (resp Response, err error)
 
 func Receive[Request form.Form, Response form.Form](
 	ctx context.Context,
@@ -20,7 +28,7 @@ func Receive[Request form.Form, Response form.Form](
 	sender *git.Tree,
 	topic string,
 	respond Responder[Request, Response],
-) git.ChangeNoResult {
+) git.Change[[]RequestResponse[Request, Response]] {
 
 	// prep
 	receiverCred := id.GetPublicCredentials(ctx, receiver)
@@ -45,6 +53,7 @@ func Receive[Request form.Form, Response form.Form](
 	// read unread messages
 	receiverLatestNextSeqNo := receiverNextSeqNo
 	base.Infof("receiving receiverSeqNo=%v senderSeqNo=%v", receiverNextSeqNo, senderNextSeqNo)
+	rr := []RequestResponse[Request, Response]{}
 	for i := receiverNextSeqNo; i < senderNextSeqNo; i++ {
 		msgFilebase := strconv.Itoa(int(i))
 		req := git.FromFile[Request](ctx, sender, senderTopicNS.Sub(msgFilebase).Path())
@@ -54,14 +63,16 @@ func Receive[Request form.Form, Response form.Form](
 			continue
 		}
 		git.ToFileStage(ctx, receiver, receiverTopicNS.Sub(msgFilebase).Path(), resp)
+		rr = append(rr, RequestResponse[Request, Response]{Request: req, Response: resp})
 		receiverLatestNextSeqNo = i + 1
 	}
 
 	// write receiver-side next seq no
 	git.ToFileStage(ctx, receiver, receiverNextNS.Path(), receiverLatestNextSeqNo)
 
-	return git.ChangeNoResult{
-		Msg: fmt.Sprintf("Received mail"),
+	return git.Change[[]RequestResponse[Request, Response]]{
+		Result: rr,
+		Msg:    fmt.Sprintf("Received mail"),
 	}
 }
 
@@ -79,8 +90,9 @@ func ReceiveSigned[Request form.Form, Response form.Form](
 	senderPublic *git.Tree,
 	topic string,
 	respond SignedResponder[Request, Response],
-) git.ChangeNoResult {
+) git.Change[[]RequestResponse[Request, Response]] {
 	receiverPrivCred := id.GetPrivateCredentials(ctx, receiverPrivate)
+	rr := []RequestResponse[Request, Response]{}
 	signRespond := func(ctx context.Context, signedReq id.SignedPlaintext) (signedResp id.SignedPlaintext, err error) {
 		if !signedReq.Verify() {
 			return signedResp, fmt.Errorf("signature not valid")
@@ -93,7 +105,12 @@ func ReceiveSigned[Request form.Form, Response form.Form](
 		if err != nil {
 			return signedResp, err
 		}
+		rr = append(rr, RequestResponse[Request, Response]{Request: req, Response: resp})
 		return id.Sign(ctx, receiverPrivCred, resp), nil
 	}
-	return Receive(ctx, receiverPublic, senderAddr, senderPublic, topic, signRespond)
+	Receive(ctx, receiverPublic, senderAddr, senderPublic, topic, signRespond)
+	return git.Change[[]RequestResponse[Request, Response]]{
+		Result: rr,
+		Msg:    fmt.Sprintf("Received signed mail"),
+	}
 }

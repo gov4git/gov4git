@@ -13,7 +13,7 @@ import (
 func TestSetGet(t *testing.T) {
 	base.LogVerbosely()
 	ctx := context.Background()
-	repo := testutil.InitPlain(t, ctx)
+	repo := testutil.InitPlainRepo(t, ctx)
 
 	m := ns.NS("ns")
 	wt := git.Worktree(ctx, repo.Repo)

@@ -7,17 +7,34 @@ import (
 	"github.com/gov4git/gov4git/lib/must"
 )
 
-func Init(ctx context.Context, publicAddr git.Address, privateAddr git.Address) git.Change[PrivateCredentials] {
+func Init(
+	ctx context.Context,
+	publicAddr git.Address,
+	privateAddr git.Address,
+) git.Change[PrivateCredentials] {
 	public := git.CloneOrInitBranch(ctx, publicAddr)
 	private := git.CloneOrInitBranch(ctx, privateAddr)
-	privateWt := git.Worktree(ctx, private)
-	publicWt := git.Worktree(ctx, public)
-	privChg := InitPrivate(ctx, privateWt, publicAddr, privateAddr)
-	pubChg := InitPublic(ctx, publicWt, privChg.Result.PublicCredentials)
-	git.Commit(ctx, privateWt, privChg.Msg)
-	git.Commit(ctx, publicWt, pubChg.Msg)
+	publicTree := git.Worktree(ctx, public)
+	privateTree := git.Worktree(ctx, private)
+
+	privChg := InitLocal(ctx, publicAddr, privateAddr, publicTree, privateTree)
+
 	git.Push(ctx, private)
 	git.Push(ctx, public)
+	return privChg
+}
+
+func InitLocal(
+	ctx context.Context,
+	publicAddr git.Address,
+	privateAddr git.Address,
+	publicTree *git.Tree,
+	privateTree *git.Tree,
+) git.Change[PrivateCredentials] {
+	privChg := InitPrivate(ctx, privateTree, publicAddr, privateAddr)
+	pubChg := InitPublic(ctx, publicTree, privChg.Result.PublicCredentials)
+	git.Commit(ctx, privateTree, privChg.Msg)
+	git.Commit(ctx, publicTree, pubChg.Msg)
 	return privChg
 }
 

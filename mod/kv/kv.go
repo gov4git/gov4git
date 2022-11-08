@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
-	"github.com/gov4git/gov4git/mod"
+	"github.com/gov4git/gov4git/lib/ns"
 )
 
 const (
@@ -24,27 +24,26 @@ type Value = form.Form
 
 type KV[K Key, V Value] struct{}
 
-func (KV[K, V]) KeyNS(ns mod.NS, key K) mod.NS {
+func (KV[K, V]) KeyNS(ns ns.NS, key K) ns.NS {
 	return ns.Sub(form.StringHashForFilename(string(key)))
 }
 
-func (x KV[K, V]) Set(ctx context.Context, ns mod.NS, t *git.Tree, key K, value V) mod.Change[form.None] {
+func (x KV[K, V]) Set(ctx context.Context, ns ns.NS, t *git.Tree, key K, value V) git.ChangeNoResult {
 	keyNS := x.KeyNS(ns, key)
-	err := t.Filesystem.MkdirAll(keyNS.Path(), 0755)
-	must.NoError(ctx, err)
+	git.TreeMkdirAll(ctx, t, keyNS)
 	form.ToFile(ctx, t.Filesystem, filepath.Join(keyNS.Path(), keyFilebase), key)
 	form.ToFile(ctx, t.Filesystem, filepath.Join(keyNS.Path(), valueFilebase), value)
 	git.Add(ctx, t, keyNS.Path())
-	return mod.Change[form.None]{
+	return git.ChangeNoResult{
 		Msg: fmt.Sprintf("Change value of %v in namespace %v", key, ns),
 	}
 }
 
-func (x KV[K, V]) Get(ctx context.Context, ns mod.NS, t *git.Tree, key K) V {
+func (x KV[K, V]) Get(ctx context.Context, ns ns.NS, t *git.Tree, key K) V {
 	return form.FromFile[V](ctx, t.Filesystem, filepath.Join(x.KeyNS(ns, key).Path(), valueFilebase))
 }
 
-func (x KV[K, V]) GetMany(ctx context.Context, ns mod.NS, t *git.Tree, keys []K) []V {
+func (x KV[K, V]) GetMany(ctx context.Context, ns ns.NS, t *git.Tree, keys []K) []V {
 	r := make([]V, len(keys))
 	for i, k := range keys {
 		r[i] = x.Get(ctx, ns, t, k)
@@ -52,15 +51,15 @@ func (x KV[K, V]) GetMany(ctx context.Context, ns mod.NS, t *git.Tree, keys []K)
 	return r
 }
 
-func (x KV[K, V]) Remove(ctx context.Context, ns mod.NS, t *git.Tree, key K) mod.Change[form.None] {
+func (x KV[K, V]) Remove(ctx context.Context, ns ns.NS, t *git.Tree, key K) git.ChangeNoResult {
 	_, err := t.Remove(x.KeyNS(ns, key).Path())
 	must.NoError(ctx, err)
-	return mod.Change[form.None]{
+	return git.ChangeNoResult{
 		Msg: fmt.Sprintf("Remove value for %v in namespace %v", key, ns),
 	}
 }
 
-func (x KV[K, V]) ListKeys(ctx context.Context, ns mod.NS, t *git.Tree) []K {
+func (x KV[K, V]) ListKeys(ctx context.Context, ns ns.NS, t *git.Tree) []K {
 	infos, err := t.Filesystem.ReadDir(ns.Path())
 	must.NoError(ctx, err)
 	r := []K{}

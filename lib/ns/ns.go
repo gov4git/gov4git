@@ -1,4 +1,4 @@
-package mod
+package ns
 
 import (
 	"path/filepath"

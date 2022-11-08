@@ -6,17 +6,17 @@ import (
 
 	"github.com/gov4git/gov4git/lib/base"
 	"github.com/gov4git/gov4git/lib/git"
+	"github.com/gov4git/gov4git/lib/ns"
 	"github.com/gov4git/gov4git/lib/testutil"
-	"github.com/gov4git/gov4git/mod"
 )
 
 func TestSetGet(t *testing.T) {
 	base.LogVerbosely()
 	ctx := context.Background()
-	repo := testutil.InitRepo(t, ctx)
+	repo := testutil.InitPlain(t, ctx)
 
-	m := mod.NS("ns")
-	wt := git.Worktree(ctx, repo)
+	m := ns.NS("ns")
+	wt := git.Worktree(ctx, repo.Repo)
 
 	x := KV[string, float64]{}
 	key := "a"

@@ -13,8 +13,8 @@ import (
 func TestMember(t *testing.T) {
 	base.LogVerbosely()
 	ctx := context.Background()
-	repo := testutil.InitRepo(t, ctx)
-	wt := git.Worktree(ctx, repo)
+	repo := testutil.InitPlain(t, ctx)
+	wt := git.Worktree(ctx, repo.Repo)
 
 	u1 := User("user1")
 	r1 := git.URL("http://1")

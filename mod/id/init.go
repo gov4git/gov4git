@@ -7,16 +7,15 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
-	"github.com/gov4git/gov4git/mod"
 )
 
-func (m PrivateMod) Init(ctx context.Context) mod.Change[PrivateCredentials] {
+func Init(ctx context.Context, m PrivateMod) git.Change[PrivateCredentials] {
 	public := git.CloneOrInitBranch(ctx, m.Public)
 	private := git.CloneOrInitBranch(ctx, m.Private)
 	privateWt := git.Worktree(ctx, private)
 	publicWt := git.Worktree(ctx, public)
-	privChg := m.InitPrivate(ctx, privateWt)
-	pubChg := m.InitPublic(ctx, publicWt, privChg.Result.PublicCredentials)
+	privChg := InitPrivate(ctx, m, privateWt)
+	pubChg := InitPublic(ctx, m, publicWt, privChg.Result.PublicCredentials)
 	git.Commit(ctx, privateWt, privChg.Msg)
 	git.Commit(ctx, publicWt, pubChg.Msg)
 	git.Push(ctx, private)
@@ -24,31 +23,31 @@ func (m PrivateMod) Init(ctx context.Context) mod.Change[PrivateCredentials] {
 	return privChg
 }
 
-func (m PrivateMod) InitPrivate(ctx context.Context, wt *git.Tree) mod.Change[PrivateCredentials] {
+func InitPrivate(ctx context.Context, m PrivateMod, priv *git.Tree) git.Change[PrivateCredentials] {
 	fileNS := m.Sub(PrivateCredentialsFilebase)
-	if _, err := wt.Filesystem.Stat(fileNS.Path()); err == nil {
+	if _, err := priv.Filesystem.Stat(fileNS.Path()); err == nil {
 		must.Panic(ctx, fmt.Errorf("private credentials file already exists"))
 	}
 	cred, err := GenerateCredentials(m.Public, m.Private)
 	if err != nil {
 		must.Panic(ctx, err)
 	}
-	form.ToFile(ctx, wt.Filesystem, fileNS.Path(), cred)
-	git.Add(ctx, wt, fileNS.Path())
-	return mod.Change[PrivateCredentials]{
+	form.ToFile(ctx, priv.Filesystem, fileNS.Path(), cred)
+	git.Add(ctx, priv, fileNS.Path())
+	return git.Change[PrivateCredentials]{
 		Result: cred,
 		Msg:    "Initialized private credentials.",
 	}
 }
 
-func (m PrivateMod) InitPublic(ctx context.Context, wt *git.Tree, cred PublicCredentials) mod.Change[struct{}] {
+func InitPublic(ctx context.Context, m PrivateMod, pub *git.Tree, cred PublicCredentials) git.ChangeNoResult {
 	fileNS := m.Sub(PublicCredentialsFilebase)
-	if _, err := wt.Filesystem.Stat(fileNS.Path()); err == nil {
+	if _, err := pub.Filesystem.Stat(fileNS.Path()); err == nil {
 		must.Panic(ctx, fmt.Errorf("public credentials file already exists"))
 	}
-	form.ToFile(ctx, wt.Filesystem, fileNS.Path(), cred)
-	git.Add(ctx, wt, fileNS.Path())
-	return mod.Change[struct{}]{
+	form.ToFile(ctx, pub.Filesystem, fileNS.Path(), cred)
+	git.Add(ctx, pub, fileNS.Path())
+	return git.ChangeNoResult{
 		Msg: "Initialized public credentials.",
 	}
 }

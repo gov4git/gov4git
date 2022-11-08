@@ -8,10 +8,16 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 )
 
-func InitRepo(t *testing.T, ctx context.Context) *git.Repository {
+type TestPlainRepo struct {
+	Dir  string
+	Repo *git.Repository
+}
+
+func InitPlain(t *testing.T, ctx context.Context) TestPlainRepo {
 	repoDir := t.TempDir()
 	base.Infof("repo %v", repoDir)
-	return git.InitPlain(ctx, repoDir, false)
+	repo := git.InitPlain(ctx, repoDir, false)
+	return TestPlainRepo{Dir: repoDir, Repo: repo}
 }
 
 func Hang() {

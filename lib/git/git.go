@@ -95,6 +95,10 @@ func CloneBranch(ctx context.Context, addr Address) *Repository {
 	return repo
 }
 
+func CloneBranchTree(ctx context.Context, addr Address) *Tree {
+	return Worktree(ctx, CloneBranch(ctx, addr))
+}
+
 func Worktree(ctx context.Context, repo *Repository) *Tree {
 	wt, err := repo.Worktree()
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
-	"github.com/gov4git/gov4git/mod"
+	"github.com/gov4git/gov4git/lib/ns"
 )
 
 func TestInit(t *testing.T) {
@@ -22,14 +22,14 @@ func TestInit(t *testing.T) {
 	publicAddr := git.NewAddress(git.URL(publicDir), git.MainBranch)
 	privateAddr := git.NewAddress(git.URL(privateDir), git.MainBranch)
 	m := PrivateMod{
-		NS:      mod.NS(""),
+		NS:      ns.NS(""),
 		Public:  publicAddr,
 		Private: privateAddr,
 	}
 
-	m.Init(ctx)
+	Init(ctx, m)
 
-	if err := must.Try0(func() { m.Init(ctx) }); err == nil {
+	if err := must.Try0(func() { Init(ctx, m) }); err == nil {
 		t.Fatal("second init must fail")
 	}
 }

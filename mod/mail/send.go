@@ -48,7 +48,8 @@ func Send[M form.Form](
 	git.ToFileStage(ctx, sender, nextNS.Path(), newNextSeqNo)
 
 	return git.Change[SeqNo]{
-		Msg: fmt.Sprintf("Sent mail #%d", nextSeqNo),
+		Result: nextSeqNo,
+		Msg:    fmt.Sprintf("Sent mail #%d", nextSeqNo),
 	}
 }
 

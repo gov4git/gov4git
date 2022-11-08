@@ -21,7 +21,7 @@ func GetUser(ctx context.Context, t *git.Tree, name User) git.URL {
 }
 
 func AddUser(ctx context.Context, t *git.Tree, name User, url git.URL) git.ChangeNoResult {
-	if err := must.Try0(func() { GetUser(ctx, t, name) }); err == nil {
+	if err := must.Try(func() { GetUser(ctx, t, name) }); err == nil {
 		must.Panic(ctx, fmt.Errorf("user already exists"))
 	}
 	return SetUser(ctx, t, name, url)

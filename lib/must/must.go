@@ -1,6 +1,9 @@
 package must
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
 type Error struct {
 	Ctx context.Context
@@ -15,13 +18,17 @@ func Panic(ctx context.Context, err error) {
 	panic(mkErr(ctx, err))
 }
 
+func Errorf(ctx context.Context, format string, args ...any) {
+	Panic(ctx, fmt.Errorf(format, args...))
+}
+
 func NoError(ctx context.Context, err error) {
 	if err != nil {
 		Panic(ctx, err)
 	}
 }
 
-func Try0(f func()) (err error) {
+func Try(f func()) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err = r.(Error).error

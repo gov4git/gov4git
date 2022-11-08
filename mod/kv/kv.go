@@ -30,7 +30,7 @@ func (KV[K, V]) KeyNS(ns ns.NS, key K) ns.NS {
 
 func (x KV[K, V]) Set(ctx context.Context, ns ns.NS, t *git.Tree, key K, value V) git.ChangeNoResult {
 	keyNS := x.KeyNS(ns, key)
-	git.TreeMkdirAll(ctx, t, keyNS)
+	git.TreeMkdirAll(ctx, t, keyNS.Path())
 	form.ToFile(ctx, t.Filesystem, filepath.Join(keyNS.Path(), keyFilebase), key)
 	form.ToFile(ctx, t.Filesystem, filepath.Join(keyNS.Path(), valueFilebase), value)
 	git.Add(ctx, t, keyNS.Path())

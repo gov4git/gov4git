@@ -39,7 +39,7 @@ func TestMember(t *testing.T) {
 	}
 
 	RemoveUser(ctx, wt, u1)
-	err := must.Try0(func() {
+	err := must.Try(func() {
 		GetUser(ctx, wt, u1)
 	})
 	if err == nil {

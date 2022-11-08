@@ -43,10 +43,10 @@ func AddMember(ctx context.Context, t *git.Tree, user User, group Group) git.Cha
 
 func IsMember(ctx context.Context, t *git.Tree, user User, group Group) bool {
 	var userHasGroup, groupHasUser bool
-	must.Try0(
+	must.Try(
 		func() { userHasGroup = userGroupsKKV.Get(ctx, userGroupsNS, t, user, group) },
 	)
-	must.Try0(
+	must.Try(
 		func() { groupHasUser = groupUsersKKV.Get(ctx, groupUsersNS, t, group, user) },
 	)
 	return userHasGroup && groupHasUser

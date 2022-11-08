@@ -8,6 +8,6 @@ var (
 )
 
 var (
-	PublicCredentialsFilebase  = "public_credentials.json"
-	PrivateCredentialsFilebase = "private_credentials.json"
+	PublicCredentialsNS  = PublicNS.Sub("public_credentials.json")
+	PrivateCredentialsNS = PrivateNS.Sub("private_credentials.json")
 )

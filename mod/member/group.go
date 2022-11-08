@@ -18,7 +18,7 @@ func GetGroup(ctx context.Context, t *git.Tree, name Group) {
 }
 
 func AddGroup(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
-	if err := must.Try0(func() { GetGroup(ctx, t, name) }); err == nil {
+	if err := must.Try(func() { GetGroup(ctx, t, name) }); err == nil {
 		must.Panic(ctx, fmt.Errorf("group already exists"))
 	}
 	return SetGroup(ctx, t, name)

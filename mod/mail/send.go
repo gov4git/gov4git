@@ -51,3 +51,16 @@ func Send[M form.Form](
 		Msg: fmt.Sprintf("Sent mail #%d", nextSeqNo),
 	}
 }
+
+func SendSigned[M form.Form](
+	ctx context.Context,
+	senderPublic *git.Tree,
+	senderPrivate *git.Tree,
+	receiver *git.Tree,
+	topic string,
+	msg M,
+) git.Change[SeqNo] {
+	senderPrivCred := id.GetPrivateCredentials(ctx, senderPrivate)
+	signed := id.Sign(ctx, senderPrivCred, msg)
+	return Send(ctx, senderPublic, receiver, topic, signed)
+}

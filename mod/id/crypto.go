@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
+	"github.com/gov4git/gov4git/lib/must"
 )
 
 type Ed25519PublicKey = form.Bytes
@@ -34,15 +35,21 @@ type SignedPlaintext struct {
 	PublicKeyEd25519 Ed25519PublicKey `json:"ed25519_public_key"`
 }
 
-func SignPlaintext(ctx context.Context, priv *PrivateCredentials, plaintext []byte) (*SignedPlaintext, error) {
+func (signed *SignedPlaintext) Verify() bool {
+	return ed25519.Verify(ed25519.PublicKey(signed.PublicKeyEd25519), signed.Plaintext, signed.Signature)
+}
+
+func SignPlaintext(ctx context.Context, priv PrivateCredentials, plaintext []byte) SignedPlaintext {
 	signature := ed25519.Sign(ed25519.PrivateKey(priv.PrivateKeyEd25519), plaintext)
-	return &SignedPlaintext{
+	return SignedPlaintext{
 		Plaintext:        plaintext,
 		Signature:        signature,
 		PublicKeyEd25519: priv.PublicCredentials.PublicKeyEd25519,
-	}, nil
+	}
 }
 
-func (signed *SignedPlaintext) Verify() bool {
-	return ed25519.Verify(ed25519.PublicKey(signed.PublicKeyEd25519), signed.Plaintext, signed.Signature)
+func Sign[V form.Form](ctx context.Context, priv PrivateCredentials, value V) SignedPlaintext {
+	data, err := form.EncodeBytes(ctx, value)
+	must.NoError(ctx, err)
+	return SignPlaintext(ctx, priv, data)
 }

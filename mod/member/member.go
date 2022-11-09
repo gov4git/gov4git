@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/lib/form"
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
-	"github.com/gov4git/gov4git/lib/ns"
+	"github.com/gov4git/gov4git/mod"
 	"github.com/gov4git/gov4git/mod/kv"
 )
 
@@ -20,16 +20,18 @@ type User string
 type Group string
 
 var (
-	usersNS = ns.NS("users")
+	membersNS = mod.RootNS.Sub("members")
+
+	usersNS = membersNS.Sub("users")
 	usersKV = kv.KV[User, git.URL]{}
 
-	groupsNS = ns.NS("groups")
+	groupsNS = membersNS.Sub("groups")
 	groupsKV = kv.KV[Group, form.None]{}
 
-	userGroupsNS  = ns.NS("user_groups")
+	userGroupsNS  = membersNS.Sub("user_groups")
 	userGroupsKKV = kv.KKV[User, Group, bool]{}
 
-	groupUsersNS  = ns.NS("group_users")
+	groupUsersNS  = membersNS.Sub("group_users")
 	groupUsersKKV = kv.KKV[Group, User, bool]{}
 )
 

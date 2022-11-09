@@ -24,7 +24,6 @@ func Send[M form.Form](
 	// fetch receiver id
 	receiverCred := id.GetPublicCredentials(ctx, receiver)
 	topicNS := SendTopicNS(receiverCred.ID, topic)
-	git.TreeMkdirAll(ctx, sender, topicNS.Path())
 
 	// write receiver id + topic in send box file
 	infoValue := SendBoxInfo{ReceiverID: receiverCred.ID, Topic: topic}

@@ -13,12 +13,13 @@ func SetGroup(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
 	return groupsKV.Set(ctx, groupsNS, t, name, form.None{})
 }
 
-func GetGroup(ctx context.Context, t *git.Tree, name Group) {
-	groupsKV.Get(ctx, groupsNS, t, name)
+func IsGroup(ctx context.Context, t *git.Tree, name Group) bool {
+	err := must.Try(func() { groupsKV.Get(ctx, groupsNS, t, name) })
+	return err == nil
 }
 
 func AddGroup(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
-	if err := must.Try(func() { GetGroup(ctx, t, name) }); err == nil {
+	if IsGroup(ctx, t, name) {
 		must.Panic(ctx, fmt.Errorf("group already exists"))
 	}
 	return SetGroup(ctx, t, name)

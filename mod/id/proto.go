@@ -1,10 +1,12 @@
 package id
 
-import "github.com/gov4git/gov4git/lib/ns"
+import (
+	"github.com/gov4git/gov4git/mod"
+)
 
 var (
-	PublicNS  = ns.NS(".id")
-	PrivateNS = ns.NS(".id")
+	PublicNS  = mod.RootNS.Sub("id")
+	PrivateNS = mod.RootNS.Sub("id")
 )
 
 var (

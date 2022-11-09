@@ -17,6 +17,8 @@ type URL string
 
 type Branch string
 
+type CommitHash string
+
 const MainBranch Branch = "main"
 
 const Origin = "origin"
@@ -95,8 +97,9 @@ func CloneBranch(ctx context.Context, addr Address) *Repository {
 	return repo
 }
 
-func CloneBranchTree(ctx context.Context, addr Address) *Tree {
-	return Worktree(ctx, CloneBranch(ctx, addr))
+func CloneBranchTree(ctx context.Context, addr Address) (*Repository, *Tree) {
+	repo := CloneBranch(ctx, addr)
+	return repo, Worktree(ctx, repo)
 }
 
 func Worktree(ctx context.Context, repo *Repository) *Tree {

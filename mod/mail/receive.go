@@ -43,9 +43,6 @@ func Receive[Request form.Form, Response form.Form](
 	receiverNextSeqNo, _ := git.TryFromFile[SeqNo](ctx, receiver, receiverNextNS.Path())
 	senderNextSeqNo, _ := git.TryFromFile[SeqNo](ctx, sender, senderNextNS.Path())
 
-	// make dir for receiver-side topic
-	git.TreeMkdirAll(ctx, receiver, receiverTopicNS.Path())
-
 	// write receive box info
 	info := ReceiveBoxInfo{SenderID: senderCred.ID, Topic: topic}
 	git.ToFileStage(ctx, receiver, receiverInfoNS.Path(), info)

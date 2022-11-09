@@ -12,14 +12,24 @@ func TestSendReceive(t *testing.T) {
 	ctx := testutil.NewCtx()
 	testSenderID := id.InitTestID(ctx, t, false)
 	testReceiverID := id.InitTestID(ctx, t, false)
-	id.InitLocal(ctx,
-		id.PublicAddress(testSenderID.Public.Address), id.PrivateAddress(testSenderID.Private.Address),
-		testSenderID.Public.Tree, testSenderID.Private.Tree,
-	)
-	id.InitLocal(ctx,
-		id.PublicAddress(testReceiverID.Public.Address), id.PrivateAddress(testReceiverID.Private.Address),
-		testReceiverID.Public.Tree, testReceiverID.Private.Tree,
-	)
+	senderOwnerAddr := id.OwnerAddress{
+		Public:  id.PublicAddress(testSenderID.Public.Address),
+		Private: id.PrivateAddress(testSenderID.Private.Address),
+	}
+	receiverOwnerAddr := id.OwnerAddress{
+		Public:  id.PublicAddress(testReceiverID.Public.Address),
+		Private: id.PrivateAddress(testReceiverID.Private.Address),
+	}
+	senderOwnerTree := id.OwnerTree{
+		Public:  testSenderID.Public.Tree,
+		Private: testSenderID.Private.Tree,
+	}
+	receiverOwnerTree := id.OwnerTree{
+		Public:  testReceiverID.Public.Tree,
+		Private: testReceiverID.Private.Tree,
+	}
+	id.InitLocal(ctx, senderOwnerAddr, senderOwnerTree)
+	id.InitLocal(ctx, receiverOwnerAddr, receiverOwnerTree)
 
 	const testTopic = "topic"
 	var testMsg []string = []string{"a", "b", "c"}
@@ -81,19 +91,29 @@ func TestSendReceiveSigned(t *testing.T) {
 	ctx := testutil.NewCtx()
 	testSenderID := id.InitTestID(ctx, t, false)
 	testReceiverID := id.InitTestID(ctx, t, false)
-	id.InitLocal(ctx,
-		id.PublicAddress(testSenderID.Public.Address), id.PrivateAddress(testSenderID.Private.Address),
-		testSenderID.Public.Tree, testSenderID.Private.Tree,
-	)
-	id.InitLocal(ctx,
-		id.PublicAddress(testReceiverID.Public.Address), id.PrivateAddress(testReceiverID.Private.Address),
-		testReceiverID.Public.Tree, testReceiverID.Private.Tree,
-	)
+	senderOwnerAddr := id.OwnerAddress{
+		Public:  id.PublicAddress(testSenderID.Public.Address),
+		Private: id.PrivateAddress(testSenderID.Private.Address),
+	}
+	receiverOwnerAddr := id.OwnerAddress{
+		Public:  id.PublicAddress(testReceiverID.Public.Address),
+		Private: id.PrivateAddress(testReceiverID.Private.Address),
+	}
+	senderOwnerTree := id.OwnerTree{
+		Public:  testSenderID.Public.Tree,
+		Private: testSenderID.Private.Tree,
+	}
+	receiverOwnerTree := id.OwnerTree{
+		Public:  testReceiverID.Public.Tree,
+		Private: testReceiverID.Private.Tree,
+	}
+	id.InitLocal(ctx, senderOwnerAddr, senderOwnerTree)
+	id.InitLocal(ctx, receiverOwnerAddr, receiverOwnerTree)
 
 	const testTopic = "topic"
 	var testMsg []string = []string{"a", "b", "c"}
 
-	s0 := SendSigned(ctx, testSenderID.Public.Tree, testSenderID.Private.Tree, testReceiverID.Public.Tree, testTopic, testMsg[0])
+	s0 := SendSigned(ctx, senderOwnerTree, testReceiverID.Public.Tree, testTopic, testMsg[0])
 	if s0.Result != 0 {
 		t.Fatalf("unexpected seq no")
 	}
@@ -118,12 +138,12 @@ func TestSendReceiveSigned(t *testing.T) {
 		t.Fatalf("expecting %v, got %v", testMsg[0], r0.Result[0])
 	}
 
-	s1 := SendSigned(ctx, testSenderID.Public.Tree, testSenderID.Private.Tree, testReceiverID.Public.Tree, testTopic, testMsg[1])
+	s1 := SendSigned(ctx, senderOwnerTree, testReceiverID.Public.Tree, testTopic, testMsg[1])
 	if s1.Result != 1 {
 		t.Fatalf("expecting %v, got %v", 1, s1.Result)
 	}
 
-	s2 := SendSigned(ctx, testSenderID.Public.Tree, testSenderID.Private.Tree, testReceiverID.Public.Tree, testTopic, testMsg[2])
+	s2 := SendSigned(ctx, senderOwnerTree, testReceiverID.Public.Tree, testTopic, testMsg[2])
 	if s2.Result != 2 {
 		t.Fatalf("expecting %v, got %v", 2, s2.Result)
 	}

@@ -7,46 +7,35 @@ import (
 	"github.com/gov4git/gov4git/lib/must"
 )
 
-type PublicAddress git.Address
-
-type PrivateAddress git.Address
-
 func Init(
 	ctx context.Context,
-	publicAddr PublicAddress,
-	privateAddr PrivateAddress,
+	ownerAddr OwnerAddress,
 ) git.Change[PrivateCredentials] {
-	public := git.CloneOrInitBranch(ctx, git.Address(publicAddr))
-	private := git.CloneOrInitBranch(ctx, git.Address(privateAddr))
-	publicTree := git.Worktree(ctx, public)
-	privateTree := git.Worktree(ctx, private)
+	ownerRepo, ownerTree := CloneOwner(ctx, ownerAddr)
+	privChg := InitLocal(ctx, ownerAddr, ownerTree)
 
-	privChg := InitLocal(ctx, publicAddr, privateAddr, publicTree, privateTree)
-
-	git.Push(ctx, private)
-	git.Push(ctx, public)
+	git.Push(ctx, ownerRepo.Private)
+	git.Push(ctx, ownerRepo.Public)
 	return privChg
 }
 
 func InitLocal(
 	ctx context.Context,
-	publicAddr PublicAddress,
-	privateAddr PrivateAddress,
-	publicTree *git.Tree,
-	privateTree *git.Tree,
+	ownerAddr OwnerAddress,
+	ownerTree OwnerTree,
 ) git.Change[PrivateCredentials] {
-	privChg := InitPrivate(ctx, privateTree, publicAddr, privateAddr)
-	pubChg := InitPublic(ctx, publicTree, privChg.Result.PublicCredentials)
-	git.Commit(ctx, privateTree, privChg.Msg)
-	git.Commit(ctx, publicTree, pubChg.Msg)
+	privChg := InitPrivate(ctx, ownerTree.Private, ownerAddr)
+	pubChg := InitPublic(ctx, ownerTree.Public, privChg.Result.PublicCredentials)
+	git.Commit(ctx, ownerTree.Private, privChg.Msg)
+	git.Commit(ctx, ownerTree.Public, pubChg.Msg)
 	return privChg
 }
 
-func InitPrivate(ctx context.Context, priv *git.Tree, publicAddr PublicAddress, privateAddr PrivateAddress) git.Change[PrivateCredentials] {
+func InitPrivate(ctx context.Context, priv *git.Tree, ownerAddr OwnerAddress) git.Change[PrivateCredentials] {
 	if _, err := priv.Filesystem.Stat(PrivateCredentialsNS.Path()); err == nil {
 		must.Errorf(ctx, "private credentials file already exists")
 	}
-	cred, err := GenerateCredentials(git.Address(publicAddr), git.Address(privateAddr))
+	cred, err := GenerateCredentials(git.Address(ownerAddr.Public), git.Address(ownerAddr.Private))
 	if err != nil {
 		must.Panic(ctx, err)
 	}

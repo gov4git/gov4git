@@ -15,12 +15,14 @@ func Open[S Strategy](
 	ctx context.Context,
 	govAddr mod.GovAddress,
 	name ns.NS,
+	title string,
+	description string,
 	choices []string,
 	participants member.Group,
 ) git.Change[BallotAddress[S]] {
 
 	govRepo, govTree := git.CloneBranchTree(ctx, git.Address(govAddr))
-	chg := OpenStageOnly[S](ctx, govAddr, govRepo, govTree, name, choices, participants)
+	chg := OpenStageOnly[S](ctx, govAddr, govRepo, govTree, name, title, description, choices, participants)
 	git.Commit(ctx, govTree, chg.Msg)
 	git.Push(ctx, govRepo)
 	return chg
@@ -32,6 +34,8 @@ func OpenStageOnly[S Strategy](
 	govRepo *git.Repository,
 	govTree *git.Tree,
 	name ns.NS,
+	title string,
+	description string,
 	choices []string,
 	participants member.Group,
 ) git.Change[BallotAddress[S]] {
@@ -54,12 +58,13 @@ func OpenStageOnly[S Strategy](
 	}
 
 	// write ad
-	head := git.Head(ctx, govRepo)
 	ad := Ad{
 		Name:         name,
+		Title:        title,
+		Description:  description,
 		Choices:      choices,
 		Participants: participants,
-		ParentCommit: git.CommitHash(head.Hash().String()),
+		ParentCommit: git.Head(ctx, govRepo),
 	}
 	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
 

@@ -1,3 +1,8 @@
+REWRITE
+- [ ] clone private repos
+- [ ] API versions of methods
+- [ ] command-line hooks
+
 PRODUCT
 
 QV-based polling with balance updates

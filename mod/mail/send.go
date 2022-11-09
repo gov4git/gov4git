@@ -54,13 +54,12 @@ func Send[M form.Form](
 
 func SendSigned[M form.Form](
 	ctx context.Context,
-	senderPublic *git.Tree,
-	senderPrivate *git.Tree,
+	senderTree id.OwnerTree,
 	receiver *git.Tree,
 	topic string,
 	msg M,
 ) git.Change[SeqNo] {
-	senderPrivCred := id.GetPrivateCredentials(ctx, senderPrivate)
+	senderPrivCred := id.GetPrivateCredentials(ctx, senderTree.Private)
 	signed := id.Sign(ctx, senderPrivCred, msg)
-	return Send(ctx, senderPublic, receiver, topic, signed)
+	return Send(ctx, senderTree.Public, receiver, topic, signed)
 }

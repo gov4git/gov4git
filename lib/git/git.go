@@ -36,6 +36,11 @@ type Repository = git.Repository
 
 type Tree = git.Worktree
 
+type RepoTree struct {
+	Repo *Repository
+	Tree *Tree
+}
+
 func CloneOrInitBranch(ctx context.Context, addr Address) *Repository {
 	repo, err := must.Try1(func() *Repository { return CloneBranch(ctx, addr) })
 	if err == nil {
@@ -137,10 +142,10 @@ func Push(ctx context.Context, r *Repository) {
 	}
 }
 
-func Head(ctx context.Context, r *Repository) *plumbing.Reference {
+func Head(ctx context.Context, r *Repository) CommitHash {
 	h, err := r.Head()
 	must.NoError(ctx, err)
-	return h
+	return CommitHash(h.Hash().String())
 }
 
 func Remotes(ctx context.Context, r *Repository) []*git.Remote {

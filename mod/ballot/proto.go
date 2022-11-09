@@ -22,9 +22,27 @@ func ClosedBallotNS[S Strategy](name ns.NS) ns.NS {
 	return ballotNS.Sub("closed").Sub(s.StrategyName()).Join(name)
 }
 
+func BallotTopic[S Strategy](name ns.NS) string {
+	var s S
+	return s.StrategyName() + ":" + name.Path()
+}
+
 type Ad struct {
 	Name         ns.NS          `json:"path"`
+	Title        string         `json:"title"`
+	Description  string         `json:"description"`
 	Choices      []string       `json:"choices"`
-	Participants member.Group   `json:"group"`
+	Participants member.Group   `json:"participants_group"`
 	ParentCommit git.CommitHash `json:"parent_commit"`
+}
+
+type Election struct {
+	VoteChoice         string  `json:"vote_choice"`
+	VoteStrengthChange float64 `json:"vote_strength_change"`
+}
+
+type ElectionEnvelope struct {
+	AdCommit  git.CommitHash `json:"ballot_ad_commit"`
+	Ad        Ad             `json:"ballot_ad"`
+	Elections []Election     `json:"ballot_elections"`
 }

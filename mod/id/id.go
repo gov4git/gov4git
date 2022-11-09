@@ -1,24 +1,32 @@
 package id
 
 import (
-	"github.com/google/uuid"
+	"context"
+
 	"github.com/gov4git/gov4git/lib/git"
 )
 
-type ID string
+type PublicAddress git.Address
 
-func GenerateUniqueID() ID {
-	return ID(uuid.New().String())
+type PrivateAddress git.Address
+
+type OwnerAddress struct {
+	Public  PublicAddress
+	Private PrivateAddress
 }
 
-type PublicCredentials struct {
-	ID               ID               `json:"id"`
-	PublicAddress    git.Address      `json:"public_address"`
-	PublicKeyEd25519 Ed25519PublicKey `json:"public_key_ed25519"`
+type OwnerRepo struct {
+	Public  *git.Repository
+	Private *git.Repository
 }
 
-type PrivateCredentials struct {
-	PrivateAddress    git.Address       `json:"private_origin"`
-	PrivateKeyEd25519 Ed25519PrivateKey `json:"private_key_ed25519"`
-	PublicCredentials PublicCredentials `json:"public_credentials"`
+type OwnerTree struct {
+	Public  *git.Tree
+	Private *git.Tree
+}
+
+func CloneOwner(ctx context.Context, ownerAddr OwnerAddress) (OwnerRepo, OwnerTree) {
+	publicRepo, publicTree := git.CloneBranchTree(ctx, git.Address(ownerAddr.Public))
+	privateRepo, privateTree := git.CloneBranchTree(ctx, git.Address(ownerAddr.Private))
+	return OwnerRepo{Public: publicRepo, Private: privateRepo}, OwnerTree{Public: publicTree, Private: privateTree}
 }

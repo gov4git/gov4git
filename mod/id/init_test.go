@@ -10,8 +10,12 @@ import (
 func TestInit(t *testing.T) {
 	ctx := testutil.NewCtx()
 	testID := InitTestID(ctx, t, true)
-	Init(ctx, PublicAddress(testID.Public.Address), PrivateAddress(testID.Private.Address))
-	if err := must.Try(func() { Init(ctx, PublicAddress(testID.Public.Address), PrivateAddress(testID.Private.Address)) }); err == nil {
+	ownerAddr := OwnerAddress{
+		Public:  PublicAddress(testID.Public.Address),
+		Private: PrivateAddress(testID.Private.Address),
+	}
+	Init(ctx, ownerAddr)
+	if err := must.Try(func() { Init(ctx, ownerAddr) }); err == nil {
 		t.Fatal("second init must fail")
 	}
 }

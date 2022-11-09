@@ -1,5 +1,14 @@
 # gov4git sync
 
+## Next: 2022-10-14
+
+- __Updates from the week:__
+  - Rewrite progress:
+    - Identity management
+    - Mailing
+    - Member management
+    - Tests and testing framework
+
 ## Next: 2022-10-07
 
 - __Context:__ October high-level goals

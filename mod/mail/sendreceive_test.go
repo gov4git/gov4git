@@ -13,11 +13,11 @@ func TestSendReceive(t *testing.T) {
 	testSenderID := id.InitTestID(ctx, t, false)
 	testReceiverID := id.InitTestID(ctx, t, false)
 	id.InitLocal(ctx,
-		testSenderID.Public.Address, testSenderID.Private.Address,
+		id.PublicAddress(testSenderID.Public.Address), id.PrivateAddress(testSenderID.Private.Address),
 		testSenderID.Public.Tree, testSenderID.Private.Tree,
 	)
 	id.InitLocal(ctx,
-		testReceiverID.Public.Address, testReceiverID.Private.Address,
+		id.PublicAddress(testReceiverID.Public.Address), id.PrivateAddress(testReceiverID.Private.Address),
 		testReceiverID.Public.Tree, testReceiverID.Private.Tree,
 	)
 
@@ -82,11 +82,11 @@ func TestSendReceiveSigned(t *testing.T) {
 	testSenderID := id.InitTestID(ctx, t, false)
 	testReceiverID := id.InitTestID(ctx, t, false)
 	id.InitLocal(ctx,
-		testSenderID.Public.Address, testSenderID.Private.Address,
+		id.PublicAddress(testSenderID.Public.Address), id.PrivateAddress(testSenderID.Private.Address),
 		testSenderID.Public.Tree, testSenderID.Private.Tree,
 	)
 	id.InitLocal(ctx,
-		testReceiverID.Public.Address, testReceiverID.Private.Address,
+		id.PublicAddress(testReceiverID.Public.Address), id.PrivateAddress(testReceiverID.Private.Address),
 		testReceiverID.Public.Tree, testReceiverID.Private.Tree,
 	)
 

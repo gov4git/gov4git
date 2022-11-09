@@ -7,13 +7,17 @@ import (
 	"github.com/gov4git/gov4git/lib/must"
 )
 
+type PublicAddress git.Address
+
+type PrivateAddress git.Address
+
 func Init(
 	ctx context.Context,
-	publicAddr git.Address,
-	privateAddr git.Address,
+	publicAddr PublicAddress,
+	privateAddr PrivateAddress,
 ) git.Change[PrivateCredentials] {
-	public := git.CloneOrInitBranch(ctx, publicAddr)
-	private := git.CloneOrInitBranch(ctx, privateAddr)
+	public := git.CloneOrInitBranch(ctx, git.Address(publicAddr))
+	private := git.CloneOrInitBranch(ctx, git.Address(privateAddr))
 	publicTree := git.Worktree(ctx, public)
 	privateTree := git.Worktree(ctx, private)
 
@@ -26,8 +30,8 @@ func Init(
 
 func InitLocal(
 	ctx context.Context,
-	publicAddr git.Address,
-	privateAddr git.Address,
+	publicAddr PublicAddress,
+	privateAddr PrivateAddress,
 	publicTree *git.Tree,
 	privateTree *git.Tree,
 ) git.Change[PrivateCredentials] {
@@ -38,11 +42,11 @@ func InitLocal(
 	return privChg
 }
 
-func InitPrivate(ctx context.Context, priv *git.Tree, publicAddr git.Address, privateAddr git.Address) git.Change[PrivateCredentials] {
+func InitPrivate(ctx context.Context, priv *git.Tree, publicAddr PublicAddress, privateAddr PrivateAddress) git.Change[PrivateCredentials] {
 	if _, err := priv.Filesystem.Stat(PrivateCredentialsNS.Path()); err == nil {
 		must.Errorf(ctx, "private credentials file already exists")
 	}
-	cred, err := GenerateCredentials(publicAddr, privateAddr)
+	cred, err := GenerateCredentials(git.Address(publicAddr), git.Address(privateAddr))
 	if err != nil {
 		must.Panic(ctx, err)
 	}

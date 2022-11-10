@@ -2,6 +2,7 @@ package ballot
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/ns"
@@ -47,15 +48,33 @@ func TallyStageOnly[S Strategy](
 		accounts[i] = member.GetUser(ctx, communityTree, user)
 	}
 
-	// process votes from users
+	// fetch votes from users
+	var fetchedVotes []FetchedVote
 	for i, account := range accounts {
-		processUserVotes[S](ctx, govAddr, govRepo, govTree, ballotName, users[i], account)
+		fetchedVotes = append(fetchedVotes,
+			fetchVotes[S](ctx, govAddr, govRepo, govTree, ballotName, users[i], account).Result...)
 	}
 
-	XXX
+	// read current tally
+	openTallyNS := OpenBallotNS[S](ballotName).Sub(tallyFilebase)
+	var currentTally *TallyForm
+	if tryCurrentTally, err := git.TryFromFile[TallyForm](ctx, communityTree, openTallyNS.Path()); err == nil {
+		currentTally = &tryCurrentTally
+	}
+
+	var s S
+	updatedTally := s.Tally(ctx, govRepo, govTree, &ad, currentTally, fetchedVotes).Result
+
+	// write updated tally
+	git.ToFile(ctx, communityTree, openTallyNS.Path(), updatedTally)
+
+	return git.Change[TallyForm]{
+		Result: updatedTally,
+		Msg:    fmt.Sprintf("Tally votes on ballot %v", ballotName),
+	}
 }
 
-func processUserVotes[S Strategy](
+func fetchVotes[S Strategy](
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govRepo id.OwnerRepo,
@@ -63,15 +82,20 @@ func processUserVotes[S Strategy](
 	ballotName ns.NS,
 	user member.User,
 	account member.Account,
-) {
+) git.Change[[]FetchedVote] {
 
+	fetched := []FetchedVote{}
 	respond := func(ctx context.Context, req VoteEnvelope, _ id.SignedPlaintext) (resp VoteEnvelope, err error) {
-		XXX
+
+		if !req.VerifyConsistency() {
+			return VoteEnvelope{}, fmt.Errorf("vote envelope is not valid")
+		}
+		fetched = append(fetched, FetchedVote{Envelope: req, User: user})
+		return req, nil
 	}
 
 	_, voterPublicTree := git.CloneBranchTree(ctx, git.Address(account.Home))
-
-	chg := mail.ReceiveSigned[VoteEnvelope, VoteEnvelope](
+	mail.ReceiveSigned[VoteEnvelope, VoteEnvelope](
 		ctx,
 		govTree,
 		account.Home,
@@ -80,4 +104,8 @@ func processUserVotes[S Strategy](
 		respond,
 	)
 
+	return git.Change[[]FetchedVote]{
+		Result: fetched,
+		Msg:    fmt.Sprintf("Fetched votes from user %v on ballot %v", user, ballotName),
+	}
 }

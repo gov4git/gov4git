@@ -3,11 +3,15 @@
 ## Next: 2022-10-14
 
 - __Updates from the week:__
-  - Rewrite progress:
+  - Prepared grant proposal for UI work
+  - Rewrite progress (90%):
     - Identity management
     - Mailing
     - Member management
+    - Balloting
     - Tests and testing framework
+
+- __Priorities for this week:__
 
 ## Next: 2022-10-07
 

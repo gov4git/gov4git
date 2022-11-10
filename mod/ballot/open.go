@@ -58,17 +58,19 @@ func OpenStageOnly[S Strategy](
 	}
 
 	// write ad
+	var s S
 	ad := AdForm{
+		Community:    govAddr,
 		Name:         name,
 		Title:        title,
 		Description:  description,
 		Choices:      choices,
+		Strategy:     s.StrategyName(),
 		Participants: participants,
 		ParentCommit: git.Head(ctx, govRepo),
 	}
 	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
 
-	var s S
 	return git.Change[BallotAddress[S]]{
 		Result: BallotAddress[S]{Gov: govAddr, Name: name},
 		Msg:    fmt.Sprintf("Create ballot of type %v", s.StrategyName()),

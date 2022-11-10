@@ -4,6 +4,7 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/ns"
 	"github.com/gov4git/gov4git/mod"
+	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/member"
 )
 
@@ -28,12 +29,14 @@ func BallotTopic[S Strategy](name ns.NS) string {
 }
 
 type AdForm struct {
-	Name         ns.NS          `json:"path"`
-	Title        string         `json:"title"`
-	Description  string         `json:"description"`
-	Choices      []string       `json:"choices"`
-	Participants member.Group   `json:"participants_group"`
-	ParentCommit git.CommitHash `json:"parent_commit"`
+	Community    gov.CommunityAddress `json:"community"`
+	Name         ns.NS                `json:"path"`
+	Title        string               `json:"title"`
+	Description  string               `json:"description"`
+	Choices      []string             `json:"choices"`
+	Strategy     string               `json:"strategy"`
+	Participants member.Group         `json:"participants_group"`
+	ParentCommit git.CommitHash       `json:"parent_commit"`
 }
 
 type VoteForm struct {

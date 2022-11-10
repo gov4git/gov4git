@@ -8,6 +8,7 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
 	"github.com/gov4git/gov4git/lib/testutil"
+	"github.com/gov4git/gov4git/mod/id"
 )
 
 func TestMember(t *testing.T) {
@@ -17,7 +18,12 @@ func TestMember(t *testing.T) {
 	wt := git.Worktree(ctx, repo.Repo)
 
 	u1 := User("user1")
-	r1 := git.URL("http://1")
+	r1 := Account{
+		Home: id.PublicAddress{
+			Repo:   git.URL("http://1"),
+			Branch: git.MainBranch,
+		},
+	}
 	AddUser(ctx, wt, u1, r1)
 	r1Got := GetUser(ctx, wt, u1)
 	if r1 != r1Got {

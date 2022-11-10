@@ -1,4 +1,10 @@
 REWRITE
+- [ ] ballots
+  - [x] open
+  - [ ] close
+  - [x] vote
+  - [ ] tally
+  - [ ] list
 - [ ] clone private repos
 - [ ] API versions of methods
 - [ ] command-line hooks

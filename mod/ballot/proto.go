@@ -27,7 +27,7 @@ func BallotTopic[S Strategy](name ns.NS) string {
 	return s.StrategyName() + ":" + name.Path()
 }
 
-type Ad struct {
+type AdForm struct {
 	Name         ns.NS          `json:"path"`
 	Title        string         `json:"title"`
 	Description  string         `json:"description"`
@@ -36,13 +36,15 @@ type Ad struct {
 	ParentCommit git.CommitHash `json:"parent_commit"`
 }
 
-type Election struct {
+type VoteForm struct {
 	VoteChoice         string  `json:"vote_choice"`
 	VoteStrengthChange float64 `json:"vote_strength_change"`
 }
 
-type ElectionEnvelope struct {
+type VoteEnvelope struct {
 	AdCommit  git.CommitHash `json:"ballot_ad_commit"`
-	Ad        Ad             `json:"ballot_ad"`
-	Elections []Election     `json:"ballot_elections"`
+	Ad        AdForm         `json:"ballot_ad"`
+	Elections []VoteForm     `json:"ballot_elections"`
 }
+
+type TallyForm struct{}

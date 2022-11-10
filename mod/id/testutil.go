@@ -14,6 +14,10 @@ type TestID struct {
 	Private testutil.PlainAddress
 }
 
+func (x TestID) PublicAddress() PublicAddress {
+	return PublicAddress(x.Public.Address)
+}
+
 func (x TestID) String() string {
 	return fmt.Sprintf("test identity, public_dir=%v private_dir=%v\n", x.Public.Dir, x.Private.Dir)
 }

@@ -46,7 +46,7 @@ func TestSendReceive(t *testing.T) {
 	r0 := Receive(
 		ctx,
 		testReceiverID.Public.Tree,
-		testSenderID.Public.Address,
+		testSenderID.PublicAddress(),
 		testSenderID.Public.Tree,
 		testTopic,
 		respond,
@@ -71,7 +71,7 @@ func TestSendReceive(t *testing.T) {
 	r12 := Receive(
 		ctx,
 		testReceiverID.Public.Tree,
-		testSenderID.Public.Address,
+		testSenderID.PublicAddress(),
 		testSenderID.Public.Tree,
 		testTopic,
 		respond,
@@ -124,9 +124,8 @@ func TestSendReceiveSigned(t *testing.T) {
 
 	r0 := ReceiveSigned(
 		ctx,
-		testReceiverID.Public.Tree,
-		testReceiverID.Private.Tree,
-		testSenderID.Public.Address,
+		receiverOwnerTree,
+		testSenderID.PublicAddress(),
 		testSenderID.Public.Tree,
 		testTopic,
 		respond,
@@ -150,9 +149,8 @@ func TestSendReceiveSigned(t *testing.T) {
 
 	r12 := ReceiveSigned(
 		ctx,
-		testReceiverID.Public.Tree,
-		testReceiverID.Private.Tree,
-		testSenderID.Public.Address,
+		receiverOwnerTree,
+		testSenderID.PublicAddress(),
 		testSenderID.Public.Tree,
 		testTopic,
 		respond,

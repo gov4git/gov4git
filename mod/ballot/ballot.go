@@ -2,7 +2,7 @@ package ballot
 
 import (
 	"github.com/gov4git/gov4git/lib/ns"
-	"github.com/gov4git/gov4git/mod"
+	"github.com/gov4git/gov4git/mod/gov"
 )
 
 type Strategy interface {
@@ -10,6 +10,6 @@ type Strategy interface {
 }
 
 type BallotAddress[S Strategy] struct {
-	Gov  mod.GovAddress
+	Gov  gov.CommunityAddress
 	Name ns.NS
 }

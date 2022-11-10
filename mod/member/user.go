@@ -10,21 +10,21 @@ import (
 	"github.com/gov4git/gov4git/mod/kv"
 )
 
-func SetUser(ctx context.Context, t *git.Tree, name User, url git.URL) git.ChangeNoResult {
+func SetUser(ctx context.Context, t *git.Tree, name User, user Account) git.ChangeNoResult {
 	AddGroup(ctx, t, Everybody)
 	AddMember(ctx, t, name, Everybody)
-	return usersKV.Set(ctx, usersNS, t, name, url)
+	return usersKV.Set(ctx, usersNS, t, name, user)
 }
 
-func GetUser(ctx context.Context, t *git.Tree, name User) git.URL {
+func GetUser(ctx context.Context, t *git.Tree, name User) Account {
 	return usersKV.Get(ctx, usersNS, t, name)
 }
 
-func AddUser(ctx context.Context, t *git.Tree, name User, url git.URL) git.ChangeNoResult {
+func AddUser(ctx context.Context, t *git.Tree, name User, user Account) git.ChangeNoResult {
 	if err := must.Try(func() { GetUser(ctx, t, name) }); err == nil {
 		must.Panic(ctx, fmt.Errorf("user already exists"))
 	}
-	return SetUser(ctx, t, name, url)
+	return SetUser(ctx, t, name, user)
 }
 
 func RemoveUser(ctx context.Context, t *git.Tree, name User) git.ChangeNoResult {

@@ -24,7 +24,7 @@ type Responder[Request form.Form, Response form.Form] func(
 func Receive[Request form.Form, Response form.Form](
 	ctx context.Context,
 	receiver *git.Tree,
-	senderAddr git.Address,
+	senderAddr id.PublicAddress,
 	sender *git.Tree,
 	topic string,
 	respond Responder[Request, Response],
@@ -81,14 +81,14 @@ type SignedResponder[Request form.Form, Response form.Form] func(
 
 func ReceiveSigned[Request form.Form, Response form.Form](
 	ctx context.Context,
-	receiverPublic *git.Tree,
-	receiverPrivate *git.Tree,
-	senderAddr git.Address,
+	receiverTree id.OwnerTree,
+	senderAddr id.PublicAddress,
 	senderPublic *git.Tree,
 	topic string,
 	respond SignedResponder[Request, Response],
 ) git.Change[[]RequestResponse[Request, Response]] {
-	receiverPrivCred := id.GetPrivateCredentials(ctx, receiverPrivate)
+
+	receiverPrivCred := id.GetOwnerCredentials(ctx, receiverTree)
 	rr := []RequestResponse[Request, Response]{}
 	signRespond := func(ctx context.Context, signedReq id.SignedPlaintext) (signedResp id.SignedPlaintext, err error) {
 		if !signedReq.Verify() {
@@ -105,7 +105,7 @@ func ReceiveSigned[Request form.Form, Response form.Form](
 		rr = append(rr, RequestResponse[Request, Response]{Request: req, Response: resp})
 		return id.Sign(ctx, receiverPrivCred, resp), nil
 	}
-	Receive(ctx, receiverPublic, senderAddr, senderPublic, topic, signRespond)
+	Receive(ctx, receiverTree.Public, senderAddr, senderPublic, topic, signRespond)
 	return git.Change[[]RequestResponse[Request, Response]]{
 		Result: rr,
 		Msg:    fmt.Sprintf("Received signed mail"),

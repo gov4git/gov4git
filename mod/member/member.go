@@ -23,7 +23,7 @@ var (
 	membersNS = mod.RootNS.Sub("members")
 
 	usersNS = membersNS.Sub("users")
-	usersKV = kv.KV[User, git.URL]{}
+	usersKV = kv.KV[User, Account]{}
 
 	groupsNS = membersNS.Sub("groups")
 	groupsKV = kv.KV[Group, form.None]{}

@@ -7,13 +7,13 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
 	"github.com/gov4git/gov4git/lib/ns"
-	"github.com/gov4git/gov4git/mod"
+	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/member"
 )
 
 func Open[S Strategy](
 	ctx context.Context,
-	govAddr mod.GovAddress,
+	govAddr gov.CommunityAddress,
 	name ns.NS,
 	title string,
 	description string,
@@ -30,7 +30,7 @@ func Open[S Strategy](
 
 func OpenStageOnly[S Strategy](
 	ctx context.Context,
-	govAddr mod.GovAddress,
+	govAddr gov.CommunityAddress,
 	govRepo *git.Repository,
 	govTree *git.Tree,
 	name ns.NS,
@@ -58,7 +58,7 @@ func OpenStageOnly[S Strategy](
 	}
 
 	// write ad
-	ad := Ad{
+	ad := AdForm{
 		Name:         name,
 		Title:        title,
 		Description:  description,

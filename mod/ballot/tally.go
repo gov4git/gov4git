@@ -99,7 +99,7 @@ func fetchVotes[S Strategy](
 		return req, nil
 	}
 
-	_, voterPublicTree := git.CloneBranchTree(ctx, git.Address(account.Home))
+	_, voterPublicTree := git.Clone(ctx, git.Address(account.Home))
 	mail.ReceiveSigned(
 		ctx,
 		govTree,

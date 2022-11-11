@@ -15,7 +15,7 @@ func ListOpen[S Strategy](
 	govAddr gov.CommunityAddress,
 ) []Advertisement {
 
-	_, govTree := git.CloneBranchTree(ctx, git.Address(govAddr))
+	_, govTree := git.Clone(ctx, git.Address(govAddr))
 	return ListOpenTree[S](ctx, govTree)
 }
 

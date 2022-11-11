@@ -19,7 +19,7 @@ func Vote[S Strategy](
 	elections []Election,
 ) git.Change[mail.SeqNo] {
 
-	govRepo := git.CloneBranch(ctx, git.Address(govAddr))
+	govRepo := git.CloneRepo(ctx, git.Address(govAddr))
 	voterRepo, voterTree := id.CloneOwner(ctx, voterAddr)
 	chg := VoteStageOnly[S](ctx, voterAddr, govAddr, voterTree, govRepo, ballotName, elections)
 	git.Commit(ctx, voterTree.Public, chg.Msg)

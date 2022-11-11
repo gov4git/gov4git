@@ -4,14 +4,15 @@ import (
 	"context"
 	"testing"
 
+	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/testutil"
 	"github.com/gov4git/gov4git/mod/id"
 )
 
 func TestSendReceive(t *testing.T) {
 	ctx := testutil.NewCtx()
-	testSenderID := id.InitTestID(ctx, t, false)
-	testReceiverID := id.InitTestID(ctx, t, false)
+	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
+	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
 	senderOwnerAddr := id.OwnerAddress{
 		Public:  id.PublicAddress(testSenderID.Public.Address),
 		Private: id.PrivateAddress(testSenderID.Private.Address),
@@ -89,8 +90,8 @@ func TestSendReceive(t *testing.T) {
 
 func TestSendReceiveSigned(t *testing.T) {
 	ctx := testutil.NewCtx()
-	testSenderID := id.InitTestID(ctx, t, false)
-	testReceiverID := id.InitTestID(ctx, t, false)
+	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
+	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
 	senderOwnerAddr := id.OwnerAddress{
 		Public:  id.PublicAddress(testSenderID.Public.Address),
 		Private: id.PrivateAddress(testSenderID.Private.Address),

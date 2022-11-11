@@ -28,6 +28,10 @@ type Address struct {
 	Branch Branch
 }
 
+func (a Address) String() string {
+	return string(a.Repo) + ":" + string(a.Branch)
+}
+
 func NewAddress(repo URL, branch Branch) Address {
 	return Address{Repo: repo, Branch: branch}
 }
@@ -42,7 +46,7 @@ type RepoTree struct {
 }
 
 func CloneOrInitBranch(ctx context.Context, addr Address) *Repository {
-	repo, err := must.Try1(func() *Repository { return CloneBranch(ctx, addr) })
+	repo, err := must.Try1(func() *Repository { return CloneRepo(ctx, addr) })
 	if err == nil {
 		return repo
 	}
@@ -87,7 +91,7 @@ func InitPlain(ctx context.Context, path string, isBare bool) *Repository {
 	return repo
 }
 
-func CloneBranch(ctx context.Context, addr Address) *Repository {
+func CloneRepo(ctx context.Context, addr Address) *Repository {
 	repo, err := git.CloneContext(ctx,
 		memory.NewStorage(),
 		memfs.New(),
@@ -102,8 +106,8 @@ func CloneBranch(ctx context.Context, addr Address) *Repository {
 	return repo
 }
 
-func CloneBranchTree(ctx context.Context, addr Address) (*Repository, *Tree) {
-	repo := CloneBranch(ctx, addr)
+func Clone(ctx context.Context, addr Address) (*Repository, *Tree) {
+	repo := CloneRepo(ctx, addr)
 	return repo, Worktree(ctx, repo)
 }
 

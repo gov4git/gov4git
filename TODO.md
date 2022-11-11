@@ -1,27 +1,28 @@
+MILESTONE NOV 2022
+
 REWRITE
 - [ ] ballots
-  - [x] open
-  - [ ] close
-  - [x] vote
-  - [ ] tally
-  - [x] list
+- [x] open
+- [x] close
+- [x] vote
+- [x] tally
+- [x] list
 - [ ] clone private repos
-  - [ ] ssh method
-  - [ ] github personal access token
-- [ ] API variants of methods
+- [ ] ssh method
+- [ ] github personal access token
 - [ ] command-line hooks
+- [ ] API covers of methods
+
+
 
 PRODUCT
-
 QV-based polling with balance updates
-     - [ ] transfer user balance
-       - [ ] mechanism for proposing operation executions
-     - [ ] vote sanity checks (e.g. allowed elections, enough balance, XXX, TODO)
-     - [ ] rename gov command to ballot: ballot open, ballot close, etc.
+- [ ] transfer user balance
+- [ ] vote sanity checks (e.g. allowed elections, enough balance)
+- [ ] polling strategy decrements balances (or puts them on hold)
 
-     - [ ] polling strategy decrements balances
+_______________________________________________________
 
-     - [ ] move voting interactions to identity main branch
 
 Merge approval workflow
      - [ ] ...

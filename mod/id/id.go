@@ -26,7 +26,7 @@ type OwnerTree struct {
 }
 
 func CloneOwner(ctx context.Context, ownerAddr OwnerAddress) (OwnerRepo, OwnerTree) {
-	publicRepo, publicTree := git.CloneBranchTree(ctx, git.Address(ownerAddr.Public))
-	privateRepo, privateTree := git.CloneBranchTree(ctx, git.Address(ownerAddr.Private))
+	publicRepo, publicTree := git.Clone(ctx, git.Address(ownerAddr.Public))
+	privateRepo, privateTree := git.Clone(ctx, git.Address(ownerAddr.Private))
 	return OwnerRepo{Public: publicRepo, Private: privateRepo}, OwnerTree{Public: publicTree, Private: privateTree}
 }

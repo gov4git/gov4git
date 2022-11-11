@@ -8,7 +8,7 @@ import (
 )
 
 func FetchPublicCredentials(ctx context.Context, publicAddr git.Address) PublicCredentials {
-	_, tree := git.CloneBranchTree(ctx, publicAddr)
+	_, tree := git.Clone(ctx, publicAddr)
 	return GetPublicCredentials(ctx, tree)
 }
 

@@ -15,7 +15,7 @@ func Close[S Strategy](
 	ballotName ns.NS,
 ) git.ChangeNoResult {
 
-	govRepo, govTree := git.CloneBranchTree(ctx, git.Address(govAddr))
+	govRepo, govTree := git.Clone(ctx, git.Address(govAddr))
 	chg := CloseStageOnly[S](ctx, govAddr, govRepo, govTree, ballotName)
 	git.Commit(ctx, govTree, chg.Msg)
 	git.Push(ctx, govRepo)

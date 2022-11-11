@@ -26,18 +26,18 @@ func Hang() {
 	<-(chan int)(nil)
 }
 
-type PlainAddress struct {
+type LocalAddress struct {
 	Dir     string
 	Repo    *git.Repository
 	Tree    *git.Tree
 	Address git.Address
 }
 
-func (x PlainAddress) String() string {
+func (x LocalAddress) String() string {
 	return fmt.Sprintf("test address, dir=%v\n", x.Dir)
 }
 
-func InitPlainAddress(ctx context.Context, t *testing.T, branch git.Branch, isBare bool) PlainAddress {
+func NewLocalAddress(ctx context.Context, t *testing.T, branch git.Branch, isBare bool) LocalAddress {
 	dir := filepath.Join(t.TempDir(), UniqueString(ctx))
 	repo := git.InitPlain(ctx, dir, isBare)
 	addr := git.NewAddress(git.URL(dir), branch)
@@ -45,5 +45,5 @@ func InitPlainAddress(ctx context.Context, t *testing.T, branch git.Branch, isBa
 	if !isBare {
 		tree = git.Worktree(ctx, repo)
 	}
-	return PlainAddress{Dir: dir, Repo: repo, Address: addr, Tree: tree}
+	return LocalAddress{Dir: dir, Repo: repo, Address: addr, Tree: tree}
 }

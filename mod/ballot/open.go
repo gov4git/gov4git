@@ -21,7 +21,7 @@ func Open[S Strategy](
 	participants member.Group,
 ) git.Change[BallotAddress[S]] {
 
-	govRepo, govTree := git.CloneBranchTree(ctx, git.Address(govAddr))
+	govRepo, govTree := git.Clone(ctx, git.Address(govAddr))
 	chg := OpenStageOnly[S](ctx, govAddr, govRepo, govTree, name, title, description, choices, participants)
 	git.Commit(ctx, govTree, chg.Msg)
 	git.Push(ctx, govRepo)

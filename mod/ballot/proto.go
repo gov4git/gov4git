@@ -31,7 +31,7 @@ func BallotTopic[S Strategy](name ns.NS) string {
 	return s.StrategyName() + ":" + name.Path()
 }
 
-type AdForm struct {
+type Advertisement struct {
 	Community    gov.CommunityAddress `json:"community"`
 	Name         ns.NS                `json:"path"`
 	Title        string               `json:"title"`
@@ -42,15 +42,17 @@ type AdForm struct {
 	ParentCommit git.CommitHash       `json:"parent_commit"`
 }
 
-type VoteForm struct {
+type Election struct {
 	VoteChoice         string  `json:"vote_choice"`
 	VoteStrengthChange float64 `json:"vote_strength_change"`
 }
 
+type Elections []Election
+
 type VoteEnvelope struct {
 	AdCommit  git.CommitHash `json:"ballot_ad_commit"`
-	Ad        AdForm         `json:"ballot_ad"`
-	Elections []VoteForm     `json:"ballot_elections"`
+	Ad        Advertisement  `json:"ballot_ad"`
+	Elections []Election     `json:"ballot_elections"`
 }
 
 // Verify verifies that elections are consistent with the ballot ad.
@@ -64,30 +66,30 @@ func (x VoteEnvelope) VerifyConsistency() bool {
 }
 
 type TallyForm struct {
-	Ad             AdForm             `json:"ballot_ad"`
-	Participations ParticipationForms `json:"ballot_participations"`
-	ChoiceTallies  ChoiceTallyForms   `json:"ballot_choice_tallies"`
+	Ad           Advertisement `json:"ballot_ad"`
+	FetchedVotes FetchedVotes  `json:"ballot_fetched_votes"`
+	ChoiceScores ChoiceScores  `json:"ballot_choice_scores"`
 }
 
-type ParticipationForm struct {
-	Name      member.User      `json:"voter_user_name"`
+type FetchedVote struct {
+	Voter     member.User      `json:"voter_user"`
 	Address   id.PublicAddress `json:"voter_address"`
-	Envelopes []VoteEnvelope   `json:"voter_vote_envelopes"`
+	Elections Elections        `json:"voter_elections"`
 }
 
-type ParticipationForms []ParticipationForm
+type FetchedVotes []FetchedVote
 
-func (x ParticipationForms) Len() int           { return len(x) }
-func (x ParticipationForms) Less(i, j int) bool { return x[i].Name < x[j].Name }
-func (x ParticipationForms) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
+func (x FetchedVotes) Len() int           { return len(x) }
+func (x FetchedVotes) Less(i, j int) bool { return x[i].Voter < x[j].Voter }
+func (x FetchedVotes) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 
-type ChoiceTallyForm struct {
+type ChoiceScore struct {
 	Choice string  `json:"choice"`
 	Score  float64 `json:"score"`
 }
 
-type ChoiceTallyForms []ChoiceTallyForm
+type ChoiceScores []ChoiceScore
 
-func (x ChoiceTallyForms) Len() int           { return len(x) }
-func (x ChoiceTallyForms) Less(i, j int) bool { return x[i].Score > x[j].Score }
-func (x ChoiceTallyForms) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
+func (x ChoiceScores) Len() int           { return len(x) }
+func (x ChoiceScores) Less(i, j int) bool { return x[i].Score > x[j].Score }
+func (x ChoiceScores) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }

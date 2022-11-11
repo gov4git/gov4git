@@ -7,7 +7,6 @@ import (
 	"github.com/gov4git/gov4git/lib/ns"
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/id"
-	"github.com/gov4git/gov4git/mod/member"
 )
 
 type Strategy interface {
@@ -17,15 +16,10 @@ type Strategy interface {
 		govRepo id.OwnerRepo,
 		govTree id.OwnerTree,
 		//
-		ad *AdForm,
+		ad *Advertisement,
 		current *TallyForm,
 		fetched []FetchedVote,
 	) git.Change[TallyForm] // tallying can change other aspects of the repo, like user balances
-}
-
-type FetchedVote struct {
-	User     member.User
-	Envelope VoteEnvelope
 }
 
 type BallotAddress[S Strategy] struct {

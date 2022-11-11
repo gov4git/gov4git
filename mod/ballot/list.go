@@ -13,7 +13,7 @@ import (
 func ListOpen[S Strategy](
 	ctx context.Context,
 	govAddr gov.CommunityAddress,
-) []AdForm {
+) []Advertisement {
 
 	_, govTree := git.CloneBranchTree(ctx, git.Address(govAddr))
 	return ListOpenTree[S](ctx, govTree)
@@ -22,20 +22,20 @@ func ListOpen[S Strategy](
 func ListOpenTree[S Strategy](
 	ctx context.Context,
 	govTree *git.Tree,
-) []AdForm {
+) []Advertisement {
 
 	openNS := OpenBallotNS[S](ns.NS(""))
 
 	files, err := git.ListFilesRecursively(govTree, openNS.Path())
 	must.NoError(ctx, err)
 
-	ads := []AdForm{}
+	ads := []Advertisement{}
 	for _, file := range files {
 		if filepath.Base(file) != adFilebase {
 			continue
 		}
-		var ad AdForm
-		err := must.Try(func() { ad = git.FromFile[AdForm](ctx, govTree, file) })
+		var ad Advertisement
+		err := must.Try(func() { ad = git.FromFile[Advertisement](ctx, govTree, file) })
 		if err != nil {
 			continue
 		}

@@ -37,7 +37,7 @@ func TallyStageOnly[S Strategy](
 
 	// read ad
 	openAdNS := OpenBallotNS[S](ballotName).Sub(adFilebase)
-	ad := git.FromFile[AdForm](ctx, communityTree, openAdNS.Path())
+	ad := git.FromFile[Advertisement](ctx, communityTree, openAdNS.Path())
 
 	// list participating users
 	users := member.ListGroupUsers(ctx, communityTree, ad.Participants)
@@ -90,12 +90,17 @@ func fetchVotes[S Strategy](
 		if !req.VerifyConsistency() {
 			return VoteEnvelope{}, fmt.Errorf("vote envelope is not valid")
 		}
-		fetched = append(fetched, FetchedVote{Envelope: req, User: user})
+		fetched = append(fetched,
+			FetchedVote{
+				Voter:     user,
+				Address:   account.Home,
+				Elections: req.Elections,
+			})
 		return req, nil
 	}
 
 	_, voterPublicTree := git.CloneBranchTree(ctx, git.Address(account.Home))
-	mail.ReceiveSigned[VoteEnvelope, VoteEnvelope](
+	mail.ReceiveSigned(
 		ctx,
 		govTree,
 		account.Home,

@@ -16,7 +16,7 @@ func Vote[S Strategy](
 	voterAddr id.OwnerAddress,
 	govAddr gov.CommunityAddress,
 	ballotName ns.NS,
-	elections []VoteForm,
+	elections []Election,
 ) git.Change[mail.SeqNo] {
 
 	govRepo := git.CloneBranch(ctx, git.Address(govAddr))
@@ -35,12 +35,12 @@ func VoteStageOnly[S Strategy](
 	voterTree id.OwnerTree,
 	govRepo *git.Repository,
 	ballotName ns.NS,
-	elections []VoteForm,
+	elections []Election,
 ) git.Change[mail.SeqNo] {
 
 	govTree := git.Worktree(ctx, govRepo)
 	openAdNS := OpenBallotNS[S](ballotName).Sub(adFilebase)
-	ad := git.FromFile[AdForm](ctx, govTree, openAdNS.Path())
+	ad := git.FromFile[Advertisement](ctx, govTree, openAdNS.Path())
 	verifyElections[S](ctx, voterAddr, govAddr, voterTree, govTree, ad, elections)
 	envelope := VoteEnvelope{
 		AdCommit:  git.Head(ctx, govRepo),
@@ -57,8 +57,8 @@ func verifyElections[S Strategy](
 	govAddr gov.CommunityAddress,
 	voterTree id.OwnerTree,
 	govTree *git.Tree,
-	ad AdForm,
-	elections []VoteForm,
+	ad Advertisement,
+	elections []Election,
 ) {
 	// check elections use available choices
 	if len(ad.Choices) > 0 {

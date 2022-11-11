@@ -35,3 +35,11 @@ func TryFromFile[V form.Form](ctx context.Context, t *Tree, filePath string) (v 
 	)
 	return
 }
+
+func RenameStage(ctx context.Context, t *Tree, oldPath, newPath string) {
+	must.NoError(ctx, t.Filesystem.Rename(oldPath, newPath))
+	_, err := t.Remove(oldPath)
+	must.NoError(ctx, err)
+	_, err = t.Add(newPath)
+	must.NoError(ctx, err)
+}

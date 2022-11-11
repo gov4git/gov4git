@@ -59,7 +59,7 @@ func OpenStageOnly[S Strategy](
 
 	// write ad
 	var s S
-	ad := AdForm{
+	ad := Advertisement{
 		Community:    govAddr,
 		Name:         name,
 		Title:        title,

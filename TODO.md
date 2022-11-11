@@ -4,9 +4,11 @@ REWRITE
   - [ ] close
   - [x] vote
   - [ ] tally
-  - [ ] list
+  - [x] list
 - [ ] clone private repos
-- [ ] API versions of methods
+  - [ ] ssh method
+  - [ ] github personal access token
+- [ ] API variants of methods
 - [ ] command-line hooks
 
 PRODUCT

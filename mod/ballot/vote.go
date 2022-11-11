@@ -6,6 +6,7 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
 	"github.com/gov4git/gov4git/lib/ns"
+	"github.com/gov4git/gov4git/mod"
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/id"
 	"github.com/gov4git/gov4git/mod/mail"
@@ -22,7 +23,7 @@ func Vote[S Strategy](
 	govRepo := git.CloneRepo(ctx, git.Address(govAddr))
 	voterRepo, voterTree := id.CloneOwner(ctx, voterAddr)
 	chg := VoteStageOnly[S](ctx, voterAddr, govAddr, voterTree, govRepo, ballotName, elections)
-	git.Commit(ctx, voterTree.Public, chg.Msg)
+	mod.Commit(ctx, voterTree.Public, chg.Msg)
 	git.Push(ctx, voterRepo.Public)
 
 	return chg

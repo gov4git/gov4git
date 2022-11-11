@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/ns"
+	"github.com/gov4git/gov4git/mod"
 	"github.com/gov4git/gov4git/mod/gov"
 )
 
@@ -17,7 +18,7 @@ func Close[S Strategy](
 
 	govRepo, govTree := git.Clone(ctx, git.Address(govAddr))
 	chg := CloseStageOnly[S](ctx, govAddr, govRepo, govTree, ballotName)
-	git.Commit(ctx, govTree, chg.Msg)
+	mod.Commit(ctx, govTree, chg.Msg)
 	git.Push(ctx, govRepo)
 	return chg
 }

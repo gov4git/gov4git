@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/ns"
+	"github.com/gov4git/gov4git/mod"
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/id"
 	"github.com/gov4git/gov4git/mod/mail"
@@ -20,7 +21,7 @@ func Tally[S Strategy](
 
 	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg := TallyStageOnly[S](ctx, govAddr, govRepo, govTree, ballotName)
-	git.Commit(ctx, git.Worktree(ctx, govRepo.Public), chg.Msg)
+	mod.Commit(ctx, git.Worktree(ctx, govRepo.Public), chg.Msg)
 	git.Push(ctx, govRepo.Public)
 	return chg
 }

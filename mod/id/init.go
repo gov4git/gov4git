@@ -5,6 +5,7 @@ import (
 
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
+	"github.com/gov4git/gov4git/mod"
 )
 
 func Init(
@@ -26,8 +27,8 @@ func InitLocal(
 ) git.Change[PrivateCredentials] {
 	privChg := InitPrivate(ctx, ownerTree.Private, ownerAddr)
 	pubChg := InitPublic(ctx, ownerTree.Public, privChg.Result.PublicCredentials)
-	git.Commit(ctx, ownerTree.Private, privChg.Msg)
-	git.Commit(ctx, ownerTree.Public, pubChg.Msg)
+	mod.Commit(ctx, ownerTree.Private, privChg.Msg)
+	mod.Commit(ctx, ownerTree.Public, pubChg.Msg)
 	return privChg
 }
 

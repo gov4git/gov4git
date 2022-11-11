@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/lib/must"
 	"github.com/gov4git/gov4git/lib/ns"
+	"github.com/gov4git/gov4git/mod"
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/member"
 )
@@ -23,7 +24,7 @@ func Open[S Strategy](
 
 	govRepo, govTree := git.Clone(ctx, git.Address(govAddr))
 	chg := OpenStageOnly[S](ctx, govAddr, govRepo, govTree, name, title, description, choices, participants)
-	git.Commit(ctx, govTree, chg.Msg)
+	mod.Commit(ctx, govTree, chg.Msg)
 	git.Push(ctx, govRepo)
 	return chg
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func SetUser(ctx context.Context, t *git.Tree, name User, user Account) git.ChangeNoResult {
-	AddGroup(ctx, t, Everybody)
+	SetGroup(ctx, t, Everybody)
 	AddMember(ctx, t, name, Everybody)
 	return usersKV.Set(ctx, usersNS, t, name, user)
 }

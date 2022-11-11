@@ -45,10 +45,10 @@ type RepoTree struct {
 	Tree *Tree
 }
 
-func CloneOrInitBranch(ctx context.Context, addr Address) *Repository {
+func CloneOrInit(ctx context.Context, addr Address) (*Repository, *Tree) {
 	repo, err := must.Try1(func() *Repository { return CloneRepo(ctx, addr) })
 	if err == nil {
-		return repo
+		return repo, Worktree(ctx, repo)
 	}
 	if err != transport.ErrEmptyRemoteRepository {
 		must.Panic(ctx, err)
@@ -64,7 +64,7 @@ func CloneOrInitBranch(ctx context.Context, addr Address) *Repository {
 
 	ChangeDefaultBranch(ctx, repo, addr.Branch)
 
-	return repo
+	return repo, Worktree(ctx, repo)
 }
 
 func ChangeDefaultBranch(ctx context.Context, repo *Repository, main Branch) {

@@ -6,10 +6,10 @@ import (
 	"math"
 	"sort"
 
-	"github.com/gov4git/gov4git/lib/git"
 	"github.com/gov4git/gov4git/mod/ballot"
 	"github.com/gov4git/gov4git/mod/id"
 	"github.com/gov4git/gov4git/mod/member"
+	"github.com/gov4git/lib4git/git"
 )
 
 type PriorityPoll struct{}

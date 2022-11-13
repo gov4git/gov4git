@@ -6,6 +6,7 @@ require (
 	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/google/uuid v1.3.0
+	github.com/gov4git/lib4git v0.0.0-20221113212336-3e7bb904880f
 	go.uber.org/zap v1.23.0
 )
 

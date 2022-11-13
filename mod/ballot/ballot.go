@@ -3,10 +3,10 @@ package ballot
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/ns"
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/id"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/ns"
 )
 
 type Strategy interface {

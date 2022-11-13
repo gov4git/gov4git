@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/gov4git/gov4git/lib/testutil"
+	"github.com/gov4git/lib4git/testutil"
 )
 
 func TestTestCommunity(t *testing.T) {

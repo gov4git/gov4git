@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/gov4git/gov4git/lib/base"
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/ns"
-	"github.com/gov4git/gov4git/lib/testutil"
+	"github.com/gov4git/lib4git/base"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/ns"
+	"github.com/gov4git/lib4git/testutil"
 )
 
 func TestSetGet(t *testing.T) {

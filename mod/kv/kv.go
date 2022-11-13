@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/gov4git/gov4git/lib/form"
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/must"
-	"github.com/gov4git/gov4git/lib/ns"
+	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
+	"github.com/gov4git/lib4git/ns"
 )
 
 const (

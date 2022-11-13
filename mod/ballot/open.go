@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/must"
-	"github.com/gov4git/gov4git/lib/ns"
 	"github.com/gov4git/gov4git/mod"
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/member"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
+	"github.com/gov4git/lib4git/ns"
 )
 
 func Open[S Strategy](

@@ -3,7 +3,7 @@ package id
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/lib/git"
+	"github.com/gov4git/lib4git/git"
 )
 
 type PublicAddress git.Address

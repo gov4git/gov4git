@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/testutil"
 	"github.com/gov4git/gov4git/mod/id"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/testutil"
 )
 
 func TestSendReceive(t *testing.T) {

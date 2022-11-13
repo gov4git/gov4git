@@ -3,8 +3,8 @@ package mod
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/ns"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/ns"
 )
 
 var RootNS = ns.NS("")

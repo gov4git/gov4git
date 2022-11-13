@@ -3,9 +3,9 @@ package id
 import (
 	"testing"
 
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/must"
-	"github.com/gov4git/gov4git/lib/testutil"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
+	"github.com/gov4git/lib4git/testutil"
 )
 
 func TestInit(t *testing.T) {

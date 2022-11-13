@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gov4git/gov4git/lib/form"
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/ns"
+	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/ns"
 )
 
 type KKV[K1 Key, K2 Key, V Value] struct{}

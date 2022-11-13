@@ -3,9 +3,9 @@ package id
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/must"
 	"github.com/gov4git/gov4git/mod"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 )
 
 func Init(

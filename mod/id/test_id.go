@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/testutil"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/testutil"
 )
 
 type TestID struct {

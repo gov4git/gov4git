@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/ed25519"
 
-	"github.com/gov4git/gov4git/lib/form"
-	"github.com/gov4git/gov4git/lib/git"
-	"github.com/gov4git/gov4git/lib/must"
+	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 )
 
 type Ed25519PublicKey = form.Bytes

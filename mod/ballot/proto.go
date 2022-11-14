@@ -42,6 +42,11 @@ type Advertisement struct {
 	ParentCommit git.CommitHash       `json:"parent_commit"`
 }
 
+type BallotAddress[S Strategy] struct {
+	Gov  gov.CommunityAddress
+	Name ns.NS
+}
+
 type Election struct {
 	VoteChoice         string  `json:"vote_choice"`
 	VoteStrengthChange float64 `json:"vote_strength_change"`

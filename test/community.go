@@ -51,13 +51,25 @@ func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 	govRepo, govTree := git.Clone(ctx, git.Address(x.community))
 
 	for i, m := range x.members {
-		member.AddUser(ctx, govTree, x.Member(i), member.Account{Home: m.Public})
+		member.AddUser(ctx, govTree, x.MemberUser(i), member.Account{Home: m.Public})
 	}
 
 	git.Commit(ctx, govTree, "add everybody")
 	git.Push(ctx, govRepo)
 }
 
-func (x *TestCommunity) Member(i int) member.User {
+func (x *TestCommunity) Community() gov.CommunityAddress {
+	return x.community
+}
+
+func (x *TestCommunity) Organizer() gov.OrganizerAddress {
+	return x.organizer
+}
+
+func (x *TestCommunity) MemberUser(i int) member.User {
 	return member.User("m" + strconv.Itoa(i))
+}
+
+func (x *TestCommunity) MemberOwner(i int) id.OwnerAddress {
+	return x.members[i]
 }

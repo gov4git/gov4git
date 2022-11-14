@@ -65,5 +65,9 @@ func TestBallot(t *testing.T) {
 		t.Errorf("expecting 1 vote, got %v", len(tallyChg.Result.FetchedVotes))
 	}
 
+	// close
+	closeChg := ballot.Close[qv.PriorityPoll](ctx, cty.Community(), ballotName)
+	fmt.Println("close: ", closeChg)
+
 	// testutil.Hang()
 }

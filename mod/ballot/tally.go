@@ -67,7 +67,7 @@ func TallyStageOnly[S Strategy](
 	updatedTally := s.Tally(ctx, govRepo, govTree, &ad, currentTally, fetchedVotes).Result
 
 	// write updated tally
-	git.ToFile(ctx, communityTree, openTallyNS.Path(), updatedTally)
+	git.ToFileStage(ctx, communityTree, openTallyNS.Path(), updatedTally)
 
 	return git.Change[TallyForm]{
 		Result: updatedTally,

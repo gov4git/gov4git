@@ -4,8 +4,10 @@ go 1.19
 
 require (
 	github.com/google/uuid v1.3.0
-	github.com/gov4git/lib4git v0.0.0-20221114175524-f8083a66eb66
+	github.com/gov4git/lib4git v0.0.0-20221114195431-c189f699c5b9
 )
+
+// replace github.com/gov4git/lib4git => /Users/petar/src/github.com/gov4git/lib4git
 
 require (
 	github.com/Microsoft/go-winio v0.4.16 // indirect

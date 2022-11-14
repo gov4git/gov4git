@@ -4,7 +4,8 @@ go 1.19
 
 require (
 	github.com/google/uuid v1.3.0
-	github.com/gov4git/lib4git v0.0.0-20221114195431-c189f699c5b9
+	github.com/gov4git/lib4git v0.0.0-20221114215512-bc6209905698
+	github.com/spf13/cobra v1.6.1
 )
 
 // replace github.com/gov4git/lib4git => /Users/petar/src/github.com/gov4git/lib4git
@@ -18,10 +19,12 @@ require (
 	github.com/go-git/go-billy/v5 v5.3.1 // indirect
 	github.com/go-git/go-git/v5 v5.4.2 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v0.0.0-20201106050909-4977a11b4351 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/xanzy/ssh-agent v0.3.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect

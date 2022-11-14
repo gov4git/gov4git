@@ -3,15 +3,22 @@
 ## Next: 2022-10-14
 
 - __Updates from the week:__
-  - Prepared grant proposal for UI work
-  - Rewrite progress (90%):
+  - Rewrite almost done:
     - Identity management
     - Mailing
     - Member management
     - Balloting
     - Tests and testing framework
+  - Staffing for UI:
+    - Job [blurb](ui-job-description.md)
+    - Socializing in RadX channels
 
 - __Priorities for this week:__
+  - Rewrite remaining:
+    - End-to-end ballot tests
+  - Implement the new features:
+    - Balance transfers
+    - Balance refunds dependent on ballot outcomes
 
 ## Next: 2022-10-07
 

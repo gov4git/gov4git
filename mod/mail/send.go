@@ -13,7 +13,7 @@ import (
 
 type SeqNo int64
 
-func Send[M form.Form](
+func SendStageOnly[M form.Form](
 	ctx context.Context,
 	sender *git.Tree,
 	receiver *git.Tree,
@@ -52,7 +52,7 @@ func Send[M form.Form](
 	}
 }
 
-func SendSigned[M form.Form](
+func SendSignedStageOnly[M form.Form](
 	ctx context.Context,
 	senderTree id.OwnerTree,
 	receiver *git.Tree,
@@ -61,5 +61,5 @@ func SendSigned[M form.Form](
 ) git.Change[SeqNo] {
 	senderPrivCred := id.GetPrivateCredentials(ctx, senderTree.Private)
 	signed := id.Sign(ctx, senderPrivCred, msg)
-	return Send(ctx, senderTree.Public, receiver, topic, signed)
+	return SendStageOnly(ctx, senderTree.Public, receiver, topic, signed)
 }

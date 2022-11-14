@@ -51,7 +51,7 @@ func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 	govRepo, govTree := git.Clone(ctx, git.Address(x.community))
 
 	for i, m := range x.members {
-		member.AddUser(ctx, govTree, x.MemberUser(i), member.Account{Home: m.Public})
+		member.AddUserStageOnly(ctx, govTree, x.MemberUser(i), member.Account{Home: m.Public})
 	}
 
 	git.Commit(ctx, govTree, "add everybody")

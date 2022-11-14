@@ -24,35 +24,35 @@ func TestMember(t *testing.T) {
 			Branch: git.MainBranch,
 		},
 	}
-	AddUser(ctx, wt, u1, r1)
-	r1Got := GetUser(ctx, wt, u1)
+	AddUserStageOnly(ctx, wt, u1, r1)
+	r1Got := GetUserLocal(ctx, wt, u1)
 	if r1 != r1Got {
 		t.Fatalf("expecting %v, got %v", r1, r1Got)
 	}
 
-	if !IsMember(ctx, wt, u1, Everybody) {
+	if !IsMemberLocal(ctx, wt, u1, Everybody) {
 		t.Fatalf("expecting is member")
 	}
 
-	allUsers := ListGroupUsers(ctx, wt, Everybody)
+	allUsers := ListGroupUsersLocal(ctx, wt, Everybody)
 	if len(allUsers) != 1 || allUsers[0] != u1 {
 		t.Fatalf("unexpected list of users in group everybody")
 	}
 
-	allGroups := ListUserGroups(ctx, wt, u1)
+	allGroups := ListUserGroupsLocal(ctx, wt, u1)
 	if len(allGroups) != 1 || allGroups[0] != Everybody {
 		t.Fatalf("unexpected list of groups for user")
 	}
 
-	RemoveUser(ctx, wt, u1)
+	RemoveUserStageOnly(ctx, wt, u1)
 	err := must.Try(func() {
-		GetUser(ctx, wt, u1)
+		GetUserLocal(ctx, wt, u1)
 	})
 	if err == nil {
 		t.Fatalf("expecting error")
 	}
 
-	if IsMember(ctx, wt, u1, Everybody) {
+	if IsMemberLocal(ctx, wt, u1, Everybody) {
 		t.Fatalf("expecting no membership")
 	}
 }

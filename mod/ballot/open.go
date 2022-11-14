@@ -54,7 +54,7 @@ func OpenStageOnly[S Strategy](
 	}
 
 	// verify group exists
-	if !member.IsGroup(ctx, govTree, participants) {
+	if !member.IsGroupLocal(ctx, govTree, participants) {
 		must.Errorf(ctx, "participant group does not exist")
 	}
 

@@ -25,14 +25,14 @@ func InitLocal(
 	ownerAddr OwnerAddress,
 	ownerTree OwnerTree,
 ) git.Change[PrivateCredentials] {
-	privChg := InitPrivate(ctx, ownerTree.Private, ownerAddr)
-	pubChg := InitPublic(ctx, ownerTree.Public, privChg.Result.PublicCredentials)
+	privChg := initPrivateStageOnly(ctx, ownerTree.Private, ownerAddr)
+	pubChg := initPublicStageOnly(ctx, ownerTree.Public, privChg.Result.PublicCredentials)
 	mod.Commit(ctx, ownerTree.Private, privChg.Msg)
 	mod.Commit(ctx, ownerTree.Public, pubChg.Msg)
 	return privChg
 }
 
-func InitPrivate(ctx context.Context, priv *git.Tree, ownerAddr OwnerAddress) git.Change[PrivateCredentials] {
+func initPrivateStageOnly(ctx context.Context, priv *git.Tree, ownerAddr OwnerAddress) git.Change[PrivateCredentials] {
 	if _, err := priv.Filesystem.Stat(PrivateCredentialsNS.Path()); err == nil {
 		must.Errorf(ctx, "private credentials file already exists")
 	}
@@ -47,7 +47,7 @@ func InitPrivate(ctx context.Context, priv *git.Tree, ownerAddr OwnerAddress) gi
 	}
 }
 
-func InitPublic(ctx context.Context, pub *git.Tree, cred PublicCredentials) git.ChangeNoResult {
+func initPublicStageOnly(ctx context.Context, pub *git.Tree, cred PublicCredentials) git.ChangeNoResult {
 	if _, err := pub.Filesystem.Stat(PublicCredentialsNS.Path()); err == nil {
 		must.Errorf(ctx, "public credentials file already exists")
 	}

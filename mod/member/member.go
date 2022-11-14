@@ -5,9 +5,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gov4git/gov4git/mod"
-	"github.com/gov4git/gov4git/mod/kv"
-	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
@@ -19,23 +17,14 @@ const (
 type User string
 type Group string
 
-var (
-	membersNS = mod.RootNS.Sub("members")
+func AddMember(ctx context.Context, addr gov.CommunityAddress, user User, group Group) {
+	r, t := gov.CloneCommunity(ctx, addr)
+	chg := AddMemberStageOnly(ctx, t, user, group)
+	git.Commit(ctx, t, chg.Msg)
+	git.Push(ctx, r)
+}
 
-	usersNS = membersNS.Sub("users")
-	usersKV = kv.KV[User, Account]{}
-
-	groupsNS = membersNS.Sub("groups")
-	groupsKV = kv.KV[Group, form.None]{}
-
-	userGroupsNS  = membersNS.Sub("user_groups")
-	userGroupsKKV = kv.KKV[User, Group, bool]{}
-
-	groupUsersNS  = membersNS.Sub("group_users")
-	groupUsersKKV = kv.KKV[Group, User, bool]{}
-)
-
-func AddMember(ctx context.Context, t *git.Tree, user User, group Group) git.ChangeNoResult {
+func AddMemberStageOnly(ctx context.Context, t *git.Tree, user User, group Group) git.ChangeNoResult {
 	userGroupsKKV.Set(ctx, userGroupsNS, t, user, group, true)
 	groupUsersKKV.Set(ctx, groupUsersNS, t, group, user, true)
 	return git.ChangeNoResult{
@@ -43,7 +32,13 @@ func AddMember(ctx context.Context, t *git.Tree, user User, group Group) git.Cha
 	}
 }
 
-func IsMember(ctx context.Context, t *git.Tree, user User, group Group) bool {
+func IsMember(ctx context.Context, addr gov.CommunityAddress, user User, group Group) bool {
+	_, t := gov.CloneCommunity(ctx, addr)
+	x := IsMemberLocal(ctx, t, user, group)
+	return x
+}
+
+func IsMemberLocal(ctx context.Context, t *git.Tree, user User, group Group) bool {
 	var userHasGroup, groupHasUser bool
 	must.Try(
 		func() { userHasGroup = userGroupsKKV.Get(ctx, userGroupsNS, t, user, group) },
@@ -54,7 +49,14 @@ func IsMember(ctx context.Context, t *git.Tree, user User, group Group) bool {
 	return userHasGroup && groupHasUser
 }
 
-func RemoveMember(ctx context.Context, t *git.Tree, user User, group Group) git.ChangeNoResult {
+func RemoveMember(ctx context.Context, addr gov.CommunityAddress, user User, group Group) {
+	r, t := gov.CloneCommunity(ctx, addr)
+	chg := RemoveMemberStageOnly(ctx, t, user, group)
+	git.Commit(ctx, t, chg.Msg)
+	git.Push(ctx, r)
+}
+
+func RemoveMemberStageOnly(ctx context.Context, t *git.Tree, user User, group Group) git.ChangeNoResult {
 	userGroupsKKV.Remove(ctx, userGroupsNS, t, user, group)
 	groupUsersKKV.Remove(ctx, groupUsersNS, t, group, user)
 	return git.ChangeNoResult{
@@ -62,10 +64,22 @@ func RemoveMember(ctx context.Context, t *git.Tree, user User, group Group) git.
 	}
 }
 
-func ListUserGroups(ctx context.Context, t *git.Tree, user User) []Group {
+func ListUserGroups(ctx context.Context, addr gov.CommunityAddress, user User) []Group {
+	_, t := gov.CloneCommunity(ctx, addr)
+	x := ListUserGroupsLocal(ctx, t, user)
+	return x
+}
+
+func ListUserGroupsLocal(ctx context.Context, t *git.Tree, user User) []Group {
 	return userGroupsKKV.ListSecondaryKeys(ctx, userGroupsNS, t, user)
 }
 
-func ListGroupUsers(ctx context.Context, t *git.Tree, group Group) []User {
+func ListGroupUsers(ctx context.Context, addr gov.CommunityAddress, group Group) []User {
+	_, t := gov.CloneCommunity(ctx, addr)
+	x := ListGroupUsersLocal(ctx, t, group)
+	return x
+}
+
+func ListGroupUsersLocal(ctx context.Context, t *git.Tree, group Group) []User {
 	return groupUsersKKV.ListSecondaryKeys(ctx, groupUsersNS, t, group)
 }

@@ -49,7 +49,7 @@ func VoteStageOnly[S Strategy](
 		Elections: elections,
 	}
 
-	return mail.SendSigned(ctx, voterTree, govTree, BallotTopic[S](ballotName), envelope)
+	return mail.SendSignedStageOnly(ctx, voterTree, govTree, BallotTopic[S](ballotName), envelope)
 }
 
 func verifyElections[S Strategy](

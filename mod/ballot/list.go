@@ -16,10 +16,10 @@ func ListOpen[S Strategy](
 ) []Advertisement {
 
 	_, govTree := git.Clone(ctx, git.Address(govAddr))
-	return ListOpenTree[S](ctx, govTree)
+	return ListOpenLocal[S](ctx, govTree)
 }
 
-func ListOpenTree[S Strategy](
+func ListOpenLocal[S Strategy](
 	ctx context.Context,
 	govTree *git.Tree,
 ) []Advertisement {

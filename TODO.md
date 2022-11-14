@@ -1,26 +1,20 @@
 MILESTONE NOV 2022
 
 REWRITE
-- [ ] ballots
-- [x] open
-- [x] close
-- [x] vote
-- [x] tally
-- [x] list
 - [ ] clone private repos
-- [ ] ssh method
-- [ ] github personal access token
+  - [ ] ssh method
+  - [ ] github personal access token
 - [ ] command-line hooks
-- [ ] API covers of methods
-
-
 
 PRODUCT
 QV-based polling with balance updates
+- [ ] balance mgmt
 - [ ] transfer user balance
 - [ ] vote sanity checks (e.g. allowed elections, enough balance)
 - [ ] polling strategy decrements balances (or puts them on hold)
 
+DILIGENCE:
+- address TODOs, XXXs
 _______________________________________________________
 
 

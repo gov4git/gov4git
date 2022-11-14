@@ -41,12 +41,12 @@ func TallyStageOnly[S Strategy](
 	ad := git.FromFile[Advertisement](ctx, communityTree, openAdNS.Path())
 
 	// list participating users
-	users := member.ListGroupUsers(ctx, communityTree, ad.Participants)
+	users := member.ListGroupUsersLocal(ctx, communityTree, ad.Participants)
 
 	// get user accounts
 	accounts := make([]member.Account, len(users))
 	for i, user := range users {
-		accounts[i] = member.GetUser(ctx, communityTree, user)
+		accounts[i] = member.GetUserLocal(ctx, communityTree, user)
 	}
 
 	// fetch votes from users
@@ -101,7 +101,7 @@ func fetchVotes[S Strategy](
 	}
 
 	_, voterPublicTree := git.Clone(ctx, git.Address(account.Home))
-	mail.ReceiveSigned(
+	mail.ReceiveSignedStageOnly(
 		ctx,
 		govTree,
 		account.Home,

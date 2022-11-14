@@ -18,6 +18,10 @@ func (x TestID) OwnerAddress() OwnerAddress {
 	return OwnerAddress{Public: x.PublicAddress(), Private: x.PrivateAddress()}
 }
 
+func (x TestID) OwnerTree() OwnerTree {
+	return OwnerTree{Public: x.Public.Tree, Private: x.Private.Tree}
+}
+
 func (x TestID) PublicAddress() PublicAddress {
 	return PublicAddress(x.Public.Address)
 }

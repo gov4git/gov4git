@@ -25,6 +25,11 @@ type OwnerTree struct {
 	Private *git.Tree
 }
 
+func CloneTree(ctx context.Context, addr PublicAddress) *git.Tree {
+	_, publicTree := git.Clone(ctx, git.Address(addr))
+	return publicTree
+}
+
 func CloneOwner(ctx context.Context, ownerAddr OwnerAddress) (OwnerRepo, OwnerTree) {
 	publicRepo, publicTree := git.CloneOrInit(ctx, git.Address(ownerAddr.Public))
 	privateRepo, privateTree := git.CloneOrInit(ctx, git.Address(ownerAddr.Private))

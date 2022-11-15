@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/gov4git/gov4git/mod/id"
 	"github.com/gov4git/gov4git/mod/member"
 	"github.com/gov4git/lib4git/git"
@@ -45,14 +48,29 @@ var (
 			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
 		},
 	}
+
+	userPropGetCmd = &cobra.Command{
+		Use:   "prop-get",
+		Short: "Get user property",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			v := member.GetUserProp[interface{}](
+				ctx,
+				setup.Community,
+				member.User(userName),
+				userKey,
+			)
+			fmt.Fprint(os.Stdout, v)
+		},
+	}
 )
 
 var (
 	userName   string
 	userRepo   string
 	userBranch string
-	// userKey    string
-	// userValue  string
+	userKey    string
+	userValue  string
 )
 
 func init() {
@@ -63,4 +81,8 @@ func init() {
 
 	userCmd.AddCommand(userRemoveCmd)
 	userRemoveCmd.Flags().StringVar(&userName, "name", "", "user alias within the community")
+
+	userCmd.AddCommand(userPropGetCmd)
+	userPropGetCmd.Flags().StringVar(&userName, "name", "", "user alias within the community")
+	userPropGetCmd.Flags().StringVar(&userKey, "key", "", "property key")
 }

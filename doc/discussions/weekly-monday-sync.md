@@ -47,7 +47,7 @@
           - Analog of smart contract method invocation
         - Opportunities:
           - Prioritization applies to libp2p/IPFS/Filecoin community management
-    - Captured details in [roadmap](doc/roadmap.md)
+    - Captured details in [roadmap](../roadmap.md)
 
 - __Priorities for this week:__
   - Push through rewrite as far as possible. Remaining:

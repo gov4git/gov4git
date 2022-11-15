@@ -8,7 +8,7 @@ We are looking to develop a basic suite of MVP frontend components: a TypeScript
 
 From a participant perspective, our protocol addresses community organization concerns such as members, groups, polls, votes, referendums, approvals, rewards, policymaking, et cetera. Under the hood, from a backend perspective, a git repository on the Internet accounts for the application's state.
 
-We aim to develop a front end for polling and voting -- this includes three deliverables:
+We aim to develop a frontend for polling and voting -- this includes three deliverables:
 - _TypeScript client library for the API._ This client will clone public and private git repos and read and write the application state to the repo.
 - _Web UI_ with UX for voting, displaying poll tallies, and manipulating participant balances.
 - _Chrome/Safari/Mozilla browser extensions_ with UX for voting and viewing rankings of issues and PRs on GitHub pages.

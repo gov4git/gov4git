@@ -42,6 +42,7 @@ func init() {
 	rootCmd.AddCommand(userCmd)
 	rootCmd.AddCommand(groupCmd)
 	rootCmd.AddCommand(memberCmd)
+	rootCmd.AddCommand(ballotCmd)
 }
 
 func initAfterFlags() {

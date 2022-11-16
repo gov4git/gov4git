@@ -76,13 +76,19 @@ var (
 func init() {
 	userCmd.AddCommand(userAddCmd)
 	userAddCmd.Flags().StringVar(&userName, "name", "", "user alias within the community")
+	userAddCmd.MarkFlagRequired("name")
 	userAddCmd.Flags().StringVar(&userRepo, "repo", "", "repo URL of user public identity")
+	userAddCmd.MarkFlagRequired("repo")
 	userAddCmd.Flags().StringVar(&userBranch, "branch", "", "branch of user public identity")
+	userAddCmd.MarkFlagRequired("branch")
 
 	userCmd.AddCommand(userRemoveCmd)
 	userRemoveCmd.Flags().StringVar(&userName, "name", "", "user alias within the community")
+	userRemoveCmd.MarkFlagRequired("name")
 
 	userCmd.AddCommand(userPropGetCmd)
 	userPropGetCmd.Flags().StringVar(&userName, "name", "", "user alias within the community")
+	userPropGetCmd.MarkFlagRequired("name")
 	userPropGetCmd.Flags().StringVar(&userKey, "key", "", "property key")
+	userPropGetCmd.MarkFlagRequired("key")
 }

@@ -67,10 +67,13 @@ var (
 func init() {
 	groupCmd.AddCommand(groupAddCmd)
 	groupAddCmd.Flags().StringVar(&groupName, "name", "", "group alias within the community")
+	groupAddCmd.MarkFlagRequired("name")
 
 	groupCmd.AddCommand(groupRemoveCmd)
 	groupRemoveCmd.Flags().StringVar(&groupName, "name", "", "group alias within the community")
+	groupRemoveCmd.MarkFlagRequired("name")
 
 	groupCmd.AddCommand(groupListCmd)
 	groupListCmd.Flags().StringVar(&groupName, "name", "", "group alias within the community")
+	groupListCmd.MarkFlagRequired("name")
 }

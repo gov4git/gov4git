@@ -63,7 +63,7 @@ func RemoveUserStageOnly(ctx context.Context, t *git.Tree, name User) git.Change
 	}
 }
 
-// props
+// set prop
 
 func SetUserProp[V form.Form](ctx context.Context, addr gov.CommunityAddress, user User, key string, value V) {
 	r, t := gov.CloneCommunity(ctx, addr)
@@ -77,6 +77,8 @@ func SetUserPropStageOnly[V form.Form](ctx context.Context, t *git.Tree, user Us
 	return propKV.Set(ctx, usersKV.KeyNS(usersNS, user), t, key, value)
 }
 
+// get prop
+
 func GetUserProp[V form.Form](ctx context.Context, addr gov.CommunityAddress, user User, key string) V {
 	_, t := gov.CloneCommunity(ctx, addr)
 	x := GetUserPropLocal[V](ctx, t, user, key)
@@ -86,4 +88,16 @@ func GetUserProp[V form.Form](ctx context.Context, addr gov.CommunityAddress, us
 func GetUserPropLocal[V form.Form](ctx context.Context, t *git.Tree, user User, key string) V {
 	propKV := kv.KV[string, V]{}
 	return propKV.Get(ctx, usersKV.KeyNS(usersNS, user), t, key)
+}
+
+func GetUserPropOrDefault[V form.Form](ctx context.Context, addr gov.CommunityAddress, user User, key string, default_ V) V {
+	r := default_
+	r, _ = must.Try1(func() V { return GetUserProp[V](ctx, addr, user, key) })
+	return r
+}
+
+func GetUserPropLocalOrDefault[V form.Form](ctx context.Context, t *git.Tree, user User, key string, default_ V) V {
+	r := default_
+	r, _ = must.Try1(func() V { return GetUserPropLocal[V](ctx, t, user, key) })
+	return r
 }

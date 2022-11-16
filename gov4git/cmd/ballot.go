@@ -112,14 +112,20 @@ func init() {
 	// open
 	ballotCmd.AddCommand(ballotOpenCmd)
 	ballotOpenCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotOpenCmd.MarkFlagRequired("name")
 	ballotOpenCmd.Flags().StringVar(&ballotTitle, "title", "", "ballot title")
+	ballotOpenCmd.MarkFlagRequired("title")
 	ballotOpenCmd.Flags().StringVar(&ballotDescription, "desc", "", "ballot description")
+	ballotOpenCmd.MarkFlagRequired("desc")
 	ballotOpenCmd.Flags().StringSliceVar(&ballotChoices, "choices", nil, "ballot choices")
+	ballotOpenCmd.MarkFlagRequired("choices")
 	ballotOpenCmd.Flags().StringVar(&ballotGroup, "group", "", "group of ballot participants")
+	ballotOpenCmd.MarkFlagRequired("group")
 
 	// close
 	ballotCmd.AddCommand(ballotCloseCmd)
 	ballotCloseCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotCloseCmd.MarkFlagRequired("name")
 
 	// list
 	ballotCmd.AddCommand(ballotListCmd)
@@ -127,12 +133,16 @@ func init() {
 	// tally
 	ballotCmd.AddCommand(ballotTallyCmd)
 	ballotTallyCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotTallyCmd.MarkFlagRequired("name")
 
 	// vote
 	ballotCmd.AddCommand(ballotVoteCmd)
 	ballotVoteCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotVoteCmd.MarkFlagRequired("name")
 	ballotVoteCmd.Flags().StringSliceVar(&ballotElectionChoice, "choices", nil, "list of elected choices")
+	ballotVoteCmd.MarkFlagRequired("choices")
 	ballotVoteCmd.Flags().Float64SliceVar(&ballotElectionStrength, "strengths", nil, "list of elected vote strengths")
+	ballotVoteCmd.MarkFlagRequired("strengths")
 }
 
 func parseElections(ctx context.Context, choices []string, strengths []float64) ballot.Elections {

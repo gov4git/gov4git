@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gov4git/gov4git/mod/gov"
+	"github.com/gov4git/gov4git/mod/id"
 	"github.com/gov4git/gov4git/mod/kv"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -99,5 +100,24 @@ func GetUserPropOrDefault[V form.Form](ctx context.Context, addr gov.CommunityAd
 func GetUserPropLocalOrDefault[V form.Form](ctx context.Context, t *git.Tree, user User, key string, default_ V) V {
 	r := default_
 	r, _ = must.Try1(func() V { return GetUserPropLocal[V](ctx, t, user, key) })
+	return r
+}
+
+// lookup
+
+func LookupUserByAddress(ctx context.Context, govAddr gov.CommunityAddress, userAddr id.PublicAddress) []User {
+	_, t := gov.CloneCommunity(ctx, govAddr)
+	return LookupUserByAddressLocal(ctx, t, userAddr)
+}
+
+func LookupUserByAddressLocal(ctx context.Context, t *git.Tree, userAddr id.PublicAddress) []User {
+	us := usersKV.ListKeys(ctx, usersNS, t)
+	r := []User{}
+	for _, u := range us {
+		acct := GetUserLocal(ctx, t, u)
+		if acct.Home == userAddr {
+			r = append(r, u)
+		}
+	}
 	return r
 }

@@ -2,6 +2,8 @@ package balance
 
 import "path/filepath"
 
-func userPropKey(balanceKey string) string {
-	return filepath.Join("balance", balanceKey)
+type Balance string
+
+func userPropKey(balanceKey Balance) string {
+	return filepath.Join("balance", string(balanceKey))
 }

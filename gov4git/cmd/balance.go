@@ -26,7 +26,7 @@ var (
 				ctx,
 				setup.Community,
 				member.User(balanceUser),
-				balanceKey,
+				balance.Balance(balanceKey),
 				balanceValue,
 			)
 		},
@@ -41,7 +41,7 @@ var (
 				ctx,
 				setup.Community,
 				member.User(balanceUser),
-				balanceKey,
+				balance.Balance(balanceKey),
 			)
 			fmt.Fprint(os.Stdout, v)
 		},
@@ -56,7 +56,7 @@ var (
 				ctx,
 				setup.Community,
 				member.User(balanceUser),
-				balanceKey,
+				balance.Balance(balanceKey),
 				balanceValue,
 			)
 			fmt.Fprint(os.Stdout, v)
@@ -72,7 +72,7 @@ var (
 				ctx,
 				setup.Community,
 				member.User(balanceUser),
-				balanceKey,
+				balance.Balance(balanceKey),
 				balanceValue,
 			)
 			fmt.Fprint(os.Stdout, v)

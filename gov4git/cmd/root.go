@@ -44,6 +44,7 @@ func init() {
 	rootCmd.AddCommand(memberCmd)
 	rootCmd.AddCommand(ballotCmd)
 	rootCmd.AddCommand(balanceCmd)
+	rootCmd.AddCommand(bureauCmd)
 }
 
 func initAfterFlags() {

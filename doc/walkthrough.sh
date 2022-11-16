@@ -1,0 +1,103 @@
+#!/bin/sh
+
+# This shell script walks through the end-to-end UX workflow that involves:
+# - Initializing participant identies
+# - Initializing governance
+# - Managing users and groups
+# - Administering a ballot, casting votes and tallying
+
+# There are two types of participants in a governed community: the community organizer and the community members.
+# The community organizer is the one who owns the community's public git repository.
+
+# __Step 1__ Every participant begins by installing gov4git.
+go install github.com/gov4git/gov4git/gov4git
+
+# __Step 2__ Participants prepare git repos for their identities and the community.
+
+# __Step 2.1__ Every participant creates a pair of public and private git repos that will represent their identity in the system.
+# For instance, I use GitHub for git hosting. I would create two repos:
+# - github.com/petar/gov4git.public (a public GitHub repo)
+# - github.com/petar/gov4git.private (a private GitHub repo)
+
+# __Step 2.2__ The organizer creates a pair of public and private git repos for the community.
+# If a public community repo already exists, it can be reused.
+# For the example here, the organizer will create two GitHub repos:
+# - github.com/petar/community.public (a public GitHub repo)
+# - github.com/petar/community.private (a private GitHub repo)
+
+# __Step 3__ Every participant prepares their local gov4git client configuration.
+# The configuration describes the participant's own identity (public and private) repos,
+# as well as the community's that they intend to interact with.
+# In this example, a participant might use:
+
+cat <<EOF >> ~/.gov4git/config
+{
+	"ssh_private_keys_file": "/Users/petar/.ssh/id_rsa",
+	"community_public_url": "git@github.com:petar/community.public.git",
+	"community_public_branch": "gov",
+	"community_private_url": "git@github.com:petar/community.private.git",
+	"community_private_branch": "main",
+	"member_public_url": "git@github.com:petar/gov4git.public.git",
+	"member_public_branch": "main",
+	"member_private_url": "git@github.com:petar/gov4git.private.git",
+	"member_private_branch": "main"
+}
+EOF
+
+# `ssh_private_keys_file` points to a local file containing your SSH credentials for cloning the private repos in the config.
+# `community_public_url` is the git URL of the public community repo
+# `community_public_branch` is the branch in the public community repo where the governance state will reside
+# `community_private_url` is the git URL of the private community repo
+# `community_private_branch` is the branch in the private community repo where the governance private keys will reside
+# `member_public_url` is the git URL of your public identity repo
+# `member_public_branch` is the branch in your public identity repo where public keys will reside
+# `member_private_url` is the git URL of your private identity repo
+# `member_private_branch` is the branch in your private identity repo where private keys will reside
+
+# Note that only the organizer of the community has to fill in `community_private_url` and `community_private_branch`.
+
+# __Step 4__ Initialize identities
+
+# __Step 4.1__ Every participant initializes their own identity.
+# This results in generating new public and private keys and
+# populating the participant's public and private identity repos.
+gov4git init-id
+
+# __Step 4.2__ The community organizer initializes the governance application
+# This creates a new branch in the community's public repo, dedicated to tracking the state of governance.
+# Also, public and private keys are generated for the community itself and
+# the respective public and private community repos are populated.
+gov4git init-gov
+
+# __Step 5__ The community organizer adds some users to the community
+gov4git user add --name petar --repo git@github.com:petar/gov4git.public.git --branch main
+
+# All users are automatically made members of group `everybody`
+gov4git group list --name everybody
+
+# The community organizer can add additional groups of users ...
+gov4git group add --name contributors
+
+# ... and associate community users with a group.
+gov4git member add --user petar --group contributors
+
+# __Step 6__ The community organizer opens a new ballot
+# A ballot is a mechanism for soliciting community votes on a set of choices.
+# Ballots can be configured to use a variety of voting and tallying strategies, and
+# users can define their own.
+#
+# This example creates a new ballot using a simple default QV strategy.
+# The ballot has a name `issue/1`, a title `Issue ` and
+# an arbitrary description which points to a GitHub issue in this case.
+# This ballot has only one choice, named `i1` which voters can up/down vote.
+# The ballot is open to all users in the group `contributors`.
+gov4git ballot open --name issue/1 --title "Issue 1" --desc "https://github.com/petar/community.public/issues/1" --group contributors --choices "i1"
+
+# __Step 7__ Participants in the ballot group can cast up/down votes asynchronously until the ballot is closed
+gov4git ballot vote --name issue/1 --choices i1 --strengths -1.0
+
+# __Step 8__ Occasionally, the community organizer fetches votes and updates the running tally
+gov4git ballot tally --name issue/1
+
+# __Step 9__ The community organizer closes the ballot, when its time to conclude and call the outcome
+gov4git ballot close --name issue/1

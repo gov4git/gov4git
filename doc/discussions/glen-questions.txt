@@ -1,5 +1,0 @@
-- [ ] vote on anything? i.e. vote on strings like "https://github.com/gov4git/gov4git/issues/1"?
-
-- continuous voting:
-	- [ ] user upvotes, then downvotes; ending balance same?
-	

@@ -1,11 +1,5 @@
 MILESTONE NOV 2022
 
-REWRITE
-- [ ] clone private repos
-  - [ ] ssh method
-  - [ ] github personal access token
-- [ ] command-line hooks
-
 PRODUCT
 QV-based polling with balance updates
 - [ ] balance mgmt
@@ -14,6 +8,7 @@ QV-based polling with balance updates
 - [ ] polling strategy decrements balances (or puts them on hold)
 
 DILIGENCE:
+- don't show panics in non-verbose mode
 - address TODOs, XXXs
 _______________________________________________________
 
@@ -25,6 +20,7 @@ Merge approval workflow
 FRAMEWORK
 - commit-level signatures
 - communication through cloning
+- track governance software code through commits hashes
 
 DOC
 - [ ] terminal-cast type video tutorials

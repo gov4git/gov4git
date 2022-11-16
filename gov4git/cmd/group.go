@@ -1,7 +1,11 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/gov4git/gov4git/mod/member"
+	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )
 
@@ -40,6 +44,20 @@ var (
 			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
 		},
 	}
+
+	groupListCmd = &cobra.Command{
+		Use:   "list",
+		Short: "List users in group",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			l := member.ListGroupUsers(
+				ctx,
+				setup.Community,
+				member.Group(groupName),
+			)
+			fmt.Fprint(os.Stdout, form.Pretty(l))
+		},
+	}
 )
 
 var (
@@ -52,4 +70,7 @@ func init() {
 
 	groupCmd.AddCommand(groupRemoveCmd)
 	groupRemoveCmd.Flags().StringVar(&groupName, "name", "", "group alias within the community")
+
+	groupCmd.AddCommand(groupListCmd)
+	groupListCmd.Flags().StringVar(&groupName, "name", "", "group alias within the community")
 }

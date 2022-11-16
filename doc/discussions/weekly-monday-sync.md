@@ -1,5 +1,20 @@
 # gov4git sync
 
+## Next: 2022-10-21
+
+- __Updates from the week:__
+  - Rewrite done (merged)
+  - UI project job posting is out (RadX/Microsoft/Trigram/etc)
+  - New product [UX walkthrough](../walkthrough.sh)
+
+- __Priorities for this week:__
+  - Dogfood deployment on gov4git
+    - GitHub automation
+      - Open/close polls for opened issues and PRs
+      - Cron for poll tallies
+    - Dogfooder documentation
+    - Find dogfood cohort (PL/RadX/etc), send invites
+
 ## Next: 2022-10-14
 
 - __Updates from the week:__

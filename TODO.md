@@ -1,25 +1,26 @@
+MILESTONE NOV 2022
+
 PRODUCT
-
 QV-based polling with balance updates
-     - [ ] transfer user balance
-       - [ ] mechanism for proposing operation executions
-     - [ ] vote sanity checks (e.g. allowed elections, enough balance, XXX, TODO)
-     - [ ] rename gov command to ballot: ballot open, ballot close, etc.
+- [ ] balance mgmt
+- [ ] transfer user balance
+- [ ] vote sanity checks (e.g. allowed elections, enough balance)
+- [ ] polling strategy decrements balances (or puts them on hold)
 
-     - [ ] polling strategy decrements balances
+DILIGENCE:
+- don't show panics in non-verbose mode
+- address TODOs, XXXs
+_______________________________________________________
 
-     - [ ] move voting interactions to identity main branch
 
 Merge approval workflow
-     - [ ] ...
-     - [ ] verify command
+- [ ] ...
+- [ ] verify command
 
 FRAMEWORK
-     -> [ ] identity and gov configs should include branch spec
-       - [ ] every service should have a config that reflects what it needs
-       - [ ] name services based on role
-  
-     - [ ] Dir->interface, Local.Sub() returns DirWithinLocal with method RelPath (or AbsPath)
+- commit-level signatures
+- communication through cloning
+- track governance software code through commits hashes
 
 DOC
 - [ ] terminal-cast type video tutorials

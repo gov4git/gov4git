@@ -45,7 +45,7 @@ Balance management operations include two features:
 - Indication of participant voice credit balances
 - Balance transfers (participants can send vote credits to other participants)
 
-For this milestone, we also must add the following operations:
+These operations must be added to all frontend components, in particular:
 - JavaScript/TypeScript client
 - Web UI
 - Chrome browser extension

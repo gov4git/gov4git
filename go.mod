@@ -8,7 +8,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 )
 
-// replace github.com/gov4git/lib4git => /Users/petar/src/github.com/gov4git/lib4git
+replace github.com/gov4git/lib4git => /Users/petar/src/github.com/gov4git/lib4git
 
 require (
 	github.com/Microsoft/go-winio v0.4.16 // indirect

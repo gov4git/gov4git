@@ -11,24 +11,22 @@ import (
 )
 
 var (
-	ballotNS      = mod.RootNS.Sub("ballots")
-	adFilebase    = "ballot_ad.json"
-	tallyFilebase = "ballot_tally.json"
+	ballotNS         = mod.RootNS.Sub("ballots")
+	adFilebase       = "ballot_ad.json"
+	strategyFilebase = "ballot_strategy.json"
+	tallyFilebase    = "ballot_tally.json"
 )
 
-func OpenBallotNS[S Strategy](name ns.NS) ns.NS {
-	var s S
-	return ballotNS.Sub("open").Sub(s.StrategyName()).Join(name)
+func OpenBallotNS(name ns.NS) ns.NS {
+	return ballotNS.Sub("open").Join(name)
 }
 
-func ClosedBallotNS[S Strategy](name ns.NS) ns.NS {
-	var s S
-	return ballotNS.Sub("closed").Sub(s.StrategyName()).Join(name)
+func ClosedBallotNS(name ns.NS) ns.NS {
+	return ballotNS.Sub("closed").Join(name)
 }
 
-func BallotTopic[S Strategy](name ns.NS) string {
-	var s S
-	return s.StrategyName() + ":" + name.Path()
+func BallotTopic(name ns.NS) string {
+	return "ballot:" + name.Path()
 }
 
 type Advertisement struct {
@@ -42,7 +40,7 @@ type Advertisement struct {
 	ParentCommit git.CommitHash       `json:"parent_commit"`
 }
 
-type BallotAddress[S Strategy] struct {
+type BallotAddress struct {
 	Gov  gov.CommunityAddress
 	Name ns.NS
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/member"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 )
 
 func Set(ctx context.Context, addr gov.CommunityAddress, user member.User, key Balance, value float64) {
@@ -23,6 +24,34 @@ func Get(ctx context.Context, addr gov.CommunityAddress, user member.User, key B
 
 func GetLocal(ctx context.Context, t *git.Tree, user member.User, key Balance) float64 {
 	return member.GetUserPropLocalOrDefault(ctx, t, user, userPropKey(key), 0.0)
+}
+
+func TryTransferStageOnly(
+	ctx context.Context,
+	t *git.Tree,
+	fromUser member.User,
+	fromBal Balance,
+	toUser member.User,
+	toBal Balance,
+	amount float64,
+) error {
+	return must.Try(func() { TransferStageOnly(ctx, t, fromUser, fromBal, toUser, toBal, amount) })
+}
+
+func TransferStageOnly(
+	ctx context.Context,
+	t *git.Tree,
+	fromUser member.User,
+	fromBal Balance,
+	toUser member.User,
+	toBal Balance,
+	amount float64,
+) {
+	must.Assertf(ctx, amount >= 0, "negative transfer")
+	prior := GetLocal(ctx, t, fromUser, fromBal)
+	must.Assertf(ctx, prior >= amount, "insufficient balance")
+	AddStageOnly(ctx, t, fromUser, fromBal, -amount)
+	AddStageOnly(ctx, t, toUser, toBal, amount)
 }
 
 func Add(ctx context.Context, addr gov.CommunityAddress, user member.User, key Balance, value float64) float64 {

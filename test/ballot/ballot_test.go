@@ -20,8 +20,10 @@ func TestBallot(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open
-	openChg := ballot.Open[qv.PriorityPoll](
+	strat := qv.PriorityPoll{UseVotingCredits: false}
+	openChg := ballot.Open(
 		ctx,
+		strat,
 		cty.Community(),
 		ballotName,
 		"ballot_name",

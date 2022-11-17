@@ -27,8 +27,10 @@ var (
 		Short: "Open a new ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			strat := qv.PriorityPoll{UseVotingCredits: ballotUseVotingCredits}
 			chg := ballot.Open[qv.PriorityPoll](
 				ctx,
+				strat,
 				setup.Community,
 				ns.NS(ballotName),
 				ballotTitle,
@@ -106,6 +108,7 @@ var (
 	ballotGroup            string
 	ballotElectionChoice   []string
 	ballotElectionStrength []float64
+	ballotUseVotingCredits bool
 )
 
 func init() {
@@ -121,6 +124,7 @@ func init() {
 	ballotOpenCmd.MarkFlagRequired("choices")
 	ballotOpenCmd.Flags().StringVar(&ballotGroup, "group", "", "group of ballot participants")
 	ballotOpenCmd.MarkFlagRequired("group")
+	ballotOpenCmd.Flags().BoolVar(&ballotUseVotingCredits, "use_credits", false, "use voting credits")
 
 	// close
 	ballotCmd.AddCommand(ballotCloseCmd)

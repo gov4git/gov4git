@@ -2,16 +2,14 @@ MILESTONE NOV 2022
 
 PRODUCT
 QV-based polling with balance updates
-- [ ] balance mgmt
-- [ ] transfer user balance
 - [ ] vote sanity checks (e.g. allowed elections, enough balance)
 - [ ] polling strategy decrements balances (or puts them on hold)
 
 DILIGENCE:
 - don't show panics in non-verbose mode
 - address TODOs, XXXs
-_______________________________________________________
 
+_______________________________________________________
 
 Merge approval workflow
 - [ ] ...

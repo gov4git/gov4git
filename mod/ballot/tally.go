@@ -37,8 +37,12 @@ func TallyStageOnly[S Strategy](
 	communityTree := govTree.Public
 
 	// read ad
-	openAdNS := OpenBallotNS[S](ballotName).Sub(adFilebase)
+	openAdNS := OpenBallotNS(ballotName).Sub(adFilebase)
 	ad := git.FromFile[Advertisement](ctx, communityTree, openAdNS.Path())
+
+	// read strategy
+	openStrategyNS := OpenBallotNS(ballotName).Sub(strategyFilebase)
+	strat := git.FromFile[S](ctx, communityTree, openStrategyNS.Path())
 
 	// list participating users
 	users := member.ListGroupUsersLocal(ctx, communityTree, ad.Participants)
@@ -57,14 +61,13 @@ func TallyStageOnly[S Strategy](
 	}
 
 	// read current tally
-	openTallyNS := OpenBallotNS[S](ballotName).Sub(tallyFilebase)
+	openTallyNS := OpenBallotNS(ballotName).Sub(tallyFilebase)
 	var currentTally *TallyForm
 	if tryCurrentTally, err := git.TryFromFile[TallyForm](ctx, communityTree, openTallyNS.Path()); err == nil {
 		currentTally = &tryCurrentTally
 	}
 
-	var s S
-	updatedTally := s.Tally(ctx, govRepo, govTree, &ad, currentTally, fetchedVotes).Result
+	updatedTally := strat.Tally(ctx, govRepo, govTree, &ad, currentTally, fetchedVotes).Result
 
 	// write updated tally
 	git.ToFileStage(ctx, communityTree, openTallyNS.Path(), updatedTally)
@@ -106,7 +109,7 @@ func fetchVotes[S Strategy](
 		govTree,
 		account.Home,
 		voterPublicTree,
-		BallotTopic[S](ballotName),
+		BallotTopic(ballotName),
 		respond,
 	)
 

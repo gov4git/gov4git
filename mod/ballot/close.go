@@ -31,11 +31,14 @@ func CloseStageOnly[S Strategy](
 	ballotName ns.NS,
 ) git.ChangeNoResult {
 
-	openNS := OpenBallotNS[S](ballotName)
-	closedNS := ClosedBallotNS[S](ballotName)
+	openNS := OpenBallotNS(ballotName)
+	closedNS := ClosedBallotNS(ballotName)
 
 	// verify ad is present
 	git.FromFile[Advertisement](ctx, govTree, openNS.Sub(adFilebase).Path())
+
+	// verify strategy is present
+	git.FromFile[S](ctx, govTree, openNS.Sub(strategyFilebase).Path())
 
 	git.RenameStage(ctx, govTree, openNS.Path(), closedNS.Path())
 

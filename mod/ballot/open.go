@@ -14,16 +14,17 @@ import (
 
 func Open[S Strategy](
 	ctx context.Context,
+	strat S,
 	govAddr gov.CommunityAddress,
 	name ns.NS,
 	title string,
 	description string,
 	choices []string,
 	participants member.Group,
-) git.Change[BallotAddress[S]] {
+) git.Change[BallotAddress] {
 
 	govRepo, govTree := git.Clone(ctx, git.Address(govAddr))
-	chg := OpenStageOnly[S](ctx, govAddr, govRepo, govTree, name, title, description, choices, participants)
+	chg := OpenStageOnly[S](ctx, strat, govAddr, govRepo, govTree, name, title, description, choices, participants)
 	mod.Commit(ctx, govTree, chg.Msg)
 	git.Push(ctx, govRepo)
 	return chg
@@ -31,6 +32,7 @@ func Open[S Strategy](
 
 func OpenStageOnly[S Strategy](
 	ctx context.Context,
+	strat S,
 	govAddr gov.CommunityAddress,
 	govRepo *git.Repository,
 	govTree *git.Tree,
@@ -39,16 +41,16 @@ func OpenStageOnly[S Strategy](
 	description string,
 	choices []string,
 	participants member.Group,
-) git.Change[BallotAddress[S]] {
+) git.Change[BallotAddress] {
 
 	// check no open ballots by the same name
-	openAdNS := OpenBallotNS[S](name).Sub(adFilebase)
+	openAdNS := OpenBallotNS(name).Sub(adFilebase)
 	if _, err := govTree.Filesystem.Stat(openAdNS.Path()); err == nil {
 		must.Errorf(ctx, "ballot already exists")
 	}
 
 	// check no closed ballots by the same name
-	closedAdNS := ClosedBallotNS[S](name).Sub(adFilebase)
+	closedAdNS := ClosedBallotNS(name).Sub(adFilebase)
 	if _, err := govTree.Filesystem.Stat(closedAdNS.Path()); err == nil {
 		must.Errorf(ctx, "closed ballot with same name exists")
 	}
@@ -59,21 +61,24 @@ func OpenStageOnly[S Strategy](
 	}
 
 	// write ad
-	var s S
 	ad := Advertisement{
 		Community:    govAddr,
 		Name:         name,
 		Title:        title,
 		Description:  description,
 		Choices:      choices,
-		Strategy:     s.StrategyName(),
+		Strategy:     strat.Name(),
 		Participants: participants,
 		ParentCommit: git.Head(ctx, govRepo),
 	}
 	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
 
-	return git.Change[BallotAddress[S]]{
-		Result: BallotAddress[S]{Gov: govAddr, Name: name},
-		Msg:    fmt.Sprintf("Create ballot of type %v", s.StrategyName()),
+	// write strategy
+	openStratNS := OpenBallotNS(name).Sub(strategyFilebase)
+	git.ToFileStage(ctx, govTree, openStratNS.Path(), strat)
+
+	return git.Change[BallotAddress]{
+		Result: BallotAddress{Gov: govAddr, Name: name},
+		Msg:    fmt.Sprintf("Create ballot of type %v", strat.Name()),
 	}
 }

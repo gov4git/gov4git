@@ -24,7 +24,7 @@ func ListOpenLocal[S Strategy](
 	govTree *git.Tree,
 ) []Advertisement {
 
-	openNS := OpenBallotNS[S](ns.NS(""))
+	openNS := OpenBallotNS(ns.NS(""))
 
 	files, err := git.ListFilesRecursively(govTree, openNS.Path())
 	must.NoError(ctx, err)

@@ -40,20 +40,28 @@ func VoteStageOnly[S Strategy](
 ) git.Change[mail.SeqNo] {
 
 	govTree := git.Worktree(ctx, govRepo)
-	openAdNS := OpenBallotNS[S](ballotName).Sub(adFilebase)
+
+	// read ad
+	openAdNS := OpenBallotNS(ballotName).Sub(adFilebase)
 	ad := git.FromFile[Advertisement](ctx, govTree, openAdNS.Path())
-	verifyElections[S](ctx, voterAddr, govAddr, voterTree, govTree, ad, elections)
+
+	// read strategy
+	openStrategyNS := OpenBallotNS(ballotName).Sub(strategyFilebase)
+	strat := git.FromFile[S](ctx, govTree, openStrategyNS.Path())
+
+	verifyElections(ctx, strat, voterAddr, govAddr, voterTree, govTree, ad, elections)
 	envelope := VoteEnvelope{
 		AdCommit:  git.Head(ctx, govRepo),
 		Ad:        ad,
 		Elections: elections,
 	}
 
-	return mail.SendSignedStageOnly(ctx, voterTree, govTree, BallotTopic[S](ballotName), envelope)
+	return mail.SendSignedStageOnly(ctx, voterTree, govTree, BallotTopic(ballotName), envelope)
 }
 
 func verifyElections[S Strategy](
 	ctx context.Context,
+	strat S,
 	voterAddr id.OwnerAddress,
 	govAddr gov.CommunityAddress,
 	voterTree id.OwnerTree,

@@ -12,6 +12,7 @@ import (
 	"github.com/gov4git/gov4git/mod/member"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 )
 
 func Process(
@@ -75,20 +76,22 @@ func processRequestStageOnly(
 			continue
 		}
 		if req.Transfer.FromUser != fetched.User {
-			base.Infof("invalid transfer request from user %v; origin of transfer is not the requesting user", fetched.User)
+			base.Infof("bureau: invalid transfer request from user %v; origin of transfer is not the requesting user", fetched.User)
 			continue
 		}
-		prior := balance.GetLocal(ctx, govTree.Public, req.Transfer.FromUser, req.Transfer.FromBalance)
-		if req.Transfer.Amount < 0 {
-			base.Infof("invalid transfer request from user %v; amount %v is negative", fetched.User, req.Transfer.Amount)
+		err := must.Try(func() {
+			balance.TransferStageOnly(
+				ctx,
+				govTree.Public,
+				req.Transfer.FromUser, req.Transfer.FromBalance,
+				req.Transfer.ToUser, req.Transfer.ToBalance,
+				req.Transfer.Amount,
+			)
+		})
+		if err != nil {
+			base.Infof("bureau: transfer error (%v)", err)
 			continue
 		}
-		if prior < req.Transfer.Amount {
-			base.Infof("invalid transfer request from user %v; amount %v exceeds balance %v", fetched.User, req.Transfer.Amount, prior)
-			continue
-		}
-		balance.AddStageOnly(ctx, govTree.Public, req.Transfer.FromUser, req.Transfer.FromBalance, -req.Transfer.Amount)
-		balance.AddStageOnly(ctx, govTree.Public, req.Transfer.ToUser, req.Transfer.ToBalance, req.Transfer.Amount)
 		base.Infof("bureau: transferred %v from %v:%v to %v:%v",
 			req.Transfer.Amount,
 			req.Transfer.FromUser, req.Transfer.FromBalance,

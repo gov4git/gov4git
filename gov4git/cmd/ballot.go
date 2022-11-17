@@ -57,6 +57,20 @@ var (
 		},
 	}
 
+	ballotShowCmd = &cobra.Command{
+		Use:   "show",
+		Short: "Show open ballot",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			r := core.Show(
+				ctx,
+				setup.Community,
+				ns.NS(ballotName),
+			)
+			fmt.Fprint(os.Stdout, r)
+		},
+	}
+
 	ballotListCmd = &cobra.Command{
 		Use:   "list",
 		Short: "List open ballots",
@@ -128,6 +142,11 @@ func init() {
 	ballotOpenCmd.Flags().BoolVar(&ballotUseVotingCredits, "use_credits", false, "use voting credits")
 
 	// close
+	ballotCmd.AddCommand(ballotShowCmd)
+	ballotShowCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotShowCmd.MarkFlagRequired("name")
+
+	// show
 	ballotCmd.AddCommand(ballotCloseCmd)
 	ballotCloseCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
 	ballotCloseCmd.MarkFlagRequired("name")

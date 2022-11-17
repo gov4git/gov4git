@@ -96,3 +96,9 @@ type ChoiceScores []ChoiceScore
 func (x ChoiceScores) Len() int           { return len(x) }
 func (x ChoiceScores) Less(i, j int) bool { return x[i].Score > x[j].Score }
 func (x ChoiceScores) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
+
+type AdStrategyTally struct {
+	Ad       Advertisement `json:"advertisement"`
+	Strategy Strategy      `json:"strategy"`
+	Tally    TallyForm     `json:"tally"`
+}

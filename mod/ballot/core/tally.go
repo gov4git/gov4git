@@ -12,6 +12,7 @@ import (
 	"github.com/gov4git/gov4git/mod/mail"
 	"github.com/gov4git/gov4git/mod/member"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -57,15 +58,15 @@ func TallyStageOnly(
 	}
 
 	// read current tally
-	openTallyNS := proto.OpenBallotNS(ballotName).Sub(proto.TallyFilebase)
 	var currentTally *proto.TallyForm
-	if tryCurrentTally, err := git.TryFromFile[proto.TallyForm](ctx, communityTree, openTallyNS.Path()); err == nil {
+	if tryCurrentTally, err := must.Try1(func() proto.TallyForm { return LoadTally(ctx, communityTree, ballotName) }); err == nil {
 		currentTally = &tryCurrentTally
 	}
 
 	updatedTally := strat.Tally(ctx, govRepo, govTree, &ad, currentTally, fetchedVotes).Result
 
 	// write updated tally
+	openTallyNS := proto.OpenBallotNS(ballotName).Sub(proto.TallyFilebase)
 	git.ToFileStage(ctx, communityTree, openTallyNS.Path(), updatedTally)
 
 	return git.Change[proto.TallyForm]{
@@ -113,4 +114,13 @@ func fetchVotes(
 		Result: fetched,
 		Msg:    fmt.Sprintf("Fetched votes from user %v on ballot %v", user, ballotName),
 	}
+}
+
+func LoadTally(
+	ctx context.Context,
+	communityTree *git.Tree,
+	ballotName ns.NS,
+) proto.TallyForm {
+	openTallyNS := proto.OpenBallotNS(ballotName).Sub(proto.TallyFilebase)
+	return git.FromFile[proto.TallyForm](ctx, communityTree, openTallyNS.Path())
 }

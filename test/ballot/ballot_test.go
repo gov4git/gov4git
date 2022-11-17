@@ -1,12 +1,13 @@
-package ballot
+package core
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/gov4git/gov4git/mod/ballot"
+	"github.com/gov4git/gov4git/mod/ballot/core"
+	"github.com/gov4git/gov4git/mod/ballot/proto"
+	"github.com/gov4git/gov4git/mod/ballot/qv"
 	"github.com/gov4git/gov4git/mod/member"
-	"github.com/gov4git/gov4git/mod/qv"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/ns"
 	"github.com/gov4git/lib4git/testutil"
@@ -21,7 +22,7 @@ func TestBallot(t *testing.T) {
 
 	// open
 	strat := qv.PriorityPoll{UseVotingCredits: false}
-	openChg := ballot.Open(
+	openChg := core.Open(
 		ctx,
 		strat,
 		cty.Community(),
@@ -34,20 +35,20 @@ func TestBallot(t *testing.T) {
 	fmt.Println("open: ", openChg)
 
 	// list
-	ads := ballot.ListOpen[qv.PriorityPoll](ctx, cty.Community())
+	ads := core.ListOpen(ctx, cty.Community())
 	if len(ads) != 1 {
 		t.Errorf("expecting 1 ad, got %v", len(ads))
 	}
 	fmt.Println("ads: ", ads)
 
 	// vote
-	elections := []ballot.Election{
+	elections := []proto.Election{
 		{
 			VoteChoice:         choices[0],
 			VoteStrengthChange: 1.0,
 		},
 	}
-	voteChg := ballot.Vote[qv.PriorityPoll](
+	voteChg := core.Vote(
 		ctx,
 		cty.MemberOwner(0),
 		cty.Community(),
@@ -57,7 +58,7 @@ func TestBallot(t *testing.T) {
 	fmt.Println("vote: ", voteChg)
 
 	// tally
-	tallyChg := ballot.Tally[qv.PriorityPoll](
+	tallyChg := core.Tally(
 		ctx,
 		cty.Organizer(),
 		ballotName,
@@ -68,7 +69,7 @@ func TestBallot(t *testing.T) {
 	}
 
 	// close
-	closeChg := ballot.Close[qv.PriorityPoll](ctx, cty.Community(), ballotName)
+	closeChg := core.Close(ctx, cty.Community(), ballotName)
 	fmt.Println("close: ", closeChg)
 
 	// testutil.Hang()

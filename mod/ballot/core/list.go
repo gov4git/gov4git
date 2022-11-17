@@ -1,41 +1,42 @@
-package ballot
+package core
 
 import (
 	"context"
 	"path/filepath"
 
+	"github.com/gov4git/gov4git/mod/ballot/proto"
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
-func ListOpen[S Strategy](
+func ListOpen(
 	ctx context.Context,
 	govAddr gov.CommunityAddress,
-) []Advertisement {
+) []proto.Advertisement {
 
 	_, govTree := git.Clone(ctx, git.Address(govAddr))
-	return ListOpenLocal[S](ctx, govTree)
+	return ListOpenLocal(ctx, govTree)
 }
 
-func ListOpenLocal[S Strategy](
+func ListOpenLocal(
 	ctx context.Context,
 	govTree *git.Tree,
-) []Advertisement {
+) []proto.Advertisement {
 
-	openNS := OpenBallotNS(ns.NS(""))
+	openNS := proto.OpenBallotNS(ns.NS(""))
 
 	files, err := git.ListFilesRecursively(govTree, openNS.Path())
 	must.NoError(ctx, err)
 
-	ads := []Advertisement{}
+	ads := []proto.Advertisement{}
 	for _, file := range files {
-		if filepath.Base(file) != adFilebase {
+		if filepath.Base(file) != proto.AdFilebase {
 			continue
 		}
-		var ad Advertisement
-		err := must.Try(func() { ad = git.FromFile[Advertisement](ctx, govTree, file) })
+		var ad proto.Advertisement
+		err := must.Try(func() { ad = git.FromFile[proto.Advertisement](ctx, govTree, file) })
 		if err != nil {
 			continue
 		}

@@ -2,6 +2,7 @@ MILESTONE NOV 2022
 
 PRODUCT
 QV-based polling with balance updates
+- [ ] ballot show
 - [ ] vote sanity checks (e.g. allowed elections, enough balance)
 - [ ] polling strategy decrements balances (or puts them on hold)
 

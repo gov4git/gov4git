@@ -37,11 +37,11 @@ This milestone completed at end of Oct 2022.
        - [x] RPC over signed git mail
      - [x] Generic data structures over git (key-value, etc)
 - Community services:
-  - [x] Bureau: governance operation proposals by users
+  - [x] Bureau: governance operational proposals by users
     - [ ] User-initiated balance transfers
 - Governance:
   - [x] User balances
-  - [ ] Balance holds during ballots
+  - [x] Balance holds during ballots
   - [ ] Balance deductions on ballot closure/clearance
 
 #### Validation

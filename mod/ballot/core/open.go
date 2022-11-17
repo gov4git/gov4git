@@ -1,10 +1,11 @@
-package ballot
+package core
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/gov4git/gov4git/mod"
+	"github.com/gov4git/gov4git/mod/ballot/proto"
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/member"
 	"github.com/gov4git/lib4git/git"
@@ -12,27 +13,27 @@ import (
 	"github.com/gov4git/lib4git/ns"
 )
 
-func Open[S Strategy](
+func Open(
 	ctx context.Context,
-	strat S,
+	strat proto.Strategy,
 	govAddr gov.CommunityAddress,
 	name ns.NS,
 	title string,
 	description string,
 	choices []string,
 	participants member.Group,
-) git.Change[BallotAddress] {
+) git.Change[proto.BallotAddress] {
 
 	govRepo, govTree := git.Clone(ctx, git.Address(govAddr))
-	chg := OpenStageOnly[S](ctx, strat, govAddr, govRepo, govTree, name, title, description, choices, participants)
+	chg := OpenStageOnly(ctx, strat, govAddr, govRepo, govTree, name, title, description, choices, participants)
 	mod.Commit(ctx, govTree, chg.Msg)
 	git.Push(ctx, govRepo)
 	return chg
 }
 
-func OpenStageOnly[S Strategy](
+func OpenStageOnly(
 	ctx context.Context,
-	strat S,
+	strat proto.Strategy,
 	govAddr gov.CommunityAddress,
 	govRepo *git.Repository,
 	govTree *git.Tree,
@@ -41,16 +42,16 @@ func OpenStageOnly[S Strategy](
 	description string,
 	choices []string,
 	participants member.Group,
-) git.Change[BallotAddress] {
+) git.Change[proto.BallotAddress] {
 
 	// check no open ballots by the same name
-	openAdNS := OpenBallotNS(name).Sub(adFilebase)
+	openAdNS := proto.OpenBallotNS(name).Sub(proto.AdFilebase)
 	if _, err := govTree.Filesystem.Stat(openAdNS.Path()); err == nil {
 		must.Errorf(ctx, "ballot already exists")
 	}
 
 	// check no closed ballots by the same name
-	closedAdNS := ClosedBallotNS(name).Sub(adFilebase)
+	closedAdNS := proto.ClosedBallotNS(name).Sub(proto.AdFilebase)
 	if _, err := govTree.Filesystem.Stat(closedAdNS.Path()); err == nil {
 		must.Errorf(ctx, "closed ballot with same name exists")
 	}
@@ -61,7 +62,7 @@ func OpenStageOnly[S Strategy](
 	}
 
 	// write ad
-	ad := Advertisement{
+	ad := proto.Advertisement{
 		Community:    govAddr,
 		Name:         name,
 		Title:        title,
@@ -74,11 +75,11 @@ func OpenStageOnly[S Strategy](
 	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
 
 	// write strategy
-	openStratNS := OpenBallotNS(name).Sub(strategyFilebase)
+	openStratNS := proto.OpenBallotNS(name).Sub(proto.StrategyFilebase)
 	git.ToFileStage(ctx, govTree, openStratNS.Path(), strat)
 
-	return git.Change[BallotAddress]{
-		Result: BallotAddress{Gov: govAddr, Name: name},
+	return git.Change[proto.BallotAddress]{
+		Result: proto.BallotAddress{Gov: govAddr, Name: name},
 		Msg:    fmt.Sprintf("Create ballot of type %v", strat.Name()),
 	}
 }

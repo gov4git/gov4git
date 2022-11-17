@@ -1,4 +1,4 @@
-package ballot
+package proto
 
 import (
 	"github.com/gov4git/gov4git/mod"
@@ -11,18 +11,18 @@ import (
 )
 
 var (
-	ballotNS         = mod.RootNS.Sub("ballots")
-	adFilebase       = "ballot_ad.json"
-	strategyFilebase = "ballot_strategy.json"
-	tallyFilebase    = "ballot_tally.json"
+	BallotNS         = mod.RootNS.Sub("ballots")
+	AdFilebase       = "ballot_ad.json"
+	StrategyFilebase = "ballot_strategy.json"
+	TallyFilebase    = "ballot_tally.json"
 )
 
 func OpenBallotNS(name ns.NS) ns.NS {
-	return ballotNS.Sub("open").Join(name)
+	return BallotNS.Sub("open").Join(name)
 }
 
 func ClosedBallotNS(name ns.NS) ns.NS {
-	return ballotNS.Sub("closed").Join(name)
+	return BallotNS.Sub("closed").Join(name)
 }
 
 func BallotTopic(name ns.NS) string {

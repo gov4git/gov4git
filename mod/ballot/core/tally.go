@@ -1,10 +1,12 @@
-package ballot
+package core
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/gov4git/gov4git/mod"
+	"github.com/gov4git/gov4git/mod/ballot/load"
+	"github.com/gov4git/gov4git/mod/ballot/proto"
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/id"
 	"github.com/gov4git/gov4git/mod/mail"
@@ -13,36 +15,30 @@ import (
 	"github.com/gov4git/lib4git/ns"
 )
 
-func Tally[S Strategy](
+func Tally(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	ballotName ns.NS,
-) git.Change[TallyForm] {
+) git.Change[proto.TallyForm] {
 
 	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg := TallyStageOnly[S](ctx, govAddr, govRepo, govTree, ballotName)
+	chg := TallyStageOnly(ctx, govAddr, govRepo, govTree, ballotName)
 	mod.Commit(ctx, git.Worktree(ctx, govRepo.Public), chg.Msg)
 	git.Push(ctx, govRepo.Public)
 	return chg
 }
 
-func TallyStageOnly[S Strategy](
+func TallyStageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govRepo id.OwnerRepo,
 	govTree id.OwnerTree,
 	ballotName ns.NS,
-) git.Change[TallyForm] {
+) git.Change[proto.TallyForm] {
 
 	communityTree := govTree.Public
 
-	// read ad
-	openAdNS := OpenBallotNS(ballotName).Sub(adFilebase)
-	ad := git.FromFile[Advertisement](ctx, communityTree, openAdNS.Path())
-
-	// read strategy
-	openStrategyNS := OpenBallotNS(ballotName).Sub(strategyFilebase)
-	strat := git.FromFile[S](ctx, communityTree, openStrategyNS.Path())
+	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName)
 
 	// list participating users
 	users := member.ListGroupUsersLocal(ctx, communityTree, ad.Participants)
@@ -54,16 +50,16 @@ func TallyStageOnly[S Strategy](
 	}
 
 	// fetch votes from users
-	var fetchedVotes []FetchedVote
+	var fetchedVotes proto.FetchedVotes
 	for i, account := range accounts {
 		fetchedVotes = append(fetchedVotes,
-			fetchVotes[S](ctx, govAddr, govRepo, govTree, ballotName, users[i], account).Result...)
+			fetchVotes(ctx, govAddr, govRepo, govTree, ballotName, users[i], account).Result...)
 	}
 
 	// read current tally
-	openTallyNS := OpenBallotNS(ballotName).Sub(tallyFilebase)
-	var currentTally *TallyForm
-	if tryCurrentTally, err := git.TryFromFile[TallyForm](ctx, communityTree, openTallyNS.Path()); err == nil {
+	openTallyNS := proto.OpenBallotNS(ballotName).Sub(proto.TallyFilebase)
+	var currentTally *proto.TallyForm
+	if tryCurrentTally, err := git.TryFromFile[proto.TallyForm](ctx, communityTree, openTallyNS.Path()); err == nil {
 		currentTally = &tryCurrentTally
 	}
 
@@ -72,13 +68,13 @@ func TallyStageOnly[S Strategy](
 	// write updated tally
 	git.ToFileStage(ctx, communityTree, openTallyNS.Path(), updatedTally)
 
-	return git.Change[TallyForm]{
+	return git.Change[proto.TallyForm]{
 		Result: updatedTally,
 		Msg:    fmt.Sprintf("Tally votes on ballot %v", ballotName),
 	}
 }
 
-func fetchVotes[S Strategy](
+func fetchVotes(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govRepo id.OwnerRepo,
@@ -86,16 +82,16 @@ func fetchVotes[S Strategy](
 	ballotName ns.NS,
 	user member.User,
 	account member.Account,
-) git.Change[[]FetchedVote] {
+) git.Change[proto.FetchedVotes] {
 
-	fetched := []FetchedVote{}
-	respond := func(ctx context.Context, req VoteEnvelope, _ id.SignedPlaintext) (resp VoteEnvelope, err error) {
+	fetched := proto.FetchedVotes{}
+	respond := func(ctx context.Context, req proto.VoteEnvelope, _ id.SignedPlaintext) (resp proto.VoteEnvelope, err error) {
 
 		if !req.VerifyConsistency() {
-			return VoteEnvelope{}, fmt.Errorf("vote envelope is not valid")
+			return proto.VoteEnvelope{}, fmt.Errorf("vote envelope is not valid")
 		}
 		fetched = append(fetched,
-			FetchedVote{
+			proto.FetchedVote{
 				Voter:     user,
 				Address:   account.Home,
 				Elections: req.Elections,
@@ -109,11 +105,11 @@ func fetchVotes[S Strategy](
 		govTree,
 		account.Home,
 		voterPublicTree,
-		BallotTopic(ballotName),
+		proto.BallotTopic(ballotName),
 		respond,
 	)
 
-	return git.Change[[]FetchedVote]{
+	return git.Change[proto.FetchedVotes]{
 		Result: fetched,
 		Msg:    fmt.Sprintf("Fetched votes from user %v on ballot %v", user, ballotName),
 	}

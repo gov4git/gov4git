@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	"github.com/gov4git/gov4git/mod/balance"
-	"github.com/gov4git/gov4git/mod/ballot"
+	"github.com/gov4git/gov4git/mod/ballot/proto"
 	"github.com/gov4git/gov4git/mod/id"
 	"github.com/gov4git/gov4git/mod/member"
 	"github.com/gov4git/lib4git/base"
@@ -18,21 +18,23 @@ type PriorityPoll struct {
 	UseVotingCredits bool `json:"use_voting_credits"`
 }
 
+const PriorityPollName = "priority_poll"
+
 func (x PriorityPoll) Name() string {
-	return "priority_poll"
+	return PriorityPollName
 }
 
 func (x PriorityPoll) Tally(
 	ctx context.Context,
 	govRepo id.OwnerRepo,
 	govTree id.OwnerTree,
-	ad *ballot.Advertisement,
-	prior *ballot.TallyForm,
-	fetched []ballot.FetchedVote,
-) git.Change[ballot.TallyForm] {
+	ad *proto.Advertisement,
+	prior *proto.TallyForm,
+	fetched []proto.FetchedVote,
+) git.Change[proto.TallyForm] {
 
 	// TODO: key on member+address to account for changes in user → address mapping
-	fetchedVotesMap := map[member.User]ballot.FetchedVote{}
+	fetchedVotesMap := map[member.User]proto.FetchedVote{}
 
 	// load prior participant votes
 	if prior != nil {
@@ -42,10 +44,10 @@ func (x PriorityPoll) Tally(
 	}
 
 	// pay for voter elections with voting credits
-	paid := []ballot.FetchedVote{}
+	paid := []proto.FetchedVote{}
 	if x.UseVotingCredits {
 		for _, fv := range fetched {
-			paidElections := ballot.Elections{}
+			paidElections := proto.Elections{}
 			for _, el := range fv.Elections {
 				err := balance.TryTransferStageOnly(
 					ctx,
@@ -60,7 +62,7 @@ func (x PriorityPoll) Tally(
 				}
 				paidElections = append(paidElections, el)
 			}
-			paid = append(paid, ballot.FetchedVote{Voter: fv.Voter, Address: fv.Address, Elections: paidElections})
+			paid = append(paid, proto.FetchedVote{Voter: fv.Voter, Address: fv.Address, Elections: paidElections})
 		}
 	} else {
 		paid = fetched
@@ -74,7 +76,7 @@ func (x PriorityPoll) Tally(
 	}
 
 	// sort fetched votes
-	fetchedVotes := ballot.FetchedVotes{}
+	fetchedVotes := proto.FetchedVotes{}
 	for _, fetchedVote := range fetchedVotesMap {
 		fetchedVotes = append(fetchedVotes, fetchedVote)
 	}
@@ -106,14 +108,14 @@ func (x PriorityPoll) Tally(
 	}
 
 	// sort choice scores
-	choiceScores := ballot.ChoiceScores{}
+	choiceScores := proto.ChoiceScores{}
 	for choice, score := range choiceScoresMap {
-		choiceScores = append(choiceScores, ballot.ChoiceScore{Choice: choice, Score: score})
+		choiceScores = append(choiceScores, proto.ChoiceScore{Choice: choice, Score: score})
 	}
 	sort.Sort(choiceScores)
 
-	return git.Change[ballot.TallyForm]{
-		Result: ballot.TallyForm{
+	return git.Change[proto.TallyForm]{
+		Result: proto.TallyForm{
 			Ad:           *ad,
 			FetchedVotes: fetchedVotes,
 			ChoiceScores: choiceScores,

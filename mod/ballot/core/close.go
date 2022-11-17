@@ -1,29 +1,31 @@
-package ballot
+package core
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/gov4git/gov4git/mod"
+	"github.com/gov4git/gov4git/mod/ballot/load"
+	"github.com/gov4git/gov4git/mod/ballot/proto"
 	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/ns"
 )
 
-func Close[S Strategy](
+func Close(
 	ctx context.Context,
 	govAddr gov.CommunityAddress,
 	ballotName ns.NS,
 ) git.ChangeNoResult {
 
 	govRepo, govTree := git.Clone(ctx, git.Address(govAddr))
-	chg := CloseStageOnly[S](ctx, govAddr, govRepo, govTree, ballotName)
+	chg := CloseStageOnly(ctx, govAddr, govRepo, govTree, ballotName)
 	mod.Commit(ctx, govTree, chg.Msg)
 	git.Push(ctx, govRepo)
 	return chg
 }
 
-func CloseStageOnly[S Strategy](
+func CloseStageOnly(
 	ctx context.Context,
 	govAddr gov.CommunityAddress,
 	govRepo *git.Repository,
@@ -31,15 +33,11 @@ func CloseStageOnly[S Strategy](
 	ballotName ns.NS,
 ) git.ChangeNoResult {
 
-	openNS := OpenBallotNS(ballotName)
-	closedNS := ClosedBallotNS(ballotName)
+	// verify ad and strategy are present
+	load.LoadStrategy(ctx, govTree, ballotName)
 
-	// verify ad is present
-	git.FromFile[Advertisement](ctx, govTree, openNS.Sub(adFilebase).Path())
-
-	// verify strategy is present
-	git.FromFile[S](ctx, govTree, openNS.Sub(strategyFilebase).Path())
-
+	openNS := proto.OpenBallotNS(ballotName)
+	closedNS := proto.ClosedBallotNS(ballotName)
 	git.RenameStage(ctx, govTree, openNS.Path(), closedNS.Path())
 
 	return git.ChangeNoResult{

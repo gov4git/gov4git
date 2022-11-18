@@ -20,7 +20,7 @@ func Tally(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	ballotName ns.NS,
-) git.Change[proto.TallyForm] {
+) git.Change[proto.Tally] {
 
 	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg := TallyStageOnly(ctx, govAddr, govRepo, govTree, ballotName)
@@ -35,7 +35,7 @@ func TallyStageOnly(
 	govRepo id.OwnerRepo,
 	govTree id.OwnerTree,
 	ballotName ns.NS,
-) git.Change[proto.TallyForm] {
+) git.Change[proto.Tally] {
 
 	communityTree := govTree.Public
 
@@ -58,8 +58,8 @@ func TallyStageOnly(
 	}
 
 	// read current tally
-	var currentTally *proto.TallyForm
-	if tryCurrentTally, err := must.Try1(func() proto.TallyForm { return LoadTally(ctx, communityTree, ballotName) }); err == nil {
+	var currentTally *proto.Tally
+	if tryCurrentTally, err := must.Try1(func() proto.Tally { return LoadTally(ctx, communityTree, ballotName) }); err == nil {
 		currentTally = &tryCurrentTally
 	}
 
@@ -69,7 +69,7 @@ func TallyStageOnly(
 	openTallyNS := proto.OpenBallotNS(ballotName).Sub(proto.TallyFilebase)
 	git.ToFileStage(ctx, communityTree, openTallyNS.Path(), updatedTally)
 
-	return git.Change[proto.TallyForm]{
+	return git.Change[proto.Tally]{
 		Result: updatedTally,
 		Msg:    fmt.Sprintf("Tally votes on ballot %v", ballotName),
 	}
@@ -120,7 +120,7 @@ func LoadTally(
 	ctx context.Context,
 	communityTree *git.Tree,
 	ballotName ns.NS,
-) proto.TallyForm {
+) proto.Tally {
 	openTallyNS := proto.OpenBallotNS(ballotName).Sub(proto.TallyFilebase)
-	return git.FromFile[proto.TallyForm](ctx, communityTree, openTallyNS.Path())
+	return git.FromFile[proto.Tally](ctx, communityTree, openTallyNS.Path())
 }

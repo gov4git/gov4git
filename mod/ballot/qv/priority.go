@@ -29,16 +29,16 @@ func (x PriorityPoll) Tally(
 	govRepo id.OwnerRepo,
 	govTree id.OwnerTree,
 	ad *proto.Advertisement,
-	prior *proto.TallyForm,
+	prior *proto.Tally,
 	fetched []proto.FetchedVote,
-) git.Change[proto.TallyForm] {
+) git.Change[proto.Tally] {
 
 	// TODO: key on member+address to account for changes in user → address mapping
 	fetchedVotesMap := map[member.User]proto.FetchedVote{}
 
 	// load prior participant votes
 	if prior != nil {
-		for _, fv := range prior.FetchedVotes {
+		for _, fv := range prior.Votes {
 			fetchedVotesMap[fv.Voter] = fv
 		}
 	}
@@ -114,12 +114,30 @@ func (x PriorityPoll) Tally(
 	}
 	sort.Sort(choiceScores)
 
-	return git.Change[proto.TallyForm]{
-		Result: proto.TallyForm{
-			Ad:           *ad,
-			FetchedVotes: fetchedVotes,
-			ChoiceScores: choiceScores,
+	return git.Change[proto.Tally]{
+		Result: proto.Tally{
+			Ad:     *ad,
+			Votes:  fetchedVotes,
+			Scores: choiceScores,
 		},
 		Msg: fmt.Sprintf("Tallied QV priority poll scores for %v", ad.Name),
+	}
+}
+
+func (x PriorityPoll) Close(
+	ctx context.Context,
+	govRepo id.OwnerRepo,
+	govTree id.OwnerTree,
+	ad *proto.Advertisement,
+	tally *proto.Tally,
+	summary proto.Summary,
+) git.Change[proto.Outcome] {
+
+	return git.Change[proto.Outcome]{
+		Result: proto.Outcome{
+			Summary: summary,
+			Scores:  tally.Scores,
+		},
+		Msg: fmt.Sprintf("closed ballot %v with outcome %v", ad.Name, summary),
 	}
 }

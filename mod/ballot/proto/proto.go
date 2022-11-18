@@ -15,6 +15,7 @@ var (
 	AdFilebase       = "ballot_ad.json"
 	StrategyFilebase = "ballot_strategy.json"
 	TallyFilebase    = "ballot_tally.json"
+	OutcomeFilebase  = "ballot_outcome.json"
 )
 
 func OpenBallotNS(name ns.NS) ns.NS {
@@ -68,10 +69,10 @@ func (x VoteEnvelope) VerifyConsistency() bool {
 	return true
 }
 
-type TallyForm struct {
-	Ad           Advertisement `json:"ballot_ad"`
-	FetchedVotes FetchedVotes  `json:"ballot_fetched_votes"`
-	ChoiceScores ChoiceScores  `json:"ballot_choice_scores"`
+type Tally struct {
+	Ad     Advertisement `json:"ballot_advertisement"`
+	Votes  FetchedVotes  `json:"ballot_fetched_votes"`
+	Scores ChoiceScores  `json:"ballot_choice_scores"`
 }
 
 type FetchedVote struct {
@@ -98,7 +99,14 @@ func (x ChoiceScores) Less(i, j int) bool { return x[i].Score > x[j].Score }
 func (x ChoiceScores) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 
 type AdStrategyTally struct {
-	Ad       Advertisement `json:"advertisement"`
-	Strategy Strategy      `json:"strategy"`
-	Tally    TallyForm     `json:"tally"`
+	Ad       Advertisement `json:"ballot_advertisement"`
+	Strategy Strategy      `json:"ballot_strategy"`
+	Tally    Tally         `json:"ballot_tally"`
+}
+
+type Summary string
+
+type Outcome struct {
+	Summary Summary      `json:"ballot_summary"`
+	Scores  ChoiceScores `json:"ballot_choice_scores"`
 }

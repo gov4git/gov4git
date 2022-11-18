@@ -1,12 +1,12 @@
 MILESTONE NOV 2022
 
 PRODUCT
-QV-based polling with balance updates
-- [ ] ballot show
+- [ ] polling strategy clears depending on outcome
 - [ ] vote sanity checks (e.g. allowed elections, enough balance)
-- [ ] polling strategy decrements balances (or puts them on hold)
 
 DILIGENCE:
+- [ ] mod -> app?
+- [ ] core -> ???
 - don't show panics in non-verbose mode
 - address TODOs, XXXs
 

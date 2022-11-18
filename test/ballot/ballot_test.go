@@ -64,12 +64,12 @@ func TestBallot(t *testing.T) {
 		ballotName,
 	)
 	fmt.Println("tally: ", tallyChg)
-	if len(tallyChg.Result.FetchedVotes) != 1 {
-		t.Errorf("expecting 1 vote, got %v", len(tallyChg.Result.FetchedVotes))
+	if len(tallyChg.Result.Votes) != 1 {
+		t.Errorf("expecting 1 vote, got %v", len(tallyChg.Result.Votes))
 	}
 
 	// close
-	closeChg := core.Close(ctx, cty.Community(), ballotName)
+	closeChg := core.Close(ctx, cty.Organizer(), ballotName, proto.Summary("ok"))
 	fmt.Println("close: ", closeChg)
 
 	// testutil.Hang()

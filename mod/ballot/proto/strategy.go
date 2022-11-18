@@ -12,13 +12,24 @@ type Parameters interface{}
 
 type Strategy interface {
 	form.Form
+
 	Name() string
+
 	Tally(
 		ctx context.Context,
 		govRepo id.OwnerRepo,
 		govTree id.OwnerTree,
 		ad *Advertisement,
-		current *TallyForm,
+		current *Tally,
 		fetched []FetchedVote,
-	) git.Change[TallyForm] // tallying can change other aspects of the repo, like user balances
+	) git.Change[Tally] // tallying can change other aspects of the repo, like user balances
+
+	Close(
+		ctx context.Context,
+		govRepo id.OwnerRepo,
+		govTree id.OwnerTree,
+		ad *Advertisement,
+		tally *Tally,
+		summary Summary,
+	) git.Change[Outcome]
 }

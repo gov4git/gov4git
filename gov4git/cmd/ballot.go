@@ -50,8 +50,9 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			chg := core.Close(
 				ctx,
-				setup.Community,
+				setup.Organizer,
 				ns.NS(ballotName),
+				proto.Summary(ballotSummary),
 			)
 			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
 		},
@@ -124,6 +125,7 @@ var (
 	ballotElectionChoice   []string
 	ballotElectionStrength []float64
 	ballotUseVotingCredits bool
+	ballotSummary          string
 )
 
 func init() {
@@ -145,6 +147,8 @@ func init() {
 	ballotCmd.AddCommand(ballotShowCmd)
 	ballotShowCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
 	ballotShowCmd.MarkFlagRequired("name")
+	ballotShowCmd.Flags().StringVar(&ballotSummary, "summary", "", "summary")
+	ballotShowCmd.MarkFlagRequired("summary")
 
 	// show
 	ballotCmd.AddCommand(ballotCloseCmd)

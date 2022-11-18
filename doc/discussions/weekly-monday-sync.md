@@ -4,10 +4,12 @@
 
 - __Updates from the week:__
   - Rewrite done (merged)
+  - Last round of MVP features done (merged)
   - UI project job posting is out (RadX/Microsoft/Trigram/etc)
   - New product [UX walkthrough](../walkthrough.sh)
 
 - __Priorities for this week:__
+  - Commence work on UI
   - Dogfood deployment on gov4git
     - GitHub automation
       - Open/close polls for opened issues and PRs

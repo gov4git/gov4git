@@ -1,9 +1,5 @@
 MILESTONE NOV 2022
 
-PRODUCT
-- [ ] polling strategy clears depending on outcome
-- [ ] vote sanity checks (e.g. allowed elections, enough balance)
-
 DILIGENCE:
 - [ ] mod -> app?
 - [ ] core -> ???

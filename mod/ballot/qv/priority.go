@@ -8,10 +8,12 @@ import (
 
 	"github.com/gov4git/gov4git/mod/balance"
 	"github.com/gov4git/gov4git/mod/ballot/proto"
+	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/id"
 	"github.com/gov4git/gov4git/mod/member"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 )
 
 type PriorityPoll struct {
@@ -22,6 +24,29 @@ const PriorityPollName = "priority_poll"
 
 func (x PriorityPoll) Name() string {
 	return PriorityPollName
+}
+
+func (x PriorityPoll) VerifyElections(
+	ctx context.Context,
+	voterAddr id.OwnerAddress,
+	govAddr gov.CommunityAddress,
+	voterTree id.OwnerTree,
+	govTree *git.Tree,
+	ad proto.Advertisement,
+	elections proto.Elections,
+) {
+	if x.UseVotingCredits {
+		spend := 0.0
+		for _, el := range elections {
+			spend += math.Abs(el.VoteStrengthChange)
+		}
+		user := member.LookupUserByAddressLocal(ctx, govTree, voterAddr.Public)
+		if len(user) == 0 {
+			must.Errorf(ctx, "cannot find user with address %v in the community", voterAddr.Public)
+		}
+		available := balance.GetLocal(ctx, govTree, user[0], VotingCredits)
+		must.Assertf(ctx, available >= spend, "insufficient voting credits %v for elections costing %v", available, spend)
+	}
 }
 
 func (x PriorityPoll) Tally(
@@ -54,7 +79,7 @@ func (x PriorityPoll) Tally(
 					govTree.Public,
 					fv.Voter, VotingCredits,
 					fv.Voter, VotingCreditsOnHold,
-					el.VoteStrengthChange,
+					math.Abs(el.VoteStrengthChange),
 				)
 				if err != nil {
 					base.Infof("not enough voting credits for voter %v election", fv.Voter)

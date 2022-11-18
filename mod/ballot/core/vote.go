@@ -19,7 +19,7 @@ func Vote(
 	voterAddr id.OwnerAddress,
 	govAddr gov.CommunityAddress,
 	ballotName ns.NS,
-	elections []proto.Election,
+	elections proto.Elections,
 ) git.Change[mail.SeqNo] {
 
 	govRepo := git.CloneRepo(ctx, git.Address(govAddr))
@@ -38,7 +38,7 @@ func VoteStageOnly(
 	voterTree id.OwnerTree,
 	govRepo *git.Repository,
 	ballotName ns.NS,
-	elections []proto.Election,
+	elections proto.Elections,
 ) git.Change[mail.SeqNo] {
 
 	govTree := git.Worktree(ctx, govRepo)
@@ -63,7 +63,7 @@ func verifyElections(
 	voterTree id.OwnerTree,
 	govTree *git.Tree,
 	ad proto.Advertisement,
-	elections []proto.Election,
+	elections proto.Elections,
 ) {
 	// check elections use available choices
 	if len(ad.Choices) > 0 {
@@ -75,6 +75,7 @@ func verifyElections(
 	}
 
 	// TODO: check sufficient balance
+	strat.VerifyElections(ctx, voterAddr, govAddr, voterTree, govTree, ad, elections)
 }
 
 func stringIsIn(s string, in []string) bool {

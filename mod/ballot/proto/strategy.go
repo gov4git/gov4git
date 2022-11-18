@@ -3,6 +3,7 @@ package proto
 import (
 	"context"
 
+	"github.com/gov4git/gov4git/mod/gov"
 	"github.com/gov4git/gov4git/mod/id"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -14,6 +15,16 @@ type Strategy interface {
 	form.Form
 
 	Name() string
+
+	VerifyElections(
+		ctx context.Context,
+		voterAddr id.OwnerAddress,
+		govAddr gov.CommunityAddress,
+		voterTree id.OwnerTree,
+		govTree *git.Tree,
+		ad Advertisement,
+		elections Elections,
+	)
 
 	Tally(
 		ctx context.Context,

@@ -56,7 +56,7 @@ type Elections []Election
 type VoteEnvelope struct {
 	AdCommit  git.CommitHash `json:"ballot_ad_commit"`
 	Ad        Advertisement  `json:"ballot_ad"`
-	Elections []Election     `json:"ballot_elections"`
+	Elections Elections      `json:"ballot_elections"`
 }
 
 // Verify verifies that elections are consistent with the ballot ad.

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gov4git/gov4git/mod/balance"
 	"github.com/gov4git/gov4git/mod/ballot/core"
 	"github.com/gov4git/gov4git/mod/ballot/proto"
 	"github.com/gov4git/gov4git/mod/ballot/qv"
@@ -13,15 +14,18 @@ import (
 	"github.com/gov4git/lib4git/testutil"
 )
 
-func TestBallot(t *testing.T) {
+func TestQV(t *testing.T) {
 	ctx := testutil.NewCtx()
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	ballotName := ns.NS("a/b/c")
 	choices := []string{"x", "y", "z"}
 
+	// init voter credits
+	balance.Set(ctx, cty.Community(), cty.MemberUser(0), qv.VotingCredits, 3.0)
+
 	// open
-	strat := qv.PriorityPoll{UseVotingCredits: false}
+	strat := qv.PriorityPoll{UseVotingCredits: true}
 	openChg := core.Open(
 		ctx,
 		strat,
@@ -34,18 +38,11 @@ func TestBallot(t *testing.T) {
 	)
 	fmt.Println("open: ", openChg)
 
-	// list
-	ads := core.ListOpen(ctx, cty.Community())
-	if len(ads) != 1 {
-		t.Errorf("expecting 1 ad, got %v", len(ads))
-	}
-	fmt.Println("ads: ", ads)
-
 	// vote
 	elections := proto.Elections{
 		{
 			VoteChoice:         choices[0],
-			VoteStrengthChange: 1.0,
+			VoteStrengthChange: 2.0,
 		},
 	}
 	voteChg := core.Vote(
@@ -69,8 +66,14 @@ func TestBallot(t *testing.T) {
 	}
 
 	// close
-	closeChg := core.Close(ctx, cty.Organizer(), ballotName, proto.Summary("ok"))
+	closeChg := core.Close(ctx, cty.Organizer(), ballotName, qv.SummaryAbandoned)
 	fmt.Println("close: ", closeChg)
+
+	// verify voter credits
+	u0 := balance.Get(ctx, cty.Community(), cty.MemberUser(0), qv.VotingCredits)
+	if u0 != 1.0 {
+		t.Errorf("expecting 1, got %v", u0)
+	}
 
 	// testutil.Hang()
 }

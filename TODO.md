@@ -3,7 +3,6 @@ MILESTONE NOV 2022
 DILIGENCE:
 - [ ] mod -> app?
 - [ ] core -> ???
-- don't show panics in non-verbose mode
 - address TODOs, XXXs
 
 _______________________________________________________

@@ -3,8 +3,8 @@ package cmd
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/mod/gov"
-	"github.com/gov4git/gov4git/mod/id"
+	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/git"
 )
 

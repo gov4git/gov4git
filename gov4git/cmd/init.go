@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gov4git/gov4git/mod/id"
+	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )

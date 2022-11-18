@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/gov4git/gov4git/mod/balance"
-	"github.com/gov4git/gov4git/mod/bureau"
-	"github.com/gov4git/gov4git/mod/member"
+	"github.com/gov4git/gov4git/proto/balance"
+	"github.com/gov4git/gov4git/proto/bureau"
+	"github.com/gov4git/gov4git/proto/member"
 	"github.com/spf13/cobra"
 )
 

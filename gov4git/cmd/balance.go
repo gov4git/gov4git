@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gov4git/gov4git/mod/balance"
-	"github.com/gov4git/gov4git/mod/member"
+	"github.com/gov4git/gov4git/proto/balance"
+	"github.com/gov4git/gov4git/proto/member"
 	"github.com/spf13/cobra"
 )
 

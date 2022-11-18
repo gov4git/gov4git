@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gov4git/gov4git/mod/ballot/core"
-	"github.com/gov4git/gov4git/mod/ballot/proto"
-	"github.com/gov4git/gov4git/mod/ballot/qv"
-	"github.com/gov4git/gov4git/mod/member"
+	"github.com/gov4git/gov4git/proto/ballot/ballot"
+	"github.com/gov4git/gov4git/proto/ballot/common"
+	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/ns"
 	"github.com/gov4git/lib4git/testutil"
@@ -22,7 +22,7 @@ func TestBallot(t *testing.T) {
 
 	// open
 	strat := qv.PriorityPoll{UseVotingCredits: false}
-	openChg := core.Open(
+	openChg := ballot.Open(
 		ctx,
 		strat,
 		cty.Community(),
@@ -35,20 +35,20 @@ func TestBallot(t *testing.T) {
 	fmt.Println("open: ", openChg)
 
 	// list
-	ads := core.ListOpen(ctx, cty.Community())
+	ads := ballot.ListOpen(ctx, cty.Community())
 	if len(ads) != 1 {
 		t.Errorf("expecting 1 ad, got %v", len(ads))
 	}
 	fmt.Println("ads: ", ads)
 
 	// vote
-	elections := proto.Elections{
+	elections := common.Elections{
 		{
 			VoteChoice:         choices[0],
 			VoteStrengthChange: 1.0,
 		},
 	}
-	voteChg := core.Vote(
+	voteChg := ballot.Vote(
 		ctx,
 		cty.MemberOwner(0),
 		cty.Community(),
@@ -58,7 +58,7 @@ func TestBallot(t *testing.T) {
 	fmt.Println("vote: ", voteChg)
 
 	// tally
-	tallyChg := core.Tally(
+	tallyChg := ballot.Tally(
 		ctx,
 		cty.Organizer(),
 		ballotName,
@@ -69,7 +69,7 @@ func TestBallot(t *testing.T) {
 	}
 
 	// close
-	closeChg := core.Close(ctx, cty.Organizer(), ballotName, proto.Summary("ok"))
+	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, common.Summary("ok"))
 	fmt.Println("close: ", closeChg)
 
 	// testutil.Hang()

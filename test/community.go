@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/gov4git/gov4git/mod/gov"
-	"github.com/gov4git/gov4git/mod/id"
-	"github.com/gov4git/gov4git/mod/member"
+	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/git"
 )

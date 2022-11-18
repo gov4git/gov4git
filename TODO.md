@@ -1,10 +1,5 @@
 MILESTONE NOV 2022
 
-DILIGENCE:
-- [ ] mod -> app?
-- [ ] core -> ???
-- address TODOs, XXXs
-
 _______________________________________________________
 
 Merge approval workflow

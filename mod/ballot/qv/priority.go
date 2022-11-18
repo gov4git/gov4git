@@ -133,6 +133,29 @@ func (x PriorityPoll) Close(
 	summary proto.Summary,
 ) git.Change[proto.Outcome] {
 
+	if x.UseVotingCredits && summary == SummaryAdopted {
+
+		// compute credits spent by each user
+		us := map[member.User]float64{}
+		for _, vote := range tally.Votes {
+			u := us[vote.Voter]
+			for _, el := range vote.Elections {
+				u += el.VoteStrengthChange
+			}
+			us[vote.Voter] = u
+		}
+
+		// refund users
+		for user, spent := range us {
+			if spent < 0 {
+				continue // don't refund voters against
+			}
+			onHold := balance.GetLocal(ctx, govTree.Public, user, VotingCreditsOnHold)
+			refund := min(spent, onHold)
+			balance.TransferStageOnly(ctx, govTree.Public, user, VotingCreditsOnHold, user, VotingCredits, refund)
+		}
+	}
+
 	return git.Change[proto.Outcome]{
 		Result: proto.Outcome{
 			Summary: summary,
@@ -140,4 +163,11 @@ func (x PriorityPoll) Close(
 		},
 		Msg: fmt.Sprintf("closed ballot %v with outcome %v", ad.Name, summary),
 	}
+}
+
+func min(x, y float64) float64 {
+	if x < y {
+		return x
+	}
+	return y
 }

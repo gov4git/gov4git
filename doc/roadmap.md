@@ -38,11 +38,11 @@ This milestone completed at end of Oct 2022.
      - [x] Generic data structures over git (key-value, etc)
 - Community services:
   - [x] Bureau: governance operational proposals by users
-    - [ ] User-initiated balance transfers
+    - [x] User-initiated balance transfers
 - Governance:
   - [x] User balances
   - [x] Balance holds during ballots
-  - [ ] Balance deductions on ballot closure/clearance
+  - [x] Balance deductions on ballot closure/clearance
 
 #### Validation
 - [ ] Dogfood deployment on gov4git repo

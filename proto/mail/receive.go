@@ -83,7 +83,7 @@ func ReceiveSignedStageOnly[Request form.Form, Response form.Form](
 	ctx context.Context,
 	receiverTree id.OwnerTree,
 	senderAddr id.HomeAddress,
-	senderPublic *git.Tree,
+	senderHome *git.Tree,
 	topic string,
 	respond SignedResponder[Request, Response],
 ) git.Change[[]RequestResponse[Request, Response]] {
@@ -105,7 +105,7 @@ func ReceiveSignedStageOnly[Request form.Form, Response form.Form](
 		rr = append(rr, RequestResponse[Request, Response]{Request: req, Response: resp})
 		return id.Sign(ctx, receiverPrivCred, resp), nil
 	}
-	ReceiveStageOnly(ctx, receiverTree.Home, senderAddr, senderPublic, topic, signRespond)
+	ReceiveStageOnly(ctx, receiverTree.Home, senderAddr, senderHome, topic, signRespond)
 	return git.Change[[]RequestResponse[Request, Response]]{
 		Result: rr,
 		Msg:    fmt.Sprintf("Received signed mail"),

@@ -13,7 +13,7 @@ import (
 var (
 	initIDCmd = &cobra.Command{
 		Use:   "init-id",
-		Short: "Initialize public and private repositories of your identity",
+		Short: "Initialize home and vault repositories of your identity",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := context.Background()
@@ -24,7 +24,7 @@ var (
 
 	initGovCmd = &cobra.Command{
 		Use:   "init-gov",
-		Short: "Initialize public and private repositories of your community",
+		Short: "Initialize home and vault repositories of your community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			chg := id.Init(ctx, id.OwnerAddress(setup.Organizer))

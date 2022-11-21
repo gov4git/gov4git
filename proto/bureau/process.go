@@ -120,12 +120,12 @@ func fetchUserRequests(
 		return req, nil
 	}
 
-	_, userPublicTree := git.Clone(ctx, git.Address(account.Home))
+	_, userHomeTree := git.Clone(ctx, git.Address(account.Home))
 	mail.ReceiveSignedStageOnly(
 		ctx,
 		govTree,
 		account.Home,
-		userPublicTree,
+		userHomeTree,
 		BureauTopic,
 		respond,
 	)

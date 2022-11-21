@@ -23,13 +23,13 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 	// initialize organizer and community
 	organizerID := id.NewTestID(ctx, t, git.MainBranch, true)
 	id.Init(ctx, organizerID.OwnerAddress())
-	base.Infof("gov_public=%v gov_private=%v", organizerID.HomeAddress(), organizerID.VaultAddress())
+	base.Infof("gov_home=%v gov_vault=%v", organizerID.HomeAddress(), organizerID.VaultAddress())
 
 	// initialize members
 	members := make([]id.OwnerAddress, numMembers)
 	for i := 0; i < numMembers; i++ {
 		memberID := id.NewTestID(ctx, t, git.MainBranch, true)
-		base.Infof("member_%d_public=%v member_%d_private=%v",
+		base.Infof("member_%d_home=%v member_%d_vault=%v",
 			i, organizerID.HomeAddress(), i, organizerID.VaultAddress())
 		id.Init(ctx, memberID.OwnerAddress())
 		members[i] = memberID.OwnerAddress()

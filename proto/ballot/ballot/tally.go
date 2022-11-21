@@ -100,12 +100,12 @@ func fetchVotes(
 		return req, nil
 	}
 
-	_, voterPublicTree := git.Clone(ctx, git.Address(account.Home))
+	_, voterHomeTree := git.Clone(ctx, git.Address(account.Home))
 	mail.ReceiveSignedStageOnly(
 		ctx,
 		govTree,
 		account.Home,
-		voterPublicTree,
+		voterHomeTree,
 		common.BallotTopic(ballotName),
 		respond,
 	)

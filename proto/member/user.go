@@ -105,12 +105,12 @@ func GetUserPropLocalOrDefault[V form.Form](ctx context.Context, t *git.Tree, us
 
 // lookup
 
-func LookupUserByAddress(ctx context.Context, govAddr gov.CommunityAddress, userAddr id.PublicAddress) []User {
+func LookupUserByAddress(ctx context.Context, govAddr gov.CommunityAddress, userAddr id.HomeAddress) []User {
 	_, t := gov.CloneCommunity(ctx, govAddr)
 	return LookupUserByAddressLocal(ctx, t, userAddr)
 }
 
-func LookupUserByAddressLocal(ctx context.Context, t *git.Tree, userAddr id.PublicAddress) []User {
+func LookupUserByAddressLocal(ctx context.Context, t *git.Tree, userAddr id.HomeAddress) []User {
 	us := usersKV.ListKeys(ctx, usersNS, t)
 	r := []User{}
 	for _, u := range us {

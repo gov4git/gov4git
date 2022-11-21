@@ -24,5 +24,5 @@ var (
 )
 
 type Account struct {
-	Home id.PublicAddress `json:"home"`
+	Home id.HomeAddress `json:"home"`
 }

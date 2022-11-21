@@ -57,12 +57,12 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 	return Setup{
 		Community: gov.CommunityAddress{Repo: cfg.CommunityPublicURL, Branch: cfg.CommunityPublicBranch},
 		Organizer: gov.OrganizerAddress{
-			Public:  id.PublicAddress{Repo: cfg.CommunityPublicURL, Branch: cfg.CommunityPublicBranch},
-			Private: id.PrivateAddress{Repo: cfg.CommunityPrivateURL, Branch: cfg.CommunityPrivateBranch},
+			Home:  id.HomeAddress{Repo: cfg.CommunityPublicURL, Branch: cfg.CommunityPublicBranch},
+			Vault: id.VaultAddress{Repo: cfg.CommunityPrivateURL, Branch: cfg.CommunityPrivateBranch},
 		},
 		Member: id.OwnerAddress{
-			Public:  id.PublicAddress{Repo: cfg.MemberPublicURL, Branch: cfg.MemberPublicBranch},
-			Private: id.PrivateAddress{Repo: cfg.MemberPrivateURL, Branch: cfg.MemberPrivateBranch},
+			Home:  id.HomeAddress{Repo: cfg.MemberPublicURL, Branch: cfg.MemberPublicBranch},
+			Vault: id.VaultAddress{Repo: cfg.MemberPrivateURL, Branch: cfg.MemberPrivateBranch},
 		},
 	}
 }

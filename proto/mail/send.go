@@ -59,7 +59,7 @@ func SendSignedStageOnly[M form.Form](
 	topic string,
 	msg M,
 ) git.Change[SeqNo] {
-	senderPrivCred := id.GetPrivateCredentials(ctx, senderTree.Private)
+	senderPrivCred := id.GetPrivateCredentials(ctx, senderTree.Vault)
 	signed := id.Sign(ctx, senderPrivCred, msg)
-	return SendStageOnly(ctx, senderTree.Public, receiver, topic, signed)
+	return SendStageOnly(ctx, senderTree.Home, receiver, topic, signed)
 }

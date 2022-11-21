@@ -23,20 +23,20 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 	// initialize organizer and community
 	organizerID := id.NewTestID(ctx, t, git.MainBranch, true)
 	id.Init(ctx, organizerID.OwnerAddress())
-	base.Infof("gov_public=%v gov_private=%v", organizerID.PublicAddress(), organizerID.PrivateAddress())
+	base.Infof("gov_public=%v gov_private=%v", organizerID.HomeAddress(), organizerID.VaultAddress())
 
 	// initialize members
 	members := make([]id.OwnerAddress, numMembers)
 	for i := 0; i < numMembers; i++ {
 		memberID := id.NewTestID(ctx, t, git.MainBranch, true)
 		base.Infof("member_%d_public=%v member_%d_private=%v",
-			i, organizerID.PublicAddress(), i, organizerID.PrivateAddress())
+			i, organizerID.HomeAddress(), i, organizerID.VaultAddress())
 		id.Init(ctx, memberID.OwnerAddress())
 		members[i] = memberID.OwnerAddress()
 	}
 
 	comty := &TestCommunity{
-		community: gov.CommunityAddress(organizerID.PublicAddress()),
+		community: gov.CommunityAddress(organizerID.HomeAddress()),
 		organizer: gov.OrganizerAddress(organizerID.OwnerAddress()),
 		members:   members,
 	}
@@ -51,7 +51,7 @@ func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 	govRepo, govTree := git.Clone(ctx, git.Address(x.community))
 
 	for i, m := range x.members {
-		member.AddUserStageOnly(ctx, govTree, x.MemberUser(i), member.Account{Home: m.Public})
+		member.AddUserStageOnly(ctx, govTree, x.MemberUser(i), member.Account{Home: m.Home})
 	}
 
 	git.Commit(ctx, govTree, "add everybody")

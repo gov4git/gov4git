@@ -13,7 +13,7 @@ func FetchOwnerCredentials(ctx context.Context, addr OwnerAddress) PrivateCreden
 }
 
 func GetOwnerCredentials(ctx context.Context, owner OwnerTree) PrivateCredentials {
-	return GetPrivateCredentials(ctx, owner.Private)
+	return GetPrivateCredentials(ctx, owner.Vault)
 }
 
 func GetPrivateCredentials(ctx context.Context, priv *git.Tree) PrivateCredentials {

@@ -7,8 +7,8 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-func FetchPublicCredentials(ctx context.Context, publicAddr git.Address) PublicCredentials {
-	_, tree := git.Clone(ctx, publicAddr)
+func FetchPublicCredentials(ctx context.Context, homeAddr git.Address) PublicCredentials {
+	_, tree := git.Clone(ctx, homeAddr)
 	return GetPublicCredentials(ctx, tree)
 }
 

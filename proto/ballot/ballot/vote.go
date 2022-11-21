@@ -25,8 +25,8 @@ func Vote(
 	govRepo := git.CloneRepo(ctx, git.Address(govAddr))
 	voterRepo, voterTree := id.CloneOwner(ctx, voterAddr)
 	chg := VoteStageOnly(ctx, voterAddr, govAddr, voterTree, govRepo, ballotName, elections)
-	proto.Commit(ctx, voterTree.Public, chg.Msg)
-	git.Push(ctx, voterRepo.Public)
+	proto.Commit(ctx, voterTree.Home, chg.Msg)
+	git.Push(ctx, voterRepo.Home)
 
 	return chg
 }

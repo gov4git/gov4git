@@ -27,8 +27,8 @@ func Transfer(
 	govRepo := git.CloneRepo(ctx, git.Address(govAddr))
 	userRepo, userTree := id.CloneOwner(ctx, userAddr)
 	chg := TransferStageOnly(ctx, userAddr, govAddr, userTree, govRepo, fromUserOpt, fromBalance, toUser, toBalance, amount)
-	proto.Commit(ctx, userTree.Public, chg.Msg)
-	git.Push(ctx, userRepo.Public)
+	proto.Commit(ctx, userTree.Home, chg.Msg)
+	git.Push(ctx, userRepo.Home)
 	return chg
 }
 
@@ -47,14 +47,14 @@ func TransferStageOnly(
 
 	// find the user name of userAddr in the community repo
 	if fromUserOpt == "" {
-		us := member.LookupUserByAddressLocal(ctx, git.Worktree(ctx, govRepo), userAddr.Public)
+		us := member.LookupUserByAddressLocal(ctx, git.Worktree(ctx, govRepo), userAddr.Home)
 		switch len(us) {
 		case 0:
-			must.Errorf(ctx, "%s not found in community %v", userAddr.Public, govAddr)
+			must.Errorf(ctx, "%s not found in community %v", userAddr.Home, govAddr)
 		case 1:
 			fromUserOpt = us[0]
 		default:
-			must.Errorf(ctx, "community %v has more than one user at address %v", govAddr, userAddr.Public)
+			must.Errorf(ctx, "community %v has more than one user at address %v", govAddr, userAddr.Home)
 		}
 	}
 

@@ -40,9 +40,9 @@ func (x PriorityPoll) VerifyElections(
 		for _, el := range elections {
 			spend += math.Abs(el.VoteStrengthChange)
 		}
-		user := member.LookupUserByAddressLocal(ctx, govTree, voterAddr.Public)
+		user := member.LookupUserByAddressLocal(ctx, govTree, voterAddr.Home)
 		if len(user) == 0 {
-			must.Errorf(ctx, "cannot find user with address %v in the community", voterAddr.Public)
+			must.Errorf(ctx, "cannot find user with address %v in the community", voterAddr.Home)
 		}
 		available := balance.GetLocal(ctx, govTree, user[0], VotingCredits)
 		must.Assertf(ctx, available >= spend, "insufficient voting credits %v for elections costing %v", available, spend)
@@ -76,7 +76,7 @@ func (x PriorityPoll) Tally(
 			for _, el := range fv.Elections {
 				err := balance.TryTransferStageOnly(
 					ctx,
-					govTree.Public,
+					govTree.Home,
 					fv.Voter, VotingCredits,
 					fv.Voter, VotingCreditsOnHold,
 					math.Abs(el.VoteStrengthChange),
@@ -175,9 +175,9 @@ func (x PriorityPoll) Close(
 			if spent < 0 {
 				continue // don't refund voters against
 			}
-			onHold := balance.GetLocal(ctx, govTree.Public, user, VotingCreditsOnHold)
+			onHold := balance.GetLocal(ctx, govTree.Home, user, VotingCreditsOnHold)
 			refund := min(spent, onHold)
-			balance.TransferStageOnly(ctx, govTree.Public, user, VotingCreditsOnHold, user, VotingCredits, refund)
+			balance.TransferStageOnly(ctx, govTree.Home, user, VotingCreditsOnHold, user, VotingCredits, refund)
 		}
 	}
 

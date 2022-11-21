@@ -76,9 +76,9 @@ type Tally struct {
 }
 
 type FetchedVote struct {
-	Voter     member.User      `json:"voter_user"`
-	Address   id.PublicAddress `json:"voter_address"`
-	Elections Elections        `json:"voter_elections"`
+	Voter     member.User    `json:"voter_user"`
+	Address   id.HomeAddress `json:"voter_address"`
+	Elections Elections      `json:"voter_elections"`
 }
 
 type FetchedVotes []FetchedVote

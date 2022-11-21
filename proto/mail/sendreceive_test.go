@@ -19,7 +19,7 @@ func TestSendReceive(t *testing.T) {
 	const testTopic = "topic"
 	var testMsg []string = []string{"a", "b", "c"}
 
-	s0 := SendStageOnly(ctx, testSenderID.Public.Tree, testReceiverID.Public.Tree, testTopic, testMsg[0])
+	s0 := SendStageOnly(ctx, testSenderID.Home.Tree, testReceiverID.Home.Tree, testTopic, testMsg[0])
 	if s0.Result != 0 {
 		t.Fatalf("unexpected seq no")
 	}
@@ -30,9 +30,9 @@ func TestSendReceive(t *testing.T) {
 
 	r0 := ReceiveStageOnly(
 		ctx,
-		testReceiverID.Public.Tree,
-		testSenderID.PublicAddress(),
-		testSenderID.Public.Tree,
+		testReceiverID.Home.Tree,
+		testSenderID.HomeAddress(),
+		testSenderID.Home.Tree,
 		testTopic,
 		respond,
 	)
@@ -43,21 +43,21 @@ func TestSendReceive(t *testing.T) {
 		t.Fatalf("expecting %v, got %v", testMsg[0], r0.Result[0])
 	}
 
-	s1 := SendStageOnly(ctx, testSenderID.Public.Tree, testReceiverID.Public.Tree, testTopic, testMsg[1])
+	s1 := SendStageOnly(ctx, testSenderID.Home.Tree, testReceiverID.Home.Tree, testTopic, testMsg[1])
 	if s1.Result != 1 {
 		t.Fatalf("expecting %v, got %v", 1, s1.Result)
 	}
 
-	s2 := SendStageOnly(ctx, testSenderID.Public.Tree, testReceiverID.Public.Tree, testTopic, testMsg[2])
+	s2 := SendStageOnly(ctx, testSenderID.Home.Tree, testReceiverID.Home.Tree, testTopic, testMsg[2])
 	if s2.Result != 2 {
 		t.Fatalf("expecting %v, got %v", 2, s2.Result)
 	}
 
 	r12 := ReceiveStageOnly(
 		ctx,
-		testReceiverID.Public.Tree,
-		testSenderID.PublicAddress(),
-		testSenderID.Public.Tree,
+		testReceiverID.Home.Tree,
+		testSenderID.HomeAddress(),
+		testSenderID.Home.Tree,
 		testTopic,
 		respond,
 	)
@@ -82,7 +82,7 @@ func TestSendReceiveSigned(t *testing.T) {
 	const testTopic = "topic"
 	var testMsg []string = []string{"a", "b", "c"}
 
-	s0 := SendSignedStageOnly(ctx, testSenderID.OwnerTree(), testReceiverID.Public.Tree, testTopic, testMsg[0])
+	s0 := SendSignedStageOnly(ctx, testSenderID.OwnerTree(), testReceiverID.Home.Tree, testTopic, testMsg[0])
 	if s0.Result != 0 {
 		t.Fatalf("unexpected seq no")
 	}
@@ -94,8 +94,8 @@ func TestSendReceiveSigned(t *testing.T) {
 	r0 := ReceiveSignedStageOnly(
 		ctx,
 		testReceiverID.OwnerTree(),
-		testSenderID.PublicAddress(),
-		testSenderID.Public.Tree,
+		testSenderID.HomeAddress(),
+		testSenderID.Home.Tree,
 		testTopic,
 		respond,
 	)
@@ -106,12 +106,12 @@ func TestSendReceiveSigned(t *testing.T) {
 		t.Fatalf("expecting %v, got %v", testMsg[0], r0.Result[0])
 	}
 
-	s1 := SendSignedStageOnly(ctx, testSenderID.OwnerTree(), testReceiverID.Public.Tree, testTopic, testMsg[1])
+	s1 := SendSignedStageOnly(ctx, testSenderID.OwnerTree(), testReceiverID.Home.Tree, testTopic, testMsg[1])
 	if s1.Result != 1 {
 		t.Fatalf("expecting %v, got %v", 1, s1.Result)
 	}
 
-	s2 := SendSignedStageOnly(ctx, testSenderID.OwnerTree(), testReceiverID.Public.Tree, testTopic, testMsg[2])
+	s2 := SendSignedStageOnly(ctx, testSenderID.OwnerTree(), testReceiverID.Home.Tree, testTopic, testMsg[2])
 	if s2.Result != 2 {
 		t.Fatalf("expecting %v, got %v", 2, s2.Result)
 	}
@@ -119,8 +119,8 @@ func TestSendReceiveSigned(t *testing.T) {
 	r12 := ReceiveSignedStageOnly(
 		ctx,
 		testReceiverID.OwnerTree(),
-		testSenderID.PublicAddress(),
-		testSenderID.Public.Tree,
+		testSenderID.HomeAddress(),
+		testSenderID.Home.Tree,
 		testTopic,
 		respond,
 	)

@@ -23,8 +23,8 @@ func Process(
 
 	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg := ProcessStageOnly(ctx, govAddr, govRepo, govTree, group)
-	proto.Commit(ctx, git.Worktree(ctx, govRepo.Public), chg.Msg)
-	git.Push(ctx, govRepo.Public)
+	proto.Commit(ctx, git.Worktree(ctx, govRepo.Home), chg.Msg)
+	git.Push(ctx, govRepo.Home)
 	return chg
 }
 
@@ -36,7 +36,7 @@ func ProcessStageOnly(
 	group member.Group,
 ) git.ChangeNoResult {
 
-	communityTree := govTree.Public
+	communityTree := govTree.Home
 
 	// list participating users
 	users := member.ListGroupUsersLocal(ctx, communityTree, group)
@@ -82,7 +82,7 @@ func processRequestStageOnly(
 		err := must.Try(func() {
 			balance.TransferStageOnly(
 				ctx,
-				govTree.Public,
+				govTree.Home,
 				req.Transfer.FromUser, req.Transfer.FromBalance,
 				req.Transfer.ToUser, req.Transfer.ToBalance,
 				req.Transfer.Amount,

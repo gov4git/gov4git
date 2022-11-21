@@ -24,8 +24,8 @@ func Tally(
 
 	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg := TallyStageOnly(ctx, govAddr, govRepo, govTree, ballotName)
-	proto.Commit(ctx, git.Worktree(ctx, govRepo.Public), chg.Msg)
-	git.Push(ctx, govRepo.Public)
+	proto.Commit(ctx, git.Worktree(ctx, govRepo.Home), chg.Msg)
+	git.Push(ctx, govRepo.Home)
 	return chg
 }
 
@@ -37,7 +37,7 @@ func TallyStageOnly(
 	ballotName ns.NS,
 ) git.Change[common.Tally] {
 
-	communityTree := govTree.Public
+	communityTree := govTree.Home
 
 	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName)
 

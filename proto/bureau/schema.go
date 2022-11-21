@@ -23,9 +23,9 @@ type TransferRequest struct {
 }
 
 type FetchedRequest struct {
-	User     member.User      `json:"requesting_user"`
-	Address  id.PublicAddress `json:"requesting_address"`
-	Requests Requests         `json:"requests"`
+	User     member.User    `json:"requesting_user"`
+	Address  id.HomeAddress `json:"requesting_address"`
+	Requests Requests       `json:"requests"`
 }
 
 type FetchedRequests []FetchedRequest

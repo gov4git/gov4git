@@ -28,7 +28,7 @@ var (
 				setup.Community,
 				member.User(userName),
 				member.Account{
-					Home: id.PublicAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
+					Home: id.HomeAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
 				},
 			)
 			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))

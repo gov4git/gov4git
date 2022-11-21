@@ -19,7 +19,7 @@ func TestMember(t *testing.T) {
 
 	u1 := User("user1")
 	r1 := Account{
-		Home: id.PublicAddress{
+		Home: id.HomeAddress{
 			Repo:   git.URL("http://1"),
 			Branch: git.MainBranch,
 		},

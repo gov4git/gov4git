@@ -10,7 +10,7 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func Set(ctx context.Context, addr gov.PublicAddress, user member.User, key Balance, value float64) {
+func Set(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) {
 	member.SetUserProp(ctx, addr, user, userPropKey(key), value)
 }
 
@@ -18,7 +18,7 @@ func SetStageOnly(ctx context.Context, t *git.Tree, user member.User, key Balanc
 	member.SetUserPropStageOnly(ctx, t, user, userPropKey(key), value)
 }
 
-func Get(ctx context.Context, addr gov.PublicAddress, user member.User, key Balance) float64 {
+func Get(ctx context.Context, addr gov.GovAddress, user member.User, key Balance) float64 {
 	return member.GetUserPropOrDefault(ctx, addr, user, userPropKey(key), 0.0)
 }
 
@@ -54,7 +54,7 @@ func TransferStageOnly(
 	AddStageOnly(ctx, t, toUser, toBal, amount)
 }
 
-func Add(ctx context.Context, addr gov.PublicAddress, user member.User, key Balance, value float64) float64 {
+func Add(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) float64 {
 	r, t := gov.Clone(ctx, addr)
 	prior := AddStageOnly(ctx, t, user, key, value)
 	git.Commit(ctx, t, fmt.Sprintf("Add %v to balance %v of user %v", value, key, user))
@@ -68,7 +68,7 @@ func AddStageOnly(ctx context.Context, t *git.Tree, user member.User, key Balanc
 	return prior
 }
 
-func Mul(ctx context.Context, addr gov.PublicAddress, user member.User, key Balance, value float64) float64 {
+func Mul(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) float64 {
 	r, t := gov.Clone(ctx, addr)
 	prior := MulStageOnly(ctx, t, user, key, value)
 	git.Commit(ctx, t, fmt.Sprintf("Multiply %v into balance %v of user %v", value, key, user))

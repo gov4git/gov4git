@@ -16,7 +16,7 @@ import (
 func Open(
 	ctx context.Context,
 	strat common.Strategy,
-	govAddr gov.PublicAddress,
+	govAddr gov.GovAddress,
 	name ns.NS,
 	title string,
 	description string,
@@ -34,7 +34,7 @@ func Open(
 func OpenStageOnly(
 	ctx context.Context,
 	strat common.Strategy,
-	govAddr gov.PublicAddress,
+	govAddr gov.GovAddress,
 	govRepo *git.Repository,
 	govTree *git.Tree,
 	name ns.NS,
@@ -63,7 +63,7 @@ func OpenStageOnly(
 
 	// write ad
 	ad := common.Advertisement{
-		Community:    govAddr,
+		Gov:          govAddr,
 		Name:         name,
 		Title:        title,
 		Description:  description,

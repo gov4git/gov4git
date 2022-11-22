@@ -17,7 +17,7 @@ import (
 func Vote(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.PublicAddress,
+	govAddr gov.GovAddress,
 	ballotName ns.NS,
 	elections common.Elections,
 ) git.Change[mail.SeqNo] {
@@ -34,7 +34,7 @@ func Vote(
 func VoteStageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.PublicAddress,
+	govAddr gov.GovAddress,
 	voterTree id.OwnerTree,
 	govRepo *git.Repository,
 	ballotName ns.NS,
@@ -59,7 +59,7 @@ func verifyElections(
 	ctx context.Context,
 	strat common.Strategy,
 	voterAddr id.OwnerAddress,
-	govAddr gov.PublicAddress,
+	govAddr gov.GovAddress,
 	voterTree id.OwnerTree,
 	govTree *git.Tree,
 	ad common.Advertisement,

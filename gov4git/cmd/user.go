@@ -25,7 +25,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			member.AddUser(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(userName),
 				member.Account{
 					PublicAddress: id.PublicAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
@@ -42,7 +42,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			member.RemoveUser(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(userName),
 			)
 			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
@@ -56,7 +56,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			v := member.GetUserProp[interface{}](
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(userName),
 				userKey,
 			)

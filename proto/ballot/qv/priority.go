@@ -29,7 +29,7 @@ func (x PriorityPoll) Name() string {
 func (x PriorityPoll) VerifyElections(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.PublicAddress,
+	govAddr gov.GovAddress,
 	voterTree id.OwnerTree,
 	govTree *git.Tree,
 	ad common.Advertisement,

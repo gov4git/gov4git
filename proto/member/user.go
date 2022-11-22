@@ -12,7 +12,7 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func SetUser(ctx context.Context, addr gov.PublicAddress, name User, acct Account) {
+func SetUser(ctx context.Context, addr gov.GovAddress, name User, acct Account) {
 	r, t := gov.Clone(ctx, addr)
 	chg := SetUserStageOnly(ctx, t, name, acct)
 	git.Commit(ctx, t, chg.Msg)
@@ -25,7 +25,7 @@ func SetUserStageOnly(ctx context.Context, t *git.Tree, name User, user Account)
 	return usersKV.Set(ctx, usersNS, t, name, user)
 }
 
-func GetUser(ctx context.Context, addr gov.PublicAddress, name User) Account {
+func GetUser(ctx context.Context, addr gov.GovAddress, name User) Account {
 	_, t := gov.Clone(ctx, addr)
 	x := GetUserLocal(ctx, t, name)
 	return x
@@ -35,7 +35,7 @@ func GetUserLocal(ctx context.Context, t *git.Tree, name User) Account {
 	return usersKV.Get(ctx, usersNS, t, name)
 }
 
-func AddUser(ctx context.Context, addr gov.PublicAddress, name User, acct Account) {
+func AddUser(ctx context.Context, addr gov.GovAddress, name User, acct Account) {
 	r, t := gov.Clone(ctx, addr)
 	chg := AddUserStageOnly(ctx, t, name, acct)
 	git.Commit(ctx, t, chg.Msg)
@@ -49,7 +49,7 @@ func AddUserStageOnly(ctx context.Context, t *git.Tree, name User, user Account)
 	return SetUserStageOnly(ctx, t, name, user)
 }
 
-func RemoveUser(ctx context.Context, addr gov.PublicAddress, name User) {
+func RemoveUser(ctx context.Context, addr gov.GovAddress, name User) {
 	r, t := gov.Clone(ctx, addr)
 	chg := RemoveUserStageOnly(ctx, t, name)
 	git.Commit(ctx, t, chg.Msg)
@@ -66,7 +66,7 @@ func RemoveUserStageOnly(ctx context.Context, t *git.Tree, name User) git.Change
 
 // set prop
 
-func SetUserProp[V form.Form](ctx context.Context, addr gov.PublicAddress, user User, key string, value V) {
+func SetUserProp[V form.Form](ctx context.Context, addr gov.GovAddress, user User, key string, value V) {
 	r, t := gov.Clone(ctx, addr)
 	chg := SetUserPropStageOnly(ctx, t, user, key, value)
 	git.Commit(ctx, t, chg.Msg)
@@ -80,7 +80,7 @@ func SetUserPropStageOnly[V form.Form](ctx context.Context, t *git.Tree, user Us
 
 // get prop
 
-func GetUserProp[V form.Form](ctx context.Context, addr gov.PublicAddress, user User, key string) V {
+func GetUserProp[V form.Form](ctx context.Context, addr gov.GovAddress, user User, key string) V {
 	_, t := gov.Clone(ctx, addr)
 	x := GetUserPropLocal[V](ctx, t, user, key)
 	return x
@@ -91,7 +91,7 @@ func GetUserPropLocal[V form.Form](ctx context.Context, t *git.Tree, user User, 
 	return propKV.Get(ctx, usersKV.KeyNS(usersNS, user), t, key)
 }
 
-func GetUserPropOrDefault[V form.Form](ctx context.Context, addr gov.PublicAddress, user User, key string, default_ V) V {
+func GetUserPropOrDefault[V form.Form](ctx context.Context, addr gov.GovAddress, user User, key string, default_ V) V {
 	r := default_
 	r, _ = must.Try1(func() V { return GetUserProp[V](ctx, addr, user, key) })
 	return r
@@ -105,7 +105,7 @@ func GetUserPropLocalOrDefault[V form.Form](ctx context.Context, t *git.Tree, us
 
 // lookup
 
-func LookupUserByAddress(ctx context.Context, govAddr gov.PublicAddress, userAddr id.PublicAddress) []User {
+func LookupUserByAddress(ctx context.Context, govAddr gov.GovAddress, userAddr id.PublicAddress) []User {
 	_, t := gov.Clone(ctx, govAddr)
 	return LookupUserByAddressLocal(ctx, t, userAddr)
 }

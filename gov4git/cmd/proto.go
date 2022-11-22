@@ -14,7 +14,7 @@ const (
 )
 
 type Setup struct {
-	Community gov.PublicAddress
+	Gov       gov.GovAddress
 	Organizer gov.OrganizerAddress
 	Member    id.OwnerAddress
 }
@@ -55,7 +55,7 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 		git.SetPasswordAuth(ctx, cfg.UserPassword.User, cfg.UserPassword.Password)
 	}
 	return Setup{
-		Community: gov.PublicAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
+		Gov: gov.GovAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
 		Organizer: gov.OrganizerAddress{
 			Public:  id.PublicAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
 			Private: id.PrivateAddress{Repo: cfg.GovPrivateURL, Branch: cfg.GovPrivateBranch},

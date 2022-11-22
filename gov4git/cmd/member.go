@@ -20,7 +20,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			member.AddMember(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(memberUser),
 				member.Group(memberGroup),
 			)
@@ -34,7 +34,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			member.RemoveMember(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(memberUser),
 				member.Group(memberGroup),
 			)

@@ -32,7 +32,7 @@ var (
 			chg := ballot.Open(
 				ctx,
 				strat,
-				setup.Community,
+				setup.Gov,
 				ns.NS(ballotName),
 				ballotTitle,
 				ballotDescription,
@@ -65,7 +65,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			r := ballot.Show(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				ns.NS(ballotName),
 			)
 			fmt.Fprint(os.Stdout, r)
@@ -79,7 +79,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			ls := ballot.ListOpen(
 				ctx,
-				setup.Community,
+				setup.Gov,
 			)
 			fmt.Fprint(os.Stdout, form.Pretty(ls))
 		},
@@ -107,7 +107,7 @@ var (
 			chg := ballot.Vote(
 				ctx,
 				setup.Member,
-				setup.Community,
+				setup.Gov,
 				ns.NS(ballotName),
 				parseElections(ctx, ballotElectionChoice, ballotElectionStrength),
 			)

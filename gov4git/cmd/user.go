@@ -23,13 +23,11 @@ var (
 		Short: "Add user to the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			member.AddUser(
+			member.AddUserByPublicAddress(
 				ctx,
 				setup.Gov,
 				member.User(userName),
-				member.Account{
-					PublicAddress: id.PublicAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
-				},
+				id.PublicAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
 			)
 			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
 		},

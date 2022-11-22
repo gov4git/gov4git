@@ -35,6 +35,16 @@ func GetUserLocal(ctx context.Context, t *git.Tree, name User) Account {
 	return usersKV.Get(ctx, usersNS, t, name)
 }
 
+func AddUserByPublicAddress(ctx context.Context, govAddr gov.GovAddress, name User, userAddr id.PublicAddress) {
+	cred := id.FetchPublicCredentials(ctx, userAddr)
+	AddUser(ctx, govAddr, name, Account{ID: cred.ID, PublicAddress: userAddr})
+}
+
+func AddUserByPublicAddressStageOnly(ctx context.Context, t *git.Tree, name User, userAddr id.PublicAddress) {
+	cred := id.FetchPublicCredentials(ctx, userAddr)
+	AddUserStageOnly(ctx, t, name, Account{ID: cred.ID, PublicAddress: userAddr})
+}
+
 func AddUser(ctx context.Context, addr gov.GovAddress, name User, acct Account) {
 	r, t := gov.Clone(ctx, addr)
 	chg := AddUserStageOnly(ctx, t, name, acct)
@@ -116,6 +126,23 @@ func LookupUserByAddressLocal(ctx context.Context, t *git.Tree, userAddr id.Publ
 	for _, u := range us {
 		acct := GetUserLocal(ctx, t, u)
 		if acct.PublicAddress == userAddr {
+			r = append(r, u)
+		}
+	}
+	return r
+}
+
+func LookupUserByID(ctx context.Context, govAddr gov.GovAddress, userID id.ID) []User {
+	_, t := gov.Clone(ctx, govAddr)
+	return LookupUserByIDLocal(ctx, t, userID)
+}
+
+func LookupUserByIDLocal(ctx context.Context, t *git.Tree, userID id.ID) []User {
+	us := usersKV.ListKeys(ctx, usersNS, t)
+	r := []User{}
+	for _, u := range us {
+		acct := GetUserLocal(ctx, t, u)
+		if acct.ID == userID {
 			r = append(r, u)
 		}
 	}

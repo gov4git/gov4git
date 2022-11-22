@@ -13,7 +13,7 @@ import (
 )
 
 type TestCommunity struct {
-	gov gov.GovAddress
+	gov       gov.GovAddress
 	organizer gov.OrganizerAddress
 	members   []id.OwnerAddress
 }
@@ -36,7 +36,7 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 	}
 
 	comty := &TestCommunity{
-		gov: gov.GovAddress(organizerID.PublicAddress()),
+		gov:       gov.GovAddress(organizerID.PublicAddress()),
 		organizer: gov.OrganizerAddress(organizerID.OwnerAddress()),
 		members:   members,
 	}
@@ -51,7 +51,7 @@ func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 	govRepo, govTree := git.Clone(ctx, git.Address(x.gov))
 
 	for i, m := range x.members {
-		member.AddUserStageOnly(ctx, govTree, x.MemberUser(i), member.Account{PublicAddress: m.Public})
+		member.AddUserByPublicAddressStageOnly(ctx, govTree, x.MemberUser(i), m.Public)
 	}
 
 	git.Commit(ctx, govTree, "add everybody")

@@ -9,7 +9,7 @@ import (
 // PublicAddress points to the user's public repo.
 type PublicAddress git.Address
 
-// VaultAdress points to the user's private repo.
+// PrivateAdress points to the user's private repo.
 type PrivateAddress git.Address
 
 type OwnerAddress struct {

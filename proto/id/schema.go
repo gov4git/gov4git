@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	PublicNS = proto.RootNS.Sub("id")
-	PrivateNS  = proto.RootNS.Sub("id")
+	PublicNS  = proto.RootNS.Sub("id")
+	PrivateNS = proto.RootNS.Sub("id")
 )
 
 var (

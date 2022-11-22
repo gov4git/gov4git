@@ -14,7 +14,7 @@ const (
 )
 
 type Setup struct {
-	Community gov.CommunityAddress
+	Community gov.PublicAddress
 	Organizer gov.OrganizerAddress
 	Member    id.OwnerAddress
 }
@@ -26,18 +26,18 @@ type Config struct {
 	UserPassword       *UserPassword `json:"user_password"`
 
 	//
-	CommunityHomeURL    git.URL    `json:"community_home_url"`
-	CommunityHomeBranch git.Branch `json:"community_home_branch"`
+	GovPublicURL    git.URL    `json:"gov_public_url"`
+	GovPublicBranch git.Branch `json:"gov_public_branch"`
 	//
-	CommunityVaultURL    git.URL    `json:"community_vault_url"`
-	CommunityVaultBranch git.Branch `json:"community_vault_branch"`
+	GovPrivateURL    git.URL    `json:"gov_private_url"`
+	GovPrivateBranch git.Branch `json:"gov_private_branch"`
 
 	//
-	MemberHomeURL    git.URL    `json:"member_home_url"`
-	MemberHomeBranch git.Branch `json:"member_home_branch"`
+	MemberPublicURL    git.URL    `json:"member_public_url"`
+	MemberPublicBranch git.Branch `json:"member_public_branch"`
 	//
-	MemberVaultURL    git.URL    `json:"member_vault_url"`
-	MemberVaultBranch git.Branch `json:"member_vault_branch"`
+	MemberPrivateURL    git.URL    `json:"member_private_url"`
+	MemberPrivateBranch git.Branch `json:"member_private_branch"`
 }
 
 type UserPassword struct {
@@ -55,14 +55,14 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 		git.SetPasswordAuth(ctx, cfg.UserPassword.User, cfg.UserPassword.Password)
 	}
 	return Setup{
-		Community: gov.CommunityAddress{Repo: cfg.CommunityHomeURL, Branch: cfg.CommunityHomeBranch},
+		Community: gov.PublicAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
 		Organizer: gov.OrganizerAddress{
-			Home:  id.HomeAddress{Repo: cfg.CommunityHomeURL, Branch: cfg.CommunityHomeBranch},
-			Vault: id.VaultAddress{Repo: cfg.CommunityVaultURL, Branch: cfg.CommunityVaultBranch},
+			Public:  id.PublicAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
+			Private: id.PrivateAddress{Repo: cfg.GovPrivateURL, Branch: cfg.GovPrivateBranch},
 		},
 		Member: id.OwnerAddress{
-			Home:  id.HomeAddress{Repo: cfg.MemberHomeURL, Branch: cfg.MemberHomeBranch},
-			Vault: id.VaultAddress{Repo: cfg.MemberVaultURL, Branch: cfg.MemberVaultBranch},
+			Public:  id.PublicAddress{Repo: cfg.MemberPublicURL, Branch: cfg.MemberPublicBranch},
+			Private: id.PrivateAddress{Repo: cfg.MemberPrivateURL, Branch: cfg.MemberPrivateBranch},
 		},
 	}
 }

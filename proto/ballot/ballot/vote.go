@@ -17,7 +17,7 @@ import (
 func Vote(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.CommunityAddress,
+	govAddr gov.PublicAddress,
 	ballotName ns.NS,
 	elections common.Elections,
 ) git.Change[mail.SeqNo] {
@@ -25,8 +25,8 @@ func Vote(
 	govRepo := git.CloneRepo(ctx, git.Address(govAddr))
 	voterRepo, voterTree := id.CloneOwner(ctx, voterAddr)
 	chg := VoteStageOnly(ctx, voterAddr, govAddr, voterTree, govRepo, ballotName, elections)
-	proto.Commit(ctx, voterTree.Home, chg.Msg)
-	git.Push(ctx, voterRepo.Home)
+	proto.Commit(ctx, voterTree.Public, chg.Msg)
+	git.Push(ctx, voterRepo.Public)
 
 	return chg
 }
@@ -34,7 +34,7 @@ func Vote(
 func VoteStageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.CommunityAddress,
+	govAddr gov.PublicAddress,
 	voterTree id.OwnerTree,
 	govRepo *git.Repository,
 	ballotName ns.NS,
@@ -59,7 +59,7 @@ func verifyElections(
 	ctx context.Context,
 	strat common.Strategy,
 	voterAddr id.OwnerAddress,
-	govAddr gov.CommunityAddress,
+	govAddr gov.PublicAddress,
 	voterTree id.OwnerTree,
 	govTree *git.Tree,
 	ad common.Advertisement,

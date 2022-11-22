@@ -7,9 +7,9 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-type CommunityAddress id.HomeAddress
+type PublicAddress id.PublicAddress
 
-func CloneCommunity(ctx context.Context, addr CommunityAddress) (*git.Repository, *git.Tree) {
+func Clone(ctx context.Context, addr PublicAddress) (*git.Repository, *git.Tree) {
 	r, t := git.Clone(ctx, git.Address(addr))
 	return r, t
 }

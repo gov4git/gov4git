@@ -12,8 +12,8 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func SetUser(ctx context.Context, addr gov.CommunityAddress, name User, acct Account) {
-	r, t := gov.CloneCommunity(ctx, addr)
+func SetUser(ctx context.Context, addr gov.PublicAddress, name User, acct Account) {
+	r, t := gov.Clone(ctx, addr)
 	chg := SetUserStageOnly(ctx, t, name, acct)
 	git.Commit(ctx, t, chg.Msg)
 	git.Push(ctx, r)
@@ -25,8 +25,8 @@ func SetUserStageOnly(ctx context.Context, t *git.Tree, name User, user Account)
 	return usersKV.Set(ctx, usersNS, t, name, user)
 }
 
-func GetUser(ctx context.Context, addr gov.CommunityAddress, name User) Account {
-	_, t := gov.CloneCommunity(ctx, addr)
+func GetUser(ctx context.Context, addr gov.PublicAddress, name User) Account {
+	_, t := gov.Clone(ctx, addr)
 	x := GetUserLocal(ctx, t, name)
 	return x
 }
@@ -35,8 +35,8 @@ func GetUserLocal(ctx context.Context, t *git.Tree, name User) Account {
 	return usersKV.Get(ctx, usersNS, t, name)
 }
 
-func AddUser(ctx context.Context, addr gov.CommunityAddress, name User, acct Account) {
-	r, t := gov.CloneCommunity(ctx, addr)
+func AddUser(ctx context.Context, addr gov.PublicAddress, name User, acct Account) {
+	r, t := gov.Clone(ctx, addr)
 	chg := AddUserStageOnly(ctx, t, name, acct)
 	git.Commit(ctx, t, chg.Msg)
 	git.Push(ctx, r)
@@ -49,8 +49,8 @@ func AddUserStageOnly(ctx context.Context, t *git.Tree, name User, user Account)
 	return SetUserStageOnly(ctx, t, name, user)
 }
 
-func RemoveUser(ctx context.Context, addr gov.CommunityAddress, name User) {
-	r, t := gov.CloneCommunity(ctx, addr)
+func RemoveUser(ctx context.Context, addr gov.PublicAddress, name User) {
+	r, t := gov.Clone(ctx, addr)
 	chg := RemoveUserStageOnly(ctx, t, name)
 	git.Commit(ctx, t, chg.Msg)
 	git.Push(ctx, r)
@@ -66,8 +66,8 @@ func RemoveUserStageOnly(ctx context.Context, t *git.Tree, name User) git.Change
 
 // set prop
 
-func SetUserProp[V form.Form](ctx context.Context, addr gov.CommunityAddress, user User, key string, value V) {
-	r, t := gov.CloneCommunity(ctx, addr)
+func SetUserProp[V form.Form](ctx context.Context, addr gov.PublicAddress, user User, key string, value V) {
+	r, t := gov.Clone(ctx, addr)
 	chg := SetUserPropStageOnly(ctx, t, user, key, value)
 	git.Commit(ctx, t, chg.Msg)
 	git.Push(ctx, r)
@@ -80,8 +80,8 @@ func SetUserPropStageOnly[V form.Form](ctx context.Context, t *git.Tree, user Us
 
 // get prop
 
-func GetUserProp[V form.Form](ctx context.Context, addr gov.CommunityAddress, user User, key string) V {
-	_, t := gov.CloneCommunity(ctx, addr)
+func GetUserProp[V form.Form](ctx context.Context, addr gov.PublicAddress, user User, key string) V {
+	_, t := gov.Clone(ctx, addr)
 	x := GetUserPropLocal[V](ctx, t, user, key)
 	return x
 }
@@ -91,7 +91,7 @@ func GetUserPropLocal[V form.Form](ctx context.Context, t *git.Tree, user User, 
 	return propKV.Get(ctx, usersKV.KeyNS(usersNS, user), t, key)
 }
 
-func GetUserPropOrDefault[V form.Form](ctx context.Context, addr gov.CommunityAddress, user User, key string, default_ V) V {
+func GetUserPropOrDefault[V form.Form](ctx context.Context, addr gov.PublicAddress, user User, key string, default_ V) V {
 	r := default_
 	r, _ = must.Try1(func() V { return GetUserProp[V](ctx, addr, user, key) })
 	return r
@@ -105,17 +105,17 @@ func GetUserPropLocalOrDefault[V form.Form](ctx context.Context, t *git.Tree, us
 
 // lookup
 
-func LookupUserByAddress(ctx context.Context, govAddr gov.CommunityAddress, userAddr id.HomeAddress) []User {
-	_, t := gov.CloneCommunity(ctx, govAddr)
+func LookupUserByAddress(ctx context.Context, govAddr gov.PublicAddress, userAddr id.PublicAddress) []User {
+	_, t := gov.Clone(ctx, govAddr)
 	return LookupUserByAddressLocal(ctx, t, userAddr)
 }
 
-func LookupUserByAddressLocal(ctx context.Context, t *git.Tree, userAddr id.HomeAddress) []User {
+func LookupUserByAddressLocal(ctx context.Context, t *git.Tree, userAddr id.PublicAddress) []User {
 	us := usersKV.ListKeys(ctx, usersNS, t)
 	r := []User{}
 	for _, u := range us {
 		acct := GetUserLocal(ctx, t, u)
-		if acct.Home == userAddr {
+		if acct.PublicAddress == userAddr {
 			r = append(r, u)
 		}
 	}

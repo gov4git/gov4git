@@ -21,8 +21,8 @@ func Close(
 
 	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg := CloseStageOnly(ctx, govAddr, govRepo, govTree, ballotName, summary)
-	proto.Commit(ctx, govTree.Home, chg.Msg)
-	git.Push(ctx, govRepo.Home)
+	proto.Commit(ctx, govTree.Public, chg.Msg)
+	git.Push(ctx, govRepo.Public)
 	return chg
 }
 
@@ -36,17 +36,17 @@ func CloseStageOnly(
 ) git.Change[common.Outcome] {
 
 	// verify ad and strategy are present
-	ad, strat := load.LoadStrategy(ctx, govTree.Home, ballotName)
-	tally := LoadTally(ctx, govTree.Home, ballotName)
+	ad, strat := load.LoadStrategy(ctx, govTree.Public, ballotName)
+	tally := LoadTally(ctx, govTree.Public, ballotName)
 	chg := strat.Close(ctx, govRepo, govTree, &ad, &tally, summary)
 
 	// write outcome
 	openOutcomeNS := common.OpenBallotNS(ballotName).Sub(common.OutcomeFilebase)
-	git.ToFileStage(ctx, govTree.Home, openOutcomeNS.Path(), chg.Result)
+	git.ToFileStage(ctx, govTree.Public, openOutcomeNS.Path(), chg.Result)
 
 	openNS := common.OpenBallotNS(ballotName)
 	closedNS := common.ClosedBallotNS(ballotName)
-	git.RenameStage(ctx, govTree.Home, openNS.Path(), closedNS.Path())
+	git.RenameStage(ctx, govTree.Public, openNS.Path(), closedNS.Path())
 
 	return chg
 }

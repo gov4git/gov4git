@@ -31,18 +31,18 @@ func BallotTopic(name ns.NS) string {
 }
 
 type Advertisement struct {
-	Community    gov.CommunityAddress `json:"community"`
-	Name         ns.NS                `json:"path"`
-	Title        string               `json:"title"`
-	Description  string               `json:"description"`
-	Choices      []string             `json:"choices"`
-	Strategy     string               `json:"strategy"`
-	Participants member.Group         `json:"participants_group"`
-	ParentCommit git.CommitHash       `json:"parent_commit"`
+	Community    gov.PublicAddress `json:"community"`
+	Name         ns.NS             `json:"path"`
+	Title        string            `json:"title"`
+	Description  string            `json:"description"`
+	Choices      []string          `json:"choices"`
+	Strategy     string            `json:"strategy"`
+	Participants member.Group      `json:"participants_group"`
+	ParentCommit git.CommitHash    `json:"parent_commit"`
 }
 
 type BallotAddress struct {
-	Gov  gov.CommunityAddress
+	Gov  gov.PublicAddress
 	Name ns.NS
 }
 
@@ -76,9 +76,9 @@ type Tally struct {
 }
 
 type FetchedVote struct {
-	Voter     member.User    `json:"voter_user"`
-	Address   id.HomeAddress `json:"voter_address"`
-	Elections Elections      `json:"voter_elections"`
+	Voter     member.User      `json:"voter_user"`
+	Address   id.PublicAddress `json:"voter_address"`
+	Elections Elections        `json:"voter_elections"`
 }
 
 type FetchedVotes []FetchedVote

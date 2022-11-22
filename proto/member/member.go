@@ -17,8 +17,8 @@ const (
 type User string
 type Group string
 
-func AddMember(ctx context.Context, addr gov.CommunityAddress, user User, group Group) {
-	r, t := gov.CloneCommunity(ctx, addr)
+func AddMember(ctx context.Context, addr gov.PublicAddress, user User, group Group) {
+	r, t := gov.Clone(ctx, addr)
 	chg := AddMemberStageOnly(ctx, t, user, group)
 	git.Commit(ctx, t, chg.Msg)
 	git.Push(ctx, r)
@@ -32,8 +32,8 @@ func AddMemberStageOnly(ctx context.Context, t *git.Tree, user User, group Group
 	}
 }
 
-func IsMember(ctx context.Context, addr gov.CommunityAddress, user User, group Group) bool {
-	_, t := gov.CloneCommunity(ctx, addr)
+func IsMember(ctx context.Context, addr gov.PublicAddress, user User, group Group) bool {
+	_, t := gov.Clone(ctx, addr)
 	x := IsMemberLocal(ctx, t, user, group)
 	return x
 }
@@ -49,8 +49,8 @@ func IsMemberLocal(ctx context.Context, t *git.Tree, user User, group Group) boo
 	return userHasGroup && groupHasUser
 }
 
-func RemoveMember(ctx context.Context, addr gov.CommunityAddress, user User, group Group) {
-	r, t := gov.CloneCommunity(ctx, addr)
+func RemoveMember(ctx context.Context, addr gov.PublicAddress, user User, group Group) {
+	r, t := gov.Clone(ctx, addr)
 	chg := RemoveMemberStageOnly(ctx, t, user, group)
 	git.Commit(ctx, t, chg.Msg)
 	git.Push(ctx, r)
@@ -64,8 +64,8 @@ func RemoveMemberStageOnly(ctx context.Context, t *git.Tree, user User, group Gr
 	}
 }
 
-func ListUserGroups(ctx context.Context, addr gov.CommunityAddress, user User) []Group {
-	_, t := gov.CloneCommunity(ctx, addr)
+func ListUserGroups(ctx context.Context, addr gov.PublicAddress, user User) []Group {
+	_, t := gov.Clone(ctx, addr)
 	x := ListUserGroupsLocal(ctx, t, user)
 	return x
 }
@@ -74,8 +74,8 @@ func ListUserGroupsLocal(ctx context.Context, t *git.Tree, user User) []Group {
 	return userGroupsKKV.ListSecondaryKeys(ctx, userGroupsNS, t, user)
 }
 
-func ListGroupUsers(ctx context.Context, addr gov.CommunityAddress, group Group) []User {
-	_, t := gov.CloneCommunity(ctx, addr)
+func ListGroupUsers(ctx context.Context, addr gov.PublicAddress, group Group) []User {
+	_, t := gov.Clone(ctx, addr)
 	x := ListGroupUsersLocal(ctx, t, group)
 	return x
 }

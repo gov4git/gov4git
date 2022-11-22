@@ -16,7 +16,7 @@ import (
 func Open(
 	ctx context.Context,
 	strat common.Strategy,
-	govAddr gov.CommunityAddress,
+	govAddr gov.PublicAddress,
 	name ns.NS,
 	title string,
 	description string,
@@ -34,7 +34,7 @@ func Open(
 func OpenStageOnly(
 	ctx context.Context,
 	strat common.Strategy,
-	govAddr gov.CommunityAddress,
+	govAddr gov.PublicAddress,
 	govRepo *git.Repository,
 	govTree *git.Tree,
 	name ns.NS,

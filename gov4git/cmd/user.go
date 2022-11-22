@@ -28,7 +28,7 @@ var (
 				setup.Community,
 				member.User(userName),
 				member.Account{
-					Home: id.HomeAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
+					PublicAddress: id.PublicAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
 				},
 			)
 			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
@@ -77,9 +77,9 @@ func init() {
 	userCmd.AddCommand(userAddCmd)
 	userAddCmd.Flags().StringVar(&userName, "name", "", "user alias within the community")
 	userAddCmd.MarkFlagRequired("name")
-	userAddCmd.Flags().StringVar(&userRepo, "repo", "", "URL of user's home repo")
+	userAddCmd.Flags().StringVar(&userRepo, "repo", "", "URL of user's public repo")
 	userAddCmd.MarkFlagRequired("repo")
-	userAddCmd.Flags().StringVar(&userBranch, "branch", "", "branch in user's home repo")
+	userAddCmd.Flags().StringVar(&userBranch, "branch", "", "branch in user's public repo")
 	userAddCmd.MarkFlagRequired("branch")
 
 	userCmd.AddCommand(userRemoveCmd)

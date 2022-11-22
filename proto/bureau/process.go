@@ -23,8 +23,8 @@ func Process(
 
 	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg := ProcessStageOnly(ctx, govAddr, govRepo, govTree, group)
-	proto.Commit(ctx, git.Worktree(ctx, govRepo.Home), chg.Msg)
-	git.Push(ctx, govRepo.Home)
+	proto.Commit(ctx, git.Worktree(ctx, govRepo.Public), chg.Msg)
+	git.Push(ctx, govRepo.Public)
 	return chg
 }
 
@@ -36,7 +36,7 @@ func ProcessStageOnly(
 	group member.Group,
 ) git.ChangeNoResult {
 
-	communityTree := govTree.Home
+	communityTree := govTree.Public
 
 	// list participating users
 	users := member.ListGroupUsersLocal(ctx, communityTree, group)
@@ -82,7 +82,7 @@ func processRequestStageOnly(
 		err := must.Try(func() {
 			balance.TransferStageOnly(
 				ctx,
-				govTree.Home,
+				govTree.Public,
 				req.Transfer.FromUser, req.Transfer.FromBalance,
 				req.Transfer.ToUser, req.Transfer.ToBalance,
 				req.Transfer.Amount,
@@ -114,18 +114,18 @@ func fetchUserRequests(
 		fetched = append(fetched,
 			FetchedRequest{
 				User:     user,
-				Address:  account.Home,
+				Address:  account.PublicAddress,
 				Requests: Requests{req},
 			})
 		return req, nil
 	}
 
-	_, userHomeTree := git.Clone(ctx, git.Address(account.Home))
+	_, userPublicTree := git.Clone(ctx, git.Address(account.PublicAddress))
 	mail.ReceiveSignedStageOnly(
 		ctx,
 		govTree,
-		account.Home,
-		userHomeTree,
+		account.PublicAddress,
+		userPublicTree,
 		BureauTopic,
 		respond,
 	)

@@ -23,8 +23,8 @@ const (
 	NextFilebase    = "next.json"
 )
 
-var SendNS = id.HomeNS.Sub("mail/sent")
-var ReceiveNS = id.HomeNS.Sub("mail/received")
+var SendNS = id.PublicNS.Sub("mail/sent")
+var ReceiveNS = id.PublicNS.Sub("mail/received")
 
 func ReceiveTopicNS(senderID id.ID, topic string) ns.NS {
 	return ReceiveNS.Sub(

@@ -24,8 +24,8 @@ func Tally(
 
 	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg := TallyStageOnly(ctx, govAddr, govRepo, govTree, ballotName)
-	proto.Commit(ctx, git.Worktree(ctx, govRepo.Home), chg.Msg)
-	git.Push(ctx, govRepo.Home)
+	proto.Commit(ctx, git.Worktree(ctx, govRepo.Public), chg.Msg)
+	git.Push(ctx, govRepo.Public)
 	return chg
 }
 
@@ -37,7 +37,7 @@ func TallyStageOnly(
 	ballotName ns.NS,
 ) git.Change[common.Tally] {
 
-	communityTree := govTree.Home
+	communityTree := govTree.Public
 
 	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName)
 
@@ -94,18 +94,18 @@ func fetchVotes(
 		fetched = append(fetched,
 			common.FetchedVote{
 				Voter:     user,
-				Address:   account.Home,
+				Address:   account.PublicAddress,
 				Elections: req.Elections,
 			})
 		return req, nil
 	}
 
-	_, voterHomeTree := git.Clone(ctx, git.Address(account.Home))
+	_, voterPublicTree := git.Clone(ctx, git.Address(account.PublicAddress))
 	mail.ReceiveSignedStageOnly(
 		ctx,
 		govTree,
-		account.Home,
-		voterHomeTree,
+		account.PublicAddress,
+		voterPublicTree,
 		common.BallotTopic(ballotName),
 		respond,
 	)

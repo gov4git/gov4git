@@ -15,8 +15,8 @@ func Init(
 	ownerRepo, ownerTree := CloneOwner(ctx, ownerAddr)
 	privChg := InitLocal(ctx, ownerAddr, ownerTree)
 
-	git.Push(ctx, ownerRepo.Vault)
-	git.Push(ctx, ownerRepo.Home)
+	git.Push(ctx, ownerRepo.Private)
+	git.Push(ctx, ownerRepo.Public)
 	return privChg
 }
 
@@ -25,21 +25,19 @@ func InitLocal(
 	ownerAddr OwnerAddress,
 	ownerTree OwnerTree,
 ) git.Change[PrivateCredentials] {
-	privChg := initVaultStageOnly(ctx, ownerTree.Vault, ownerAddr)
-	pubChg := initHomeStageOnly(ctx, ownerTree.Home, privChg.Result.PublicCredentials)
-	proto.Commit(ctx, ownerTree.Vault, privChg.Msg)
-	proto.Commit(ctx, ownerTree.Home, pubChg.Msg)
+	privChg := initPrivateStageOnly(ctx, ownerTree.Private, ownerAddr)
+	pubChg := initPublicStageOnly(ctx, ownerTree.Public, privChg.Result.PublicCredentials)
+	proto.Commit(ctx, ownerTree.Private, privChg.Msg)
+	proto.Commit(ctx, ownerTree.Public, pubChg.Msg)
 	return privChg
 }
 
-func initVaultStageOnly(ctx context.Context, priv *git.Tree, ownerAddr OwnerAddress) git.Change[PrivateCredentials] {
+func initPrivateStageOnly(ctx context.Context, priv *git.Tree, ownerAddr OwnerAddress) git.Change[PrivateCredentials] {
 	if _, err := priv.Filesystem.Stat(PrivateCredentialsNS.Path()); err == nil {
 		must.Errorf(ctx, "private credentials file already exists")
 	}
-	cred, err := GenerateCredentials(git.Address(ownerAddr.Home), git.Address(ownerAddr.Vault))
-	if err != nil {
-		must.Panic(ctx, err)
-	}
+	cred, err := GenerateCredentials()
+	must.NoError(ctx, err)
 	git.ToFileStage(ctx, priv, PrivateCredentialsNS.Path(), cred)
 	return git.Change[PrivateCredentials]{
 		Result: cred,
@@ -47,7 +45,7 @@ func initVaultStageOnly(ctx context.Context, priv *git.Tree, ownerAddr OwnerAddr
 	}
 }
 
-func initHomeStageOnly(ctx context.Context, pub *git.Tree, cred PublicCredentials) git.ChangeNoResult {
+func initPublicStageOnly(ctx context.Context, pub *git.Tree, cred PublicCredentials) git.ChangeNoResult {
 	if _, err := pub.Filesystem.Stat(PublicCredentialsNS.Path()); err == nil {
 		must.Errorf(ctx, "public credentials file already exists")
 	}

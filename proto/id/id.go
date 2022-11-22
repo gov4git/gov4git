@@ -6,32 +6,34 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-type HomeAddress git.Address
+// PublicAddress points to the user's public repo.
+type PublicAddress git.Address
 
-type VaultAddress git.Address
+// VaultAdress points to the user's private repo.
+type PrivateAddress git.Address
 
 type OwnerAddress struct {
-	Home  HomeAddress
-	Vault VaultAddress
+	Public  PublicAddress
+	Private PrivateAddress
 }
 
 type OwnerRepo struct {
-	Home  *git.Repository
-	Vault *git.Repository
+	Public  *git.Repository
+	Private *git.Repository
 }
 
 type OwnerTree struct {
-	Home  *git.Tree
-	Vault *git.Tree
+	Public  *git.Tree
+	Private *git.Tree
 }
 
-func CloneTree(ctx context.Context, addr HomeAddress) *git.Tree {
-	_, homeTree := git.Clone(ctx, git.Address(addr))
-	return homeTree
+func CloneTree(ctx context.Context, addr PublicAddress) *git.Tree {
+	_, publicTree := git.Clone(ctx, git.Address(addr))
+	return publicTree
 }
 
 func CloneOwner(ctx context.Context, ownerAddr OwnerAddress) (OwnerRepo, OwnerTree) {
-	homeRepo, homeTree := git.CloneOrInit(ctx, git.Address(ownerAddr.Home))
-	vaultRepo, vaultTree := git.CloneOrInit(ctx, git.Address(ownerAddr.Vault))
-	return OwnerRepo{Home: homeRepo, Vault: vaultRepo}, OwnerTree{Home: homeTree, Vault: vaultTree}
+	publicRepo, publicTree := git.CloneOrInit(ctx, git.Address(ownerAddr.Public))
+	privateRepo, privateTree := git.CloneOrInit(ctx, git.Address(ownerAddr.Private))
+	return OwnerRepo{Public: publicRepo, Private: privateRepo}, OwnerTree{Public: publicTree, Private: privateTree}
 }

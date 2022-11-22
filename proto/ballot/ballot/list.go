@@ -13,7 +13,7 @@ import (
 
 func ListOpen(
 	ctx context.Context,
-	govAddr gov.CommunityAddress,
+	govAddr gov.PublicAddress,
 ) []common.Advertisement {
 
 	_, govTree := git.Clone(ctx, git.Address(govAddr))

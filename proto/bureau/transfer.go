@@ -16,7 +16,7 @@ import (
 func Transfer(
 	ctx context.Context,
 	userAddr id.OwnerAddress,
-	govAddr gov.CommunityAddress,
+	govAddr gov.PublicAddress,
 	fromUserOpt member.User, // optional, if empty string, a lookup forthe user is performed
 	fromBalance balance.Balance,
 	toUser member.User,
@@ -27,15 +27,15 @@ func Transfer(
 	govRepo := git.CloneRepo(ctx, git.Address(govAddr))
 	userRepo, userTree := id.CloneOwner(ctx, userAddr)
 	chg := TransferStageOnly(ctx, userAddr, govAddr, userTree, govRepo, fromUserOpt, fromBalance, toUser, toBalance, amount)
-	proto.Commit(ctx, userTree.Home, chg.Msg)
-	git.Push(ctx, userRepo.Home)
+	proto.Commit(ctx, userTree.Public, chg.Msg)
+	git.Push(ctx, userRepo.Public)
 	return chg
 }
 
 func TransferStageOnly(
 	ctx context.Context,
 	userAddr id.OwnerAddress,
-	govAddr gov.CommunityAddress,
+	govAddr gov.PublicAddress,
 	userTree id.OwnerTree,
 	govRepo *git.Repository,
 	fromUserOpt member.User,
@@ -47,14 +47,14 @@ func TransferStageOnly(
 
 	// find the user name of userAddr in the community repo
 	if fromUserOpt == "" {
-		us := member.LookupUserByAddressLocal(ctx, git.Worktree(ctx, govRepo), userAddr.Home)
+		us := member.LookupUserByAddressLocal(ctx, git.Worktree(ctx, govRepo), userAddr.Public)
 		switch len(us) {
 		case 0:
-			must.Errorf(ctx, "%s not found in community %v", userAddr.Home, govAddr)
+			must.Errorf(ctx, "%s not found in community %v", userAddr.Public, govAddr)
 		case 1:
 			fromUserOpt = us[0]
 		default:
-			must.Errorf(ctx, "community %v has more than one user at address %v", govAddr, userAddr.Home)
+			must.Errorf(ctx, "community %v has more than one user at address %v", govAddr, userAddr.Public)
 		}
 	}
 

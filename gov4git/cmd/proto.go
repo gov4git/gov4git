@@ -14,7 +14,7 @@ const (
 )
 
 type Setup struct {
-	Community gov.CommunityAddress
+	Gov       gov.GovAddress
 	Organizer gov.OrganizerAddress
 	Member    id.OwnerAddress
 }
@@ -26,11 +26,11 @@ type Config struct {
 	UserPassword       *UserPassword `json:"user_password"`
 
 	//
-	CommunityPublicURL    git.URL    `json:"community_public_url"`
-	CommunityPublicBranch git.Branch `json:"community_public_branch"`
+	GovPublicURL    git.URL    `json:"gov_public_url"`
+	GovPublicBranch git.Branch `json:"gov_public_branch"`
 	//
-	CommunityPrivateURL    git.URL    `json:"community_private_url"`
-	CommunityPrivateBranch git.Branch `json:"community_private_branch"`
+	GovPrivateURL    git.URL    `json:"gov_private_url"`
+	GovPrivateBranch git.Branch `json:"gov_private_branch"`
 
 	//
 	MemberPublicURL    git.URL    `json:"member_public_url"`
@@ -55,10 +55,10 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 		git.SetPasswordAuth(ctx, cfg.UserPassword.User, cfg.UserPassword.Password)
 	}
 	return Setup{
-		Community: gov.CommunityAddress{Repo: cfg.CommunityPublicURL, Branch: cfg.CommunityPublicBranch},
+		Gov: gov.GovAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
 		Organizer: gov.OrganizerAddress{
-			Public:  id.PublicAddress{Repo: cfg.CommunityPublicURL, Branch: cfg.CommunityPublicBranch},
-			Private: id.PrivateAddress{Repo: cfg.CommunityPrivateURL, Branch: cfg.CommunityPrivateBranch},
+			Public:  id.PublicAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
+			Private: id.PrivateAddress{Repo: cfg.GovPrivateURL, Branch: cfg.GovPrivateBranch},
 		},
 		Member: id.OwnerAddress{
 			Public:  id.PublicAddress{Repo: cfg.MemberPublicURL, Branch: cfg.MemberPublicBranch},

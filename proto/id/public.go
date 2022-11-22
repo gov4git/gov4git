@@ -7,11 +7,11 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-func FetchPublicCredentials(ctx context.Context, publicAddr git.Address) PublicCredentials {
-	_, tree := git.Clone(ctx, publicAddr)
+func FetchPublicCredentials(ctx context.Context, addr PublicAddress) PublicCredentials {
+	_, tree := git.Clone(ctx, git.Address(addr))
 	return GetPublicCredentials(ctx, tree)
 }
 
-func GetPublicCredentials(ctx context.Context, wt *git.Tree) PublicCredentials {
-	return form.FromFile[PublicCredentials](ctx, wt.Filesystem, PublicCredentialsNS.Path())
+func GetPublicCredentials(ctx context.Context, t *git.Tree) PublicCredentials {
+	return form.FromFile[PublicCredentials](ctx, t.Filesystem, PublicCredentialsNS.Path())
 }

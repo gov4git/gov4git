@@ -94,17 +94,17 @@ func fetchVotes(
 		fetched = append(fetched,
 			common.FetchedVote{
 				Voter:     user,
-				Address:   account.Home,
+				Address:   account.PublicAddress,
 				Elections: req.Elections,
 			})
 		return req, nil
 	}
 
-	_, voterPublicTree := git.Clone(ctx, git.Address(account.Home))
+	_, voterPublicTree := git.Clone(ctx, git.Address(account.PublicAddress))
 	mail.ReceiveSignedStageOnly(
 		ctx,
 		govTree,
-		account.Home,
+		account.PublicAddress,
 		voterPublicTree,
 		common.BallotTopic(ballotName),
 		respond,

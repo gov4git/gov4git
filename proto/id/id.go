@@ -6,8 +6,10 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
+// PublicAddress points to the user's public repo.
 type PublicAddress git.Address
 
+// PrivateAdress points to the user's private repo.
 type PrivateAddress git.Address
 
 type OwnerAddress struct {

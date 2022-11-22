@@ -36,10 +36,8 @@ func initPrivateStageOnly(ctx context.Context, priv *git.Tree, ownerAddr OwnerAd
 	if _, err := priv.Filesystem.Stat(PrivateCredentialsNS.Path()); err == nil {
 		must.Errorf(ctx, "private credentials file already exists")
 	}
-	cred, err := GenerateCredentials(git.Address(ownerAddr.Public), git.Address(ownerAddr.Private))
-	if err != nil {
-		must.Panic(ctx, err)
-	}
+	cred, err := GenerateCredentials()
+	must.NoError(ctx, err)
 	git.ToFileStage(ctx, priv, PrivateCredentialsNS.Path(), cred)
 	return git.Change[PrivateCredentials]{
 		Result: cred,

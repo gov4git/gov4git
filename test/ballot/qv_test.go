@@ -22,14 +22,14 @@ func TestQV(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// init voter credits
-	balance.Set(ctx, cty.Community(), cty.MemberUser(0), qv.VotingCredits, 3.0)
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 3.0)
 
 	// open
 	strat := qv.PriorityPoll{UseVotingCredits: true}
 	openChg := ballot.Open(
 		ctx,
 		strat,
-		cty.Community(),
+		cty.Gov(),
 		ballotName,
 		"ballot_name",
 		"ballot description",
@@ -48,7 +48,7 @@ func TestQV(t *testing.T) {
 	voteChg := ballot.Vote(
 		ctx,
 		cty.MemberOwner(0),
-		cty.Community(),
+		cty.Gov(),
 		ballotName,
 		elections,
 	)
@@ -70,7 +70,7 @@ func TestQV(t *testing.T) {
 	fmt.Println("close: ", closeChg)
 
 	// verify voter credits
-	u0 := balance.Get(ctx, cty.Community(), cty.MemberUser(0), qv.VotingCredits)
+	u0 := balance.Get(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits)
 	if u0 != 1.0 {
 		t.Errorf("expecting 1, got %v", u0)
 	}

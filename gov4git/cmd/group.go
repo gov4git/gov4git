@@ -24,7 +24,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			member.AddGroup(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.Group(groupName),
 			)
 			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
@@ -38,7 +38,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			member.RemoveGroup(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.Group(groupName),
 			)
 			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
@@ -52,7 +52,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			l := member.ListGroupUsers(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.Group(groupName),
 			)
 			fmt.Fprint(os.Stdout, form.Pretty(l))

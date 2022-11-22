@@ -5,7 +5,6 @@ import (
 	"crypto/ed25519"
 
 	"github.com/gov4git/lib4git/form"
-	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
 
@@ -13,17 +12,15 @@ type Ed25519PublicKey = form.Bytes
 
 type Ed25519PrivateKey = form.Bytes
 
-func GenerateCredentials(public git.Address, private git.Address) (PrivateCredentials, error) {
+func GenerateCredentials() (PrivateCredentials, error) {
 	pubKey, privKey, err := ed25519.GenerateKey(nil)
 	if err != nil {
 		return PrivateCredentials{}, err
 	}
 	return PrivateCredentials{
-		PrivateAddress:    private,
 		PrivateKeyEd25519: Ed25519PrivateKey(privKey),
 		PublicCredentials: PublicCredentials{
 			ID:               GenerateUniqueID(),
-			PublicAddress:    public,
 			PublicKeyEd25519: Ed25519PublicKey(pubKey),
 		},
 	}, nil

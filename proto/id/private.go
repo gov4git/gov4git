@@ -16,6 +16,6 @@ func GetOwnerCredentials(ctx context.Context, owner OwnerTree) PrivateCredential
 	return GetPrivateCredentials(ctx, owner.Private)
 }
 
-func GetPrivateCredentials(ctx context.Context, priv *git.Tree) PrivateCredentials {
-	return form.FromFile[PrivateCredentials](ctx, priv.Filesystem, PrivateCredentialsNS.Path())
+func GetPrivateCredentials(ctx context.Context, privateTree *git.Tree) PrivateCredentials {
+	return form.FromFile[PrivateCredentials](ctx, privateTree.Filesystem, PrivateCredentialsNS.Path())
 }

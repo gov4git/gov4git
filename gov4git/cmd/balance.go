@@ -24,7 +24,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			balance.Set(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(balanceUser),
 				balance.Balance(balanceKey),
 				balanceValue,
@@ -39,7 +39,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			v := balance.Get(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(balanceUser),
 				balance.Balance(balanceKey),
 			)
@@ -54,7 +54,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			v := balance.Add(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(balanceUser),
 				balance.Balance(balanceKey),
 				balanceValue,
@@ -70,7 +70,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			v := balance.Mul(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(balanceUser),
 				balance.Balance(balanceKey),
 				balanceValue,

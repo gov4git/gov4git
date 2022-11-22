@@ -24,7 +24,7 @@ var (
 
 	initGovCmd = &cobra.Command{
 		Use:   "init-gov",
-		Short: "Initialize public and private repositories of your community",
+		Short: "Initialize public and private repositories of your governance",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			chg := id.Init(ctx, id.OwnerAddress(setup.Organizer))

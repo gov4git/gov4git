@@ -23,13 +23,11 @@ var (
 		Short: "Add user to the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			member.AddUser(
+			member.AddUserByPublicAddress(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(userName),
-				member.Account{
-					Home: id.PublicAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
-				},
+				id.PublicAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
 			)
 			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
 		},
@@ -42,7 +40,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			member.RemoveUser(
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(userName),
 			)
 			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
@@ -56,7 +54,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			v := member.GetUserProp[interface{}](
 				ctx,
-				setup.Community,
+				setup.Gov,
 				member.User(userName),
 				userKey,
 			)
@@ -77,9 +75,9 @@ func init() {
 	userCmd.AddCommand(userAddCmd)
 	userAddCmd.Flags().StringVar(&userName, "name", "", "user alias within the community")
 	userAddCmd.MarkFlagRequired("name")
-	userAddCmd.Flags().StringVar(&userRepo, "repo", "", "repo URL of user public identity")
+	userAddCmd.Flags().StringVar(&userRepo, "repo", "", "URL of user's public repo")
 	userAddCmd.MarkFlagRequired("repo")
-	userAddCmd.Flags().StringVar(&userBranch, "branch", "", "branch of user public identity")
+	userAddCmd.Flags().StringVar(&userBranch, "branch", "", "branch in user's public repo")
 	userAddCmd.MarkFlagRequired("branch")
 
 	userCmd.AddCommand(userRemoveCmd)

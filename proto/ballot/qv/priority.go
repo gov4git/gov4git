@@ -29,7 +29,7 @@ func (x PriorityPoll) Name() string {
 func (x PriorityPoll) VerifyElections(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.CommunityAddress,
+	govAddr gov.GovAddress,
 	voterTree id.OwnerTree,
 	govTree *git.Tree,
 	ad common.Advertisement,
@@ -40,9 +40,10 @@ func (x PriorityPoll) VerifyElections(
 		for _, el := range elections {
 			spend += math.Abs(el.VoteStrengthChange)
 		}
-		user := member.LookupUserByAddressLocal(ctx, govTree, voterAddr.Public)
+		voterCred := id.GetPublicCredentials(ctx, voterTree.Public)
+		user := member.LookupUserByIDLocal(ctx, govTree, voterCred.ID)
 		if len(user) == 0 {
-			must.Errorf(ctx, "cannot find user with address %v in the community", voterAddr.Public)
+			must.Errorf(ctx, "cannot find user with id %v in the community", voterCred.ID)
 		}
 		available := balance.GetLocal(ctx, govTree, user[0], VotingCredits)
 		must.Assertf(ctx, available >= spend, "insufficient voting credits %v for elections costing %v", available, spend)

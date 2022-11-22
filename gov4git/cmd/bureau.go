@@ -36,7 +36,7 @@ var (
 			bureau.Transfer(
 				ctx,
 				setup.Member,
-				setup.Community,
+				setup.Gov,
 				member.User(bureauFromUser),
 				balance.Balance(bureauFromBalance),
 				member.User(bureauToUser),

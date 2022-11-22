@@ -17,17 +17,17 @@ func TestBureau(t *testing.T) {
 	usd := balance.Balance("usd")
 
 	// credit user 0 with some cash
-	balance.Set(ctx, cty.Community(), cty.MemberUser(0), usd, 3.0)
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), usd, 3.0)
 
 	// user 0 requests transfer to user 1
-	bureau.Transfer(ctx, cty.MemberOwner(0), cty.Community(), member.User(""), usd, cty.MemberUser(1), usd, 1.0)
+	bureau.Transfer(ctx, cty.MemberOwner(0), cty.Gov(), member.User(""), usd, cty.MemberUser(1), usd, 1.0)
 
 	// process request
 	bureau.Process(ctx, cty.Organizer(), member.Everybody)
 
 	// get resulting balances
-	u0 := balance.Get(ctx, cty.Community(), cty.MemberUser(0), usd)
-	u1 := balance.Get(ctx, cty.Community(), cty.MemberUser(1), usd)
+	u0 := balance.Get(ctx, cty.Gov(), cty.MemberUser(0), usd)
+	u1 := balance.Get(ctx, cty.Gov(), cty.MemberUser(1), usd)
 
 	if u0 != 2.0 {
 		t.Errorf("expecting 2, got %v", u0)

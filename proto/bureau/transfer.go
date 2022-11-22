@@ -16,7 +16,7 @@ import (
 func Transfer(
 	ctx context.Context,
 	userAddr id.OwnerAddress,
-	govAddr gov.CommunityAddress,
+	govAddr gov.GovAddress,
 	fromUserOpt member.User, // optional, if empty string, a lookup forthe user is performed
 	fromBalance balance.Balance,
 	toUser member.User,
@@ -35,7 +35,7 @@ func Transfer(
 func TransferStageOnly(
 	ctx context.Context,
 	userAddr id.OwnerAddress,
-	govAddr gov.CommunityAddress,
+	govAddr gov.GovAddress,
 	userTree id.OwnerTree,
 	govRepo *git.Repository,
 	fromUserOpt member.User,
@@ -45,9 +45,11 @@ func TransferStageOnly(
 	amount float64,
 ) git.Change[mail.SeqNo] {
 
+	userCred := id.GetPublicCredentials(ctx, userTree.Public)
+
 	// find the user name of userAddr in the community repo
 	if fromUserOpt == "" {
-		us := member.LookupUserByAddressLocal(ctx, git.Worktree(ctx, govRepo), userAddr.Public)
+		us := member.LookupUserByIDLocal(ctx, git.Worktree(ctx, govRepo), userCred.ID)
 		switch len(us) {
 		case 0:
 			must.Errorf(ctx, "%s not found in community %v", userAddr.Public, govAddr)

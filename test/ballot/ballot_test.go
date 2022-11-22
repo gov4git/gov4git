@@ -25,7 +25,7 @@ func TestBallot(t *testing.T) {
 	openChg := ballot.Open(
 		ctx,
 		strat,
-		cty.Community(),
+		cty.Gov(),
 		ballotName,
 		"ballot_name",
 		"ballot description",
@@ -35,7 +35,7 @@ func TestBallot(t *testing.T) {
 	fmt.Println("open: ", openChg)
 
 	// list
-	ads := ballot.ListOpen(ctx, cty.Community())
+	ads := ballot.ListOpen(ctx, cty.Gov())
 	if len(ads) != 1 {
 		t.Errorf("expecting 1 ad, got %v", len(ads))
 	}
@@ -51,7 +51,7 @@ func TestBallot(t *testing.T) {
 	voteChg := ballot.Vote(
 		ctx,
 		cty.MemberOwner(0),
-		cty.Community(),
+		cty.Gov(),
 		ballotName,
 		elections,
 	)

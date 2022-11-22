@@ -114,17 +114,17 @@ func fetchUserRequests(
 		fetched = append(fetched,
 			FetchedRequest{
 				User:     user,
-				Address:  account.Home,
+				Address:  account.PublicAddress,
 				Requests: Requests{req},
 			})
 		return req, nil
 	}
 
-	_, userPublicTree := git.Clone(ctx, git.Address(account.Home))
+	_, userPublicTree := git.Clone(ctx, git.Address(account.PublicAddress))
 	mail.ReceiveSignedStageOnly(
 		ctx,
 		govTree,
-		account.Home,
+		account.PublicAddress,
 		userPublicTree,
 		BureauTopic,
 		respond,

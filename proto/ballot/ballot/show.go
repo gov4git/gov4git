@@ -12,7 +12,7 @@ import (
 
 func Show(
 	ctx context.Context,
-	govAddr gov.CommunityAddress,
+	govAddr gov.GovAddress,
 	ballotName ns.NS,
 ) common.AdStrategyTally {
 
@@ -23,7 +23,7 @@ func Show(
 
 func ShowLocal(
 	ctx context.Context,
-	govAddr gov.CommunityAddress,
+	govAddr gov.GovAddress,
 	govTree *git.Tree,
 	ballotName ns.NS,
 ) common.AdStrategyTally {

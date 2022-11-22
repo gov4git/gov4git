@@ -31,18 +31,18 @@ func BallotTopic(name ns.NS) string {
 }
 
 type Advertisement struct {
-	Community    gov.CommunityAddress `json:"community"`
-	Name         ns.NS                `json:"path"`
-	Title        string               `json:"title"`
-	Description  string               `json:"description"`
-	Choices      []string             `json:"choices"`
-	Strategy     string               `json:"strategy"`
-	Participants member.Group         `json:"participants_group"`
-	ParentCommit git.CommitHash       `json:"parent_commit"`
+	Gov          gov.GovAddress `json:"community"`
+	Name         ns.NS          `json:"path"`
+	Title        string         `json:"title"`
+	Description  string         `json:"description"`
+	Choices      []string       `json:"choices"`
+	Strategy     string         `json:"strategy"`
+	Participants member.Group   `json:"participants_group"`
+	ParentCommit git.CommitHash `json:"parent_commit"`
 }
 
 type BallotAddress struct {
-	Gov  gov.CommunityAddress
+	Gov  gov.GovAddress
 	Name ns.NS
 }
 

@@ -1,19 +1,36 @@
 ---
-name: Add contributor to the gov4git community governance
-about: Create a report to help us improve
-title: 'Add contributor'
-labels: 'community, request'
+name: Join the community
+about: Use this form to join the community
+title: "I'd like to join this project's community"
+labels: ['community']
 assignees: 'petar'
-
----
-Use the JSON form below to add yourself to the gov4git community.
-
-```json
-{
-     "contributor_public_url": "YOUR_PUBLIC_URL", // your gov4git identity's public repo URL (should require no authentication)
-     "contributor_public_branch": "YOUR_PUBLIC_BRANCH", // your gov4git identity's public repo branch
-}
-```
-
-Make sure to provide a URL for your identity's public repo that does not require authentication.
-E.g. if you are using GitHub as your git provider, use the `HTTPS` URL for your repo.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your interest in our community!
+        Use the form below to join our community governance.
+  - type: input
+    id: contributor_public_url
+    attributes:
+      label: Your public repo
+      description: The URL of your gov4git public repo
+      placeholder: e.g. https://github.com/petar/gov4git.public.git
+    validations:
+      required: true
+  - type: input
+    id: contributor_public_branch
+    attributes:
+      label: Your public branch
+      description: The branch within your gov4git public repo that holds your identity
+      placeholder: e.g. main
+    validations:
+      required: true
+  - type: input
+    id: contributor_email
+    attributes:
+      label: Your email (optional)
+      description: Share your email, if you want to receive community updates
+      placeholder: e.g. petar@protocol.ai
+    validations:
+      required: false

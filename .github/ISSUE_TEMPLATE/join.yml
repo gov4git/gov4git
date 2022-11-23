@@ -35,7 +35,3 @@ body:
       placeholder: e.g. petar@protocol.ai
     validations:
       required: false
-  - type: textarea
-    id: anything_else
-    attributes:
-      label: Anything else you want to tell us?

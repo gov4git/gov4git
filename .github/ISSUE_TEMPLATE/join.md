@@ -1,3 +1,4 @@
+---
 name: Join the community
 about: Use this form to join the community
 title: I'd like to join this project's community
@@ -39,3 +40,4 @@ body:
     id: anything_else
     attributes:
       label: Anything else you want to tell us?
+---

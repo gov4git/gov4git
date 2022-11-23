@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/google/uuid v1.3.0
-	github.com/gov4git/lib4git v0.0.0-20221118184136-a0ffca09ad0d
+	github.com/gov4git/lib4git v0.0.0-20221123184220-a2d3d80796b0
 	github.com/spf13/cobra v1.6.1
 )
 

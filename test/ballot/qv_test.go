@@ -18,7 +18,7 @@ func TestQV(t *testing.T) {
 	ctx := testutil.NewCtx()
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := ns.NS("a/b/c")
+	ballotName := ns.NS{"a", "b", "c"}
 	choices := []string{"x", "y", "z"}
 
 	// init voter credits

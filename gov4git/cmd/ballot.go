@@ -33,7 +33,7 @@ var (
 				ctx,
 				strat,
 				setup.Gov,
-				ns.NS(ballotName),
+				ns.ParseFromPath(ballotName),
 				ballotTitle,
 				ballotDescription,
 				ballotChoices,
@@ -51,7 +51,7 @@ var (
 			chg := ballot.Close(
 				ctx,
 				setup.Organizer,
-				ns.NS(ballotName),
+				ns.ParseFromPath(ballotName),
 				common.Summary(ballotSummary),
 			)
 			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
@@ -66,7 +66,7 @@ var (
 			r := ballot.Show(
 				ctx,
 				setup.Gov,
-				ns.NS(ballotName),
+				ns.ParseFromPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, r)
 		},
@@ -93,7 +93,7 @@ var (
 			chg := ballot.Tally(
 				ctx,
 				setup.Organizer,
-				ns.NS(ballotName),
+				ns.ParseFromPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
 		},
@@ -108,7 +108,7 @@ var (
 				ctx,
 				setup.Member,
 				setup.Gov,
-				ns.NS(ballotName),
+				ns.ParseFromPath(ballotName),
 				parseElections(ctx, ballotElectionChoice, ballotElectionStrength),
 			)
 			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))

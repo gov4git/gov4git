@@ -1,5 +1,19 @@
 # gov4git sync
 
+## Next: 2022-10-28
+
+- __Updates from the week:__
+  - Kicked off UI engineering discussions
+  - Deployed gov4git dogfooding on gov4git
+  - Started looking into GitHub automation for the dogfood deployment:
+    - [Use a GitHub form to request joining a community](https://github.com/gov4git/gov4git/issues/new?assignees=petar&labels=community&template=join.yml&title=I%27d+like+to+join+this+project%27s+community)
+
+- __Priorities for this week:__
+  - Continue automation and documentation for dogfooding
+    - Landing page with instructions for dogfooders
+    - Opening and closing polls on issue creation using GitHub actions
+  - Plan out a whitepaper
+
 ## Next: 2022-10-21
 
 - __Updates from the week:__

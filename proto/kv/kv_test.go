@@ -15,7 +15,7 @@ func TestSetGet(t *testing.T) {
 	ctx := context.Background()
 	repo := testutil.InitPlainRepo(t, ctx)
 
-	m := ns.NS("ns")
+	m := ns.NS{"ns"}
 	wt := git.Worktree(ctx, repo.Repo)
 
 	x := KV[string, float64]{}

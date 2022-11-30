@@ -51,6 +51,14 @@ This milestone completed at end of Oct 2022.
 
 ### Milestone 3a: Document and socialize
 
+Short-form:
+- [ ] Slides on gov4git
+- [ ] Slides on dapps over git
+- [ ] Slides on chain on git
+
+Long-form:
+- [ ] Whitepaper
+
 ### Milestone 3b: Web app and browser extension for voting
 
 #### Develop
@@ -68,7 +76,15 @@ This milestone completed at end of Oct 2022.
 - Dogfood on libp2p/IPFS/Filecoin?
 - Dogfood on Plurality Book project
 
-### Milestone 4: Verifiable change arbitration and approval
+### Milestone 4a: Protocol framework improvements
+
+- [ ] Communications
+  - [ ] Local on-disk repo cache at the client
+- [ ] Cryptography
+  - [ ] Signing all commits at the framework level, transparent to the application
+  - [ ] Use repository embeddings as a generic implementation of communication
+
+### Milestone 4b: Verifiable change arbitration and approval
 
 #### Develop
 - Governance:

@@ -1,6 +1,12 @@
 # gov4git sync
 
-## Next: 2022-10-28
+## Next: 2022-12-05
+
+- __Updates from the week:__
+  - Discovered need to add an authentication manager to manage user's credentials for different repos (while testing dogfood setup)
+    - Upgraded lib4git and gov4git with a new auth manager
+
+## Next: 2022-11-28
 
 - __Updates from the week:__
   - Kicked off UI engineering discussions
@@ -14,7 +20,7 @@
     - Opening and closing polls on issue creation using GitHub actions
   - Plan out a whitepaper
 
-## Next: 2022-10-21
+## Next: 2022-11-21
 
 - __Updates from the week:__
   - Rewrite done (merged)
@@ -31,7 +37,7 @@
     - Dogfooder documentation
     - Find dogfood cohort (PL/RadX/etc), send invites
 
-## Next: 2022-10-14
+## Next: 2022-11-14
 
 - __Updates from the week:__
   - Rewrite almost done:
@@ -51,7 +57,7 @@
     - Balance transfers
     - Balance refunds dependent on ballot outcomes
 
-## Next: 2022-10-07
+## Next: 2022-11-07
 
 - __Context:__ October high-level goals
   - Develop ground framework for decentralized apps over git:

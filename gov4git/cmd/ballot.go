@@ -58,8 +58,8 @@ var (
 		},
 	}
 
-	ballotShowCmd = &cobra.Command{
-		Use:   "show",
+	ballotShowOpenCmd = &cobra.Command{
+		Use:   "show-open",
 		Short: "Show open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
@@ -67,6 +67,22 @@ var (
 				ctx,
 				setup.Gov,
 				ns.ParseFromPath(ballotName),
+				false,
+			)
+			fmt.Fprint(os.Stdout, r)
+		},
+	}
+
+	ballotShowClosedCmd = &cobra.Command{
+		Use:   "show-closed",
+		Short: "Show closed ballot",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			r := ballot.Show(
+				ctx,
+				setup.Gov,
+				ns.ParseFromPath(ballotName),
+				true,
 			)
 			fmt.Fprint(os.Stdout, r)
 		},
@@ -144,16 +160,21 @@ func init() {
 	ballotOpenCmd.Flags().BoolVar(&ballotUseVotingCredits, "use_credits", false, "use voting credits")
 
 	// close
-	ballotCmd.AddCommand(ballotShowCmd)
-	ballotShowCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
-	ballotShowCmd.MarkFlagRequired("name")
-	ballotShowCmd.Flags().StringVar(&ballotSummary, "summary", "", "summary")
-	ballotShowCmd.MarkFlagRequired("summary")
-
-	// show
 	ballotCmd.AddCommand(ballotCloseCmd)
 	ballotCloseCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
 	ballotCloseCmd.MarkFlagRequired("name")
+	ballotCloseCmd.Flags().StringVar(&ballotSummary, "summary", "", "summary")
+	ballotCloseCmd.MarkFlagRequired("summary")
+
+	// show open
+	ballotCmd.AddCommand(ballotShowOpenCmd)
+	ballotShowOpenCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotShowOpenCmd.MarkFlagRequired("name")
+
+	// show closed
+	ballotCmd.AddCommand(ballotShowClosedCmd)
+	ballotShowClosedCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotShowClosedCmd.MarkFlagRequired("name")
 
 	// list
 	ballotCmd.AddCommand(ballotListCmd)

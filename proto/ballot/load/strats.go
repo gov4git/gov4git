@@ -14,17 +14,28 @@ func LoadStrategy(
 	ctx context.Context,
 	govTree *git.Tree,
 	ballotName ns.NS,
+	closed bool,
 ) (common.Advertisement, common.Strategy) {
 
 	// read ad
-	openAdNS := common.OpenBallotNS(ballotName).Sub(common.AdFilebase)
-	ad := git.FromFile[common.Advertisement](ctx, govTree, openAdNS.Path())
+	var adNS ns.NS
+	if closed {
+		adNS = common.ClosedBallotNS(ballotName).Sub(common.AdFilebase)
+	} else {
+		adNS = common.OpenBallotNS(ballotName).Sub(common.AdFilebase)
+	}
+	ad := git.FromFile[common.Advertisement](ctx, govTree, adNS.Path())
 
 	// read strategy
-	openStrategyNS := common.OpenBallotNS(ballotName).Sub(common.StrategyFilebase)
+	var strategyNS ns.NS
+	if closed {
+		strategyNS = common.ClosedBallotNS(ballotName).Sub(common.StrategyFilebase)
+	} else {
+		strategyNS = common.OpenBallotNS(ballotName).Sub(common.StrategyFilebase)
+	}
 	switch ad.Strategy {
 	case qv.PriorityPollName:
-		return ad, git.FromFile[qv.PriorityPoll](ctx, govTree, openStrategyNS.Path())
+		return ad, git.FromFile[qv.PriorityPoll](ctx, govTree, strategyNS.Path())
 	default:
 		must.Errorf(ctx, "unkonwn ballot strategy %v", ad.Strategy)
 		panic("unreachable")

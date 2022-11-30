@@ -39,7 +39,7 @@ func TallyStageOnly(
 
 	communityTree := govTree.Public
 
-	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName)
+	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName, false)
 
 	// list participating users
 	users := member.ListGroupUsersLocal(ctx, communityTree, ad.Participants)
@@ -59,7 +59,7 @@ func TallyStageOnly(
 
 	// read current tally
 	var currentTally *common.Tally
-	if tryCurrentTally, err := must.Try1(func() common.Tally { return LoadTally(ctx, communityTree, ballotName) }); err == nil {
+	if tryCurrentTally, err := must.Try1(func() common.Tally { return LoadTally(ctx, communityTree, ballotName, false) }); err == nil {
 		currentTally = &tryCurrentTally
 	}
 
@@ -120,7 +120,13 @@ func LoadTally(
 	ctx context.Context,
 	communityTree *git.Tree,
 	ballotName ns.NS,
+	closed bool,
 ) common.Tally {
-	openTallyNS := common.OpenBallotNS(ballotName).Sub(common.TallyFilebase)
-	return git.FromFile[common.Tally](ctx, communityTree, openTallyNS.Path())
+	var tallyNS ns.NS
+	if closed {
+		tallyNS = common.ClosedBallotNS(ballotName).Sub(common.TallyFilebase)
+	} else {
+		tallyNS = common.OpenBallotNS(ballotName).Sub(common.TallyFilebase)
+	}
+	return git.FromFile[common.Tally](ctx, communityTree, tallyNS.Path())
 }

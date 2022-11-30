@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
@@ -47,6 +48,7 @@ func TransferStageOnly(
 	toBal Balance,
 	amount float64,
 ) {
+	base.Infof("transfering %v units from %v:%v to %v:%v", amount, fromUser, fromBal, toUser, toBal)
 	must.Assertf(ctx, amount >= 0, "negative transfer")
 	prior := GetLocal(ctx, t, fromUser, fromBal)
 	must.Assertf(ctx, prior >= amount, "insufficient balance")

@@ -36,8 +36,8 @@ func CloseStageOnly(
 ) git.Change[common.Outcome] {
 
 	// verify ad and strategy are present
-	ad, strat := load.LoadStrategy(ctx, govTree.Public, ballotName)
-	tally := LoadTally(ctx, govTree.Public, ballotName)
+	ad, strat := load.LoadStrategy(ctx, govTree.Public, ballotName, false)
+	tally := LoadTally(ctx, govTree.Public, ballotName, false)
 	chg := strat.Close(ctx, govRepo, govTree, &ad, &tally, summary)
 
 	// write outcome

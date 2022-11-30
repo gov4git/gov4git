@@ -43,7 +43,7 @@ func VoteStageOnly(
 
 	govTree := git.Worktree(ctx, govRepo)
 
-	ad, strat := load.LoadStrategy(ctx, govTree, ballotName)
+	ad, strat := load.LoadStrategy(ctx, govTree, ballotName, false)
 
 	verifyElections(ctx, strat, voterAddr, govAddr, voterTree, govTree, ad, elections)
 	envelope := common.VoteEnvelope{

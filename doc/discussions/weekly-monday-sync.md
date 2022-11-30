@@ -5,7 +5,8 @@
 - __Updates from the week:__
   - Discovered need to add an authentication manager to manage user's credentials for different repos (while testing dogfood setup)
     - Upgraded lib4git and gov4git with a new auth manager
-  - Researched [ScuttleButt](scuttlebutt.nz) is a nice architectural alternative to building dapps over git. Plan to include a comparison in the whitepaper.
+  - [ScuttleButt](scuttlebutt.nz) is a nice architectural alternative to building dapps over git. Plan to include a comparison in the whitepaper.
+  - Found [git appraise](https://github.com/google/git-appraise) and [git bug](https://github.com/MichaelMure/git-bug) as examples of highly-used applications built on top of git. 
 
 ## Next: 2022-11-28
 

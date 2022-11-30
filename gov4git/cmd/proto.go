@@ -20,24 +20,23 @@ type Setup struct {
 }
 
 type Config struct {
-	// auth
+	Auth map[git.URL]AuthConfig `json:"auth"`
+	//
+	GovPublicURL     git.URL    `json:"gov_public_url"`
+	GovPublicBranch  git.Branch `json:"gov_public_branch"`
+	GovPrivateURL    git.URL    `json:"gov_private_url"`
+	GovPrivateBranch git.Branch `json:"gov_private_branch"`
+	//
+	MemberPublicURL     git.URL    `json:"member_public_url"`
+	MemberPublicBranch  git.Branch `json:"member_public_branch"`
+	MemberPrivateURL    git.URL    `json:"member_private_url"`
+	MemberPrivateBranch git.Branch `json:"member_private_branch"`
+}
+
+type AuthConfig struct {
 	SSHPrivateKeysFile *string       `json:"ssh_private_keys_file"`
 	AccessToken        *string       `json:"access_token"`
 	UserPassword       *UserPassword `json:"user_password"`
-
-	//
-	GovPublicURL    git.URL    `json:"gov_public_url"`
-	GovPublicBranch git.Branch `json:"gov_public_branch"`
-	//
-	GovPrivateURL    git.URL    `json:"gov_private_url"`
-	GovPrivateBranch git.Branch `json:"gov_private_branch"`
-
-	//
-	MemberPublicURL    git.URL    `json:"member_public_url"`
-	MemberPublicBranch git.Branch `json:"member_public_branch"`
-	//
-	MemberPrivateURL    git.URL    `json:"member_private_url"`
-	MemberPrivateBranch git.Branch `json:"member_private_branch"`
 }
 
 type UserPassword struct {
@@ -46,14 +45,18 @@ type UserPassword struct {
 }
 
 func (cfg Config) Setup(ctx context.Context) Setup {
-	switch {
-	case cfg.SSHPrivateKeysFile != nil:
-		git.SetSSHFileAuth(ctx, "git", *cfg.SSHPrivateKeysFile)
-	case cfg.AccessToken != nil:
-		git.SetTokenAuth(ctx, *cfg.AccessToken)
-	case cfg.UserPassword != nil:
-		git.SetPasswordAuth(ctx, cfg.UserPassword.User, cfg.UserPassword.Password)
+
+	for url, auth := range cfg.Auth {
+		switch {
+		case auth.SSHPrivateKeysFile != nil:
+			git.SetAuth(url, git.MakeSSHFileAuth(ctx, "git", *auth.SSHPrivateKeysFile))
+		case auth.AccessToken != nil:
+			git.SetAuth(url, git.MakeTokenAuth(ctx, *auth.AccessToken))
+		case auth.UserPassword != nil:
+			git.SetAuth(url, git.MakePasswordAuth(ctx, auth.UserPassword.User, auth.UserPassword.Password))
+		}
 	}
+
 	return Setup{
 		Gov: gov.GovAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
 		Organizer: gov.OrganizerAddress{

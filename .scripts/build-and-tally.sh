@@ -6,13 +6,11 @@ go build
 
 mkdir -p ~/.gov4git
 
-TOKEN=${{ secrets.GITHUB_TOKEN }}
-
 cat <<EOF >> ~/.gov4git/config.json
 {
      "auth" : {
-          "git@github.com:gov4git/gov4git.git": { "access_token": "$TOKEN" },
-          "git@github.com:gov4git/gov4git.private.git": { "access_token": "$TOKEN" },
+          "git@github.com:gov4git/gov4git.git": { "access_token": "$GITHUB_TOKEN" },
+          "git@github.com:gov4git/gov4git.private.git": { "access_token": "$GITHUB_TOKEN" },
      },
      "gov_public_url": "git@github.com:gov4git/gov4git.git",
 	"gov_public_branch": "gov",

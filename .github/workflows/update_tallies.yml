@@ -18,3 +18,5 @@ jobs:
         echo current directory `pwd`
         echo home directory ~
     - run: .scripts/build-and-tally.sh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

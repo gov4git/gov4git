@@ -98,7 +98,13 @@ var (
 				setup.Gov,
 				false,
 			)
-			fmt.Fprint(os.Stdout, form.Pretty(ls))
+			if ballotOnlyNames {
+				for _, n := range common.AdsToBallotNames(ls) {
+					fmt.Println(n)
+				}
+			} else {
+				fmt.Fprint(os.Stdout, form.Pretty(ls))
+			}
 		},
 	}
 
@@ -112,7 +118,13 @@ var (
 				setup.Gov,
 				true,
 			)
-			fmt.Fprint(os.Stdout, form.Pretty(ls))
+			if ballotOnlyNames {
+				for _, n := range common.AdsToBallotNames(ls) {
+					fmt.Println(n)
+				}
+			} else {
+				fmt.Fprint(os.Stdout, form.Pretty(ls))
+			}
 		},
 	}
 
@@ -157,6 +169,7 @@ var (
 	ballotElectionStrength []float64
 	ballotUseVotingCredits bool
 	ballotSummary          string
+	ballotOnlyNames        bool
 )
 
 func init() {
@@ -193,9 +206,11 @@ func init() {
 
 	// list open
 	ballotCmd.AddCommand(ballotListOpenCmd)
+	ballotListOpenCmd.Flags().BoolVar(&ballotOnlyNames, "only_names", false, "list only ballot names")
 
 	// list closed
 	ballotCmd.AddCommand(ballotListClosedCmd)
+	ballotListClosedCmd.Flags().BoolVar(&ballotOnlyNames, "only_names", false, "list only ballot names")
 
 	// tally
 	ballotCmd.AddCommand(ballotTallyCmd)

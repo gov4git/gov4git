@@ -18,4 +18,4 @@ gov4git balance get --user=petar --key=voting_credits_on_hold
 gov4git ballot show-open --name=issue/6
 
 # show current tally for a closed issue
-gov4git ballot show-open --name=issue/6
+gov4git ballot show-closed --name=issue/6

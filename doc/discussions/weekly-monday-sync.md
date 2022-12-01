@@ -7,6 +7,15 @@
     - Upgraded lib4git and gov4git with a new auth manager
   - [ScuttleButt](scuttlebutt.nz) is a nice architectural alternative to building dapps over git. Plan to include a comparison in the whitepaper.
   - Found [git appraise](https://github.com/google/git-appraise) and [git bug](https://github.com/MichaelMure/git-bug) as examples of highly-used applications built on top of git. 
+  - We are on the waiting list for [GitHub Blocks (beta)](https://blocks.githubnext.com/)
+  - First draft of dogfood documentation (and UX flow) is in place
+    - [How to join the community](../dogfood/how-to-join.md)
+    - [How to participate](../dogfood/how-to-participate.md)
+  - Three issues available to dogfood prioritization polling
+  - New release [v0.0.2](https://github.com/gov4git/lib4git/releases/tag/v0.0.2) of [lib4git](https://github.com/gov4git/lib4git) including:
+    - Support for embedding and tracking repos inside other repos. This is a key functionality for efficient implementation of communication for communities of significant scale (pertains to later milestones in our roadmap).
+    - Support for local, on-disk read/write caching of remote repos. This is a key functionality for optimizing the "snappiness" of the gov4git UX. (The functionality will be adopted by the gov4git client at a later opportunity.)
+    - Bug fixes.
 
 ## Next: 2022-11-28
 

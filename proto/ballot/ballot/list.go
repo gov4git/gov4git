@@ -11,23 +11,30 @@ import (
 	"github.com/gov4git/lib4git/ns"
 )
 
-func ListOpen(
+func List(
 	ctx context.Context,
 	govAddr gov.GovAddress,
+	closed bool,
 ) []common.Advertisement {
 
 	_, govTree := git.Clone(ctx, git.Address(govAddr))
-	return ListOpenLocal(ctx, govTree)
+	return ListLocal(ctx, govTree, closed)
 }
 
-func ListOpenLocal(
+func ListLocal(
 	ctx context.Context,
 	govTree *git.Tree,
+	closed bool,
 ) []common.Advertisement {
 
-	openNS := common.OpenBallotNS(ns.NS{})
+	var ballotsNS ns.NS
+	if closed {
+		ballotsNS = common.ClosedBallotNS(ns.NS{})
+	} else {
+		ballotsNS = common.OpenBallotNS(ns.NS{})
+	}
 
-	files, err := git.ListFilesRecursively(govTree, openNS.Path())
+	files, err := git.ListFilesRecursively(govTree, ballotsNS.Path())
 	must.NoError(ctx, err)
 
 	ads := []common.Advertisement{}

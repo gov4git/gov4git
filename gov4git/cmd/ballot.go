@@ -88,14 +88,29 @@ var (
 		},
 	}
 
-	ballotListCmd = &cobra.Command{
-		Use:   "list",
+	ballotListOpenCmd = &cobra.Command{
+		Use:   "list-open",
 		Short: "List open ballots",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			ls := ballot.ListOpen(
+			ls := ballot.List(
 				ctx,
 				setup.Gov,
+				false,
+			)
+			fmt.Fprint(os.Stdout, form.Pretty(ls))
+		},
+	}
+
+	ballotListClosedCmd = &cobra.Command{
+		Use:   "list-closed",
+		Short: "List closed ballots",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			ls := ballot.List(
+				ctx,
+				setup.Gov,
+				true,
 			)
 			fmt.Fprint(os.Stdout, form.Pretty(ls))
 		},
@@ -176,8 +191,11 @@ func init() {
 	ballotShowClosedCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
 	ballotShowClosedCmd.MarkFlagRequired("name")
 
-	// list
-	ballotCmd.AddCommand(ballotListCmd)
+	// list open
+	ballotCmd.AddCommand(ballotListOpenCmd)
+
+	// list closed
+	ballotCmd.AddCommand(ballotListClosedCmd)
 
 	// tally
 	ballotCmd.AddCommand(ballotTallyCmd)

@@ -35,7 +35,7 @@ func TestBallot(t *testing.T) {
 	fmt.Println("open: ", openChg)
 
 	// list
-	ads := ballot.ListOpen(ctx, cty.Gov())
+	ads := ballot.List(ctx, cty.Gov(), false)
 	if len(ads) != 1 {
 		t.Errorf("expecting 1 ad, got %v", len(ads))
 	}

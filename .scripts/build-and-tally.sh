@@ -18,4 +18,6 @@ cat <<EOF >> ~/.gov4git/config.json
 	"gov_private_branch": "gov",
 }
 EOF
-echo ~/.gov4git/config.json
+cat ~/.gov4git/config.json
+
+./gov4git ballot list-open

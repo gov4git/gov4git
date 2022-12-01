@@ -76,7 +76,7 @@ As a community member, you can take part in prioritizing issues by spending your
 
 First, let's list all issues that are open for voting. Run the command:
 ```sh
-gov4git ballot list
+gov4git ballot list-open
 ```
 
 Suppose we are interested in issue #6. Let's take a look at how many votes this issue has collected so far. Run the command:

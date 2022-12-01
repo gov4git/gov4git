@@ -20,4 +20,8 @@ cat <<EOF >> ~/.gov4git/config.json
 EOF
 cat ~/.gov4git/config.json
 
-./gov4git ballot list-open --only_names | xargs -L 1 ./gov4git -v ballot tally --name
+./gov4git ballot list-open --only_names > open-ballots
+echo Tallying open ballots:
+cat open-ballots
+
+cat open-ballots | xargs -L 1 ./gov4git -v ballot tally --name

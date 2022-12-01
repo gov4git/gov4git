@@ -10,7 +10,7 @@
 # The community organizer is the one who owns the community's public git repository.
 
 # __Step 1__ Every participant begins by installing gov4git.
-go install github.com/gov4git/gov4git/gov4git
+go install github.com/gov4git/gov4git/gov4git@latest
 
 # __Step 2__ Participants prepare git repos for their identities and the community.
 
@@ -32,11 +32,16 @@ go install github.com/gov4git/gov4git/gov4git
 
 cat <<EOF >> ~/.gov4git/config
 {
-	"ssh_private_keys_file": "/Users/petar/.ssh/id_rsa",
-	"community_public_url": "git@github.com:petar/community.public.git",
-	"community_public_branch": "gov",
-	"community_private_url": "git@github.com:petar/community.private.git",
-	"community_private_branch": "main",
+     "auth" : {
+          "git@github.com:petar/community.public.git": { "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa" },
+          "git@github.com:petar/community.private.git": { "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa" },
+          "git@github.com:petar/gov4git.public.git": { "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa" },
+          "git@github.com:petar/gov4git.private.git": { "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa" }
+     },
+     "gov_public_url": "git@github.com:petar/community.public.git",
+	"gov_public_branch": "gov",
+	"gov_private_url": "git@github.com:petar/community.private.git",
+	"gov_private_branch": "gov",
 	"member_public_url": "git@github.com:petar/gov4git.public.git",
 	"member_public_branch": "main",
 	"member_private_url": "git@github.com:petar/gov4git.private.git",

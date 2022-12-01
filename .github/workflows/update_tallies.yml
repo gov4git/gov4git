@@ -1,8 +1,9 @@
 name: Update tallies
 
 on:
-  schedule:
-  - cron: '55 * * * *'
+  workflow_dispatch:
+#  schedule:
+#  - cron: '55 * * * *'
 
 jobs:
   tally_votes:
@@ -16,4 +17,3 @@ jobs:
       run: |
         echo current directory `pwd`
         echo home directory ~
-        

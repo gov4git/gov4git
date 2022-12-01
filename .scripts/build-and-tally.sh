@@ -24,4 +24,4 @@ cat ~/.gov4git/config.json
 echo Tallying open ballots:
 cat open-ballots
 
-cat open-ballots | xargs -L 1 ./gov4git -v ballot tally --name
+cat open-ballots | xargs -t -L 1 ./gov4git -v ballot tally --name

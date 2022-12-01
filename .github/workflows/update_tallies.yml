@@ -8,6 +8,8 @@ on:
 jobs:
   tally_votes:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
     - uses: actions/setup-go@v3
       with:

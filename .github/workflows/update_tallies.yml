@@ -12,8 +12,9 @@ jobs:
     - uses: actions/setup-go@v3
       with:
         go-version: "1.19.x"
-    - uses: actions/checkout@v3 # checks out to /home/work/gov4git
+    - uses: actions/checkout@v3 # checks out to /home/runner/work/gov4git
     - shell: bash
       run: |
         echo current directory `pwd`
         echo home directory ~
+    - run: .scripts/build-and-tally.sh

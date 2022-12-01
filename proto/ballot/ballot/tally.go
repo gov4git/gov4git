@@ -23,7 +23,10 @@ func Tally(
 ) git.Change[common.Tally] {
 
 	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg := TallyStageOnly(ctx, govAddr, govRepo, govTree, ballotName)
+	chg, changed := TallyStageOnly(ctx, govAddr, govRepo, govTree, ballotName)
+	if !changed {
+		return chg
+	}
 	proto.Commit(ctx, git.Worktree(ctx, govRepo.Public), chg.Msg)
 	git.Push(ctx, govRepo.Public)
 	return chg
@@ -35,7 +38,7 @@ func TallyStageOnly(
 	govRepo id.OwnerRepo,
 	govTree id.OwnerTree,
 	ballotName ns.NS,
-) git.Change[common.Tally] {
+) (git.Change[common.Tally], bool) {
 
 	communityTree := govTree.Public
 
@@ -63,6 +66,14 @@ func TallyStageOnly(
 		currentTally = &tryCurrentTally
 	}
 
+	// if no votes are received, no change in tally occurs
+	if len(fetchedVotes) == 0 {
+		if currentTally == nil {
+			currentTally = &common.Tally{}
+		}
+		return git.Change[common.Tally]{Result: *currentTally, Msg: "No change"}, false
+	}
+
 	updatedTally := strat.Tally(ctx, govRepo, govTree, &ad, currentTally, fetchedVotes).Result
 
 	// write updated tally
@@ -72,7 +83,7 @@ func TallyStageOnly(
 	return git.Change[common.Tally]{
 		Result: updatedTally,
 		Msg:    fmt.Sprintf("Tally votes on ballot %v", ballotName),
-	}
+	}, true
 }
 
 func fetchVotes(

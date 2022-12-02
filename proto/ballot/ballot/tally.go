@@ -22,25 +22,24 @@ func Tally(
 	ballotName ns.NS,
 ) git.Change[common.Tally] {
 
-	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg, changed := TallyStageOnly(ctx, govAddr, govRepo, govTree, ballotName)
+	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
+	chg, changed := TallyStageOnly(ctx, govAddr, govOwner, ballotName)
 	if !changed {
 		return chg
 	}
-	proto.Commit(ctx, git.Worktree(ctx, govRepo.Public), chg.Msg)
-	git.Push(ctx, govRepo.Public)
+	proto.Commit(ctx, govOwner.Public.Tree(), chg.Msg)
+	govOwner.Public.Push(ctx)
 	return chg
 }
 
 func TallyStageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
-	govRepo id.OwnerRepo,
-	govTree id.OwnerTree,
+	govOwner id.OwnerCloned,
 	ballotName ns.NS,
 ) (git.Change[common.Tally], bool) {
 
-	communityTree := govTree.Public
+	communityTree := govOwner.Public.Tree()
 
 	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName, false)
 
@@ -57,7 +56,7 @@ func TallyStageOnly(
 	var fetchedVotes common.FetchedVotes
 	for i, account := range accounts {
 		fetchedVotes = append(fetchedVotes,
-			fetchVotes(ctx, govAddr, govRepo, govTree, ballotName, users[i], account).Result...)
+			fetchVotes(ctx, govAddr, govOwner, ballotName, users[i], account).Result...)
 	}
 
 	// read current tally
@@ -74,7 +73,7 @@ func TallyStageOnly(
 		return git.Change[common.Tally]{Result: *currentTally, Msg: "No change"}, false
 	}
 
-	updatedTally := strat.Tally(ctx, govRepo, govTree, &ad, currentTally, fetchedVotes).Result
+	updatedTally := strat.Tally(ctx, govOwner, &ad, currentTally, fetchedVotes).Result
 
 	// write updated tally
 	openTallyNS := common.OpenBallotNS(ballotName).Sub(common.TallyFilebase)
@@ -89,8 +88,7 @@ func TallyStageOnly(
 func fetchVotes(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
-	govRepo id.OwnerRepo,
-	govTree id.OwnerTree,
+	govOwner id.OwnerCloned,
 	ballotName ns.NS,
 	user member.User,
 	account member.Account,
@@ -111,10 +109,10 @@ func fetchVotes(
 		return req, nil
 	}
 
-	_, voterPublicTree := git.Clone(ctx, git.Address(account.PublicAddress))
+	voterPublicTree := git.Clone(ctx, git.Address(account.PublicAddress)).Tree()
 	mail.ReceiveSignedStageOnly(
 		ctx,
-		govTree,
+		govOwner,
 		account.PublicAddress,
 		voterPublicTree,
 		common.BallotTopic(ballotName),

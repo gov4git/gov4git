@@ -23,6 +23,7 @@
   - Migrate gov4git governance to dedicated repo
   - Migrate GitHub automation
   - Release dogfood experiment
+  - Explore GitHub blocks for gov4git
 
 ## Next: 2022-11-28
 

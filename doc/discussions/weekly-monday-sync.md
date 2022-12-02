@@ -15,7 +15,14 @@
   - New release [v0.0.2](https://github.com/gov4git/lib4git/releases/tag/v0.0.2) of [lib4git](https://github.com/gov4git/lib4git) including:
     - Support for embedding and tracking repos inside other repos. This is a key functionality for efficient implementation of communication for communities of significant scale (pertains to later milestones in our roadmap).
     - Support for local, on-disk read/write caching of remote repos. This is a key functionality for optimizing the "snappiness" of the gov4git UX. (The functionality will be adopted by the gov4git client at a later opportunity.)
+    - Introduced a new cloning abstraction that carries authentication credentials. This was necessary for GitHub automation purposes.
     - Bug fixes.
+  - Created first-draft GitHub automation for governance
+
+- __Priorities for this week:__
+  - Migrate gov4git governance to dedicated repo
+  - Migrate GitHub automation
+  - Release dogfood experiment
 
 ## Next: 2022-11-28
 

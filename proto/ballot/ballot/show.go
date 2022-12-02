@@ -18,9 +18,7 @@ func Show(
 	closed bool,
 ) common.AdStrategyTally {
 
-	govRepo := git.CloneRepo(ctx, git.Address(govAddr))
-	chg := ShowLocal(ctx, govAddr, git.Worktree(ctx, govRepo), ballotName, closed)
-	return chg
+	return ShowLocal(ctx, govAddr, git.Clone(ctx, git.Address(govAddr)).Tree(), ballotName, closed)
 }
 
 func ShowLocal(

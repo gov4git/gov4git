@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -11,10 +12,10 @@ import (
 )
 
 func SetGroup(ctx context.Context, addr gov.GovAddress, name Group) {
-	r, t := gov.Clone(ctx, addr)
-	chg := SetGroupStageOnly(ctx, t, name)
-	git.Commit(ctx, t, chg.Msg)
-	git.Push(ctx, r)
+	cloned := gov.Clone(ctx, addr)
+	chg := SetGroupStageOnly(ctx, cloned.Tree(), name)
+	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	cloned.Push(ctx)
 }
 
 func SetGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
@@ -22,9 +23,7 @@ func SetGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeN
 }
 
 func IsGroup(ctx context.Context, addr gov.GovAddress, name Group) bool {
-	_, t := gov.Clone(ctx, addr)
-	x := IsGroupLocal(ctx, t, name)
-	return x
+	return IsGroupLocal(ctx, gov.Clone(ctx, addr).Tree(), name)
 }
 
 func IsGroupLocal(ctx context.Context, t *git.Tree, name Group) bool {
@@ -33,10 +32,10 @@ func IsGroupLocal(ctx context.Context, t *git.Tree, name Group) bool {
 }
 
 func AddGroup(ctx context.Context, addr gov.GovAddress, name Group) {
-	r, t := gov.Clone(ctx, addr)
-	chg := AddGroupStageOnly(ctx, t, name)
-	git.Commit(ctx, t, chg.Msg)
-	git.Push(ctx, r)
+	cloned := gov.Clone(ctx, addr)
+	chg := AddGroupStageOnly(ctx, cloned.Tree(), name)
+	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	cloned.Push(ctx)
 }
 
 func AddGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
@@ -47,10 +46,10 @@ func AddGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeN
 }
 
 func RemoveGroup(ctx context.Context, addr gov.GovAddress, name Group) {
-	r, t := gov.Clone(ctx, addr)
-	chg := RemoveGroupStageOnly(ctx, t, name)
-	git.Commit(ctx, t, chg.Msg)
-	git.Push(ctx, r)
+	cloned := gov.Clone(ctx, addr)
+	chg := RemoveGroupStageOnly(ctx, cloned.Tree(), name)
+	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	cloned.Push(ctx)
 }
 
 func RemoveGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {

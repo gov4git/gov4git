@@ -8,12 +8,11 @@ import (
 )
 
 func FetchOwnerCredentials(ctx context.Context, addr OwnerAddress) PrivateCredentials {
-	_, tree := CloneOwner(ctx, addr)
-	return GetOwnerCredentials(ctx, tree)
+	return GetOwnerCredentials(ctx, CloneOwner(ctx, addr))
 }
 
-func GetOwnerCredentials(ctx context.Context, owner OwnerTree) PrivateCredentials {
-	return GetPrivateCredentials(ctx, owner.Private)
+func GetOwnerCredentials(ctx context.Context, owner OwnerCloned) PrivateCredentials {
+	return GetPrivateCredentials(ctx, owner.Private.Tree())
 }
 
 func GetPrivateCredentials(ctx context.Context, privateTree *git.Tree) PrivateCredentials {

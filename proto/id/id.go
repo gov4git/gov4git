@@ -17,23 +17,18 @@ type OwnerAddress struct {
 	Private PrivateAddress
 }
 
-type OwnerRepo struct {
-	Public  *git.Repository
-	Private *git.Repository
+func Clone(ctx context.Context, addr PublicAddress) git.Cloned {
+	return git.Clone(ctx, git.Address(addr))
 }
 
-type OwnerTree struct {
-	Public  *git.Tree
-	Private *git.Tree
+type OwnerCloned struct {
+	Public  git.Cloned
+	Private git.Cloned
 }
 
-func CloneTree(ctx context.Context, addr PublicAddress) *git.Tree {
-	_, publicTree := git.Clone(ctx, git.Address(addr))
-	return publicTree
-}
-
-func CloneOwner(ctx context.Context, ownerAddr OwnerAddress) (OwnerRepo, OwnerTree) {
-	publicRepo, publicTree := git.CloneOrInit(ctx, git.Address(ownerAddr.Public))
-	privateRepo, privateTree := git.CloneOrInit(ctx, git.Address(ownerAddr.Private))
-	return OwnerRepo{Public: publicRepo, Private: privateRepo}, OwnerTree{Public: publicTree, Private: privateTree}
+func CloneOwner(ctx context.Context, ownerAddr OwnerAddress) OwnerCloned {
+	return OwnerCloned{
+		Public:  git.CloneOrInit(ctx, git.Address(ownerAddr.Public)),
+		Private: git.CloneOrInit(ctx, git.Address(ownerAddr.Private)),
+	}
 }

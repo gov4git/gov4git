@@ -30,8 +30,8 @@ func (x PriorityPoll) VerifyElections(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
 	govAddr gov.GovAddress,
-	voterTree id.OwnerTree,
-	govTree *git.Tree,
+	voterCloned id.OwnerCloned,
+	govCloned git.Cloned,
 	ad common.Advertisement,
 	elections common.Elections,
 ) {
@@ -40,20 +40,19 @@ func (x PriorityPoll) VerifyElections(
 		for _, el := range elections {
 			spend += math.Abs(el.VoteStrengthChange)
 		}
-		voterCred := id.GetPublicCredentials(ctx, voterTree.Public)
-		user := member.LookupUserByIDLocal(ctx, govTree, voterCred.ID)
+		voterCred := id.GetPublicCredentials(ctx, voterCloned.Public.Tree())
+		user := member.LookupUserByIDLocal(ctx, govCloned.Tree(), voterCred.ID)
 		if len(user) == 0 {
 			must.Errorf(ctx, "cannot find user with id %v in the community", voterCred.ID)
 		}
-		available := balance.GetLocal(ctx, govTree, user[0], VotingCredits)
+		available := balance.GetLocal(ctx, govCloned.Tree(), user[0], VotingCredits)
 		must.Assertf(ctx, available >= spend, "insufficient voting credits %v for elections costing %v", available, spend)
 	}
 }
 
 func (x PriorityPoll) Tally(
 	ctx context.Context,
-	govRepo id.OwnerRepo,
-	govTree id.OwnerTree,
+	govOwner id.OwnerCloned,
 	ad *common.Advertisement,
 	prior *common.Tally,
 	fetched []common.FetchedVote,
@@ -77,7 +76,7 @@ func (x PriorityPoll) Tally(
 			for _, el := range fv.Elections {
 				err := balance.TryTransferStageOnly(
 					ctx,
-					govTree.Public,
+					govOwner.Public.Tree(),
 					fv.Voter, VotingCredits,
 					fv.Voter, VotingCreditsOnHold,
 					math.Abs(el.VoteStrengthChange),
@@ -152,8 +151,7 @@ func (x PriorityPoll) Tally(
 
 func (x PriorityPoll) Close(
 	ctx context.Context,
-	govRepo id.OwnerRepo,
-	govTree id.OwnerTree,
+	govOwner id.OwnerCloned,
 	ad *common.Advertisement,
 	tally *common.Tally,
 	summary common.Summary,
@@ -176,9 +174,9 @@ func (x PriorityPoll) Close(
 			if spent < 0 {
 				continue // don't refund voters against
 			}
-			onHold := balance.GetLocal(ctx, govTree.Public, user, VotingCreditsOnHold)
+			onHold := balance.GetLocal(ctx, govOwner.Public.Tree(), user, VotingCreditsOnHold)
 			refund := min(spent, onHold)
-			balance.TransferStageOnly(ctx, govTree.Public, user, VotingCreditsOnHold, user, VotingCredits, refund)
+			balance.TransferStageOnly(ctx, govOwner.Public.Tree(), user, VotingCreditsOnHold, user, VotingCredits, refund)
 		}
 	}
 

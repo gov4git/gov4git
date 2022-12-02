@@ -24,10 +24,10 @@ func Open(
 	participants member.Group,
 ) git.Change[common.BallotAddress] {
 
-	govRepo, govTree := git.Clone(ctx, git.Address(govAddr))
-	chg := OpenStageOnly(ctx, strat, govAddr, govRepo, govTree, name, title, description, choices, participants)
-	proto.Commit(ctx, govTree, chg.Msg)
-	git.Push(ctx, govRepo)
+	govCloned := git.Clone(ctx, git.Address(govAddr))
+	chg := OpenStageOnly(ctx, strat, govAddr, govCloned, name, title, description, choices, participants)
+	proto.Commit(ctx, govCloned.Tree(), chg.Msg)
+	govCloned.Push(ctx)
 	return chg
 }
 
@@ -35,8 +35,7 @@ func OpenStageOnly(
 	ctx context.Context,
 	strat common.Strategy,
 	govAddr gov.GovAddress,
-	govRepo *git.Repository,
-	govTree *git.Tree,
+	govCloned git.Cloned,
 	name ns.NS,
 	title string,
 	description string,
@@ -46,18 +45,18 @@ func OpenStageOnly(
 
 	// check no open ballots by the same name
 	openAdNS := common.OpenBallotNS(name).Sub(common.AdFilebase)
-	if _, err := govTree.Filesystem.Stat(openAdNS.Path()); err == nil {
+	if _, err := govCloned.Tree().Filesystem.Stat(openAdNS.Path()); err == nil {
 		must.Errorf(ctx, "ballot already exists")
 	}
 
 	// check no closed ballots by the same name
 	closedAdNS := common.ClosedBallotNS(name).Sub(common.AdFilebase)
-	if _, err := govTree.Filesystem.Stat(closedAdNS.Path()); err == nil {
+	if _, err := govCloned.Tree().Filesystem.Stat(closedAdNS.Path()); err == nil {
 		must.Errorf(ctx, "closed ballot with same name exists")
 	}
 
 	// verify group exists
-	if !member.IsGroupLocal(ctx, govTree, participants) {
+	if !member.IsGroupLocal(ctx, govCloned.Tree(), participants) {
 		must.Errorf(ctx, "participant group does not exist")
 	}
 
@@ -70,13 +69,13 @@ func OpenStageOnly(
 		Choices:      choices,
 		Strategy:     strat.Name(),
 		Participants: participants,
-		ParentCommit: git.Head(ctx, govRepo),
+		ParentCommit: git.Head(ctx, govCloned.Repo()),
 	}
-	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
+	git.ToFileStage(ctx, govCloned.Tree(), openAdNS.Path(), ad)
 
 	// write strategy
 	openStratNS := common.OpenBallotNS(name).Sub(common.StrategyFilebase)
-	git.ToFileStage(ctx, govTree, openStratNS.Path(), strat)
+	git.ToFileStage(ctx, govCloned.Tree(), openStratNS.Path(), strat)
 
 	return git.Change[common.BallotAddress]{
 		Result: common.BallotAddress{Gov: govAddr, Name: name},

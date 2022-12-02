@@ -20,16 +20,15 @@ type Strategy interface {
 		ctx context.Context,
 		voterAddr id.OwnerAddress,
 		govAddr gov.GovAddress,
-		voterTree id.OwnerTree,
-		govTree *git.Tree,
+		voterCloned id.OwnerCloned,
+		govCloned git.Cloned,
 		ad Advertisement,
 		elections Elections,
 	)
 
 	Tally(
 		ctx context.Context,
-		govRepo id.OwnerRepo,
-		govTree id.OwnerTree,
+		gov id.OwnerCloned,
 		ad *Advertisement,
 		current *Tally,
 		fetched []FetchedVote,
@@ -37,8 +36,7 @@ type Strategy interface {
 
 	Close(
 		ctx context.Context,
-		govRepo id.OwnerRepo,
-		govTree id.OwnerTree,
+		gov id.OwnerCloned,
 		ad *Advertisement,
 		tally *Tally,
 		summary Summary,

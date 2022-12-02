@@ -22,11 +22,11 @@ func Vote(
 	elections common.Elections,
 ) git.Change[mail.SeqNo] {
 
-	govRepo := git.CloneRepo(ctx, git.Address(govAddr))
-	voterRepo, voterTree := id.CloneOwner(ctx, voterAddr)
-	chg := VoteStageOnly(ctx, voterAddr, govAddr, voterTree, govRepo, ballotName, elections)
-	proto.Commit(ctx, voterTree.Public, chg.Msg)
-	git.Push(ctx, voterRepo.Public)
+	govCloned := git.Clone(ctx, git.Address(govAddr))
+	voterOwner := id.CloneOwner(ctx, voterAddr)
+	chg := VoteStageOnly(ctx, voterAddr, govAddr, voterOwner, govCloned, ballotName, elections)
+	proto.Commit(ctx, voterOwner.Public.Tree(), chg.Msg)
+	voterOwner.Public.Push(ctx)
 
 	return chg
 }
@@ -35,24 +35,22 @@ func VoteStageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
 	govAddr gov.GovAddress,
-	voterTree id.OwnerTree,
-	govRepo *git.Repository,
+	voterOwner id.OwnerCloned,
+	govCloned git.Cloned,
 	ballotName ns.NS,
 	elections common.Elections,
 ) git.Change[mail.SeqNo] {
 
-	govTree := git.Worktree(ctx, govRepo)
+	ad, strat := load.LoadStrategy(ctx, govCloned.Tree(), ballotName, false)
 
-	ad, strat := load.LoadStrategy(ctx, govTree, ballotName, false)
-
-	verifyElections(ctx, strat, voterAddr, govAddr, voterTree, govTree, ad, elections)
+	verifyElections(ctx, strat, voterAddr, govAddr, voterOwner, govCloned, ad, elections)
 	envelope := common.VoteEnvelope{
-		AdCommit:  git.Head(ctx, govRepo),
+		AdCommit:  git.Head(ctx, govCloned.Repo()),
 		Ad:        ad,
 		Elections: elections,
 	}
 
-	return mail.SendSignedStageOnly(ctx, voterTree, govTree, common.BallotTopic(ballotName), envelope)
+	return mail.SendSignedStageOnly(ctx, voterOwner, govCloned.Tree(), common.BallotTopic(ballotName), envelope)
 }
 
 func verifyElections(
@@ -60,8 +58,8 @@ func verifyElections(
 	strat common.Strategy,
 	voterAddr id.OwnerAddress,
 	govAddr gov.GovAddress,
-	voterTree id.OwnerTree,
-	govTree *git.Tree,
+	voterOwner id.OwnerCloned,
+	govCloned git.Cloned,
 	ad common.Advertisement,
 	elections common.Elections,
 ) {
@@ -74,7 +72,7 @@ func verifyElections(
 		}
 	}
 
-	strat.VerifyElections(ctx, voterAddr, govAddr, voterTree, govTree, ad, elections)
+	strat.VerifyElections(ctx, voterAddr, govAddr, voterOwner, govCloned, ad, elections)
 }
 
 func stringIsIn(s string, in []string) bool {

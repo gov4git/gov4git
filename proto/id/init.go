@@ -12,23 +12,24 @@ func Init(
 	ctx context.Context,
 	ownerAddr OwnerAddress,
 ) git.Change[PrivateCredentials] {
-	ownerRepo, ownerTree := CloneOwner(ctx, ownerAddr)
-	privChg := InitLocal(ctx, ownerAddr, ownerTree)
+	ownerCloned := CloneOwner(ctx, ownerAddr)
+	privChg := InitLocal(ctx, ownerAddr, ownerCloned)
 
-	git.Push(ctx, ownerRepo.Private)
-	git.Push(ctx, ownerRepo.Public)
+	ownerCloned.Public.Push(ctx)
+	ownerCloned.Private.Push(ctx)
 	return privChg
 }
 
 func InitLocal(
 	ctx context.Context,
 	ownerAddr OwnerAddress,
-	ownerTree OwnerTree,
+	ownerCloned OwnerCloned,
 ) git.Change[PrivateCredentials] {
-	privChg := initPrivateStageOnly(ctx, ownerTree.Private, ownerAddr)
-	pubChg := initPublicStageOnly(ctx, ownerTree.Public, privChg.Result.PublicCredentials)
-	proto.Commit(ctx, ownerTree.Private, privChg.Msg)
-	proto.Commit(ctx, ownerTree.Public, pubChg.Msg)
+
+	privChg := initPrivateStageOnly(ctx, ownerCloned.Private.Tree(), ownerAddr)
+	pubChg := initPublicStageOnly(ctx, ownerCloned.Public.Tree(), privChg.Result.PublicCredentials)
+	proto.Commit(ctx, ownerCloned.Private.Tree(), privChg.Msg)
+	proto.Commit(ctx, ownerCloned.Public.Tree(), pubChg.Msg)
 	return privChg
 }
 

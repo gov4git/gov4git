@@ -9,13 +9,12 @@ import (
 
 type GovAddress id.PublicAddress
 
-func Clone(ctx context.Context, addr GovAddress) (*git.Repository, *git.Tree) {
-	r, t := git.Clone(ctx, git.Address(addr))
-	return r, t
+func Clone(ctx context.Context, addr GovAddress) git.Cloned {
+	return git.Clone(ctx, git.Address(addr))
 }
 
 type OrganizerAddress id.OwnerAddress
 
-func CloneOrganizer(ctx context.Context, addr OrganizerAddress) (id.OwnerRepo, id.OwnerTree) {
+func CloneOrganizer(ctx context.Context, addr OrganizerAddress) id.OwnerCloned {
 	return id.CloneOwner(ctx, id.OwnerAddress(addr))
 }

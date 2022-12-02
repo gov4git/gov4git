@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -18,10 +19,10 @@ type User string
 type Group string
 
 func AddMember(ctx context.Context, addr gov.GovAddress, user User, group Group) {
-	r, t := gov.Clone(ctx, addr)
-	chg := AddMemberStageOnly(ctx, t, user, group)
-	git.Commit(ctx, t, chg.Msg)
-	git.Push(ctx, r)
+	cloned := gov.Clone(ctx, addr)
+	chg := AddMemberStageOnly(ctx, cloned.Tree(), user, group)
+	git.Commit(ctx, cloned.Tree(), chg.Msg)
+	cloned.Push(ctx)
 }
 
 func AddMemberStageOnly(ctx context.Context, t *git.Tree, user User, group Group) git.ChangeNoResult {
@@ -33,9 +34,7 @@ func AddMemberStageOnly(ctx context.Context, t *git.Tree, user User, group Group
 }
 
 func IsMember(ctx context.Context, addr gov.GovAddress, user User, group Group) bool {
-	_, t := gov.Clone(ctx, addr)
-	x := IsMemberLocal(ctx, t, user, group)
-	return x
+	return IsMemberLocal(ctx, gov.Clone(ctx, addr).Tree(), user, group)
 }
 
 func IsMemberLocal(ctx context.Context, t *git.Tree, user User, group Group) bool {
@@ -50,10 +49,10 @@ func IsMemberLocal(ctx context.Context, t *git.Tree, user User, group Group) boo
 }
 
 func RemoveMember(ctx context.Context, addr gov.GovAddress, user User, group Group) {
-	r, t := gov.Clone(ctx, addr)
-	chg := RemoveMemberStageOnly(ctx, t, user, group)
-	git.Commit(ctx, t, chg.Msg)
-	git.Push(ctx, r)
+	cloned := gov.Clone(ctx, addr)
+	chg := RemoveMemberStageOnly(ctx, cloned.Tree(), user, group)
+	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	cloned.Push(ctx)
 }
 
 func RemoveMemberStageOnly(ctx context.Context, t *git.Tree, user User, group Group) git.ChangeNoResult {
@@ -65,9 +64,7 @@ func RemoveMemberStageOnly(ctx context.Context, t *git.Tree, user User, group Gr
 }
 
 func ListUserGroups(ctx context.Context, addr gov.GovAddress, user User) []Group {
-	_, t := gov.Clone(ctx, addr)
-	x := ListUserGroupsLocal(ctx, t, user)
-	return x
+	return ListUserGroupsLocal(ctx, gov.Clone(ctx, addr).Tree(), user)
 }
 
 func ListUserGroupsLocal(ctx context.Context, t *git.Tree, user User) []Group {
@@ -75,9 +72,7 @@ func ListUserGroupsLocal(ctx context.Context, t *git.Tree, user User) []Group {
 }
 
 func ListGroupUsers(ctx context.Context, addr gov.GovAddress, group Group) []User {
-	_, t := gov.Clone(ctx, addr)
-	x := ListGroupUsersLocal(ctx, t, group)
-	return x
+	return ListGroupUsersLocal(ctx, gov.Clone(ctx, addr).Tree(), group)
 }
 
 func ListGroupUsersLocal(ctx context.Context, t *git.Tree, group Group) []User {

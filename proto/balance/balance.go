@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
@@ -57,10 +58,10 @@ func TransferStageOnly(
 }
 
 func Add(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) float64 {
-	r, t := gov.Clone(ctx, addr)
-	prior := AddStageOnly(ctx, t, user, key, value)
-	git.Commit(ctx, t, fmt.Sprintf("Add %v to balance %v of user %v", value, key, user))
-	git.Push(ctx, r)
+	cloned := gov.Clone(ctx, addr)
+	prior := AddStageOnly(ctx, cloned.Tree(), user, key, value)
+	proto.Commit(ctx, cloned.Tree(), fmt.Sprintf("Add %v to balance %v of user %v", value, key, user))
+	cloned.Push(ctx)
 	return prior
 }
 
@@ -71,10 +72,10 @@ func AddStageOnly(ctx context.Context, t *git.Tree, user member.User, key Balanc
 }
 
 func Mul(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) float64 {
-	r, t := gov.Clone(ctx, addr)
-	prior := MulStageOnly(ctx, t, user, key, value)
-	git.Commit(ctx, t, fmt.Sprintf("Multiply %v into balance %v of user %v", value, key, user))
-	git.Push(ctx, r)
+	cloned := gov.Clone(ctx, addr)
+	prior := MulStageOnly(ctx, cloned.Tree(), user, key, value)
+	proto.Commit(ctx, cloned.Tree(), fmt.Sprintf("Multiply %v into balance %v of user %v", value, key, user))
+	cloned.Push(ctx)
 	return prior
 }
 

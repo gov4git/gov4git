@@ -21,22 +21,21 @@ func Process(
 	group member.Group,
 ) git.ChangeNoResult {
 
-	govRepo, govTree := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg := ProcessStageOnly(ctx, govAddr, govRepo, govTree, group)
-	proto.Commit(ctx, git.Worktree(ctx, govRepo.Public), chg.Msg)
-	git.Push(ctx, govRepo.Public)
+	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
+	chg := ProcessStageOnly(ctx, govAddr, govOwner, group)
+	proto.Commit(ctx, govOwner.Public.Tree(), chg.Msg)
+	govOwner.Public.Push(ctx)
 	return chg
 }
 
 func ProcessStageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
-	govRepo id.OwnerRepo,
-	govTree id.OwnerTree,
+	govOwner id.OwnerCloned,
 	group member.Group,
 ) git.ChangeNoResult {
 
-	communityTree := govTree.Public
+	communityTree := govOwner.Public.Tree()
 
 	// list participating users
 	users := member.ListGroupUsersLocal(ctx, communityTree, group)
@@ -51,12 +50,12 @@ func ProcessStageOnly(
 	var fetchedReqs FetchedRequests
 	for i, account := range accounts {
 		fetchedReqs = append(fetchedReqs,
-			fetchUserRequests(ctx, govAddr, govRepo, govTree, users[i], account).Result...)
+			fetchUserRequests(ctx, govAddr, govOwner, users[i], account).Result...)
 	}
 
 	// process requests
 	for _, fetched := range fetchedReqs {
-		processRequestStageOnly(ctx, govAddr, govRepo, govTree, fetched)
+		processRequestStageOnly(ctx, govAddr, govOwner, fetched)
 	}
 
 	return git.ChangeNoResult{
@@ -67,8 +66,7 @@ func ProcessStageOnly(
 func processRequestStageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
-	govRepo id.OwnerRepo,
-	govTree id.OwnerTree,
+	govOwner id.OwnerCloned,
 	fetched FetchedRequest,
 ) {
 	for _, req := range fetched.Requests {
@@ -82,7 +80,7 @@ func processRequestStageOnly(
 		err := must.Try(func() {
 			balance.TransferStageOnly(
 				ctx,
-				govTree.Public,
+				govOwner.Public.Tree(),
 				req.Transfer.FromUser, req.Transfer.FromBalance,
 				req.Transfer.ToUser, req.Transfer.ToBalance,
 				req.Transfer.Amount,
@@ -103,8 +101,7 @@ func processRequestStageOnly(
 func fetchUserRequests(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
-	govRepo id.OwnerRepo,
-	govTree id.OwnerTree,
+	govOwner id.OwnerCloned,
 	user member.User,
 	account member.Account,
 ) git.Change[FetchedRequests] {
@@ -120,12 +117,12 @@ func fetchUserRequests(
 		return req, nil
 	}
 
-	_, userPublicTree := git.Clone(ctx, git.Address(account.PublicAddress))
+	userPublic := git.Clone(ctx, git.Address(account.PublicAddress))
 	mail.ReceiveSignedStageOnly(
 		ctx,
-		govTree,
+		govOwner,
 		account.PublicAddress,
-		userPublicTree,
+		userPublic.Tree(),
 		BureauTopic,
 		respond,
 	)

@@ -24,11 +24,12 @@ func Transfer(
 	amount float64,
 ) git.Change[mail.SeqNo] {
 
-	govRepo := git.CloneRepo(ctx, git.Address(govAddr))
-	userRepo, userTree := id.CloneOwner(ctx, userAddr)
-	chg := TransferStageOnly(ctx, userAddr, govAddr, userTree, govRepo, fromUserOpt, fromBalance, toUser, toBalance, amount)
-	proto.Commit(ctx, userTree.Public, chg.Msg)
-	git.Push(ctx, userRepo.Public)
+	govCloned := git.Clone(ctx, git.Address(govAddr))
+	// userRepo, userTree := id.CloneOwner(ctx, userAddr)
+	userOwner := id.CloneOwner(ctx, userAddr)
+	chg := TransferStageOnly(ctx, userAddr, govAddr, userOwner, govCloned, fromUserOpt, fromBalance, toUser, toBalance, amount)
+	proto.Commit(ctx, userOwner.Public.Tree(), chg.Msg)
+	userOwner.Public.Push(ctx)
 	return chg
 }
 
@@ -36,8 +37,8 @@ func TransferStageOnly(
 	ctx context.Context,
 	userAddr id.OwnerAddress,
 	govAddr gov.GovAddress,
-	userTree id.OwnerTree,
-	govRepo *git.Repository,
+	userOwner id.OwnerCloned,
+	govCloned git.Cloned,
 	fromUserOpt member.User,
 	fromBalance balance.Balance,
 	toUser member.User,
@@ -45,11 +46,11 @@ func TransferStageOnly(
 	amount float64,
 ) git.Change[mail.SeqNo] {
 
-	userCred := id.GetPublicCredentials(ctx, userTree.Public)
+	userCred := id.GetPublicCredentials(ctx, userOwner.Public.Tree())
 
 	// find the user name of userAddr in the community repo
 	if fromUserOpt == "" {
-		us := member.LookupUserByIDLocal(ctx, git.Worktree(ctx, govRepo), userCred.ID)
+		us := member.LookupUserByIDLocal(ctx, govCloned.Tree(), userCred.ID)
 		switch len(us) {
 		case 0:
 			must.Errorf(ctx, "%s not found in community %v", userAddr.Public, govAddr)
@@ -60,7 +61,6 @@ func TransferStageOnly(
 		}
 	}
 
-	govTree := git.Worktree(ctx, govRepo)
 	request := Request{
 		Transfer: &TransferRequest{
 			FromUser:    fromUserOpt,
@@ -71,5 +71,5 @@ func TransferStageOnly(
 		},
 	}
 
-	return mail.SendSignedStageOnly(ctx, userTree, govTree, BureauTopic, request)
+	return mail.SendSignedStageOnly(ctx, userOwner, govCloned.Tree(), BureauTopic, request)
 }

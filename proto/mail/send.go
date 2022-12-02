@@ -54,12 +54,12 @@ func SendStageOnly[M form.Form](
 
 func SendSignedStageOnly[M form.Form](
 	ctx context.Context,
-	senderTree id.OwnerTree,
+	senderCloned id.OwnerCloned,
 	receiver *git.Tree,
 	topic string,
 	msg M,
 ) git.Change[SeqNo] {
-	senderPrivCred := id.GetPrivateCredentials(ctx, senderTree.Private)
+	senderPrivCred := id.GetPrivateCredentials(ctx, senderCloned.Private.Tree())
 	signed := id.Sign(ctx, senderPrivCred, msg)
-	return SendStageOnly(ctx, senderTree.Public, receiver, topic, signed)
+	return SendStageOnly(ctx, senderCloned.Public.Tree(), receiver, topic, signed)
 }

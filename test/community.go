@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
@@ -48,14 +49,14 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 
 func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 
-	govRepo, govTree := git.Clone(ctx, git.Address(x.gov))
+	govCloned := git.Clone(ctx, git.Address(x.gov))
 
 	for i, m := range x.members {
-		member.AddUserByPublicAddressStageOnly(ctx, govTree, x.MemberUser(i), m.Public)
+		member.AddUserByPublicAddressStageOnly(ctx, govCloned.Tree(), x.MemberUser(i), m.Public)
 	}
 
-	git.Commit(ctx, govTree, "add everybody")
-	git.Push(ctx, govRepo)
+	proto.Commit(ctx, govCloned.Tree(), "add everybody")
+	govCloned.Push(ctx)
 }
 
 func (x *TestCommunity) Gov() gov.GovAddress {

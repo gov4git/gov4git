@@ -18,20 +18,20 @@ func (x TestID) OwnerAddress() OwnerAddress {
 	return OwnerAddress{Public: x.PublicAddress(), Private: x.PrivateAddress()}
 }
 
-func (x TestID) OwnerTree() OwnerTree {
-	return OwnerTree{Public: x.Public.Tree, Private: x.Private.Tree}
+func (x TestID) OwnerCloned() OwnerCloned {
+	return OwnerCloned{Public: x.Public, Private: x.Private}
 }
 
 func (x TestID) PublicAddress() PublicAddress {
-	return PublicAddress(x.Public.Address)
+	return PublicAddress(x.Public.Address())
 }
 
 func (x TestID) PrivateAddress() PrivateAddress {
-	return PrivateAddress(x.Private.Address)
+	return PrivateAddress(x.Private.Address())
 }
 
 func (x TestID) String() string {
-	return fmt.Sprintf("test identity, public_dir=%v private_dir=%v\n", x.Public.Dir, x.Private.Dir)
+	return fmt.Sprintf("test identity, public_dir=%v private_dir=%v\n", x.Public.Dir(), x.Private.Dir())
 }
 
 func NewTestID(ctx context.Context, t *testing.T, branch git.Branch, isBare bool) TestID {

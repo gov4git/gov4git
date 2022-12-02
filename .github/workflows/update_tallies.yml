@@ -7,6 +7,7 @@ on:
 
 jobs:
   tally_votes:
+    environment: governance
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -7,7 +7,7 @@
     - Upgraded lib4git and gov4git with a new auth manager
   - [ScuttleButt](scuttlebutt.nz) is a nice architectural alternative to building dapps over git. Plan to include a comparison in the whitepaper.
   - Found [git appraise](https://github.com/google/git-appraise) and [git bug](https://github.com/MichaelMure/git-bug) as examples of highly-used applications built on top of git. 
-  - We are on the waiting list for [GitHub Blocks (beta)](https://blocks.githubnext.com/)
+  - We have early adopter access to [GitHub Blocks (beta)](https://blocks.githubnext.com/)
   - First draft of dogfood documentation (and UX flow) is in place
     - [How to join the community](../dogfood/how-to-join.md)
     - [How to participate](../dogfood/how-to-participate.md)

@@ -9,7 +9,7 @@ mkdir -p ~/.gov4git
 cat <<EOF >> ~/.gov4git/config.json
 {
      "auth" : {
-          "https://github.com/gov4git/gov4git.git": {
+          "https://github.com/gov4git/governance.git": {
                "user_password": {
                     "user": "$GOVERNANCE_ACCESS_USER",
                     "password": "$GOVERNANCE_ACCESS_TOKEN"
@@ -22,10 +22,10 @@ cat <<EOF >> ~/.gov4git/config.json
                }
           }
      },
-     "gov_public_url": "https://github.com/gov4git/gov4git.git",
-	"gov_public_branch": "gov",
+     "gov_public_url": "https://github.com/gov4git/governance.git",
+	"gov_public_branch": "main",
 	"gov_private_url": "https://github.com/gov4git/gov4git.private.git",
-	"gov_private_branch": "gov"
+	"gov_private_branch": "main"
 }
 EOF
 cat ~/.gov4git/config.json

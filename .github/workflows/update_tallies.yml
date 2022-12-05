@@ -2,8 +2,8 @@ name: Update tallies
 
 on:
   workflow_dispatch:
-#  schedule:
-#  - cron: '55 * * * *'
+  schedule:
+  - cron: '55 * * * *'
 
 jobs:
   tally_votes:

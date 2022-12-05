@@ -4,7 +4,7 @@ You are here because you [requested to join](https://github.com/gov4git/gov4git/
 
 You can now take part in the community governance of the gov4git project. For instance, you could cast votes in prioritizing outstanding issues, as well as donate voting credits to other users you want to empower.
 
-All governance operations and proceedings of our community are recorded in a transparent and verifiable manner in our [GitHub repository](https://github.com/gov4git/gov4git) in a [dedicated branch](https://github.com/gov4git/gov4git/tree/gov).
+All governance operations and proceedings of our community are recorded in a transparent and verifiable manner in our [governance repository](https://github.com/gov4git/governance).
 
 You can interact with our community governance and exercise your member rights (such as voting) using a dedicated command-line client application. A slick web UI is in the making, but for now we assume that you are not the patient kind, and are willing to wrestle the terminal.
 
@@ -29,8 +29,8 @@ gov4git -h
 Before you can use the client, you need to configure it with information about your own identity, as well as the community that you plan to interact this.
 
 You will need the following information handy:
-- The git URL of the community's public repo, which is `https://github.com/gov4git/gov4git.git`
-- The git branch in the community's public repo, where governance proceedings live, which in our case is `gov`
+- The git URL of the community's public repo, which is `https://github.com/gov4git/governance.git`
+- The git branch in the community's public repo, where governance proceedings live, which in our case is `main`
 - The git URL of your identity's public repo, which in my case is `git@github.com:petar/gov4git.public.git` Make sure you use a writable URL, since your client will perform write operations to your own public repo.
 - The git branch in your identity's public repo where your identity resides. In my case, this is `main`.
 - The git URL of your identity's private repo, which in my case is `git@github.com:petar/gov4git.private.git` Make sure you use a writable URL here as well.
@@ -49,7 +49,7 @@ Place the following configuration in a file at path `~/.gov4git/config.json`, ma
                "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa"
           }
      },
-     "gov_public_url": "https://github.com/gov4git/gov4git.git",
+     "gov_public_url": "https://github.com/gov4git/governance.git",
 	"gov_public_branch": "gov",
 	"member_public_url": "git@github.com:petar/gov4git.public.git",
 	"member_public_branch": "main",
@@ -116,7 +116,7 @@ This will display the current tally for issue #6, along with a list of everyone'
 
 ## What next?
 
-We are dogfood-ing a brand new product — governance for git — which is exploring a few different frontiers at once:
+We are dogfood-ing a brand new product which is exploring a few different frontiers at once:
 - What is the right model and UX for governance applications?
 - Can decentralized social applications be built entirely on the git protocol?
 - Can a blockchain-like immutable and verifiable history of governance be implemented by a networked community of git repos?
@@ -127,4 +127,3 @@ Please, don't hesitate to submit feedback in the form of [issues](https://github
 ```sh
 gov4git -v ...
 ```
-

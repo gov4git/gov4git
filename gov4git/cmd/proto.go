@@ -46,6 +46,8 @@ type UserPassword struct {
 
 func (cfg Config) Setup(ctx context.Context) Setup {
 
+	git.SetAuthor("gov4git governance", "no-reply@gov4git.xyz")
+
 	for url, auth := range cfg.Auth {
 		switch {
 		case auth.SSHPrivateKeysFile != nil:

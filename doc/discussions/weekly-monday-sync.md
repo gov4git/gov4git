@@ -1,5 +1,10 @@
 # gov4git sync
 
+## Next: 2022-12-12
+
+- __Updates from the week:__
+  - lib4git: Handle git commit signatures
+
 ## Next: 2022-12-05
 
 - __Updates from the week:__

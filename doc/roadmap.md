@@ -45,9 +45,9 @@ This milestone completed at end of Oct 2022.
   - [x] Balance deductions on ballot closure/clearance
 
 #### Validation
-- [ ] Dogfood deployment on gov4git repo
-  - [ ] Dogfooder docs
-  - [ ] Invite dogfooders (PL/RadX)
+- [x] Dogfood deployment on gov4git repo
+  - [x] Dogfooder docs
+  - [x] Invite dogfooders (PL/RadX/GitHub)
 
 ### Milestone 3a: Document and socialize
 

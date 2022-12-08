@@ -4,6 +4,10 @@
 
 - __Updates from the week:__
   - lib4git: Handle git commit signatures
+  - Dogfood deployment on gov4git is live
+    - Invitations to RadX/GitHub/PL/Microsoft/Govrn
+  - Documentation project [repo](https://github.com/gov4git/doc4git)
+    - XXX
 
 ## Next: 2022-12-05
 

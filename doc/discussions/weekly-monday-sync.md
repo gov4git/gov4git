@@ -7,7 +7,12 @@
   - Dogfood deployment on gov4git is live
     - Invitations to RadX/GitHub/PL/Microsoft/Govrn
   - Documentation project [repo](https://github.com/gov4git/doc4git)
-    - XXX
+    - First draft of section on [applications over git](https://github.com/gov4git/doc4git/blob/main/articles/gov4git_whitepaper.md#decentralized-social-applications-over-git)
+
+- __Priorities for this week:__
+  - Start on documentation for "governance as a lightweight blockchain over git"
+  - UI team planning (roadmap, timelines)
+  - Discussion platform, logo
 
 ## Next: 2022-12-05
 

@@ -31,6 +31,8 @@ type Config struct {
 	MemberPublicBranch  git.Branch `json:"member_public_branch"`
 	MemberPrivateURL    git.URL    `json:"member_private_url"`
 	MemberPrivateBranch git.Branch `json:"member_private_branch"`
+	//
+	CacheDir string `json:"cache_dir"`
 }
 
 type AuthConfig struct {

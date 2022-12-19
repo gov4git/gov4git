@@ -1,5 +1,15 @@
 # gov4git sync
 
+## Next: 2022-12-19
+
+- __Updates from the week:__
+  - [issue tree](https://github.com/gov4git/roadmap/issues/1) roadmap for the UI work
+  - [specs for the UI work](../spec/)
+
+- __Priorities for this week:__
+  - record lightning talk for gov4git
+  - more spec work
+
 ## Next: 2022-12-12
 
 - __Updates from the week:__

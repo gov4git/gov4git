@@ -58,7 +58,7 @@ Place the following configuration in a file at path `~/.gov4git/config.json`, ma
           }
      },
      "gov_public_url": "https://github.com/gov4git/governance.git",
-	"gov_public_branch": "gov",
+	"gov_public_branch": "main",
 	"member_public_url": "git@github.com:petar/gov4git.public.git",
 	"member_public_branch": "main",
 	"member_private_url": "git@github.com:petar/gov4git.private.git",

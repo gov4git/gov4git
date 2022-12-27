@@ -40,3 +40,7 @@ The input to a send operation is:
      `signature` is a Base64 Standard encoding of the signature.
 
      `ed25519_public_key` is a Base64 Standard encoding of the sender's public ED25519 key.
+
+3. drop the message in the sender's public repo (this is [implemented here](https://github.com/gov4git/gov4git/blob/main/proto/mail/send.go#L16))
+
+     - XXX

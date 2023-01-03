@@ -43,4 +43,18 @@ The input to a send operation is:
 
 3. drop the message in the sender's public repo (this is [implemented here](https://github.com/gov4git/gov4git/blob/main/proto/mail/send.go#L16))
 
-     - XXX
+     - sending a message entails writing a file with the message contents into a specific "sent" directory within the sender's repo
+
+     - the path to the "sent" directory is uniquely determined by the receiver's identity and the topic; it is given by
+
+          `/id/mail/sent/{ HashOf(receiver_id) }/{ HashOf(topic) }`
+     
+     where the function `HashOf` (implemented [here](https://github.com/gov4git/lib4git/blob/main/form/bytes.go#L38)) returns the lowercase Base32 Standard encoding with no padding of the SHA256 hash of the argument.
+
+     Let's call the resulting path `SENT_DIR`.
+
+     - read the next available message sequence number from the file `SENT_DIR/next.json`; if present, this file contains a single positive integer, otherwise the next available sequence number is 0. Let's call the string representation of this number `NEXT_SEQNO`.
+     
+     - write the JSON encoding of the signed message (computed in the previous step) to the file `SENT_DIR/NEXT_SEQNO`
+
+     - write the number `NEXT_SEQNO+1` in JSON format to the file `SENT_DIR/next.json`

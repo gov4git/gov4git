@@ -44,6 +44,6 @@ To cast a vote, the user must specify the ballot name and a set of elections.
 
      - use the [send](send.md) operation to send the vote envelope from the voter to the community governance, using topic `"ballot:BALLOT_NAME"`, where `BALLOT_NAME` is the path string corresponding to the ballot name
 
-          - note that the ballot name is a list of strings, e.g. `["a", "b", "c"]`. the path string corresponding to this ballot name is `"a/b/c"`
+          - note that the ballot name is a list of strings, e.g. `["a", "b", "c"]`; the path string corresponding to this ballot name is `"a/b/c"`
           
           - for reference, the computation of the topic is [implemented here](https://github.com/gov4git/gov4git/blob/main/proto/ballot/common/schema.go#L29)

@@ -86,6 +86,10 @@ gov4git group add --name contributors
 # ... and associate community users with a group.
 gov4git member add --user petar --group contributors
 
+# grant a few voting_credits tokens to user petar
+# voting_credits can be spent on ballots.
+gov4git balance add --user petar --key voting_credits --value 30.00
+
 # __Step 6__ The community organizer opens a new ballot
 # A ballot is a mechanism for soliciting community votes on a set of choices.
 # Ballots can be configured to use a variety of voting and tallying strategies, and

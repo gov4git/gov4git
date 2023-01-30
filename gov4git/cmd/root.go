@@ -23,7 +23,7 @@ var (
 	}
 )
 
-var ctx = context.Background()
+var ctx = git.WithAuth(context.Background(), nil)
 
 var (
 	configPath string
@@ -49,8 +49,6 @@ func init() {
 }
 
 func initAfterFlags() {
-	ctx := context.Background()
-
 	if verbose {
 		base.LogVerbosely()
 	} else {

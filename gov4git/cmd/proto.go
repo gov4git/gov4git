@@ -31,6 +31,8 @@ type Config struct {
 	MemberPublicBranch  git.Branch `json:"member_public_branch"`
 	MemberPrivateURL    git.URL    `json:"member_private_url"`
 	MemberPrivateBranch git.Branch `json:"member_private_branch"`
+	//
+	CacheDir string `json:"cache_dir"`
 }
 
 type AuthConfig struct {
@@ -51,11 +53,11 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 	for url, auth := range cfg.Auth {
 		switch {
 		case auth.SSHPrivateKeysFile != nil:
-			git.SetAuth(url, git.MakeSSHFileAuth(ctx, "git", *auth.SSHPrivateKeysFile))
+			git.SetAuth(ctx, url, git.MakeSSHFileAuth(ctx, "git", *auth.SSHPrivateKeysFile))
 		case auth.AccessToken != nil:
-			git.SetAuth(url, git.MakeTokenAuth(ctx, *auth.AccessToken))
+			git.SetAuth(ctx, url, git.MakeTokenAuth(ctx, *auth.AccessToken))
 		case auth.UserPassword != nil:
-			git.SetAuth(url, git.MakePasswordAuth(ctx, auth.UserPassword.User, auth.UserPassword.Password))
+			git.SetAuth(ctx, url, git.MakePasswordAuth(ctx, auth.UserPassword.User, auth.UserPassword.Password))
 		}
 	}
 

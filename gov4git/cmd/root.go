@@ -9,6 +9,7 @@ import (
 
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/git"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +23,7 @@ var (
 	}
 )
 
-var ctx = context.Background()
+var ctx = git.WithAuth(context.Background(), nil)
 
 var (
 	configPath string
@@ -34,7 +35,7 @@ func init() {
 
 	rootCmd.SilenceUsage = true
 	rootCmd.SilenceErrors = true
-	rootCmd.PersistentFlags().StringVar(&configPath, "config", "", "config file (default is $HOME/.gov4git/config.json)")
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "config file (default is $HOME/.gov4git/config.json)")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "run in developer mode with verbose logging")
 
 	rootCmd.AddCommand(initIDCmd)
@@ -48,8 +49,6 @@ func init() {
 }
 
 func initAfterFlags() {
-	ctx := context.Background()
-
 	if verbose {
 		base.LogVerbosely()
 	} else {
@@ -76,6 +75,10 @@ func initAfterFlags() {
 	config, err := form.DecodeBytes[Config](ctx, data)
 	if err != nil {
 		base.Fatalf("decoding config file (%v)", err)
+	}
+
+	if config.CacheDir != "" {
+		git.UseCache(ctx, config.CacheDir)
 	}
 
 	setup = config.Setup(ctx)

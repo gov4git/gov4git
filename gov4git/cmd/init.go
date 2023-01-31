@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -16,7 +15,6 @@ var (
 		Short: "Initialize public and private repositories of your identity",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			ctx := context.Background()
 			chg := id.Init(ctx, setup.Member)
 			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
 		},

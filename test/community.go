@@ -49,7 +49,7 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 
 func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 
-	govCloned := git.Clone(ctx, git.Address(x.gov))
+	govCloned := git.CloneOne(ctx, git.Address(x.gov))
 
 	for i, m := range x.members {
 		member.AddUserByPublicAddressStageOnly(ctx, govCloned.Tree(), x.MemberUser(i), m.Public)

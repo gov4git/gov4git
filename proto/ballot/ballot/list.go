@@ -17,7 +17,7 @@ func List(
 	closed bool,
 ) []common.Advertisement {
 
-	return ListLocal(ctx, git.Clone(ctx, git.Address(govAddr)).Tree(), closed)
+	return ListLocal(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree(), closed)
 }
 
 func ListLocal(

@@ -18,7 +18,7 @@ type OwnerAddress struct {
 }
 
 func Clone(ctx context.Context, addr PublicAddress) git.Cloned {
-	return git.Clone(ctx, git.Address(addr))
+	return git.CloneOne(ctx, git.Address(addr))
 }
 
 type OwnerCloned struct {
@@ -28,7 +28,7 @@ type OwnerCloned struct {
 
 func CloneOwner(ctx context.Context, ownerAddr OwnerAddress) OwnerCloned {
 	return OwnerCloned{
-		Public:  git.CloneOrInit(ctx, git.Address(ownerAddr.Public)),
-		Private: git.CloneOrInit(ctx, git.Address(ownerAddr.Private)),
+		Public:  git.CloneOne(ctx, git.Address(ownerAddr.Public)),
+		Private: git.CloneOne(ctx, git.Address(ownerAddr.Private)),
 	}
 }

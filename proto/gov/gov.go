@@ -10,7 +10,7 @@ import (
 type GovAddress id.PublicAddress
 
 func Clone(ctx context.Context, addr GovAddress) git.Cloned {
-	return git.Clone(ctx, git.Address(addr))
+	return git.CloneOne(ctx, git.Address(addr))
 }
 
 type OrganizerAddress id.OwnerAddress

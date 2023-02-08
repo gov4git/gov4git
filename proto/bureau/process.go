@@ -117,7 +117,7 @@ func fetchUserRequests(
 		return req, nil
 	}
 
-	userPublic := git.Clone(ctx, git.Address(account.PublicAddress))
+	userPublic := git.CloneOne(ctx, git.Address(account.PublicAddress))
 	mail.ReceiveSignedStageOnly(
 		ctx,
 		govOwner,

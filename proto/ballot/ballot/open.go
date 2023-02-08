@@ -24,7 +24,7 @@ func Open(
 	participants member.Group,
 ) git.Change[common.BallotAddress] {
 
-	govCloned := git.Clone(ctx, git.Address(govAddr))
+	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	chg := OpenStageOnly(ctx, strat, govAddr, govCloned, name, title, description, choices, participants)
 	proto.Commit(ctx, govCloned.Tree(), chg.Msg)
 	govCloned.Push(ctx)

@@ -109,7 +109,7 @@ func fetchVotes(
 		return req, nil
 	}
 
-	voterPublicTree := git.Clone(ctx, git.Address(account.PublicAddress)).Tree()
+	voterPublicTree := git.CloneOne(ctx, git.Address(account.PublicAddress)).Tree()
 	mail.ReceiveSignedStageOnly(
 		ctx,
 		govOwner,

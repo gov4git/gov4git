@@ -18,7 +18,7 @@ func Show(
 	closed bool,
 ) common.AdStrategyTally {
 
-	return ShowLocal(ctx, govAddr, git.Clone(ctx, git.Address(govAddr)).Tree(), ballotName, closed)
+	return ShowLocal(ctx, govAddr, git.CloneOne(ctx, git.Address(govAddr)).Tree(), ballotName, closed)
 }
 
 func ShowLocal(

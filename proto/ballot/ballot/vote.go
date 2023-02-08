@@ -22,7 +22,7 @@ func Vote(
 	elections common.Elections,
 ) git.Change[mail.SeqNo] {
 
-	govCloned := git.Clone(ctx, git.Address(govAddr))
+	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	voterOwner := id.CloneOwner(ctx, voterAddr)
 	chg := VoteStageOnly(ctx, voterAddr, govAddr, voterOwner, govCloned, ballotName, elections)
 	proto.Commit(ctx, voterOwner.Public.Tree(), chg.Msg)

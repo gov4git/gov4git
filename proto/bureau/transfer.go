@@ -24,7 +24,7 @@ func Transfer(
 	amount float64,
 ) git.Change[mail.SeqNo] {
 
-	govCloned := git.Clone(ctx, git.Address(govAddr))
+	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	// userRepo, userTree := id.CloneOwner(ctx, userAddr)
 	userOwner := id.CloneOwner(ctx, userAddr)
 	chg := TransferStageOnly(ctx, userAddr, govAddr, userOwner, govCloned, fromUserOpt, fromBalance, toUser, toBalance, amount)

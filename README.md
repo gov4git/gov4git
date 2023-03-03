@@ -5,6 +5,13 @@ Welcome! This repository hosts the code of gov4git — a decentralized protocol 
 [![gov4git walkthrough](https://img.youtube.com/vi/9oWkN9VNGhI/0.jpg)](https://www.youtube.com/watch?v=9oWkN9VNGhI)
 
 
+## Documentation
+
+gov4git is a framework for programming and deploying governance applications. It is based on a new, radically simple and powerful software architecture for decentralized applications and trusted computation.
+
+- [Summary](https://github.com/gov4git/doc/blob/main/summary/summary.md) of gov4git for users
+- [Whitepaper](https://github.com/gov4git/doc/blob/main/whitepaper/whitepaper.md) describing the software architecture underlying gov4git
+
 ## Status
 
 Gov4git has reached an [MVP milestone](doc/roadmap.md#milestone-2-framework-rewrite--community-features-targeting-end-of-nov-2022), which includes a variety of features:

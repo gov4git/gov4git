@@ -10,14 +10,13 @@ import (
 )
 
 func main() {
-	if base.IsVerbose() {
-		cmd.Execute()
-	} else {
-		err := must.Try(
-			func() { cmd.Execute() },
-		)
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
+	err, stk := must.TryWithStack(
+		func() { cmd.Execute() },
+	)
+	if err != nil {
+		if base.IsVerbose() {
+			fmt.Fprintln(os.Stderr, string(stk))
 		}
+		fmt.Fprint(os.Stderr, err)
 	}
 }

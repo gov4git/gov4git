@@ -14,7 +14,7 @@ gov4git is a framework for programming and deploying governance applications. It
 
 ## Status
 
-Gov4git has reached an [MVP milestone](doc/roadmap.md#milestone-2-framework-rewrite--community-features-targeting-end-of-nov-2022), which includes a variety of features:
+Gov4git has reached an [MVP milestone](https://github.com/gov4git/doc/blob/main/roadmap/gov4git_roadmap.md), which includes a variety of features:
 - identity system for community members
 - community user and group management
 - polling for prioritizing work (such as issues or pull requests) based on quadratic voting

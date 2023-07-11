@@ -1,9 +1,12 @@
 package balance
 
-import "path/filepath"
+import (
+	"strings"
+)
 
 type Balance string
 
 func userPropKey(balanceKey Balance) string {
-	return filepath.Join("balance", string(balanceKey))
+	key := strings.TrimLeft(string(balanceKey), "/")
+	return strings.Join([]string{"balance", key}, "/")
 }

@@ -27,7 +27,7 @@ var (
 				setup.Gov,
 				member.Group(groupName),
 			)
-			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
+			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -41,7 +41,7 @@ var (
 				setup.Gov,
 				member.Group(groupName),
 			)
-			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
+			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -55,7 +55,7 @@ var (
 				setup.Gov,
 				member.Group(groupName),
 			)
-			fmt.Fprint(os.Stdout, form.Pretty(l))
+			fmt.Fprint(os.Stdout, form.SprintJSON(l))
 		},
 	}
 )

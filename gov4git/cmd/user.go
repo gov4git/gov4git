@@ -29,7 +29,7 @@ var (
 				member.User(userName),
 				id.PublicAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
 			)
-			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
+			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -43,7 +43,7 @@ var (
 				setup.Gov,
 				member.User(userName),
 			)
-			// fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
+			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 

@@ -39,7 +39,7 @@ var (
 				ballotChoices,
 				member.Group(ballotGroup),
 			)
-			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
+			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -54,7 +54,7 @@ var (
 				ns.ParseFromPath(ballotName),
 				common.Summary(ballotSummary),
 			)
-			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
+			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -69,7 +69,7 @@ var (
 				ns.ParseFromPath(ballotName),
 				false,
 			)
-			fmt.Fprint(os.Stdout, r)
+			fmt.Fprint(os.Stdout, form.SprintJSON(r))
 		},
 	}
 
@@ -84,7 +84,7 @@ var (
 				ns.ParseFromPath(ballotName),
 				true,
 			)
-			fmt.Fprint(os.Stdout, r)
+			fmt.Fprint(os.Stdout, form.SprintJSON(r))
 		},
 	}
 
@@ -103,7 +103,7 @@ var (
 					fmt.Println(n)
 				}
 			} else {
-				fmt.Fprint(os.Stdout, form.Pretty(ls))
+				fmt.Fprint(os.Stdout, form.SprintJSON(ls))
 			}
 		},
 	}
@@ -123,7 +123,7 @@ var (
 					fmt.Println(n)
 				}
 			} else {
-				fmt.Fprint(os.Stdout, form.Pretty(ls))
+				fmt.Fprint(os.Stdout, form.SprintJSON(ls))
 			}
 		},
 	}
@@ -138,7 +138,7 @@ var (
 				setup.Organizer,
 				ns.ParseFromPath(ballotName),
 			)
-			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
+			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -154,7 +154,7 @@ var (
 				ns.ParseFromPath(ballotName),
 				parseElections(ctx, ballotElectionChoice, ballotElectionStrength),
 			)
-			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
+			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 )

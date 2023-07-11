@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )
 
@@ -43,7 +44,7 @@ var (
 				member.User(balanceUser),
 				balance.Balance(balanceKey),
 			)
-			fmt.Fprint(os.Stdout, v)
+			fmt.Fprint(os.Stdout, form.SprintJSON(v))
 		},
 	}
 
@@ -59,7 +60,7 @@ var (
 				balance.Balance(balanceKey),
 				balanceValue,
 			)
-			fmt.Fprint(os.Stdout, v)
+			fmt.Fprint(os.Stdout, form.SprintJSON(v))
 		},
 	}
 
@@ -75,7 +76,7 @@ var (
 				balance.Balance(balanceKey),
 				balanceValue,
 			)
-			fmt.Fprint(os.Stdout, v)
+			fmt.Fprint(os.Stdout, form.SprintJSON(v))
 		},
 	}
 )

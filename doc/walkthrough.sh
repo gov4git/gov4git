@@ -61,6 +61,31 @@ EOF
 
 # Note that only the organizer of the community has to fill in `community_private_url` and `community_private_branch`.
 
+# Also note that gov4git supports SSH as well as HTTPS urls for git repos.
+# If you were to rewrite the above config using HTTPS, it would look like this:
+
+cat <<EOF >> ~/.gov4git/config
+{
+     "auth" : {
+          "https://github.com/petar/community.public.git": { "access_token": "YOUR_ACCESS_TOKEN" },
+          "https://github.com/petar/community.private.git": { "access_token": "YOUR_ACCESS_TOKEN" },
+          "https://github.com/petar/gov4git.public.git": { "access_token": "YOUR_ACCESS_TOKEN" },
+          "https://github.com/petar/gov4git.private.git": { "access_token": "YOUR_ACCESS_TOKEN" }
+     },
+     "gov_public_url": "https://github.com/petar/community.public.git",
+	"gov_public_branch": "gov",
+	"gov_private_url": "https://github.com/petar/community.private.git",
+	"gov_private_branch": "gov",
+	"member_public_url": "https://github.com/petar/gov4git.public.git",
+	"member_public_branch": "main",
+	"member_private_url": "https://github.com/petar/gov4git.private.git",
+	"member_private_branch": "main"
+}
+EOF
+
+# By default gov4git looks for this config file in `~/.gov4git/config`, however you can specify a custom location
+# using the `--config` flag, e.g. `gov4git --config /path/to/config.json ...`
+
 # __Step 4__ Initialize identities
 
 # __Step 4.1__ Every participant initializes their own identity.

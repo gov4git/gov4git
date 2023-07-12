@@ -16,7 +16,7 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			chg := id.Init(ctx, setup.Member)
-			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
+			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -26,7 +26,7 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			chg := id.Init(ctx, id.OwnerAddress(setup.Organizer))
-			fmt.Fprint(os.Stdout, form.Pretty(chg.Result))
+			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 )

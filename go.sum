@@ -34,8 +34,8 @@ github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da/go.mod h1:cIg4er
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/gov4git/lib4git v0.0.12 h1:l90vxPIYGyArJPsXoaR8td5R8xbIaC4COgGOUNSTSIU=
-github.com/gov4git/lib4git v0.0.12/go.mod h1:bXL67JOVTyh/5FkF5HyabaMk5BxAC08GYbqTjVyrY18=
+github.com/gov4git/lib4git v0.0.13-0.20230711012909-a59852c09fdd h1:biEsh57cnVKydjFPGW2g0fkssOEmvEpPUme31PYZYVw=
+github.com/gov4git/lib4git v0.0.13-0.20230711012909-a59852c09fdd/go.mod h1:bXL67JOVTyh/5FkF5HyabaMk5BxAC08GYbqTjVyrY18=
 github.com/imdario/mergo v0.3.15 h1:M8XP7IuFNsqUx6VPK2P9OSmsYsI/YFaGil0uD21V3dM=
 github.com/imdario/mergo v0.3.15/go.mod h1:WBLT9ZmE3lPoWsEzCh9LPo3TiwVN+ZKEjmz+hD27ysY=
 github.com/inconshreveable/mousetrap v1.0.1 h1:U3uMjPSQEBMNp1lFxmllqCPM6P5u/Xq7Pgzkat/bFNc=

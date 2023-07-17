@@ -21,7 +21,12 @@ var (
 	vendorCreateCmd = &cobra.Command{
 		Use:   "create",
 		Short: "Create a hosted git repo",
-		Long:  ``,
+		Long: `Call the GitHub API to create a new repo. Example usage:
+
+	gov4git vendor create --token=GITHUB_ACCESS_TOKEN --owner=GITHUB_USER_OR_ORG --repo=REPO_NAME 
+
+This creates a public repo. Adding the flag --private will result in creating a private repo.
+		`,
 		Run: func(cmd *cobra.Command, args []string) {
 			vendor := github.NewGitHubVendor(vendorGithubToken)
 			repo, err := vendor.CreateRepo(ctx, vendorRepoName, vendorGithubOwner, vendorRepoPrivate)
@@ -33,7 +38,10 @@ var (
 	vendorRemoveCmd = &cobra.Command{
 		Use:   "remove",
 		Short: "Remove a hosted git repo",
-		Long:  ``,
+		Long: `Call the GitHub API to remove a repo. Example uage:
+
+	gov4git vendor remove --owner=GITHUB_USER_OR_ORG --repo=REPO_NAME
+`,
 		Run: func(cmd *cobra.Command, args []string) {
 			vendor := github.NewGitHubVendor(vendorGithubToken)
 			err := vendor.RemoveRepo(ctx, vendorRepoName, vendorGithubOwner)
@@ -53,15 +61,15 @@ func init() {
 	vendorCmd.AddCommand(vendorCreateCmd)
 	vendorCreateCmd.Flags().StringVar(&vendorGithubToken, "token", "", "GitHub access token")
 	vendorCreateCmd.Flags().StringVar(&vendorGithubOwner, "owner", "", "GitHub owner")
-	vendorCreateCmd.Flags().StringVar(&vendorRepoName, "name", "", "Repo name")
+	vendorCreateCmd.Flags().StringVar(&vendorRepoName, "repo", "", "Repo name")
 	vendorCreateCmd.Flags().BoolVar(&vendorRepoPrivate, "private", false, "Make private repo")
 	vendorCreateCmd.MarkFlagRequired("token")
 	vendorCreateCmd.MarkFlagRequired("owner")
-	vendorCreateCmd.MarkFlagRequired("name")
+	vendorCreateCmd.MarkFlagRequired("repo")
 
 	vendorCmd.AddCommand(vendorRemoveCmd)
 	vendorRemoveCmd.Flags().StringVar(&vendorGithubOwner, "owner", "", "GitHub owner")
-	vendorRemoveCmd.Flags().StringVar(&vendorRepoName, "name", "", "Repo name")
+	vendorRemoveCmd.Flags().StringVar(&vendorRepoName, "repo", "", "Repo name")
 	vendorRemoveCmd.MarkFlagRequired("owner")
-	vendorRemoveCmd.MarkFlagRequired("name")
+	vendorRemoveCmd.MarkFlagRequired("repo")
 }

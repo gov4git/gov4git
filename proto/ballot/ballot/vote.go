@@ -43,6 +43,11 @@ func VoteStageOnly(
 
 	ad, strat := load.LoadStrategy(ctx, govCloned.Tree(), ballotName, false)
 
+	// if the ballot is frozen, refuse to cast a vote
+	if ad.Frozen {
+		must.Errorf(ctx, "ballot is frozen")
+	}
+
 	verifyElections(ctx, strat, voterAddr, govAddr, voterOwner, govCloned, ad, elections)
 	envelope := common.VoteEnvelope{
 		AdCommit:  git.Head(ctx, govCloned.Repo()),

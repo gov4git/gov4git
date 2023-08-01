@@ -38,6 +38,7 @@ type Advertisement struct {
 	Choices      []string       `json:"choices"`
 	Strategy     string         `json:"strategy"`
 	Participants member.Group   `json:"participants_group"`
+	Frozen       bool           `json:"frozen"` // if frozen, the ballot is not accepting votes
 	ParentCommit git.CommitHash `json:"parent_commit"`
 }
 

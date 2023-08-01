@@ -43,6 +43,11 @@ func TallyStageOnly(
 
 	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName, false)
 
+	// if the ballot is frozen, don't tally
+	if ad.Frozen {
+		return git.Change[common.Tally]{Msg: "Ballot is frozen"}, false
+	}
+
 	// list participating users
 	users := member.ListGroupUsersLocal(ctx, communityTree, ad.Participants)
 

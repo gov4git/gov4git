@@ -43,6 +43,34 @@ var (
 		},
 	}
 
+	ballotFreezeCmd = &cobra.Command{
+		Use:   "freeze",
+		Short: "Freeze an open ballot",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			chg := ballot.Freeze(
+				ctx,
+				setup.Organizer,
+				ns.ParseFromPath(ballotName),
+			)
+			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
+		},
+	}
+
+	ballotUnfreezeCmd = &cobra.Command{
+		Use:   "unfreeze",
+		Short: "Unfreeze an open ballot",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			chg := ballot.Unfreeze(
+				ctx,
+				setup.Organizer,
+				ns.ParseFromPath(ballotName),
+			)
+			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
+		},
+	}
+
 	ballotCloseCmd = &cobra.Command{
 		Use:   "close",
 		Short: "Close an open ballot",
@@ -193,6 +221,16 @@ func init() {
 	ballotCloseCmd.MarkFlagRequired("name")
 	ballotCloseCmd.Flags().StringVar(&ballotSummary, "summary", "", "summary")
 	ballotCloseCmd.MarkFlagRequired("summary")
+
+	// freeze
+	ballotCmd.AddCommand(ballotFreezeCmd)
+	ballotFreezeCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotFreezeCmd.MarkFlagRequired("name")
+
+	// unfreeze
+	ballotCmd.AddCommand(ballotUnfreezeCmd)
+	ballotUnfreezeCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotUnfreezeCmd.MarkFlagRequired("name")
 
 	// show open
 	ballotCmd.AddCommand(ballotShowOpenCmd)

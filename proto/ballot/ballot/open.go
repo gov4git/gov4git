@@ -69,6 +69,7 @@ func OpenStageOnly(
 		Choices:      choices,
 		Strategy:     strat.Name(),
 		Participants: participants,
+		Frozen:       false,
 		ParentCommit: git.Head(ctx, govCloned.Repo()),
 	}
 	git.ToFileStage(ctx, govCloned.Tree(), openAdNS.Path(), ad)

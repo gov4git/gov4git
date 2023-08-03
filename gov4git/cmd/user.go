@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/spf13/cobra"
 )
@@ -61,6 +62,20 @@ var (
 			fmt.Fprint(os.Stdout, v)
 		},
 	}
+
+	userListGroupsCmd = &cobra.Command{
+		Use:   "groups",
+		Short: "List user's group memberships",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			l := member.ListUserGroups(
+				ctx,
+				setup.Gov,
+				member.User(userName),
+			)
+			fmt.Fprint(os.Stdout, form.SprintJSON(l))
+		},
+	}
 )
 
 var (
@@ -89,4 +104,8 @@ func init() {
 	userPropGetCmd.MarkFlagRequired("name")
 	userPropGetCmd.Flags().StringVar(&userKey, "key", "", "property key")
 	userPropGetCmd.MarkFlagRequired("key")
+
+	userCmd.AddCommand(userListGroupsCmd)
+	userListGroupsCmd.Flags().StringVar(&userName, "name", "", "user alias within the community")
+	userListGroupsCmd.MarkFlagRequired("name")
 }

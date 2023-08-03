@@ -46,7 +46,20 @@ var (
 	}
 
 	groupListCmd = &cobra.Command{
-		Use:   "list",
+		Use:   "list", // deprecated in favor of `users`
+		Short: "List users in group",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			l := member.ListGroupUsers(
+				ctx,
+				setup.Gov,
+				member.Group(groupName),
+			)
+			fmt.Fprint(os.Stdout, form.SprintJSON(l))
+		},
+	}
+	groupUsersCmd = &cobra.Command{
+		Use:   "users",
 		Short: "List users in group",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {

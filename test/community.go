@@ -55,7 +55,8 @@ func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 		member.AddUserByPublicAddressStageOnly(ctx, govCloned.Tree(), x.MemberUser(i), m.Public)
 	}
 
-	proto.Commit(ctx, govCloned.Tree(), "add everybody")
+	chg := git.NewChangeNoResult("add everybody", "test_add_everybody")
+	proto.Commit(ctx, govCloned.Tree(), chg)
 	govCloned.Push(ctx)
 }
 

@@ -8,6 +8,7 @@ import (
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
@@ -60,7 +61,14 @@ func TransferStageOnly(
 func Add(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) float64 {
 	cloned := gov.Clone(ctx, addr)
 	prior := AddStageOnly(ctx, cloned.Tree(), user, key, value)
-	proto.Commit(ctx, cloned.Tree(), fmt.Sprintf("Add %v to balance %v of user %v", value, key, user))
+	chg := git.NewChange[form.Map, float64](
+		fmt.Sprintf("Add %v to balance %v of user %v", value, key, user),
+		"balance_add",
+		form.Map{"user": user, "balance": key, "value": value},
+		prior,
+		nil,
+	)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 	return prior
 }
@@ -74,7 +82,14 @@ func AddStageOnly(ctx context.Context, t *git.Tree, user member.User, key Balanc
 func Mul(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) float64 {
 	cloned := gov.Clone(ctx, addr)
 	prior := MulStageOnly(ctx, cloned.Tree(), user, key, value)
-	proto.Commit(ctx, cloned.Tree(), fmt.Sprintf("Multiply %v into balance %v of user %v", value, key, user))
+	chg := git.NewChange[form.Map, float64](
+		fmt.Sprintf("Multiply %v into balance %v of user %v", value, key, user),
+		"balance_mul",
+		form.Map{"user": user, "balance": key, "value": value},
+		prior,
+		nil,
+	)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 	return prior
 }

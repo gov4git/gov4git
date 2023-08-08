@@ -12,6 +12,7 @@ import (
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
@@ -56,7 +57,7 @@ func (x PriorityPoll) Tally(
 	ad *common.Advertisement,
 	prior *common.Tally,
 	fetched []common.FetchedVote,
-) git.Change[common.Tally] {
+) git.Change[form.Map, common.Tally] {
 
 	// TODO: key on member+address to account for changes in user → address mapping
 	fetchedVotesMap := map[member.User]common.FetchedVote{}
@@ -139,14 +140,17 @@ func (x PriorityPoll) Tally(
 	}
 	sort.Sort(choiceScores)
 
-	return git.Change[common.Tally]{
-		Result: common.Tally{
+	return git.NewChange(
+		fmt.Sprintf("Tallied QV priority poll scores for ballot %v", ad.Name),
+		"ballot_qv_tally",
+		form.Map{"ballot_name": ad.Name},
+		common.Tally{
 			Ad:     *ad,
 			Votes:  fetchedVotes,
 			Scores: choiceScores,
 		},
-		Msg: fmt.Sprintf("Tallied QV priority poll scores for %v", ad.Name),
-	}
+		nil,
+	)
 }
 
 func (x PriorityPoll) Close(
@@ -155,7 +159,7 @@ func (x PriorityPoll) Close(
 	ad *common.Advertisement,
 	tally *common.Tally,
 	summary common.Summary,
-) git.Change[common.Outcome] {
+) git.Change[form.Map, common.Outcome] {
 
 	if x.UseVotingCredits && summary == SummaryAdopted {
 
@@ -180,13 +184,16 @@ func (x PriorityPoll) Close(
 		}
 	}
 
-	return git.Change[common.Outcome]{
-		Result: common.Outcome{
+	return git.NewChange(
+		fmt.Sprintf("closed ballot %v with outcome %v", ad.Name, summary),
+		"ballot_qv_close",
+		form.Map{"ballot_name": ad.Name},
+		common.Outcome{
 			Summary: summary,
 			Scores:  tally.Scores,
 		},
-		Msg: fmt.Sprintf("closed ballot %v with outcome %v", ad.Name, summary),
-	}
+		nil,
+	)
 }
 
 func min(x, y float64) float64 {

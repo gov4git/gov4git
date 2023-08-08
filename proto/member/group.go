@@ -14,7 +14,7 @@ import (
 func SetGroup(ctx context.Context, addr gov.GovAddress, name Group) {
 	cloned := gov.Clone(ctx, addr)
 	chg := SetGroupStageOnly(ctx, cloned.Tree(), name)
-	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
@@ -34,7 +34,7 @@ func IsGroupLocal(ctx context.Context, t *git.Tree, name Group) bool {
 func AddGroup(ctx context.Context, addr gov.GovAddress, name Group) {
 	cloned := gov.Clone(ctx, addr)
 	chg := AddGroupStageOnly(ctx, cloned.Tree(), name)
-	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
@@ -48,14 +48,12 @@ func AddGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeN
 func RemoveGroup(ctx context.Context, addr gov.GovAddress, name Group) {
 	cloned := gov.Clone(ctx, addr)
 	chg := RemoveGroupStageOnly(ctx, cloned.Tree(), name)
-	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
 func RemoveGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
 	groupsKV.Remove(ctx, groupsNS, t, name)
 	groupUsersKKV.RemovePrimary(ctx, groupUsersNS, t, name) // remove memberships
-	return git.ChangeNoResult{
-		Msg: fmt.Sprintf("Remove group %v", name),
-	}
+	return git.NewChangeNoResult(fmt.Sprintf("Remove group %v", name), "member_remove_group")
 }

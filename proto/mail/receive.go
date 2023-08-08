@@ -28,7 +28,7 @@ func ReceiveStageOnly[Request form.Form, Response form.Form](
 	sender *git.Tree,
 	topic string,
 	respond Responder[Request, Response],
-) git.Change[[]RequestResponse[Request, Response]] {
+) git.Change[form.Map, []RequestResponse[Request, Response]] {
 
 	// prep
 	receiverCred := id.GetPublicCredentials(ctx, receiver)
@@ -67,10 +67,13 @@ func ReceiveStageOnly[Request form.Form, Response form.Form](
 	// write receiver-side next seq no
 	git.ToFileStage(ctx, receiver, receiverNextNS.Path(), receiverLatestNextSeqNo)
 
-	return git.Change[[]RequestResponse[Request, Response]]{
-		Result: rr,
-		Msg:    fmt.Sprintf("Received mail"),
-	}
+	return git.NewChange(
+		fmt.Sprintf("Received mail"),
+		"mail_receive",
+		form.Map{"topic": topic},
+		rr,
+		nil,
+	)
 }
 
 type SignedResponder[Request form.Form, Response form.Form] func(
@@ -86,7 +89,7 @@ func ReceiveSignedStageOnly[Request form.Form, Response form.Form](
 	senderPublic *git.Tree,
 	topic string,
 	respond SignedResponder[Request, Response],
-) git.Change[[]RequestResponse[Request, Response]] {
+) git.Change[form.Map, []RequestResponse[Request, Response]] {
 
 	receiverPrivCred := id.GetOwnerCredentials(ctx, receiverCloned)
 	rr := []RequestResponse[Request, Response]{}
@@ -105,9 +108,12 @@ func ReceiveSignedStageOnly[Request form.Form, Response form.Form](
 		rr = append(rr, RequestResponse[Request, Response]{Request: req, Response: resp})
 		return id.Sign(ctx, receiverPrivCred, resp), nil
 	}
-	ReceiveStageOnly(ctx, receiverCloned.Public.Tree(), senderAddr, senderPublic, topic, signRespond)
-	return git.Change[[]RequestResponse[Request, Response]]{
-		Result: rr,
-		Msg:    fmt.Sprintf("Received signed mail"),
-	}
+	recvOnly := ReceiveStageOnly(ctx, receiverCloned.Public.Tree(), senderAddr, senderPublic, topic, signRespond)
+	return git.NewChange(
+		fmt.Sprintf("Received signed mail."),
+		"mail_receive_signed",
+		form.Map{"topic": topic},
+		rr,
+		form.Forms{recvOnly},
+	)
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/gov4git/gov4git/proto/mail"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
@@ -23,7 +24,7 @@ func Process(
 
 	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg := ProcessStageOnly(ctx, govAddr, govOwner, group)
-	proto.Commit(ctx, govOwner.Public.Tree(), chg.Msg)
+	proto.Commit(ctx, govOwner.Public.Tree(), chg)
 	govOwner.Public.Push(ctx)
 	return chg
 }
@@ -58,9 +59,10 @@ func ProcessStageOnly(
 		processRequestStageOnly(ctx, govAddr, govOwner, fetched)
 	}
 
-	return git.ChangeNoResult{
-		Msg: fmt.Sprintf("Process bureau requests of users in group %v", group),
-	}
+	return git.NewChangeNoResult(
+		fmt.Sprintf("Process bureau requests of users in group %v", group),
+		"bureau_process",
+	)
 }
 
 func processRequestStageOnly(
@@ -104,7 +106,7 @@ func fetchUserRequests(
 	govOwner id.OwnerCloned,
 	user member.User,
 	account member.Account,
-) git.Change[FetchedRequests] {
+) git.Change[form.Map, FetchedRequests] {
 
 	fetched := FetchedRequests{}
 	respond := func(ctx context.Context, req Request, _ id.SignedPlaintext) (resp Request, err error) {
@@ -118,7 +120,7 @@ func fetchUserRequests(
 	}
 
 	userPublic := git.CloneOne(ctx, git.Address(account.PublicAddress))
-	mail.ReceiveSignedStageOnly(
+	recvOnly := mail.ReceiveSignedStageOnly(
 		ctx,
 		govOwner,
 		account.PublicAddress,
@@ -127,8 +129,11 @@ func fetchUserRequests(
 		respond,
 	)
 
-	return git.Change[FetchedRequests]{
-		Result: fetched,
-		Msg:    fmt.Sprintf("Fetched requests from user %v", user),
-	}
+	return git.NewChange(
+		fmt.Sprintf("Fetched requests from user %v", user),
+		"bureau_fetch_user_requests",
+		form.Map{"user": user, "account": account},
+		fetched,
+		form.Forms{recvOnly},
+	)
 }

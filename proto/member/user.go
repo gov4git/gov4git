@@ -16,7 +16,7 @@ import (
 func SetUser(ctx context.Context, addr gov.GovAddress, name User, acct Account) {
 	cloned := gov.Clone(ctx, addr)
 	chg := SetUserStageOnly(ctx, cloned.Tree(), name, acct)
-	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
@@ -47,7 +47,7 @@ func AddUserByPublicAddressStageOnly(ctx context.Context, t *git.Tree, name User
 func AddUser(ctx context.Context, addr gov.GovAddress, name User, acct Account) {
 	cloned := gov.Clone(ctx, addr)
 	chg := AddUserStageOnly(ctx, cloned.Tree(), name, acct)
-	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
@@ -61,16 +61,14 @@ func AddUserStageOnly(ctx context.Context, t *git.Tree, name User, user Account)
 func RemoveUser(ctx context.Context, addr gov.GovAddress, name User) {
 	cloned := gov.Clone(ctx, addr)
 	chg := RemoveUserStageOnly(ctx, cloned.Tree(), name)
-	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
 func RemoveUserStageOnly(ctx context.Context, t *git.Tree, name User) git.ChangeNoResult {
 	usersKV.Remove(ctx, usersNS, t, name)
 	userGroupsKKV.RemovePrimary(ctx, userGroupsNS, t, name) // remove memberships
-	return git.ChangeNoResult{
-		Msg: fmt.Sprintf("Remove user %v", name),
-	}
+	return git.NewChangeNoResult(fmt.Sprintf("Remove user %v", name), "member_remove_user")
 }
 
 // set prop
@@ -78,7 +76,7 @@ func RemoveUserStageOnly(ctx context.Context, t *git.Tree, name User) git.Change
 func SetUserProp[V form.Form](ctx context.Context, addr gov.GovAddress, user User, key string, value V) {
 	cloned := gov.Clone(ctx, addr)
 	chg := SetUserPropStageOnly(ctx, cloned.Tree(), user, key, value)
-	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 

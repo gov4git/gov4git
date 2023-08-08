@@ -22,7 +22,7 @@ func Freeze(
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg := FreezeStageOnly(ctx, govAddr, govCloned, ballotName)
-	proto.Commit(ctx, govCloned.Public.Tree(), chg.Msg)
+	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
 }
@@ -49,5 +49,5 @@ func FreezeStageOnly(
 	openAdNS := common.OpenBallotNS(ballotName).Sub(common.AdFilebase)
 	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
 
-	return git.ChangeNoResult{Msg: fmt.Sprintf("Freeze ballot %v", ballotName)}
+	return git.NewChangeNoResult(fmt.Sprintf("Freeze ballot %v", ballotName), "ballot_freeze")
 }

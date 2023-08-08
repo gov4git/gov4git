@@ -32,7 +32,7 @@ type Strategy interface {
 		ad *Advertisement,
 		current *Tally,
 		fetched []FetchedVote,
-	) git.Change[Tally] // tallying can change other aspects of the repo, like user balances
+	) git.Change[form.Map, Tally] // tallying can change other aspects of the repo, like user balances
 
 	Close(
 		ctx context.Context,
@@ -40,5 +40,5 @@ type Strategy interface {
 		ad *Advertisement,
 		tally *Tally,
 		summary Summary,
-	) git.Change[Outcome]
+	) git.Change[form.Map, Outcome]
 }

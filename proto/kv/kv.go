@@ -34,9 +34,10 @@ func (x KV[K, V]) Set(ctx context.Context, ns ns.NS, t *git.Tree, key K, value V
 	form.ToFile(ctx, t.Filesystem, filepath.Join(keyNS.Path(), keyFilebase), key)
 	form.ToFile(ctx, t.Filesystem, filepath.Join(keyNS.Path(), valueFilebase), value)
 	git.Add(ctx, t, keyNS.Path())
-	return git.ChangeNoResult{
-		Msg: fmt.Sprintf("Change value of %v in namespace %v", key, ns),
-	}
+	return git.NewChangeNoResult(
+		fmt.Sprintf("Change value of %v in namespace %v", key, ns),
+		"kv_set",
+	)
 }
 
 func (x KV[K, V]) Get(ctx context.Context, ns ns.NS, t *git.Tree, key K) V {
@@ -54,9 +55,10 @@ func (x KV[K, V]) GetMany(ctx context.Context, ns ns.NS, t *git.Tree, keys []K) 
 func (x KV[K, V]) Remove(ctx context.Context, ns ns.NS, t *git.Tree, key K) git.ChangeNoResult {
 	_, err := t.Remove(x.KeyNS(ns, key).Path())
 	must.NoError(ctx, err)
-	return git.ChangeNoResult{
-		Msg: fmt.Sprintf("Remove value for %v in namespace %v", key, ns),
-	}
+	return git.NewChangeNoResult(
+		fmt.Sprintf("Remove value for %v in namespace %v", key, ns),
+		"kv_remove",
+	)
 }
 
 func (x KV[K, V]) ListKeys(ctx context.Context, ns ns.NS, t *git.Tree) []K {

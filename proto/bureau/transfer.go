@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/mail"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
@@ -22,13 +23,13 @@ func Transfer(
 	toUser member.User,
 	toBalance balance.Balance,
 	amount float64,
-) git.Change[mail.SeqNo] {
+) git.Change[form.Map, mail.SeqNo] {
 
 	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	// userRepo, userTree := id.CloneOwner(ctx, userAddr)
 	userOwner := id.CloneOwner(ctx, userAddr)
 	chg := TransferStageOnly(ctx, userAddr, govAddr, userOwner, govCloned, fromUserOpt, fromBalance, toUser, toBalance, amount)
-	proto.Commit(ctx, userOwner.Public.Tree(), chg.Msg)
+	proto.Commit(ctx, userOwner.Public.Tree(), chg)
 	userOwner.Public.Push(ctx)
 	return chg
 }
@@ -44,7 +45,7 @@ func TransferStageOnly(
 	toUser member.User,
 	toBalance balance.Balance,
 	amount float64,
-) git.Change[mail.SeqNo] {
+) git.Change[form.Map, mail.SeqNo] {
 
 	userCred := id.GetPublicCredentials(ctx, userOwner.Public.Tree())
 
@@ -71,5 +72,18 @@ func TransferStageOnly(
 		},
 	}
 
-	return mail.SendSignedStageOnly(ctx, userOwner, govCloned.Tree(), BureauTopic, request)
+	sendOnly := mail.SendSignedStageOnly(ctx, userOwner, govCloned.Tree(), BureauTopic, request)
+	return git.NewChange(
+		"Transfer account tokens.",
+		"bureau_transfer",
+		form.Map{
+			"from_user":    fromUserOpt,
+			"from_balance": fromBalance,
+			"to_user":      toUser,
+			"to_balance":   toBalance,
+			"amount":       amount,
+		},
+		sendOnly.Result,
+		form.Forms{sendOnly},
+	)
 }

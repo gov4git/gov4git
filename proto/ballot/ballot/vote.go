@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/mail"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
@@ -20,12 +21,12 @@ func Vote(
 	govAddr gov.GovAddress,
 	ballotName ns.NS,
 	elections common.Elections,
-) git.Change[mail.SeqNo] {
+) git.Change[form.Map, mail.SeqNo] {
 
 	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	voterOwner := id.CloneOwner(ctx, voterAddr)
 	chg := VoteStageOnly(ctx, voterAddr, govAddr, voterOwner, govCloned, ballotName, elections)
-	proto.Commit(ctx, voterOwner.Public.Tree(), chg.Msg)
+	proto.Commit(ctx, voterOwner.Public.Tree(), chg)
 	voterOwner.Public.Push(ctx)
 
 	return chg
@@ -39,7 +40,7 @@ func VoteStageOnly(
 	govCloned git.Cloned,
 	ballotName ns.NS,
 	elections common.Elections,
-) git.Change[mail.SeqNo] {
+) git.Change[form.Map, mail.SeqNo] {
 
 	ad, strat := load.LoadStrategy(ctx, govCloned.Tree(), ballotName, false)
 
@@ -55,7 +56,14 @@ func VoteStageOnly(
 		Elections: elections,
 	}
 
-	return mail.SendSignedStageOnly(ctx, voterOwner, govCloned.Tree(), common.BallotTopic(ballotName), envelope)
+	sendChg := mail.SendSignedStageOnly(ctx, voterOwner, govCloned.Tree(), common.BallotTopic(ballotName), envelope)
+	return git.NewChange(
+		"Cast vote",
+		"ballot_vote",
+		form.Map{"ballot_name": ballotName, "elections": elections},
+		sendChg.Result,
+		form.Forms{sendChg},
+	)
 }
 
 func verifyElections(

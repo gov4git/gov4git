@@ -8,6 +8,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
@@ -22,11 +23,11 @@ func Open(
 	description string,
 	choices []string,
 	participants member.Group,
-) git.Change[common.BallotAddress] {
+) git.Change[form.Map, common.BallotAddress] {
 
 	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	chg := OpenStageOnly(ctx, strat, govAddr, govCloned, name, title, description, choices, participants)
-	proto.Commit(ctx, govCloned.Tree(), chg.Msg)
+	proto.Commit(ctx, govCloned.Tree(), chg)
 	govCloned.Push(ctx)
 	return chg
 }
@@ -41,7 +42,7 @@ func OpenStageOnly(
 	description string,
 	choices []string,
 	participants member.Group,
-) git.Change[common.BallotAddress] {
+) git.Change[form.Map, common.BallotAddress] {
 
 	// check no open ballots by the same name
 	openAdNS := common.OpenBallotNS(name).Sub(common.AdFilebase)
@@ -78,8 +79,15 @@ func OpenStageOnly(
 	openStratNS := common.OpenBallotNS(name).Sub(common.StrategyFilebase)
 	git.ToFileStage(ctx, govCloned.Tree(), openStratNS.Path(), strat)
 
-	return git.Change[common.BallotAddress]{
-		Result: common.BallotAddress{Gov: govAddr, Name: name},
-		Msg:    fmt.Sprintf("Create ballot of type %v", strat.Name()),
-	}
+	return git.NewChange(
+		fmt.Sprintf("Create ballot of type %v", strat.Name()),
+		"ballot_open",
+		form.Map{
+			"strategy":     strat,
+			"name":         name,
+			"participants": participants,
+		},
+		common.BallotAddress{Gov: govAddr, Name: name},
+		nil,
+	)
 }

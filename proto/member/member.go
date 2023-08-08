@@ -21,16 +21,14 @@ type Group string
 func AddMember(ctx context.Context, addr gov.GovAddress, user User, group Group) {
 	cloned := gov.Clone(ctx, addr)
 	chg := AddMemberStageOnly(ctx, cloned.Tree(), user, group)
-	git.Commit(ctx, cloned.Tree(), chg.Msg)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
 func AddMemberStageOnly(ctx context.Context, t *git.Tree, user User, group Group) git.ChangeNoResult {
 	userGroupsKKV.Set(ctx, userGroupsNS, t, user, group, true)
 	groupUsersKKV.Set(ctx, groupUsersNS, t, group, user, true)
-	return git.ChangeNoResult{
-		Msg: fmt.Sprintf("Added user %v to group %v", user, group),
-	}
+	return git.NewChangeNoResult(fmt.Sprintf("Added user %v to group %v", user, group), "member_add_member")
 }
 
 func IsMember(ctx context.Context, addr gov.GovAddress, user User, group Group) bool {
@@ -51,16 +49,14 @@ func IsMemberLocal(ctx context.Context, t *git.Tree, user User, group Group) boo
 func RemoveMember(ctx context.Context, addr gov.GovAddress, user User, group Group) {
 	cloned := gov.Clone(ctx, addr)
 	chg := RemoveMemberStageOnly(ctx, cloned.Tree(), user, group)
-	proto.Commit(ctx, cloned.Tree(), chg.Msg)
+	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
 func RemoveMemberStageOnly(ctx context.Context, t *git.Tree, user User, group Group) git.ChangeNoResult {
 	userGroupsKKV.Remove(ctx, userGroupsNS, t, user, group)
 	groupUsersKKV.Remove(ctx, groupUsersNS, t, group, user)
-	return git.ChangeNoResult{
-		Msg: fmt.Sprintf("Removed user %v from group %v", user, group),
-	}
+	return git.NewChangeNoResult(fmt.Sprintf("Removed user %v from group %v", user, group), "member_remove_member")
 }
 
 func ListUserGroups(ctx context.Context, addr gov.GovAddress, user User) []Group {

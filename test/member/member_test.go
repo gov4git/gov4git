@@ -28,3 +28,25 @@ func TestUserAddRemove(t *testing.T) {
 		t.Errorf("expecting user to be missing")
 	}
 }
+
+func TestGroupAddRemove(t *testing.T) {
+	ctx := testutil.NewCtx()
+	cty := test.NewTestCommunity(t, ctx, 2)
+
+	u1 := member.User("testuser1")
+	g1 := member.Group("testgroup1")
+
+	member.AddUserByPublicAddress(ctx, cty.Gov(), u1, cty.MemberOwner(0).Public)
+	member.AddGroup(ctx, cty.Gov(), g1)
+	member.AddMember(ctx, cty.Gov(), u1, g1)
+	users1 := member.ListGroupUsers(ctx, cty.Gov(), g1)
+	if len(users1) != 1 || users1[0] != u1 {
+		t.Fatalf("expecting %v, got %v", []member.User{u1}, users1)
+	}
+
+	member.RemoveMember(ctx, cty.Gov(), u1, g1)
+	users2 := member.ListGroupUsers(ctx, cty.Gov(), g1)
+	if len(users2) != 0 {
+		t.Fatalf("expecting no members, got %v", users2)
+	}
+}

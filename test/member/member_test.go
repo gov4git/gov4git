@@ -44,6 +44,15 @@ func TestGroupAddRemove(t *testing.T) {
 	if len(users1) != 1 || users1[0] != u1 {
 		t.Fatalf("expecting %v, got %v", []member.User{u1}, users1)
 	}
+	if !member.IsMember(ctx, cty.Gov(), u1, g1) {
+		t.Errorf("expecting user to be a member")
+	}
+
+	// check user's groups are `everybody` and `testgroup1`
+	groups1 := member.ListUserGroups(ctx, cty.Gov(), u1)
+	if !IsIn(g1, groups1) {
+		t.Errorf("expecting group to be in user's memberships")
+	}
 
 	// remove user from group, check group has no members
 	member.RemoveMember(ctx, cty.Gov(), u1, g1)

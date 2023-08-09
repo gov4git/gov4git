@@ -36,6 +36,7 @@ func TestGroupAddRemove(t *testing.T) {
 	u1 := member.User("testuser1")
 	g1 := member.Group("testgroup1")
 
+	// add user to group, check user is a member
 	member.AddUserByPublicAddress(ctx, cty.Gov(), u1, cty.MemberOwner(0).Public)
 	member.AddGroup(ctx, cty.Gov(), g1)
 	member.AddMember(ctx, cty.Gov(), u1, g1)
@@ -44,9 +45,25 @@ func TestGroupAddRemove(t *testing.T) {
 		t.Fatalf("expecting %v, got %v", []member.User{u1}, users1)
 	}
 
+	// remove user from group, check group has no members
 	member.RemoveMember(ctx, cty.Gov(), u1, g1)
 	users2 := member.ListGroupUsers(ctx, cty.Gov(), g1)
 	if len(users2) != 0 {
 		t.Fatalf("expecting no members, got %v", users2)
 	}
+
+	// verify user is in `everybody`group
+	users3 := member.ListGroupUsers(ctx, cty.Gov(), member.Everybody)
+	if !IsIn(u1, users3) {
+		t.Fatalf("expecting %v, got %v", []member.User{u1}, users3)
+	}
+}
+
+func IsIn[X comparable](query X, list []X) bool {
+	for _, k := range list {
+		if k == query {
+			return true
+		}
+	}
+	return false
 }

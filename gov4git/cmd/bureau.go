@@ -20,6 +20,7 @@ var (
 		Short: "Fetch and process requests from community members",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			bureau.Process(
 				ctx,
 				setup.Organizer,
@@ -33,6 +34,7 @@ var (
 		Short: "Make a transfer request to the community governance",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			bureau.Transfer(
 				ctx,
 				setup.Member,

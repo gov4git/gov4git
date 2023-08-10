@@ -28,6 +28,7 @@ var (
 		Short: "Open a new ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			strat := qv.PriorityPoll{UseVotingCredits: ballotUseVotingCredits}
 			chg := ballot.Open(
 				ctx,
@@ -48,6 +49,7 @@ var (
 		Short: "Freeze an open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			chg := ballot.Freeze(
 				ctx,
 				setup.Organizer,
@@ -62,6 +64,7 @@ var (
 		Short: "Unfreeze an open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			chg := ballot.Unfreeze(
 				ctx,
 				setup.Organizer,
@@ -76,6 +79,7 @@ var (
 		Short: "Close an open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			chg := ballot.Close(
 				ctx,
 				setup.Organizer,
@@ -91,6 +95,7 @@ var (
 		Short: "Show open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			r := ballot.Show(
 				ctx,
 				setup.Gov,
@@ -106,6 +111,7 @@ var (
 		Short: "Show closed ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			r := ballot.Show(
 				ctx,
 				setup.Gov,
@@ -121,6 +127,7 @@ var (
 		Short: "List open ballots",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			ls := ballot.List(
 				ctx,
 				setup.Gov,
@@ -141,6 +148,7 @@ var (
 		Short: "List closed ballots",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			ls := ballot.List(
 				ctx,
 				setup.Gov,
@@ -161,6 +169,7 @@ var (
 		Short: "Fetch current votes and record latest tally",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			chg := ballot.Tally(
 				ctx,
 				setup.Organizer,
@@ -175,6 +184,7 @@ var (
 		Short: "Cast a vote on an open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			chg := ballot.Vote(
 				ctx,
 				setup.Member,

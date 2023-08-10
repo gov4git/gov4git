@@ -21,9 +21,9 @@ func SetUser(ctx context.Context, addr gov.GovAddress, name User, acct Account) 
 }
 
 func SetUserStageOnly(ctx context.Context, t *git.Tree, name User, user Account) git.ChangeNoResult {
-	SetGroupStageOnly(ctx, t, Everybody)
-	AddMemberStageOnly(ctx, t, name, Everybody)
-	return usersKV.Set(ctx, usersNS, t, name, user)
+	SetGroupStageOnly(ctx, t, Everybody)            // create everybody group, if it doesn't exist
+	AddMemberStageOnly(ctx, t, name, Everybody)     // add membership of user to everybody
+	return usersKV.Set(ctx, usersNS, t, name, user) // create the user record
 }
 
 func GetUser(ctx context.Context, addr gov.GovAddress, name User) Account {
@@ -66,8 +66,12 @@ func RemoveUser(ctx context.Context, addr gov.GovAddress, name User) {
 }
 
 func RemoveUserStageOnly(ctx context.Context, t *git.Tree, name User) git.ChangeNoResult {
+	// remove all group memberships of the user
+	for _, g := range ListUserGroupsLocal(ctx, t, name) {
+		RemoveMemberStageOnly(ctx, t, name, g)
+	}
+	// remove user record
 	usersKV.Remove(ctx, usersNS, t, name)
-	userGroupsKKV.RemovePrimary(ctx, userGroupsNS, t, name) // remove memberships
 	return git.NewChangeNoResult(fmt.Sprintf("Remove user %v", name), "member_remove_user")
 }
 

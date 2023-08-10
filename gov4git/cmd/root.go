@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -55,7 +54,9 @@ func initAfterFlags() {
 	} else {
 		base.LogQuietly()
 	}
+}
 
+func LoadConfig() {
 	if configPath == "" {
 		// find home directory
 		home, err := os.UserHomeDir()
@@ -68,7 +69,7 @@ func initAfterFlags() {
 		configPath = filepath.Join(home, LocalAgentPath, "config.json")
 	}
 
-	data, err := ioutil.ReadFile(configPath)
+	data, err := os.ReadFile(configPath)
 	if err != nil {
 		base.Fatalf("reading config file (%v)", err)
 	}
@@ -89,8 +90,15 @@ var (
 	setup Setup
 )
 
-func Execute() {
+func Execute() int {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
+	return 0
+}
+
+func ExecuteWithConfig(cfgPath string) int {
+	configPath = cfgPath
+	return Execute()
 }

@@ -23,6 +23,7 @@ var (
 		Short: "Set user balance",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			balance.Set(
 				ctx,
 				setup.Gov,
@@ -38,6 +39,7 @@ var (
 		Short: "Get user balance",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			v := balance.Get(
 				ctx,
 				setup.Gov,
@@ -53,6 +55,7 @@ var (
 		Short: "Add to user balance",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			v := balance.Add(
 				ctx,
 				setup.Gov,
@@ -69,6 +72,7 @@ var (
 		Short: "Multiply user balance",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			v := balance.Mul(
 				ctx,
 				setup.Gov,

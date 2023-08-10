@@ -24,6 +24,7 @@ var (
 		Short: "Add user to the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			member.AddUserByPublicAddress(
 				ctx,
 				setup.Gov,
@@ -39,6 +40,7 @@ var (
 		Short: "Remove user from the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			member.RemoveUser(
 				ctx,
 				setup.Gov,
@@ -53,6 +55,7 @@ var (
 		Short: "Get user property",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			v := member.GetUserProp[interface{}](
 				ctx,
 				setup.Gov,
@@ -68,6 +71,7 @@ var (
 		Short: "List user's group memberships",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			l := member.ListUserGroups(
 				ctx,
 				setup.Gov,

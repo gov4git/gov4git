@@ -15,6 +15,7 @@ var (
 		Short: "Initialize public and private repositories of your identity",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			chg := id.Init(ctx, setup.Member)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -25,6 +26,7 @@ var (
 		Short: "Initialize public and private repositories of your governance",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			chg := id.Init(ctx, id.OwnerAddress(setup.Organizer))
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},

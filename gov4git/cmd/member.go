@@ -18,6 +18,7 @@ var (
 		Short: "Add member",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			member.AddMember(
 				ctx,
 				setup.Gov,
@@ -32,6 +33,7 @@ var (
 		Short: "Remove member from the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			member.RemoveMember(
 				ctx,
 				setup.Gov,

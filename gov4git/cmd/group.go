@@ -22,6 +22,7 @@ var (
 		Short: "Add group to the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			member.AddGroup(
 				ctx,
 				setup.Gov,
@@ -36,6 +37,7 @@ var (
 		Short: "Remove group from the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			member.RemoveGroup(
 				ctx,
 				setup.Gov,
@@ -50,6 +52,7 @@ var (
 		Short: "List users in group",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			l := member.ListGroupUsers(
 				ctx,
 				setup.Gov,
@@ -63,6 +66,7 @@ var (
 		Short: "List users in group",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
 			l := member.ListGroupUsers(
 				ctx,
 				setup.Gov,

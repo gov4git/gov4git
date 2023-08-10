@@ -1,10 +1,16 @@
 provision # community and one user
 
+# init-id
+
 gov4git --config $WORK/config.json init-gov
 stdout private_key_ed25519
 
+# init-gov
+
 gov4git --config $WORK/config.json init-id
 stdout private_key_ed25519
+
+# user, group, member
 
 gov4git --config $WORK/config.json user add --name member1 --repo ~/member_public --branch main
 gov4git --config $WORK/config.json group list --name everybody
@@ -12,6 +18,14 @@ stdout member1
 
 gov4git --config $WORK/config.json group add --name group1
 gov4git --config $WORK/config.json member add --user member1 --group group1
+
+gov4git --config $WORK/config.json group add --name group2
+gov4git --config $WORK/config.json member add --user member1 --group group2
+gov4git --config $WORK/config.json group list --name group2
+stdout member1
+gov4git --config $WORK/config.json member remove --user member1 --group group2
+gov4git --config $WORK/config.json group list --name group2
+stdout \[\]
 
 gov4git --config $WORK/config.json user remove --name member1
 gov4git --config $WORK/config.json group list --name everybody

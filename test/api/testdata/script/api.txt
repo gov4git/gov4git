@@ -10,7 +10,15 @@ gov4git --config $WORK/config.json user add --name member1 --repo ~/member_publi
 gov4git --config $WORK/config.json group list --name everybody
 stdout member1
 
+gov4git --config $WORK/config.json group add --name group1
+gov4git --config $WORK/config.json member add --user member1 --group group1
+
 gov4git --config $WORK/config.json user remove --name member1
 gov4git --config $WORK/config.json group list --name everybody
 ! stdout member1
+gov4git --config $WORK/config.json group list --name group1
+! stdout member1
 
+gov4git --config $WORK/config.json group remove --name group1
+gov4git --config $WORK/config.json group list --name group1
+stdout \[\]

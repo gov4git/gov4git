@@ -1,0 +1,35 @@
+provision # community and one user
+
+# init-id
+
+gov4git init-gov
+stdout private_key_ed25519
+
+# init-gov
+
+gov4git init-id
+stdout private_key_ed25519
+
+# add user and balance
+
+gov4git user add --name member1 --repo ~/member_public --branch main
+gov4git balance add --key credits --user member1 --value 30.0
+
+# ballot
+
+gov4git ballot open --name ballot_1/xyz --title 'Ballot 1' --desc 'Description 1' --group everybody --choices 'choice-1'
+gov4git ballot list-open
+stdout ballot_1
+
+gov4git ballot vote --name ballot_1/xyz --choices choice-1 --strengths 9.0
+gov4git ballot tally --name ballot_1/xyz
+
+gov4git ballot show-open --name ballot_1/xyz
+stdout '"score": 3'
+
+gov4git ballot close --name ballot_1/xyz --summary accepted
+gov4git ballot list-closed
+stdout ballot_1
+
+gov4git ballot show-closed --name ballot_1/xyz
+stdout '"score": 3'

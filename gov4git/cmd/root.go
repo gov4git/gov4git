@@ -97,3 +97,8 @@ func Execute() int {
 	}
 	return 0
 }
+
+func ExecuteWithConfig(cfgPath string) int {
+	configPath = cfgPath
+	return Execute()
+}

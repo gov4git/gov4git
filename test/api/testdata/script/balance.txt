@@ -2,30 +2,30 @@ provision # community and one user
 
 # init-id
 
-gov4git --config $WORK/config.json init-gov
+gov4git init-gov
 stdout private_key_ed25519
 
 # init-gov
 
-gov4git --config $WORK/config.json init-id
+gov4git init-id
 stdout private_key_ed25519
 
 # add/verify user
 
-gov4git --config $WORK/config.json user add --name member1 --repo ~/member_public --branch main
-gov4git --config $WORK/config.json group list --name everybody
+gov4git user add --name member1 --repo ~/member_public --branch main
+gov4git group list --name everybody
 stdout member1
 
 # balance
 
-gov4git --config $WORK/config.json balance add --key credits --user member1 --value 30.0
-gov4git --config $WORK/config.json balance get --key credits --user member1
+gov4git balance add --key credits --user member1 --value 30.0
+gov4git balance get --key credits --user member1
 stdout 30
 
-gov4git --config $WORK/config.json balance set --key credits --user member1 --value 20.0
-gov4git --config $WORK/config.json balance get --key credits --user member1
+gov4git balance set --key credits --user member1 --value 20.0
+gov4git balance get --key credits --user member1
 stdout 20
 
-gov4git --config $WORK/config.json balance mul --key credits --user member1 --value 5.0
-gov4git --config $WORK/config.json balance get --key credits --user member1
+gov4git balance mul --key credits --user member1 --value 5.0
+gov4git balance get --key credits --user member1
 stdout 100

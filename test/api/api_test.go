@@ -11,7 +11,9 @@ import (
 
 func TestMain(m *testing.M) {
 	resRun := testscript.RunMain(m, map[string]func() int{
-		"gov4git": cmd.Execute,
+		"gov4git": func() int {
+			return cmd.ExecuteWithConfig("config.json")
+		},
 	})
 	os.Exit(resRun)
 }

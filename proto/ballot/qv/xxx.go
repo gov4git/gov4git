@@ -2,29 +2,24 @@ package qv
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
-	"github.com/gov4git/lib4git/must"
 )
 
 func Tally_XXX(
 	ctx context.Context,
-	govOwner id.OwnerCloned,
+	owner id.OwnerCloned,
 	ad *common.Advertisement,
-	prior *common.Tally,
-	fetched []common.FetchedVote, // newly fetched votes from participating users
-) git.Change[form.Map, common.Tally] {
+	prior *common.Tally2,
+	fetched map[member.User]common.Elections, // newly fetched votes from participating users
+) git.Change[form.Map, common.Tally2] {
 
-	// group old and new votes by user
-	oldVotesByUser := map[member.User]common.FetchedVote{}
-	if prior != nil { // load prior participant votes
-		oldVotesByUser = GroupVotesByUser(ctx, prior.Votes)
-	}
-	newVotesByUser := GroupVotesByUser(ctx, fetched)
+	oldVotesByUser, newVotesByUser := prior.AcceptedVotes, fetched
 
 	// compute set of all users
 	users := map[member.User]bool{}
@@ -35,57 +30,46 @@ func Tally_XXX(
 		users[u] = true
 	}
 
-	// for every user, try adding the new votes to the old ones and charge the user
-	scoredVotesByUser := map[member.User]ScoredVotes{}
-	discardedVotes := common.DiscardedVotes{}
-	XXX // keep track of charges in tally
+	// for every user, try augmenting the old votes with the new ones and charging the user
+	acceptedVotes := map[member.User]common.Elections{}
+	rejectedVotes := map[member.User]common.RejectedElections{}
+	charges := map[member.User]float64{}
+	votesByUser := map[member.User]map[string]common.StrengthAndScore{}
 
 	for u := range users {
 		oldVotes, newVotes := oldVotesByUser[u], newVotesByUser[u]
-		oldScore, newScore := AugmentUserVotes(ctx, oldVotes, newVotes)
-		costDiff := newScore.Cost - oldScore.Cost
+		oldScore, augmentedScore := augmentAndScoreUserVotes(ctx, oldVotes, newVotes)
+		costDiff := augmentedScore.Cost - oldScore.Cost
+
+		XXX // support charge-free voting?
+
 		// try charging the user for the new votes
-		if err := ChargeUser(ctx, govOwner.Public.Tree(), u, costDiff); err != nil {
-			scoredVotesByUser[u] = oldScore
-			discardedVotes = append(discardedVotes, common.DiscardedVote{Vote: newVotes, Reason: err.Error()})
-			XXX // keep track of charges in tally
+		if err := ChargeUser(ctx, owner.Public.Tree(), u, costDiff); err != nil {
+			acceptedVotes[u] = oldVotes
+			rejectedVotes[u] = append(prior.RejectedVotes[u], rejectVotes(newVotes, err)...)
+			charges[u] = prior.Charges[u]
+			votesByUser[u] = oldScore.Score
 		} else {
-			scoredVotesByUser[u] = newScore
-			XXX // keep track of charges in tally
+			acceptedVotes[u] = augmentedScore.Votes
+			rejectedVotes[u] = prior.RejectedVotes[u]
+			charges[u] = prior.Charges[u] + costDiff
+			votesByUser[u] = augmentedScore.Score
 		}
 	}
 
-	panic("XXX")
-}
-
-func AugmentUserVotes(
-	ctx context.Context,
-	oldVotes common.FetchedVote,
-	newVotes common.FetchedVote,
-) (oldScore, newScore ScoredVotes) {
-	oldScore = ScoreAndCostOfUserVotes(ctx, oldVotes)
-	augmentedVotes := common.FetchedVote{
-		Voter:     mergeUser(ctx, oldVotes.Voter, newVotes.Voter),
-		Address:   mergeAddress(oldVotes.Address, newVotes.Address),
-		Elections: append(append(common.Elections{}, oldVotes.Elections...), newVotes.Elections...),
+	tally := common.Tally2{
+		Ad:            *ad,
+		Scores:        totalScore(ad.Choices, votesByUser),
+		VotesByUser:   votesByUser,
+		AcceptedVotes: acceptedVotes,
+		RejectedVotes: rejectedVotes,
+		Charges:       charges,
 	}
-	newScore = ScoreAndCostOfUserVotes(ctx, augmentedVotes)
-	return
-}
-
-func mergeUser(ctx context.Context, u, v member.User) member.User {
-	if u != "" && v != "" {
-		must.Assertf(ctx, u == v, "users must be same")
-	}
-	if v == "" {
-		return u
-	}
-	return v
-}
-
-func mergeAddress(a id.PublicAddress, b id.PublicAddress) id.PublicAddress {
-	if b.IsEmpty() {
-		return a
-	}
-	return b
+	return git.NewChange(
+		fmt.Sprintf("Tallied QV scores for ballot %v", ad.Name),
+		"ballot_qv_tally",
+		form.Map{"ballot_name": ad.Name},
+		tally,
+		nil,
+	)
 }

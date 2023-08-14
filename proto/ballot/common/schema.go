@@ -48,6 +48,7 @@ type BallotAddress struct {
 }
 
 type Election struct {
+	XXX                        // add timestamp
 	VoteChoice         string  `json:"vote_choice"`
 	VoteStrengthChange float64 `json:"vote_strength_change"`
 }
@@ -77,12 +78,27 @@ type Tally struct {
 	// XXX: discarded votes
 }
 
-type DiscardedVote struct {
-	Vote   FetchedVote `json:"fetched_vote"`
-	Reason string      `json:"reason"`
+type Tally2 struct {
+	Ad            Advertisement                               `json:"ballot_advertisement"`
+	Scores        map[string]float64                          `json:"ballot_scores"`        // choice -> score
+	VotesByUser   map[member.User]map[string]StrengthAndScore `json:"ballot_votes_by_user"` // user -> choice -> signed voting credits spent on the choice by the user
+	AcceptedVotes map[member.User]Elections                   `json:"ballot_accepted_votes"`
+	RejectedVotes map[member.User]RejectedElections           `json:"ballot_rejected_votes"`
+	Charges       map[member.User]float64                     `json:"ballot_charges"`
 }
 
-type DiscardedVotes []DiscardedVote
+type StrengthAndScore struct {
+	Strength float64 `json:"strength"` // signed number of voting credits spent by the user
+	Score    float64 `json:"score"`    // qv score, based on the voting strength (above)
+}
+
+type RejectedElection struct {
+	XXX             // add timestamp
+	Vote   Election `json:"rejected_vote"`
+	Reason string   `json:"rejection_reason"`
+}
+
+type RejectedElections []RejectedElection
 
 type FetchedVote struct {
 	Voter     member.User      `json:"voter_user"`
@@ -95,6 +111,8 @@ type FetchedVotes []FetchedVote
 func (x FetchedVotes) Len() int           { return len(x) }
 func (x FetchedVotes) Less(i, j int) bool { return x[i].Voter < x[j].Voter }
 func (x FetchedVotes) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
+
+// XXX: shouldn't be necessary (below)
 
 type ChoiceScore struct {
 	Choice string  `json:"choice"`

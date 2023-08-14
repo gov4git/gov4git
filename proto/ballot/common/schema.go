@@ -74,7 +74,15 @@ type Tally struct {
 	Ad     Advertisement `json:"ballot_advertisement"`
 	Votes  FetchedVotes  `json:"ballot_fetched_votes"`
 	Scores ChoiceScores  `json:"ballot_choice_scores"`
+	// XXX: discarded votes
 }
+
+type DiscardedVote struct {
+	Vote   FetchedVote `json:"fetched_vote"`
+	Reason string      `json:"reason"`
+}
+
+type DiscardedVotes []DiscardedVote
 
 type FetchedVote struct {
 	Voter     member.User      `json:"voter_user"`

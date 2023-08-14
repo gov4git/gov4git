@@ -48,7 +48,7 @@ type BallotAddress struct {
 }
 
 type Election struct {
-	XXX                        // add timestamp
+	// XXX: add timestamp
 	VoteChoice         string  `json:"vote_choice"`
 	VoteStrengthChange float64 `json:"vote_strength_change"`
 }
@@ -75,7 +75,6 @@ type Tally struct {
 	Ad     Advertisement `json:"ballot_advertisement"`
 	Votes  FetchedVotes  `json:"ballot_fetched_votes"`
 	Scores ChoiceScores  `json:"ballot_choice_scores"`
-	// XXX: discarded votes
 }
 
 type Tally2 struct {
@@ -93,7 +92,7 @@ type StrengthAndScore struct {
 }
 
 type RejectedElection struct {
-	XXX             // add timestamp
+	// XXX: add timestamp
 	Vote   Election `json:"rejected_vote"`
 	Reason string   `json:"rejection_reason"`
 }

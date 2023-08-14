@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
@@ -41,10 +42,8 @@ func Tally_XXX(
 		oldScore, augmentedScore := augmentAndScoreUserVotes(ctx, oldVotes, newVotes)
 		costDiff := augmentedScore.Cost - oldScore.Cost
 
-		XXX // support charge-free voting?
-
 		// try charging the user for the new votes
-		if err := ChargeUser(ctx, owner.Public.Tree(), u, costDiff); err != nil {
+		if err := ChargeUser(ctx, owner, u, costDiff); err != nil {
 			acceptedVotes[u] = oldVotes
 			rejectedVotes[u] = append(prior.RejectedVotes[u], rejectVotes(newVotes, err)...)
 			charges[u] = prior.Charges[u]
@@ -72,4 +71,8 @@ func Tally_XXX(
 		tally,
 		nil,
 	)
+}
+
+func ChargeUser(ctx context.Context, owner id.OwnerCloned, user member.User, charge float64) error {
+	return balance.TryChargeStageOnly(ctx, owner.Public.Tree(), user, VotingCredits, charge)
 }

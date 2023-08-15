@@ -25,7 +25,7 @@ func TestQV(t *testing.T) {
 	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 3.0)
 
 	// open
-	strat := qv.PriorityPoll{UseVotingCredits: true}
+	strat := qv.QV{UseVotingCredits: true}
 	openChg := ballot.Open(
 		ctx,
 		strat,

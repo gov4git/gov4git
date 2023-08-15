@@ -17,11 +17,11 @@ func Close(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	ballotName ns.NS,
-	summary common.Summary,
+	cancel bool,
 ) git.Change[form.Map, common.Outcome] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg := CloseStageOnly(ctx, govAddr, govCloned, ballotName, summary)
+	chg := CloseStageOnly(ctx, govAddr, govCloned, ballotName, cancel)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
@@ -32,7 +32,7 @@ func CloseStageOnly(
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
 	ballotName ns.NS,
-	summary common.Summary,
+	cancel bool,
 ) git.Change[form.Map, common.Outcome] {
 
 	govTree := govCloned.Public.Tree()
@@ -40,7 +40,12 @@ func CloseStageOnly(
 	// verify ad and strategy are present
 	ad, strat := load.LoadStrategy(ctx, govTree, ballotName, false)
 	tally := LoadTally(ctx, govTree, ballotName, false)
-	chg := strat.Close(ctx, govCloned, &ad, &tally, summary)
+	var chg git.Change[map[string]form.Form, common.Outcome]
+	if cancel {
+		chg = strat.Cancel(ctx, govCloned, &ad, &tally)
+	} else {
+		chg = strat.Close(ctx, govCloned, &ad, &tally)
+	}
 
 	// write outcome
 	openOutcomeNS := common.OpenBallotNS(ballotName).Sub(common.OutcomeFilebase)

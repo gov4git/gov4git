@@ -5,6 +5,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 )
@@ -22,7 +23,8 @@ type Strategy interface {
 		govAddr gov.GovAddress,
 		voterCloned id.OwnerCloned,
 		govCloned git.Cloned,
-		ad Advertisement,
+		ad *Advertisement,
+		prior *Tally,
 		elections Elections,
 	)
 
@@ -31,7 +33,7 @@ type Strategy interface {
 		gov id.OwnerCloned,
 		ad *Advertisement,
 		current *Tally,
-		fetched []FetchedVote,
+		fetched map[member.User]Elections,
 	) git.Change[form.Map, Tally] // tallying can change other aspects of the repo, like user balances
 
 	Close(
@@ -39,6 +41,12 @@ type Strategy interface {
 		gov id.OwnerCloned,
 		ad *Advertisement,
 		tally *Tally,
-		summary Summary,
+	) git.Change[form.Map, Outcome]
+
+	Cancel(
+		ctx context.Context,
+		gov id.OwnerCloned,
+		ad *Advertisement,
+		tally *Tally,
 	) git.Change[form.Map, Outcome]
 }

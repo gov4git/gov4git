@@ -29,7 +29,7 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			strat := qv.PriorityPoll{UseVotingCredits: ballotUseVotingCredits}
+			strat := qv.QV{}
 			chg := ballot.Open(
 				ctx,
 				strat,
@@ -84,7 +84,7 @@ var (
 				ctx,
 				setup.Organizer,
 				ns.ParseFromPath(ballotName),
-				common.Summary(ballotSummary),
+				ballotCancel,
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -206,7 +206,7 @@ var (
 	ballotElectionChoice   []string
 	ballotElectionStrength []float64
 	ballotUseVotingCredits bool
-	ballotSummary          string
+	ballotCancel           bool
 	ballotOnlyNames        bool
 )
 
@@ -229,8 +229,8 @@ func init() {
 	ballotCmd.AddCommand(ballotCloseCmd)
 	ballotCloseCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
 	ballotCloseCmd.MarkFlagRequired("name")
-	ballotCloseCmd.Flags().StringVar(&ballotSummary, "summary", "", "summary")
-	ballotCloseCmd.MarkFlagRequired("summary")
+	ballotCloseCmd.Flags().BoolVar(&ballotCancel, "cancel", false, "if set, the ballot is cancelled and voters are refunded")
+	ballotCloseCmd.MarkFlagRequired("cancel")
 
 	// freeze
 	ballotCmd.AddCommand(ballotFreezeCmd)

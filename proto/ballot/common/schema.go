@@ -3,7 +3,6 @@ package common
 import (
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/ns"
@@ -72,12 +71,6 @@ func (x VoteEnvelope) VerifyConsistency() bool {
 }
 
 type Tally struct {
-	Ad     Advertisement `json:"ballot_advertisement"`
-	Votes  FetchedVotes  `json:"ballot_fetched_votes"`
-	Scores ChoiceScores  `json:"ballot_choice_scores"`
-}
-
-type Tally2 struct {
 	Ad            Advertisement                               `json:"ballot_advertisement"`
 	Scores        map[string]float64                          `json:"ballot_scores"`        // choice -> score
 	VotesByUser   map[member.User]map[string]StrengthAndScore `json:"ballot_votes_by_user"` // user -> choice -> signed voting credits spent on the choice by the user
@@ -99,31 +92,6 @@ type RejectedElection struct {
 
 type RejectedElections []RejectedElection
 
-type FetchedVote struct {
-	Voter     member.User      `json:"voter_user"`
-	Address   id.PublicAddress `json:"voter_address"`
-	Elections Elections        `json:"voter_elections"`
-}
-
-type FetchedVotes []FetchedVote
-
-func (x FetchedVotes) Len() int           { return len(x) }
-func (x FetchedVotes) Less(i, j int) bool { return x[i].Voter < x[j].Voter }
-func (x FetchedVotes) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
-
-// XXX: shouldn't be necessary (below)
-
-type ChoiceScore struct {
-	Choice string  `json:"choice"`
-	Score  float64 `json:"score"`
-}
-
-type ChoiceScores []ChoiceScore
-
-func (x ChoiceScores) Len() int           { return len(x) }
-func (x ChoiceScores) Less(i, j int) bool { return x[i].Score > x[j].Score }
-func (x ChoiceScores) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
-
 type AdStrategyTally struct {
 	Ad       Advertisement `json:"ballot_advertisement"`
 	Strategy Strategy      `json:"ballot_strategy"`
@@ -133,6 +101,6 @@ type AdStrategyTally struct {
 type Summary string
 
 type Outcome struct {
-	Summary Summary      `json:"ballot_summary"`
-	Scores  ChoiceScores `json:"ballot_choice_scores"`
+	Summary string             `json:"ballot_summary"`
+	Scores  map[string]float64 `json:"ballot_scores"`
 }

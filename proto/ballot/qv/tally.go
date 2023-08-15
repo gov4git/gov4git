@@ -12,13 +12,24 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-func Tally_XXX(
+func (qv QV) Tally(
 	ctx context.Context,
 	owner id.OwnerCloned,
 	ad *common.Advertisement,
-	prior *common.Tally2,
+	prior *common.Tally,
 	fetched map[member.User]common.Elections, // newly fetched votes from participating users
-) git.Change[form.Map, common.Tally2] {
+) git.Change[form.Map, common.Tally] {
+
+	return qv.tally(ctx, owner.Public, ad, prior, fetched)
+}
+
+func (qv QV) tally(
+	ctx context.Context,
+	govCloned git.Cloned, // clone of the public gov repo
+	ad *common.Advertisement,
+	prior *common.Tally,
+	fetched map[member.User]common.Elections, // newly fetched votes from participating users
+) git.Change[form.Map, common.Tally] {
 
 	oldVotesByUser, newVotesByUser := prior.AcceptedVotes, fetched
 
@@ -43,7 +54,7 @@ func Tally_XXX(
 		costDiff := augmentedScore.Cost - oldScore.Cost
 
 		// try charging the user for the new votes
-		if err := ChargeUser(ctx, owner, u, costDiff); err != nil {
+		if err := chargeUser(ctx, govCloned, u, costDiff); err != nil {
 			acceptedVotes[u] = oldVotes
 			rejectedVotes[u] = append(prior.RejectedVotes[u], rejectVotes(newVotes, err)...)
 			charges[u] = prior.Charges[u]
@@ -56,7 +67,7 @@ func Tally_XXX(
 		}
 	}
 
-	tally := common.Tally2{
+	tally := common.Tally{
 		Ad:            *ad,
 		Scores:        totalScore(ad.Choices, votesByUser),
 		VotesByUser:   votesByUser,
@@ -73,6 +84,6 @@ func Tally_XXX(
 	)
 }
 
-func ChargeUser(ctx context.Context, owner id.OwnerCloned, user member.User, charge float64) error {
-	return balance.TryChargeStageOnly(ctx, owner.Public.Tree(), user, VotingCredits, charge)
+func chargeUser(ctx context.Context, govCloned git.Cloned, user member.User, charge float64) error {
+	return balance.TryChargeStageOnly(ctx, govCloned.Tree(), user, VotingCredits, charge)
 }

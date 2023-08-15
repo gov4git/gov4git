@@ -21,7 +21,7 @@ func TestBallot(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := qv.PriorityPoll{UseVotingCredits: false}
+	strat := qv.QV{UseVotingCredits: false}
 	openChg := ballot.Open(
 		ctx,
 		strat,

@@ -85,7 +85,8 @@ func verifyElections(
 		}
 	}
 
-	strat.VerifyElections(ctx, voterAddr, govAddr, voterOwner, govCloned, ad, elections)
+	tally := LoadTally(ctx, govCloned.Tree(), ad.Name, false)
+	strat.VerifyElections(ctx, voterAddr, govAddr, voterOwner, govCloned, &ad, &tally, elections)
 }
 
 func stringIsIn(s string, in []string) bool {

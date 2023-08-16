@@ -1,10 +1,8 @@
 - [x] test voting math and verification
-- [ ] test attempting vote with insufficient funds
+- [x] test attempting vote with insufficient funds
 - [x] test cancel ballot
+- [ ] add timestamps
+- [x] update walkthrough
 
-- add timestamps
-- address all XXX and ???
-
-- update walkthrough
 - remove dogfood deployment
 - cleanup main readme

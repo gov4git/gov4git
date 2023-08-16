@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
@@ -281,7 +282,11 @@ func parseElections(ctx context.Context, choices []string, strengths []float64) 
 	}
 	el := make(common.Elections, len(choices))
 	for i := range choices {
-		el[i] = common.Election{VoteChoice: choices[i], VoteStrengthChange: strengths[i]}
+		el[i] = common.Election{
+			VoteTime:           time.Now(),
+			VoteChoice:         choices[i],
+			VoteStrengthChange: strengths[i],
+		}
 	}
 	return el
 }

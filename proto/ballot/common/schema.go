@@ -1,6 +1,8 @@
 package common
 
 import (
+	"time"
+
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
@@ -47,9 +49,9 @@ type BallotAddress struct {
 }
 
 type Election struct {
-	// XXX: add timestamp
-	VoteChoice         string  `json:"vote_choice"`
-	VoteStrengthChange float64 `json:"vote_strength_change"`
+	VoteTime           time.Time `json:"vote_time"`
+	VoteChoice         string    `json:"vote_choice"`
+	VoteStrengthChange float64   `json:"vote_strength_change"`
 }
 
 type Elections []Election
@@ -74,7 +76,7 @@ type Tally struct {
 	Ad            Advertisement                               `json:"ballot_advertisement"`
 	Scores        map[string]float64                          `json:"ballot_scores"`        // choice -> score
 	VotesByUser   map[member.User]map[string]StrengthAndScore `json:"ballot_votes_by_user"` // user -> choice -> signed voting credits spent on the choice by the user
-	AcceptedVotes map[member.User]Elections                   `json:"ballot_accepted_votes"`
+	AcceptedVotes map[member.User]AcceptedElections           `json:"ballot_accepted_votes"`
 	RejectedVotes map[member.User]RejectedElections           `json:"ballot_rejected_votes"`
 	Charges       map[member.User]float64                     `json:"ballot_charges"`
 }
@@ -84,10 +86,17 @@ type StrengthAndScore struct {
 	Score    float64 `json:"score"`    // qv score, based on the voting strength (above)
 }
 
+type AcceptedElection struct {
+	Time time.Time `json:"accepted_time"`
+	Vote Election  `json:"accepted_vote"`
+}
+
+type AcceptedElections []AcceptedElection
+
 type RejectedElection struct {
-	// XXX: add timestamp
-	Vote   Election `json:"rejected_vote"`
-	Reason string   `json:"rejection_reason"`
+	Time   time.Time `json:"rejected_time"`
+	Vote   Election  `json:"rejected_vote"`
+	Reason string    `json:"rejected_reason"`
 }
 
 type RejectedElections []RejectedElection

@@ -80,7 +80,7 @@ func OpenStageOnly(
 		Ad:            ad,
 		Scores:        map[string]float64{},
 		VotesByUser:   map[member.User]map[string]common.StrengthAndScore{},
-		AcceptedVotes: map[member.User]common.Elections{},
+		AcceptedVotes: map[member.User]common.AcceptedElections{},
 		RejectedVotes: map[member.User]common.RejectedElections{},
 		Charges:       map[member.User]float64{},
 	}

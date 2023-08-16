@@ -45,7 +45,7 @@ func (qv QV) tally(
 	}
 
 	// for every user, try augmenting the old votes with the new ones and charging the user
-	acceptedVotes := map[member.User]common.Elections{}
+	acceptedVotes := map[member.User]common.AcceptedElections{}
 	rejectedVotes := map[member.User]common.RejectedElections{}
 	charges := map[member.User]float64{}
 	votesByUser := map[member.User]map[string]common.StrengthAndScore{}

@@ -134,4 +134,4 @@ gov4git ballot vote --name issue/1 --choices i1 --strengths -1.0
 gov4git ballot tally --name issue/1
 
 # __Step 9__ The community organizer closes the ballot, when its time to conclude and call the outcome
-gov4git ballot close --name issue/1 --summary success
+gov4git ballot close --name issue/1

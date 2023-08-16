@@ -3,24 +3,25 @@ package qv
 import (
 	"context"
 	"math"
+	"time"
 
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/member"
 )
 
 type scoredVotes struct {
-	Votes common.Elections
+	Votes common.AcceptedElections
 	Score map[string]common.StrengthAndScore // choice -> voting strength and resulting score
 	Cost  float64
 }
 
-func scoreUserVotes(ctx context.Context, el common.Elections) scoredVotes {
+func scoreUserVotes(ctx context.Context, el common.AcceptedElections) scoredVotes {
 	// aggregate voting strength on each choice
 	score := map[string]common.StrengthAndScore{}
 	for _, el := range el {
-		x := score[el.VoteChoice]
-		x.Strength += el.VoteStrengthChange
-		score[el.VoteChoice] = x
+		x := score[el.Vote.VoteChoice]
+		x.Strength += el.Vote.VoteStrengthChange
+		score[el.Vote.VoteChoice] = x
 	}
 	// compute score per choice
 	for choice, ss := range score {
@@ -45,17 +46,25 @@ func qvScoreFromStrength(strength float64) float64 {
 	return sign * math.Sqrt(math.Abs(strength))
 }
 
-func augmentAndScoreUserVotes(ctx context.Context, oldVotes common.Elections, newVotes common.Elections) (oldScore, augmentedScore scoredVotes) {
+func augmentAndScoreUserVotes(ctx context.Context, oldVotes common.AcceptedElections, newVotes common.Elections) (oldScore, augmentedScore scoredVotes) {
 	oldScore = scoreUserVotes(ctx, oldVotes)
-	augmentedVotes := append(append(common.Elections{}, oldVotes...), newVotes...)
+	augmentedVotes := append(append(common.AcceptedElections{}, oldVotes...), acceptVotes(newVotes)...)
 	augmentedScore = scoreUserVotes(ctx, augmentedVotes)
 	return
+}
+
+func acceptVotes(votes common.Elections) common.AcceptedElections {
+	r := make(common.AcceptedElections, len(votes))
+	for i, v := range votes {
+		r[i] = common.AcceptedElection{Time: time.Now(), Vote: v}
+	}
+	return r
 }
 
 func rejectVotes(votes common.Elections, reason error) common.RejectedElections {
 	r := make(common.RejectedElections, len(votes))
 	for i, v := range votes {
-		r[i] = common.RejectedElection{Vote: v, Reason: reason.Error()}
+		r[i] = common.RejectedElection{Time: time.Now(), Vote: v, Reason: reason.Error()}
 	}
 	return r
 }

@@ -42,7 +42,7 @@ func TestInsufficientCredits(t *testing.T) {
 
 	// vote
 	elections := common.Elections{
-		{VoteChoice: choices[0], VoteStrengthChange: 2.0},
+		common.NewElection(choices[0], 2.0),
 	}
 	if err := must.Try(
 		func() { ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections) },

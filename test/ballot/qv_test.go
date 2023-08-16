@@ -43,14 +43,14 @@ func TestQV(t *testing.T) {
 	// first round of votes
 	var elections0 [2]common.Elections
 	elections0[0] = common.Elections{
-		{VoteChoice: choices[0], VoteStrengthChange: 2.0},
-		{VoteChoice: choices[1], VoteStrengthChange: 3.0},
-		{VoteChoice: choices[2], VoteStrengthChange: 5.0},
+		common.NewElection(choices[0], 2.0),
+		common.NewElection(choices[1], 3.0),
+		common.NewElection(choices[2], 5.0),
 	}
 	elections0[1] = common.Elections{
-		{VoteChoice: choices[0], VoteStrengthChange: -6.0},
-		{VoteChoice: choices[1], VoteStrengthChange: -4.0},
-		{VoteChoice: choices[2], VoteStrengthChange: -2.0},
+		common.NewElection(choices[0], -6.0),
+		common.NewElection(choices[1], -4.0),
+		common.NewElection(choices[2], -2.0),
 	}
 	voteChg00 := ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections0[0])
 	fmt.Println("vote 0/0: ", form.SprintJSON(voteChg00))

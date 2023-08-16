@@ -48,10 +48,7 @@ func TestBallotClose(t *testing.T) {
 
 	// vote
 	elections := common.Elections{
-		{
-			VoteChoice:         choices[0],
-			VoteStrengthChange: 1.0,
-		},
+		common.NewElection(choices[0], 1.0),
 	}
 	voteChg := ballot.Vote(
 		ctx,
@@ -119,10 +116,7 @@ func TestBallotCancel(t *testing.T) {
 
 	// vote
 	elections := common.Elections{
-		{
-			VoteChoice:         choices[0],
-			VoteStrengthChange: 1.0,
-		},
+		common.NewElection(choices[0], 1.0),
 	}
 	voteChg := ballot.Vote(
 		ctx,

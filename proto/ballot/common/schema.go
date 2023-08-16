@@ -54,6 +54,10 @@ type Election struct {
 	VoteStrengthChange float64   `json:"vote_strength_change"`
 }
 
+func NewElection(choice string, strength float64) Election {
+	return Election{VoteTime: time.Now(), VoteChoice: choice, VoteStrengthChange: strength}
+}
+
 type Elections []Election
 
 type VoteEnvelope struct {

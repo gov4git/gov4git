@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
@@ -231,7 +230,6 @@ func init() {
 	ballotCloseCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
 	ballotCloseCmd.MarkFlagRequired("name")
 	ballotCloseCmd.Flags().BoolVar(&ballotCancel, "cancel", false, "if set, the ballot is cancelled and voters are refunded")
-	ballotCloseCmd.MarkFlagRequired("cancel")
 
 	// freeze
 	ballotCmd.AddCommand(ballotFreezeCmd)
@@ -282,11 +280,7 @@ func parseElections(ctx context.Context, choices []string, strengths []float64) 
 	}
 	el := make(common.Elections, len(choices))
 	for i := range choices {
-		el[i] = common.Election{
-			VoteTime:           time.Now(),
-			VoteChoice:         choices[i],
-			VoteStrengthChange: strengths[i],
-		}
+		el[i] = common.NewElection(choices[i], strengths[i])
 	}
 	return el
 }

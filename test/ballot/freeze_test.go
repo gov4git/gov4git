@@ -42,7 +42,7 @@ func TestFreezeBallot(t *testing.T) {
 
 	// vote
 	elections := common.Elections{
-		{VoteChoice: choices[0], VoteStrengthChange: 1.0},
+		common.NewElection(choices[0], 1.0),
 	}
 	voteChg := ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections)
 	fmt.Println("vote: ", form.SprintJSON(voteChg))

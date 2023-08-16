@@ -1,0 +1,3 @@
+repo = "https://github.com/gov4git/gov4git" # location of the gov4git source repo
+release = "vX.X.X" # use the binaries from this release
+commit = "XXX" # verify that the release commit is this

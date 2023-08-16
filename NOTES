@@ -1,3 +1,7 @@
+- [x] test voting math and verification
+- [ ] test attempting vote with insufficient funds
+- [x] test cancel ballot
+
 - add timestamps
 - address all XXX and ???
 

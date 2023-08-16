@@ -2,8 +2,10 @@ package ballot
 
 import (
 	"fmt"
+	"math"
 	"testing"
 
+	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
@@ -22,7 +24,7 @@ func TestFreezeBallot(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := qv.QV{UseVotingCredits: false}
+	strat := qv.QV{}
 	openChg := ballot.Open(
 		ctx,
 		strat,
@@ -34,6 +36,9 @@ func TestFreezeBallot(t *testing.T) {
 		member.Everybody,
 	)
 	fmt.Println("open: ", openChg)
+
+	// give voter credits
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 1.0)
 
 	// vote
 	elections := common.Elections{
@@ -89,12 +94,12 @@ func TestFreezeBallot(t *testing.T) {
 		ballotName,
 	)
 	fmt.Println("tally: ", tallyChg)
-	if len(tallyChg.Result.Votes) != 1 {
-		t.Errorf("expecting 1 vote, got %v", len(tallyChg.Result.Votes))
+	if tallyChg.Result.Scores[choices[0]] != math.Sqrt(2.0) {
+		t.Errorf("expecting %v vote, got %v", math.Sqrt(2.0), tallyChg.Result.Scores[choices[0]])
 	}
 
 	// close
-	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, common.Summary("ok"))
+	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, false)
 	fmt.Println("close: ", closeChg)
 
 	// testutil.Hang()

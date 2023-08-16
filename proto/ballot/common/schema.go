@@ -1,9 +1,10 @@
 package common
 
 import (
+	"time"
+
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/ns"
@@ -48,8 +49,13 @@ type BallotAddress struct {
 }
 
 type Election struct {
-	VoteChoice         string  `json:"vote_choice"`
-	VoteStrengthChange float64 `json:"vote_strength_change"`
+	VoteTime           time.Time `json:"vote_time"`
+	VoteChoice         string    `json:"vote_choice"`
+	VoteStrengthChange float64   `json:"vote_strength_change"`
+}
+
+func NewElection(choice string, strength float64) Election {
+	return Election{VoteTime: time.Now(), VoteChoice: choice, VoteStrengthChange: strength}
 }
 
 type Elections []Election
@@ -71,33 +77,33 @@ func (x VoteEnvelope) VerifyConsistency() bool {
 }
 
 type Tally struct {
-	Ad     Advertisement `json:"ballot_advertisement"`
-	Votes  FetchedVotes  `json:"ballot_fetched_votes"`
-	Scores ChoiceScores  `json:"ballot_choice_scores"`
+	Ad            Advertisement                               `json:"ballot_advertisement"`
+	Scores        map[string]float64                          `json:"ballot_scores"`        // choice -> score
+	VotesByUser   map[member.User]map[string]StrengthAndScore `json:"ballot_votes_by_user"` // user -> choice -> signed voting credits spent on the choice by the user
+	AcceptedVotes map[member.User]AcceptedElections           `json:"ballot_accepted_votes"`
+	RejectedVotes map[member.User]RejectedElections           `json:"ballot_rejected_votes"`
+	Charges       map[member.User]float64                     `json:"ballot_charges"`
 }
 
-type FetchedVote struct {
-	Voter     member.User      `json:"voter_user"`
-	Address   id.PublicAddress `json:"voter_address"`
-	Elections Elections        `json:"voter_elections"`
+type StrengthAndScore struct {
+	Strength float64 `json:"strength"` // signed number of voting credits spent by the user
+	Score    float64 `json:"score"`    // qv score, based on the voting strength (above)
 }
 
-type FetchedVotes []FetchedVote
-
-func (x FetchedVotes) Len() int           { return len(x) }
-func (x FetchedVotes) Less(i, j int) bool { return x[i].Voter < x[j].Voter }
-func (x FetchedVotes) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
-
-type ChoiceScore struct {
-	Choice string  `json:"choice"`
-	Score  float64 `json:"score"`
+type AcceptedElection struct {
+	Time time.Time `json:"accepted_time"`
+	Vote Election  `json:"accepted_vote"`
 }
 
-type ChoiceScores []ChoiceScore
+type AcceptedElections []AcceptedElection
 
-func (x ChoiceScores) Len() int           { return len(x) }
-func (x ChoiceScores) Less(i, j int) bool { return x[i].Score > x[j].Score }
-func (x ChoiceScores) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
+type RejectedElection struct {
+	Time   time.Time `json:"rejected_time"`
+	Vote   Election  `json:"rejected_vote"`
+	Reason string    `json:"rejected_reason"`
+}
+
+type RejectedElections []RejectedElection
 
 type AdStrategyTally struct {
 	Ad       Advertisement `json:"ballot_advertisement"`
@@ -108,6 +114,6 @@ type AdStrategyTally struct {
 type Summary string
 
 type Outcome struct {
-	Summary Summary      `json:"ballot_summary"`
-	Scores  ChoiceScores `json:"ballot_choice_scores"`
+	Summary string             `json:"ballot_summary"`
+	Scores  map[string]float64 `json:"ballot_scores"`
 }

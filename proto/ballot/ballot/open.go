@@ -75,6 +75,18 @@ func OpenStageOnly(
 	}
 	git.ToFileStage(ctx, govCloned.Tree(), openAdNS.Path(), ad)
 
+	// write initial tally
+	tally := common.Tally{
+		Ad:            ad,
+		Scores:        map[string]float64{},
+		VotesByUser:   map[member.User]map[string]common.StrengthAndScore{},
+		AcceptedVotes: map[member.User]common.AcceptedElections{},
+		RejectedVotes: map[member.User]common.RejectedElections{},
+		Charges:       map[member.User]float64{},
+	}
+	openTallyNS := common.OpenBallotNS(ad.Name).Sub(common.TallyFilebase)
+	git.ToFileStage(ctx, govCloned.Tree(), openTallyNS.Path(), tally)
+
 	// write strategy
 	openStratNS := common.OpenBallotNS(name).Sub(common.StrategyFilebase)
 	git.ToFileStage(ctx, govCloned.Tree(), openStratNS.Path(), strat)

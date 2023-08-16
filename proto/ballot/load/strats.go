@@ -34,8 +34,8 @@ func LoadStrategy(
 		strategyNS = common.OpenBallotNS(ballotName).Sub(common.StrategyFilebase)
 	}
 	switch ad.Strategy {
-	case qv.PriorityPollName:
-		return ad, git.FromFile[qv.PriorityPoll](ctx, govTree, strategyNS.Path())
+	case qv.QVStrategyName:
+		return ad, git.FromFile[qv.QV](ctx, govTree, strategyNS.Path())
 	default:
 		must.Errorf(ctx, "unkonwn ballot strategy %v", ad.Strategy)
 		panic("unreachable")

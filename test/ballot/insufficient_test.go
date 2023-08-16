@@ -16,7 +16,7 @@ import (
 	"github.com/gov4git/lib4git/testutil"
 )
 
-func TestFreezeBallot(t *testing.T) {
+func TestInsufficientCredits(t *testing.T) {
 	ctx := testutil.NewCtx()
 	cty := test.NewTestCommunity(t, ctx, 2)
 
@@ -42,31 +42,21 @@ func TestFreezeBallot(t *testing.T) {
 
 	// vote
 	elections := common.Elections{
-		common.NewElection(choices[0], 1.0),
+		common.NewElection(choices[0], 2.0),
 	}
-	voteChg := ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections)
-	fmt.Println("vote: ", form.SprintJSON(voteChg))
-
-	// freeze ballot
-	freezeChg := ballot.Freeze(ctx, cty.Organizer(), ballotName)
-	fmt.Println("freeze: ", form.SprintJSON(freezeChg))
-
-	// try voting while frozen
-	if must.Try(
+	if err := must.Try(
 		func() { ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections) },
-	) == nil {
-		t.Fatalf("voting on a frozen ballot should have failed")
+	); err != nil {
+		fmt.Println("vote rejected: ", err.Error())
+	} else {
+		t.Fatalf("vote must fail")
 	}
-
-	// unfreeze ballot
-	unfreezeChg := ballot.Unfreeze(ctx, cty.Organizer(), ballotName)
-	fmt.Println("unfreeze: ", form.SprintJSON(unfreezeChg))
 
 	// tally
 	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName)
 	fmt.Println("tally: ", form.SprintJSON(tallyChg))
-	if tallyChg.Result.Scores[choices[0]] != 1.0 {
-		t.Errorf("expecting %v, got %v", 1.0, tallyChg.Result.Scores[choices[0]])
+	if tallyChg.Result.Scores[choices[0]] != 0.0 {
+		t.Errorf("expecting %v, got %v", 0.0, tallyChg.Result.Scores[choices[0]])
 	}
 
 	// close

@@ -13,7 +13,7 @@ stdout private_key_ed25519
 # add user and balance
 
 gov4git user add --name member1 --repo ~/member_public --branch main
-gov4git balance add --key credits --user member1 --value 30.0
+gov4git balance add --key voting_credits --user member1 --value 30.0
 
 # ballot
 
@@ -27,7 +27,7 @@ gov4git ballot tally --name ballot_1/xyz
 gov4git ballot show-open --name ballot_1/xyz
 stdout '"score": 3'
 
-gov4git ballot close --name ballot_1/xyz --summary accepted
+gov4git ballot close --name ballot_1/xyz
 gov4git ballot list-closed
 stdout ballot_1
 

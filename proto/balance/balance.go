@@ -58,6 +58,29 @@ func TransferStageOnly(
 	AddStageOnly(ctx, t, toUser, toBal, amount)
 }
 
+func TryChargeStageOnly(
+	ctx context.Context,
+	t *git.Tree,
+	user member.User,
+	bal Balance,
+	amount float64,
+) error {
+	return must.Try(func() { ChargeStageOnly(ctx, t, user, bal, amount) })
+}
+
+func ChargeStageOnly(
+	ctx context.Context,
+	t *git.Tree,
+	user member.User,
+	bal Balance,
+	amount float64,
+) {
+	base.Infof("charging %v units from %v:%v", amount, user, bal)
+	prior := GetLocal(ctx, t, user, bal)
+	must.Assertf(ctx, prior >= amount, "insufficient balance")
+	AddStageOnly(ctx, t, user, bal, -amount)
+}
+
 func Add(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) float64 {
 	cloned := gov.Clone(ctx, addr)
 	prior := AddStageOnly(ctx, cloned.Tree(), user, key, value)

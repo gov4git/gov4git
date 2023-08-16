@@ -9,6 +9,10 @@ import (
 // PublicAddress points to the user's public repo.
 type PublicAddress git.Address
 
+func (x PublicAddress) IsEmpty() bool {
+	return x.IsEmpty()
+}
+
 // PrivateAdress points to the user's private repo.
 type PrivateAddress git.Address
 

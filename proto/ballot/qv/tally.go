@@ -10,6 +10,7 @@ import (
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 )
 
 func (qv QV) Tally(
@@ -20,7 +21,7 @@ func (qv QV) Tally(
 	fetched map[member.User]common.Elections, // newly fetched votes from participating users
 ) git.Change[form.Map, common.Tally] {
 
-	return qv.tally(ctx, owner.Public, ad, prior, fetched)
+	return qv.tally(ctx, owner.Public, ad, prior, fetched, false)
 }
 
 func (qv QV) tally(
@@ -29,6 +30,7 @@ func (qv QV) tally(
 	ad *common.Advertisement,
 	prior *common.Tally,
 	fetched map[member.User]common.Elections, // newly fetched votes from participating users
+	strict bool, // fail if any voter has insufficient funds
 ) git.Change[form.Map, common.Tally] {
 
 	oldVotesByUser, newVotesByUser := prior.AcceptedVotes, fetched
@@ -54,7 +56,11 @@ func (qv QV) tally(
 		costDiff := augmentedScore.Cost - oldScore.Cost
 
 		// try charging the user for the new votes
-		if err := chargeUser(ctx, govCloned, u, costDiff); err != nil {
+		err := chargeUser(ctx, govCloned, u, costDiff)
+		if strict {
+			must.NoError(ctx, err)
+		}
+		if err != nil {
 			acceptedVotes[u] = oldVotes
 			rejectedVotes[u] = append(prior.RejectedVotes[u], rejectVotes(newVotes, err)...)
 			charges[u] = prior.Charges[u]

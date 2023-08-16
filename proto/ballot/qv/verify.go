@@ -29,5 +29,5 @@ func (qv QV) VerifyElections(
 	}
 
 	// tally writes to the gov repo, but the repo is throw-away and won't be committed
-	qv.tally(ctx, govCloned, ad, prior, map[member.User]common.Elections{user[0]: elections})
+	qv.tally(ctx, govCloned, ad, prior, map[member.User]common.Elections{user[0]: elections}, true)
 }

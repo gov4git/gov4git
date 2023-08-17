@@ -39,10 +39,37 @@ func TallyStageOnly(
 ) (git.Change[form.Map, common.Tally], bool) {
 
 	communityTree := govOwner.Public.Tree()
+	ad, _ := load.LoadStrategy(ctx, communityTree, ballotName, false)
 
+	// compute all participating voter accounts
+	voterAccounts := map[member.User]member.Account{}
+	for _, user := range member.ListGroupUsersLocal(ctx, communityTree, ad.Participants) {
+		voterAccounts[user] = member.GetUserLocal(ctx, communityTree, user)
+	}
+
+	// fetch repos of all participating voters
+	votersCloned := map[member.User]git.Cloned{}
+	for u, a := range voterAccounts {
+		votersCloned[u] = git.CloneOne(ctx, git.Address(a.PublicAddress))
+	}
+
+	return tallyVotersClonedStageOnly(ctx, govAddr, govOwner, ballotName, voterAccounts, votersCloned)
+}
+
+func tallyVotersClonedStageOnly(
+	ctx context.Context,
+	govAddr gov.OrganizerAddress,
+	govOwner id.OwnerCloned,
+	ballotName ns.NS,
+	voterAccounts map[member.User]member.Account,
+	votersCloned map[member.User]git.Cloned,
+) (git.Change[form.Map, common.Tally], bool) {
+
+	communityTree := govOwner.Public.Tree()
 	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName, false)
 
 	// if the ballot is frozen, don't tally
+	// XXX: still fetch the votes and discard them?
 	if ad.Frozen {
 		return git.NewChange(
 			"Ballot is frozen",
@@ -53,20 +80,10 @@ func TallyStageOnly(
 		), false
 	}
 
-	// list participating users
-	users := member.ListGroupUsersLocal(ctx, communityTree, ad.Participants)
-
-	// get user accounts
-	accounts := make([]member.Account, len(users))
-	for i, user := range users {
-		accounts[i] = member.GetUserLocal(ctx, communityTree, user)
-	}
-
-	// fetch votes from users
 	var fetchedVotes FetchedVotes
 	var fetchVoteChanges []git.Change[form.Map, FetchedVotes]
-	for i, account := range accounts {
-		chg := fetchVotes(ctx, govAddr, govOwner, ballotName, users[i], account)
+	for user, account := range voterAccounts {
+		chg := fetchVotesCloned(ctx, govAddr, govOwner, ballotName, user, account, votersCloned[user])
 		fetchVoteChanges = append(fetchVoteChanges, chg)
 		fetchedVotes = append(fetchedVotes, chg.Result...)
 	}

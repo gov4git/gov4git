@@ -1,4 +1,4 @@
-- [ ] test tally all
+- [x] test tally all
 - [ ] tallying frozen ops consumes pending user votes
 - [x] top-level sync operation
   - [ ] test sync

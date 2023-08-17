@@ -42,16 +42,14 @@ func TallyAllStageOnly(
 	adVoters := make([]adVoters, len(ads))
 	allVoters := map[member.User]member.Account{}
 	for i, ad := range ads {
-		adVoters[i].ad = &ad
-		adVoters[i].voterAccounts = map[member.User]member.Account{}
-		adVoters[i].voterClones = map[member.User]git.Cloned{}
-		adVoters[i].voters = member.ListGroupUsersLocal(ctx, communityTree, ad.Participants)
-		for _, user := range adVoters[i].voters {
-			if _, ok := allVoters[user]; !ok {
-				account := member.GetUserLocal(ctx, communityTree, user)
-				adVoters[i].voterAccounts[user] = account
-				allVoters[user] = account
-			}
+		adVoters[i].Ad = ad
+		adVoters[i].VoterAccounts = map[member.User]member.Account{}
+		adVoters[i].VoterClones = map[member.User]git.Cloned{}
+		adVoters[i].Voters = member.ListGroupUsersLocal(ctx, communityTree, ad.Participants)
+		for _, user := range adVoters[i].Voters {
+			account := member.GetUserLocal(ctx, communityTree, user)
+			adVoters[i].VoterAccounts[user] = account
+			allVoters[user] = account
 		}
 	}
 
@@ -63,16 +61,19 @@ func TallyAllStageOnly(
 
 	// populate ad voter structures
 	for i, ad := range adVoters {
-		for u := range ad.voterAccounts {
-			adVoters[i].voterClones[u] = allVoterClones[u]
+		for u := range ad.VoterAccounts {
+			adVoters[i].VoterClones[u] = allVoterClones[u]
 		}
 	}
 
 	// perform tallies for all open ballots
 	tallyChanges := []git.Change[map[string]form.Form, common.Tally]{}
 	tallies := []common.Tally{}
+	fmt.Println("adVoters: ", form.SprintJSON(adVoters))
 	for _, adv := range adVoters {
-		if tallyChg, changed := tallyVotersClonedStageOnly(ctx, govAddr, govOwner, adv.ad.Name, adv.voterAccounts, adv.voterClones); changed {
+		fmt.Println("XXX tallying", form.SprintJSON(adv))
+		if tallyChg, changed := tallyVotersClonedStageOnly(ctx, govAddr, govOwner, adv.Ad.Name, adv.VoterAccounts, adv.VoterClones); changed {
+			fmt.Println("	XXX changed", changed)
 			tallyChanges = append(tallyChanges, tallyChg)
 			tallies = append(tallies, tallyChg.Result)
 		}
@@ -88,8 +89,8 @@ func TallyAllStageOnly(
 }
 
 type adVoters struct {
-	ad            *common.Advertisement
-	voters        []member.User
-	voterAccounts map[member.User]member.Account
-	voterClones   map[member.User]git.Cloned
+	Ad            common.Advertisement
+	Voters        []member.User
+	VoterAccounts map[member.User]member.Account
+	VoterClones   map[member.User]git.Cloned
 }

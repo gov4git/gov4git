@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
@@ -14,7 +15,6 @@ import (
 func List(
 	ctx context.Context,
 	govAddr gov.GovAddress,
-	closed bool,
 ) []common.Advertisement {
 
 	return ListLocal(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree())
@@ -43,5 +43,43 @@ func ListLocal(
 		ads = append(ads, ad)
 	}
 
+	return ads
+}
+
+func ListFilter(
+	ctx context.Context,
+	govAddr gov.GovAddress,
+	onlyOpen bool,
+	onlyClosed bool,
+	onlyFrozen bool,
+	withParticipant member.User,
+) []common.Advertisement {
+
+	return ListFilterLocal(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree(), onlyOpen, onlyClosed, onlyFrozen, withParticipant)
+}
+
+func ListFilterLocal(
+	ctx context.Context,
+	govTree *git.Tree,
+	onlyOpen bool,
+	onlyClosed bool,
+	onlyFrozen bool,
+	withParticipant member.User,
+) []common.Advertisement {
+
+	ads := ListLocal(ctx, govTree)
+	if onlyOpen {
+		ads = common.FilterOpenClosedAds(false, ads)
+	}
+	if onlyClosed {
+		ads = common.FilterOpenClosedAds(true, ads)
+	}
+	if onlyFrozen {
+		ads = common.FilterFrozenAds(true, ads)
+	}
+	if withParticipant != "" {
+		userGroups := member.ListUserGroupsLocal(ctx, govTree, withParticipant)
+		ads = common.FilterWithParticipants(userGroups, ads)
+	}
 	return ads
 }

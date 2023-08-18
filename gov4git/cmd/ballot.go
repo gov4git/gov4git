@@ -111,17 +111,20 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			ls := ballot.List(
+			ads := ballot.ListFilter(
 				ctx,
 				setup.Gov,
-				false,
+				ballotOnlyOpen,
+				ballotOnlyClosed,
+				ballotOnlyFrozen,
+				member.User(ballotWithParticipant),
 			)
 			if ballotOnlyNames {
-				for _, n := range common.AdsToBallotNames(ls) {
+				for _, n := range common.AdsToBallotNames(ads) {
 					fmt.Println(n)
 				}
 			} else {
-				fmt.Fprint(os.Stdout, form.SprintJSON(ls))
+				fmt.Fprint(os.Stdout, form.SprintJSON(ads))
 			}
 		},
 	}
@@ -170,6 +173,10 @@ var (
 	ballotUseVotingCredits bool
 	ballotCancel           bool
 	ballotOnlyNames        bool
+	ballotOnlyOpen         bool
+	ballotOnlyClosed       bool
+	ballotOnlyFrozen       bool
+	ballotWithParticipant  string
 )
 
 func init() {
@@ -211,6 +218,10 @@ func init() {
 	// list
 	ballotCmd.AddCommand(ballotListCmd)
 	ballotListCmd.Flags().BoolVar(&ballotOnlyNames, "only_names", false, "list only ballot names")
+	ballotListCmd.Flags().BoolVar(&ballotOnlyOpen, "open", false, "list only open ballots")
+	ballotListCmd.Flags().BoolVar(&ballotOnlyClosed, "closed", false, "list only closed ballots")
+	ballotListCmd.Flags().BoolVar(&ballotOnlyFrozen, "frozen", false, "list only frozen ballots")
+	ballotListCmd.Flags().StringVar(&ballotWithParticipant, "participant", "", "list only ballots where the given user is a participant")
 
 	// tally
 	ballotCmd.AddCommand(ballotTallyCmd)

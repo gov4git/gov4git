@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/form"
@@ -38,7 +39,7 @@ func TestOpenClose(t *testing.T) {
 	fmt.Println("open: ", openChg)
 
 	// list
-	ads := ballot.List(ctx, cty.Gov(), false)
+	ads := ballot.List(ctx, cty.Gov())
 	if len(ads) != 1 {
 		t.Errorf("expecting 1 ad, got %v", len(ads))
 	}
@@ -75,6 +76,12 @@ func TestOpenClose(t *testing.T) {
 	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, false)
 	fmt.Println("close: ", form.SprintJSON(closeChg))
 
+	// verify state changed
+	ast := ballot.Show(ctx, gov.GovAddress(cty.Organizer().Public), ballotName)
+	if !ast.Ad.Closed {
+		t.Errorf("expecting closed flag")
+	}
+
 	// verify no credits left
 	credits := balance.Get(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits)
 	if credits != 0.0 {
@@ -106,7 +113,7 @@ func TestOpenCancel(t *testing.T) {
 	fmt.Println("open: ", openChg)
 
 	// list
-	ads := ballot.List(ctx, cty.Gov(), false)
+	ads := ballot.List(ctx, cty.Gov())
 	if len(ads) != 1 {
 		t.Errorf("expecting 1 ad, got %v", len(ads))
 	}
@@ -142,6 +149,12 @@ func TestOpenCancel(t *testing.T) {
 	// close
 	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, true)
 	fmt.Println("close: ", form.SprintJSON(closeChg))
+
+	// verify state changed
+	ast := ballot.Show(ctx, gov.GovAddress(cty.Organizer().Public), ballotName)
+	if !ast.Ad.Closed || !ast.Ad.Cancelled {
+		t.Errorf("expecting closed and cancelled")
+	}
 
 	// verify no credits left
 	credits := balance.Get(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits)

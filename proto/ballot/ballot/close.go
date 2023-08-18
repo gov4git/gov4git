@@ -10,6 +10,7 @@ import (
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -39,7 +40,10 @@ func CloseStageOnly(
 
 	// verify ad and strategy are present
 	ad, strat := load.LoadStrategy(ctx, govTree, ballotName)
+	must.Assertf(ctx, !ad.Closed, "ballot already closed")
+
 	tally := LoadTally(ctx, govTree, ballotName)
+
 	var chg git.Change[map[string]form.Form, common.Outcome]
 	if cancel {
 		chg = strat.Cancel(ctx, govCloned, &ad, &tally)
@@ -53,6 +57,7 @@ func CloseStageOnly(
 
 	// write state
 	ad.Closed = true
+	ad.Cancelled = cancel
 	openAdNS := common.BallotPath(ballotName).Sub(common.AdFilebase)
 	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
 

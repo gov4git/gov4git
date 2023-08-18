@@ -1,6 +1,6 @@
 - [x] test tally all
 - [ ] tallying frozen ops consumes pending user votes
 - [x] top-level sync operation
-  - [ ] test sync
+  - [x] test sync
   - [ ] test sync cli api
   - [x] plumb through to cli

@@ -37,6 +37,7 @@ type Advertisement struct {
 	Participants member.Group   `json:"participants_group"`
 	Frozen       bool           `json:"frozen"` // if frozen, the ballot is not accepting votes
 	Closed       bool           `json:"closed"` // closed ballots cannot be re-opened
+	Cancelled    bool           `json:"cancelled"`
 	ParentCommit git.CommitHash `json:"parent_commit"`
 }
 

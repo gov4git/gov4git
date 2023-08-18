@@ -8,6 +8,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/form"
@@ -102,6 +103,12 @@ func TestVoteFreezeTally(t *testing.T) {
 	// freeze
 	freezeChg := ballot.Freeze(ctx, cty.Organizer(), ballotName)
 	fmt.Println("freeze: ", form.SprintJSON(freezeChg))
+
+	// verify state changed
+	ast := ballot.Show(ctx, gov.GovAddress(cty.Organizer().Public), ballotName)
+	if !ast.Ad.Frozen {
+		t.Errorf("expecting frozen")
+	}
 
 	// tally
 	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName)

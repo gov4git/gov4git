@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/testutil"
+	"github.com/gov4git/lib4git/util"
 )
 
 func TestUserAddRemove(t *testing.T) {
@@ -50,7 +51,7 @@ func TestGroupAddRemove(t *testing.T) {
 
 	// check user's groups are `everybody` and `testgroup1`
 	groups1 := member.ListUserGroups(ctx, cty.Gov(), u1)
-	if !IsIn(g1, groups1) {
+	if !util.IsIn(g1, groups1...) {
 		t.Errorf("expecting group to be in user's memberships")
 	}
 
@@ -63,16 +64,7 @@ func TestGroupAddRemove(t *testing.T) {
 
 	// verify user is in `everybody`group
 	users3 := member.ListGroupUsers(ctx, cty.Gov(), member.Everybody)
-	if !IsIn(u1, users3) {
+	if !util.IsIn(u1, users3...) {
 		t.Fatalf("expecting %v, got %v", []member.User{u1}, users3)
 	}
-}
-
-func IsIn[X comparable](query X, list []X) bool {
-	for _, k := range list {
-		if k == query {
-			return true
-		}
-	}
-	return false
 }

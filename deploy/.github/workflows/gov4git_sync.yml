@@ -1,0 +1,18 @@
+name: gov4git sync
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: '55 * * * *'
+
+jobs:
+  gov4git_sync:
+    name: Sync gov4git state
+    environment: governance
+    runs-on: ubuntu-latest
+    steps:
+      uses: SebRollen/toml-action@v1.0.2
+      id: gov4git_repo
+      with:
+        file: ".gov4git.toml"
+        field: "repo" # accessible via ${{ steps.gov4git_repo.outputs.value }}

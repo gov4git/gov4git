@@ -47,6 +47,7 @@ func init() {
 	rootCmd.AddCommand(bureauCmd)
 	rootCmd.AddCommand(vendorCmd)
 	rootCmd.AddCommand(syncCmd)
+	rootCmd.AddCommand(versionCmd)
 }
 
 func initAfterFlags() {

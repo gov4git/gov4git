@@ -27,9 +27,15 @@ gov4git ballot tally --name ballot_1/xyz
 gov4git ballot show-open --name ballot_1/xyz
 stdout '"score": 3'
 
+gov4git ballot vote --name ballot_1/xyz --choices choice-1 --strengths 7.0
+gov4git sync
+
+gov4git ballot show-open --name ballot_1/xyz
+stdout '"score": 4'
+
 gov4git ballot close --name ballot_1/xyz
 gov4git ballot list-closed
 stdout ballot_1
 
 gov4git ballot show-closed --name ballot_1/xyz
-stdout '"score": 3'
+stdout '"score": 4'

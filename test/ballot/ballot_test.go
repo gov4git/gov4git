@@ -2,6 +2,7 @@ package ballot
 
 import (
 	"fmt"
+	"math"
 	"testing"
 
 	"github.com/gov4git/gov4git/proto/balance"
@@ -15,7 +16,7 @@ import (
 	"github.com/gov4git/lib4git/testutil"
 )
 
-func TestBallotClose(t *testing.T) {
+func TestOpenClose(t *testing.T) {
 	ctx := testutil.NewCtx()
 	cty := test.NewTestCommunity(t, ctx, 2)
 
@@ -83,7 +84,7 @@ func TestBallotClose(t *testing.T) {
 	// testutil.Hang()
 }
 
-func TestBallotCancel(t *testing.T) {
+func TestOpenCancel(t *testing.T) {
 	ctx := testutil.NewCtx()
 	cty := test.NewTestCommunity(t, ctx, 2)
 
@@ -146,6 +147,50 @@ func TestBallotCancel(t *testing.T) {
 	credits := balance.Get(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits)
 	if credits != 1.0 {
 		t.Errorf("expecting %v, got %v", 1.0, credits)
+	}
+
+	// testutil.Hang()
+}
+
+func TestTallyAll(t *testing.T) {
+	ctx := testutil.NewCtx()
+	cty := test.NewTestCommunity(t, ctx, 2)
+
+	ballotName0 := ns.NS{"a", "b", "c"}
+	ballotName1 := ns.NS{"d", "e", "f"}
+	choices := []string{"x", "y", "z"}
+
+	// open two ballots
+	strat := qv.QV{}
+	openChg0 := ballot.Open(ctx, strat, cty.Gov(), ballotName0, "ballot_0", "ballot 0", choices, member.Everybody)
+	fmt.Println("open 0: ", form.SprintJSON(openChg0))
+	openChg1 := ballot.Open(ctx, strat, cty.Gov(), ballotName1, "ballot_1", "ballot 1", choices, member.Everybody)
+	fmt.Println("open 1: ", form.SprintJSON(openChg1))
+
+	// give credits to users
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 5.0)
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(1), qv.VotingCredits, 5.0)
+
+	// vote
+	elections0 := common.Elections{common.NewElection(choices[0], 5.0)}
+	elections1 := common.Elections{common.NewElection(choices[0], -5.0)}
+	voteChg0 := ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName0, elections0)
+	fmt.Println("vote 0: ", form.SprintJSON(voteChg0))
+	voteChg1 := ballot.Vote(ctx, cty.MemberOwner(1), cty.Gov(), ballotName1, elections1)
+	fmt.Println("vote 1: ", form.SprintJSON(voteChg1))
+
+	// tally
+	tallyChg := ballot.TallyAll(ctx, cty.Organizer())
+	fmt.Println("tally: ", form.SprintJSON(tallyChg))
+
+	// verify tallies are correct
+	ast0 := ballot.Show(ctx, cty.Gov(), ballotName0, false)
+	if ast0.Tally.Scores[choices[0]] != math.Sqrt(5.0) {
+		t.Errorf("expecting %v, got %v", math.Sqrt(5.0), ast0.Tally.Scores[choices[0]])
+	}
+	ast1 := ballot.Show(ctx, cty.Gov(), ballotName1, false)
+	if ast1.Tally.Scores[choices[0]] != -math.Sqrt(5.0) {
+		t.Errorf("expecting %v, got %v", -math.Sqrt(5.0), ast1.Tally.Scores[choices[0]])
 	}
 
 	// testutil.Hang()

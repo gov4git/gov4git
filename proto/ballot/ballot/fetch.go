@@ -42,6 +42,19 @@ func fetchVotes(
 	user member.User,
 	account member.Account,
 ) git.Change[form.Map, FetchedVotes] {
+	userCloned := git.CloneOne(ctx, git.Address(account.PublicAddress))
+	return fetchVotesCloned(ctx, govAddr, govOwner, ballotName, user, account, userCloned)
+}
+
+func fetchVotesCloned(
+	ctx context.Context,
+	govAddr gov.OrganizerAddress,
+	govOwner id.OwnerCloned,
+	ballotName ns.NS,
+	user member.User,
+	account member.Account,
+	userCloned git.Cloned,
+) git.Change[form.Map, FetchedVotes] {
 
 	fetched := FetchedVotes{}
 	respond := func(ctx context.Context, req common.VoteEnvelope, _ id.SignedPlaintext) (resp common.VoteEnvelope, err error) {
@@ -58,7 +71,7 @@ func fetchVotes(
 		return req, nil
 	}
 
-	voterPublicTree := git.CloneOne(ctx, git.Address(account.PublicAddress)).Tree()
+	voterPublicTree := userCloned.Tree()
 	mail.ReceiveSignedStageOnly(
 		ctx,
 		govOwner,

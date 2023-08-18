@@ -3,6 +3,7 @@ package ballot
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/ballot/common"
@@ -39,40 +40,45 @@ func TallyStageOnly(
 ) (git.Change[form.Map, common.Tally], bool) {
 
 	communityTree := govOwner.Public.Tree()
+	ad, _ := load.LoadStrategy(ctx, communityTree, ballotName, false)
 
+	// compute all participating voter accounts
+	voterAccounts := map[member.User]member.Account{}
+	for _, user := range member.ListGroupUsersLocal(ctx, communityTree, ad.Participants) {
+		voterAccounts[user] = member.GetUserLocal(ctx, communityTree, user)
+	}
+
+	// fetch repos of all participating voters
+	votersCloned := map[member.User]git.Cloned{}
+	for u, a := range voterAccounts {
+		votersCloned[u] = git.CloneOne(ctx, git.Address(a.PublicAddress))
+	}
+
+	return tallyVotersClonedStageOnly(ctx, govAddr, govOwner, ballotName, voterAccounts, votersCloned)
+}
+
+func tallyVotersClonedStageOnly(
+	ctx context.Context,
+	govAddr gov.OrganizerAddress,
+	govOwner id.OwnerCloned,
+	ballotName ns.NS,
+	voterAccounts map[member.User]member.Account,
+	votersCloned map[member.User]git.Cloned,
+) (git.Change[form.Map, common.Tally], bool) {
+
+	communityTree := govOwner.Public.Tree()
 	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName, false)
-
-	// if the ballot is frozen, don't tally
-	if ad.Frozen {
-		return git.NewChange(
-			"Ballot is frozen",
-			"ballot_tally",
-			form.Map{"ballot_name": ballotName},
-			common.Tally{},
-			nil,
-		), false
-	}
-
-	// list participating users
-	users := member.ListGroupUsersLocal(ctx, communityTree, ad.Participants)
-
-	// get user accounts
-	accounts := make([]member.Account, len(users))
-	for i, user := range users {
-		accounts[i] = member.GetUserLocal(ctx, communityTree, user)
-	}
-
-	// fetch votes from users
-	var fetchedVotes FetchedVotes
-	var fetchVoteChanges []git.Change[form.Map, FetchedVotes]
-	for i, account := range accounts {
-		chg := fetchVotes(ctx, govAddr, govOwner, ballotName, users[i], account)
-		fetchVoteChanges = append(fetchVoteChanges, chg)
-		fetchedVotes = append(fetchedVotes, chg.Result...)
-	}
 
 	// read current tally
 	currentTally := LoadTally(ctx, communityTree, ballotName, false)
+
+	var fetchedVotes FetchedVotes
+	var fetchVoteChanges []git.Change[form.Map, FetchedVotes]
+	for user, account := range voterAccounts {
+		chg := fetchVotesCloned(ctx, govAddr, govOwner, ballotName, user, account, votersCloned[user])
+		fetchVoteChanges = append(fetchVoteChanges, chg)
+		fetchedVotes = append(fetchedVotes, chg.Result...)
+	}
 
 	// if no votes are received, no change in tally occurs
 	if len(fetchedVotes) == 0 {
@@ -83,6 +89,23 @@ func TallyStageOnly(
 			currentTally,
 			nil,
 		), false
+	}
+
+	// if the ballot is frozen, consume and reject pending votes
+	if ad.Frozen {
+		rejectFetchedVotes(fetchedVotes, currentTally.RejectedVotes)
+
+		// write updated tally
+		openTallyNS := common.OpenBallotNS(ballotName).Sub(common.TallyFilebase)
+		git.ToFileStage(ctx, communityTree, openTallyNS.Path(), currentTally)
+
+		return git.NewChange(
+			"Ballot is frozen, discarding pending votes",
+			"ballot_tally",
+			form.Map{"ballot_name": ballotName},
+			currentTally,
+			form.ToForms(fetchVoteChanges),
+		), true
 	}
 
 	updatedTally := strat.Tally(ctx, govOwner, &ad, &currentTally, fetchedVotesToElections(fetchedVotes)).Result
@@ -98,6 +121,17 @@ func TallyStageOnly(
 		updatedTally,
 		form.ToForms(fetchVoteChanges),
 	), true
+}
+
+func rejectFetchedVotes(fv FetchedVotes, rej map[member.User]common.RejectedElections) {
+	for _, fv := range fv {
+		for _, el := range fv.Elections {
+			rej[fv.Voter] = append(
+				rej[fv.Voter],
+				common.RejectedElection{Time: time.Now(), Vote: el, Reason: "ballot is frozen"},
+			)
+		}
+	}
 }
 
 func LoadTally(

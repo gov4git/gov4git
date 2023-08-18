@@ -3,6 +3,7 @@ package ballot
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/ballot/common"
@@ -68,17 +69,8 @@ func tallyVotersClonedStageOnly(
 	communityTree := govOwner.Public.Tree()
 	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName, false)
 
-	// if the ballot is frozen, don't tally
-	// XXX: still fetch the votes and discard them?
-	if ad.Frozen {
-		return git.NewChange(
-			"Ballot is frozen",
-			"ballot_tally",
-			form.Map{"ballot_name": ballotName},
-			common.Tally{},
-			nil,
-		), false
-	}
+	// read current tally
+	currentTally := LoadTally(ctx, communityTree, ballotName, false)
 
 	var fetchedVotes FetchedVotes
 	var fetchVoteChanges []git.Change[form.Map, FetchedVotes]
@@ -87,9 +79,6 @@ func tallyVotersClonedStageOnly(
 		fetchVoteChanges = append(fetchVoteChanges, chg)
 		fetchedVotes = append(fetchedVotes, chg.Result...)
 	}
-
-	// read current tally
-	currentTally := LoadTally(ctx, communityTree, ballotName, false)
 
 	// if no votes are received, no change in tally occurs
 	if len(fetchedVotes) == 0 {
@@ -100,6 +89,23 @@ func tallyVotersClonedStageOnly(
 			currentTally,
 			nil,
 		), false
+	}
+
+	// if the ballot is frozen, consume and reject pending votes
+	if ad.Frozen {
+		rejectFetchedVotes(fetchedVotes, currentTally.RejectedVotes)
+
+		// write updated tally
+		openTallyNS := common.OpenBallotNS(ballotName).Sub(common.TallyFilebase)
+		git.ToFileStage(ctx, communityTree, openTallyNS.Path(), currentTally)
+
+		return git.NewChange(
+			"Ballot is frozen, discarding pending votes",
+			"ballot_tally",
+			form.Map{"ballot_name": ballotName},
+			currentTally,
+			form.ToForms(fetchVoteChanges),
+		), true
 	}
 
 	updatedTally := strat.Tally(ctx, govOwner, &ad, &currentTally, fetchedVotesToElections(fetchedVotes)).Result
@@ -115,6 +121,17 @@ func tallyVotersClonedStageOnly(
 		updatedTally,
 		form.ToForms(fetchVoteChanges),
 	), true
+}
+
+func rejectFetchedVotes(fv FetchedVotes, rej map[member.User]common.RejectedElections) {
+	for _, fv := range fv {
+		for _, el := range fv.Elections {
+			rej[fv.Voter] = append(
+				rej[fv.Voter],
+				common.RejectedElection{Time: time.Now(), Vote: el, Reason: "ballot is frozen"},
+			)
+		}
+	}
 }
 
 func LoadTally(

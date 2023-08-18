@@ -19,16 +19,12 @@ var (
 	OutcomeFilebase  = "ballot_outcome.json"
 )
 
-func OpenBallotNS(name ns.NS) ns.NS {
-	return BallotNS.Sub("open").Join(name)
-}
-
-func ClosedBallotNS(name ns.NS) ns.NS {
-	return BallotNS.Sub("closed").Join(name)
-}
-
 func BallotTopic(name ns.NS) string {
 	return "ballot:" + name.Path()
+}
+
+func BallotPath(path ns.NS) ns.NS {
+	return BallotNS.Join(path)
 }
 
 type Advertisement struct {
@@ -40,6 +36,7 @@ type Advertisement struct {
 	Strategy     string         `json:"strategy"`
 	Participants member.Group   `json:"participants_group"`
 	Frozen       bool           `json:"frozen"` // if frozen, the ballot is not accepting votes
+	Closed       bool           `json:"closed"` // closed ballots cannot be re-opened
 	ParentCommit git.CommitHash `json:"parent_commit"`
 }
 

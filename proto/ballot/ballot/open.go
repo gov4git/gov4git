@@ -45,15 +45,9 @@ func OpenStageOnly(
 ) git.Change[form.Map, common.BallotAddress] {
 
 	// check no open ballots by the same name
-	openAdNS := common.OpenBallotNS(name).Sub(common.AdFilebase)
+	openAdNS := common.BallotPath(name).Sub(common.AdFilebase)
 	if _, err := govCloned.Tree().Filesystem.Stat(openAdNS.Path()); err == nil {
 		must.Errorf(ctx, "ballot already exists")
-	}
-
-	// check no closed ballots by the same name
-	closedAdNS := common.ClosedBallotNS(name).Sub(common.AdFilebase)
-	if _, err := govCloned.Tree().Filesystem.Stat(closedAdNS.Path()); err == nil {
-		must.Errorf(ctx, "closed ballot with same name exists")
 	}
 
 	// verify group exists
@@ -71,6 +65,7 @@ func OpenStageOnly(
 		Strategy:     strat.Name(),
 		Participants: participants,
 		Frozen:       false,
+		Closed:       false,
 		ParentCommit: git.Head(ctx, govCloned.Repo()),
 	}
 	git.ToFileStage(ctx, govCloned.Tree(), openAdNS.Path(), ad)
@@ -84,11 +79,11 @@ func OpenStageOnly(
 		RejectedVotes: map[member.User]common.RejectedElections{},
 		Charges:       map[member.User]float64{},
 	}
-	openTallyNS := common.OpenBallotNS(ad.Name).Sub(common.TallyFilebase)
+	openTallyNS := common.BallotPath(name).Sub(common.TallyFilebase)
 	git.ToFileStage(ctx, govCloned.Tree(), openTallyNS.Path(), tally)
 
 	// write strategy
-	openStratNS := common.OpenBallotNS(name).Sub(common.StrategyFilebase)
+	openStratNS := common.BallotPath(name).Sub(common.StrategyFilebase)
 	git.ToFileStage(ctx, govCloned.Tree(), openStratNS.Path(), strat)
 
 	return git.NewChange(

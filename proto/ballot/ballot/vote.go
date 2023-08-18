@@ -42,12 +42,10 @@ func VoteStageOnly(
 	elections common.Elections,
 ) git.Change[form.Map, mail.SeqNo] {
 
-	ad, strat := load.LoadStrategy(ctx, govCloned.Tree(), ballotName, false)
+	ad, strat := load.LoadStrategy(ctx, govCloned.Tree(), ballotName)
 
-	// if the ballot is frozen, refuse to cast a vote
-	if ad.Frozen {
-		must.Errorf(ctx, "ballot is frozen")
-	}
+	must.Assertf(ctx, !ad.Closed, "ballot is closed")
+	must.Assertf(ctx, !ad.Frozen, "ballot is frozen")
 
 	verifyElections(ctx, strat, voterAddr, govAddr, voterOwner, govCloned, ad, elections)
 	envelope := common.VoteEnvelope{
@@ -85,7 +83,7 @@ func verifyElections(
 		}
 	}
 
-	tally := LoadTally(ctx, govCloned.Tree(), ad.Name, false)
+	tally := LoadTally(ctx, govCloned.Tree(), ad.Name)
 	strat.VerifyElections(ctx, voterAddr, govAddr, voterOwner, govCloned, &ad, &tally, elections)
 }
 

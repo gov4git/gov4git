@@ -90,9 +90,9 @@ var (
 		},
 	}
 
-	ballotShowOpenCmd = &cobra.Command{
-		Use:   "show-open",
-		Short: "Show open ballot",
+	ballotShowCmd = &cobra.Command{
+		Use:   "show",
+		Short: "Show ballot details",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
@@ -100,31 +100,14 @@ var (
 				ctx,
 				setup.Gov,
 				ns.ParseFromPath(ballotName),
-				false,
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(r))
 		},
 	}
 
-	ballotShowClosedCmd = &cobra.Command{
-		Use:   "show-closed",
-		Short: "Show closed ballot",
-		Long:  ``,
-		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			r := ballot.Show(
-				ctx,
-				setup.Gov,
-				ns.ParseFromPath(ballotName),
-				true,
-			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(r))
-		},
-	}
-
-	ballotListOpenCmd = &cobra.Command{
-		Use:   "list-open",
-		Short: "List open ballots",
+	ballotListCmd = &cobra.Command{
+		Use:   "list",
+		Short: "List ballots",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
@@ -132,27 +115,6 @@ var (
 				ctx,
 				setup.Gov,
 				false,
-			)
-			if ballotOnlyNames {
-				for _, n := range common.AdsToBallotNames(ls) {
-					fmt.Println(n)
-				}
-			} else {
-				fmt.Fprint(os.Stdout, form.SprintJSON(ls))
-			}
-		},
-	}
-
-	ballotListClosedCmd = &cobra.Command{
-		Use:   "list-closed",
-		Short: "List closed ballots",
-		Long:  ``,
-		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			ls := ballot.List(
-				ctx,
-				setup.Gov,
-				true,
 			)
 			if ballotOnlyNames {
 				for _, n := range common.AdsToBallotNames(ls) {
@@ -241,23 +203,14 @@ func init() {
 	ballotUnfreezeCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
 	ballotUnfreezeCmd.MarkFlagRequired("name")
 
-	// show open
-	ballotCmd.AddCommand(ballotShowOpenCmd)
-	ballotShowOpenCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
-	ballotShowOpenCmd.MarkFlagRequired("name")
+	// show
+	ballotCmd.AddCommand(ballotShowCmd)
+	ballotShowCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotShowCmd.MarkFlagRequired("name")
 
-	// show closed
-	ballotCmd.AddCommand(ballotShowClosedCmd)
-	ballotShowClosedCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
-	ballotShowClosedCmd.MarkFlagRequired("name")
-
-	// list open
-	ballotCmd.AddCommand(ballotListOpenCmd)
-	ballotListOpenCmd.Flags().BoolVar(&ballotOnlyNames, "only_names", false, "list only ballot names")
-
-	// list closed
-	ballotCmd.AddCommand(ballotListClosedCmd)
-	ballotListClosedCmd.Flags().BoolVar(&ballotOnlyNames, "only_names", false, "list only ballot names")
+	// list
+	ballotCmd.AddCommand(ballotListCmd)
+	ballotListCmd.Flags().BoolVar(&ballotOnlyNames, "only_names", false, "list only ballot names")
 
 	// tally
 	ballotCmd.AddCommand(ballotTallyCmd)

@@ -18,24 +18,24 @@ gov4git balance add --key voting_credits --user member1 --value 30.0
 # ballot
 
 gov4git ballot open --name ballot_1/xyz --title 'Ballot 1' --desc 'Description 1' --group everybody --choices 'choice-1'
-gov4git ballot list-open
+gov4git ballot list
 stdout ballot_1
 
 gov4git ballot vote --name ballot_1/xyz --choices choice-1 --strengths 9.0
 gov4git ballot tally --name ballot_1/xyz
 
-gov4git ballot show-open --name ballot_1/xyz
+gov4git ballot show --name ballot_1/xyz
 stdout '"score": 3'
 
 gov4git ballot vote --name ballot_1/xyz --choices choice-1 --strengths 7.0
 gov4git sync
 
-gov4git ballot show-open --name ballot_1/xyz
+gov4git ballot show --name ballot_1/xyz
 stdout '"score": 4'
 
 gov4git ballot close --name ballot_1/xyz
-gov4git ballot list-closed
+gov4git ballot list
 stdout ballot_1
 
-gov4git ballot show-closed --name ballot_1/xyz
+gov4git ballot show --name ballot_1/xyz
 stdout '"score": 4'

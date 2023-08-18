@@ -38,8 +38,8 @@ func CloseStageOnly(
 	govTree := govCloned.Public.Tree()
 
 	// verify ad and strategy are present
-	ad, strat := load.LoadStrategy(ctx, govTree, ballotName, false)
-	tally := LoadTally(ctx, govTree, ballotName, false)
+	ad, strat := load.LoadStrategy(ctx, govTree, ballotName)
+	tally := LoadTally(ctx, govTree, ballotName)
 	var chg git.Change[map[string]form.Form, common.Outcome]
 	if cancel {
 		chg = strat.Cancel(ctx, govCloned, &ad, &tally)
@@ -48,12 +48,13 @@ func CloseStageOnly(
 	}
 
 	// write outcome
-	openOutcomeNS := common.OpenBallotNS(ballotName).Sub(common.OutcomeFilebase)
+	openOutcomeNS := common.BallotPath(ballotName).Sub(common.OutcomeFilebase)
 	git.ToFileStage(ctx, govTree, openOutcomeNS.Path(), chg.Result)
 
-	openNS := common.OpenBallotNS(ballotName)
-	closedNS := common.ClosedBallotNS(ballotName)
-	git.RenameStage(ctx, govTree, openNS.Path(), closedNS.Path())
+	// write state
+	ad.Closed = true
+	openAdNS := common.BallotPath(ballotName).Sub(common.AdFilebase)
+	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
 
 	return chg
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -40,7 +41,7 @@ func TallyStageOnly(
 ) (git.Change[form.Map, common.Tally], bool) {
 
 	communityTree := govOwner.Public.Tree()
-	ad, _ := load.LoadStrategy(ctx, communityTree, ballotName, false)
+	ad, _ := load.LoadStrategy(ctx, communityTree, ballotName)
 
 	// compute all participating voter accounts
 	voterAccounts := map[member.User]member.Account{}
@@ -67,10 +68,11 @@ func tallyVotersClonedStageOnly(
 ) (git.Change[form.Map, common.Tally], bool) {
 
 	communityTree := govOwner.Public.Tree()
-	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName, false)
+	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName)
+	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 
 	// read current tally
-	currentTally := LoadTally(ctx, communityTree, ballotName, false)
+	currentTally := LoadTally(ctx, communityTree, ballotName)
 
 	var fetchedVotes FetchedVotes
 	var fetchVoteChanges []git.Change[form.Map, FetchedVotes]
@@ -96,7 +98,7 @@ func tallyVotersClonedStageOnly(
 		rejectFetchedVotes(fetchedVotes, currentTally.RejectedVotes)
 
 		// write updated tally
-		openTallyNS := common.OpenBallotNS(ballotName).Sub(common.TallyFilebase)
+		openTallyNS := common.BallotPath(ballotName).Sub(common.TallyFilebase)
 		git.ToFileStage(ctx, communityTree, openTallyNS.Path(), currentTally)
 
 		return git.NewChange(
@@ -111,7 +113,7 @@ func tallyVotersClonedStageOnly(
 	updatedTally := strat.Tally(ctx, govOwner, &ad, &currentTally, fetchedVotesToElections(fetchedVotes)).Result
 
 	// write updated tally
-	openTallyNS := common.OpenBallotNS(ballotName).Sub(common.TallyFilebase)
+	openTallyNS := common.BallotPath(ballotName).Sub(common.TallyFilebase)
 	git.ToFileStage(ctx, communityTree, openTallyNS.Path(), updatedTally)
 
 	return git.NewChange(
@@ -134,17 +136,7 @@ func rejectFetchedVotes(fv FetchedVotes, rej map[member.User]common.RejectedElec
 	}
 }
 
-func LoadTally(
-	ctx context.Context,
-	communityTree *git.Tree,
-	ballotName ns.NS,
-	closed bool,
-) common.Tally {
-	var tallyNS ns.NS
-	if closed {
-		tallyNS = common.ClosedBallotNS(ballotName).Sub(common.TallyFilebase)
-	} else {
-		tallyNS = common.OpenBallotNS(ballotName).Sub(common.TallyFilebase)
-	}
+func LoadTally(ctx context.Context, communityTree *git.Tree, ballotName ns.NS) common.Tally {
+	tallyNS := common.BallotPath(ballotName).Sub(common.TallyFilebase)
 	return git.FromFile[common.Tally](ctx, communityTree, tallyNS.Path())
 }

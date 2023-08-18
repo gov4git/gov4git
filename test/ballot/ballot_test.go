@@ -184,11 +184,11 @@ func TestTallyAll(t *testing.T) {
 	fmt.Println("tally: ", form.SprintJSON(tallyChg))
 
 	// verify tallies are correct
-	ast0 := ballot.Show(ctx, cty.Gov(), ballotName0, false)
+	ast0 := ballot.Show(ctx, cty.Gov(), ballotName0)
 	if ast0.Tally.Scores[choices[0]] != math.Sqrt(5.0) {
 		t.Errorf("expecting %v, got %v", math.Sqrt(5.0), ast0.Tally.Scores[choices[0]])
 	}
-	ast1 := ballot.Show(ctx, cty.Gov(), ballotName1, false)
+	ast1 := ballot.Show(ctx, cty.Gov(), ballotName1)
 	if ast1.Tally.Scores[choices[0]] != -math.Sqrt(5.0) {
 		t.Errorf("expecting %v, got %v", -math.Sqrt(5.0), ast1.Tally.Scores[choices[0]])
 	}

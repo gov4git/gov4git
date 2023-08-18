@@ -11,14 +11,9 @@ import (
 	"github.com/gov4git/lib4git/ns"
 )
 
-func Show(
-	ctx context.Context,
-	govAddr gov.GovAddress,
-	ballotName ns.NS,
-	closed bool,
-) common.AdStrategyTally {
+func Show(ctx context.Context, govAddr gov.GovAddress, ballotName ns.NS) common.AdStrategyTally {
 
-	return ShowLocal(ctx, govAddr, git.CloneOne(ctx, git.Address(govAddr)).Tree(), ballotName, closed)
+	return ShowLocal(ctx, govAddr, git.CloneOne(ctx, git.Address(govAddr)).Tree(), ballotName)
 }
 
 func ShowLocal(
@@ -26,11 +21,10 @@ func ShowLocal(
 	govAddr gov.GovAddress,
 	govTree *git.Tree,
 	ballotName ns.NS,
-	closed bool,
 ) common.AdStrategyTally {
 
-	ad, strat := load.LoadStrategy(ctx, govTree, ballotName, closed)
+	ad, strat := load.LoadStrategy(ctx, govTree, ballotName)
 	var tally common.Tally
-	must.Try(func() { tally = LoadTally(ctx, govTree, ballotName, closed) })
+	must.Try(func() { tally = LoadTally(ctx, govTree, ballotName) })
 	return common.AdStrategyTally{Ad: ad, Strategy: strat, Tally: tally}
 }

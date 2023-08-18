@@ -36,7 +36,7 @@ func TallyAllStageOnly(
 
 	// list all open ballots
 	communityTree := govOwner.Public.Tree()
-	ads := ListLocal(ctx, communityTree, false)
+	ads := common.FilterOpenClosedAds(false, ListLocal(ctx, communityTree))
 
 	// compute union of all voter accounts from all open ballots
 	adVoters := make([]adVoters, len(ads))

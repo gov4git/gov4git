@@ -36,17 +36,15 @@ func FreezeStageOnly(
 
 	govTree := govCloned.Public.Tree()
 
-	// verify ad and strategy are present
-	ad, _ := load.LoadStrategy(ctx, govTree, ballotName, false)
+	ad, _ := load.LoadStrategy(ctx, govTree, ballotName)
 
-	// verify ballot is not already frozen
-	if ad.Frozen {
-		must.Errorf(ctx, "ballot already frozen")
-	}
+	must.Assertf(ctx, !ad.Closed, "ballot is closed")
+	must.Assertf(ctx, !ad.Frozen, "ballot already frozen")
+
 	ad.Frozen = true
 
 	// write updated ad
-	openAdNS := common.OpenBallotNS(ballotName).Sub(common.AdFilebase)
+	openAdNS := common.BallotPath(ballotName).Sub(common.AdFilebase)
 	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
 
 	return git.NewChangeNoResult(fmt.Sprintf("Freeze ballot %v", ballotName), "ballot_freeze")

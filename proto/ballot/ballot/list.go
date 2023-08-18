@@ -17,21 +17,15 @@ func List(
 	closed bool,
 ) []common.Advertisement {
 
-	return ListLocal(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree(), closed)
+	return ListLocal(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree())
 }
 
 func ListLocal(
 	ctx context.Context,
 	govTree *git.Tree,
-	closed bool,
 ) []common.Advertisement {
 
-	var ballotsNS ns.NS
-	if closed {
-		ballotsNS = common.ClosedBallotNS(ns.NS{})
-	} else {
-		ballotsNS = common.OpenBallotNS(ns.NS{})
-	}
+	ballotsNS := common.BallotPath(ns.NS{})
 
 	files, err := git.ListFilesRecursively(govTree, ballotsNS.Path())
 	must.NoError(ctx, err)

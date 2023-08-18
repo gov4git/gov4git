@@ -30,6 +30,14 @@ stdout '"score": 3'
 gov4git ballot vote --name ballot_1/xyz --choices choice-1 --strengths 7.0
 gov4git sync
 
+gov4git ballot vote --name ballot_1/xyz --choices choice-1 --strengths 2.0
+gov4git ballot freeze --name ballot_1/xyz
+
+gov4git ballot list --frozen
+stdout ballot_1
+
+gov4git sync
+
 gov4git ballot show --name ballot_1/xyz
 stdout '"score": 4'
 

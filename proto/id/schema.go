@@ -1,8 +1,11 @@
 package id
 
 import (
+	"crypto/ed25519"
+
 	"github.com/google/uuid"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/lib4git/form"
 )
 
 var (
@@ -26,7 +29,19 @@ type PublicCredentials struct {
 	PublicKeyEd25519 Ed25519PublicKey `json:"public_key_ed25519"`
 }
 
+func Ed25519PubKeyToID(pubKey ed25519.PublicKey) ID {
+	return ID(form.BytesHashForFilename(pubKey))
+}
+
+func (x PublicCredentials) IsValid() bool {
+	return form.BytesHashForFilename(x.PublicKeyEd25519) == string(x.ID)
+}
+
 type PrivateCredentials struct {
 	PrivateKeyEd25519 Ed25519PrivateKey `json:"private_key_ed25519"`
 	PublicCredentials PublicCredentials `json:"public_credentials"`
+}
+
+func (x PrivateCredentials) IsValid() bool {
+	return x.PublicCredentials.IsValid()
 }

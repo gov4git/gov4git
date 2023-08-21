@@ -5,6 +5,7 @@ import (
 
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 )
 
 func FetchOwnerCredentials(ctx context.Context, addr OwnerAddress) PrivateCredentials {
@@ -16,5 +17,7 @@ func GetOwnerCredentials(ctx context.Context, owner OwnerCloned) PrivateCredenti
 }
 
 func GetPrivateCredentials(ctx context.Context, privateTree *git.Tree) PrivateCredentials {
-	return form.FromFile[PrivateCredentials](ctx, privateTree.Filesystem, PrivateCredentialsNS.Path())
+	cred := form.FromFile[PrivateCredentials](ctx, privateTree.Filesystem, PrivateCredentialsNS.Path())
+	must.Assertf(ctx, cred.IsValid(), "credentials are not valid")
+	return cred
 }

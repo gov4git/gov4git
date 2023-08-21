@@ -20,7 +20,7 @@ func GenerateCredentials() (PrivateCredentials, error) {
 	return PrivateCredentials{
 		PrivateKeyEd25519: Ed25519PrivateKey(privKey),
 		PublicCredentials: PublicCredentials{
-			ID:               GenerateUniqueID(),
+			ID:               Ed25519PubKeyToID(pubKey),
 			PublicKeyEd25519: Ed25519PublicKey(pubKey),
 		},
 	}, nil

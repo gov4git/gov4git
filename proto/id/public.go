@@ -5,6 +5,7 @@ import (
 
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 )
 
 func FetchPublicCredentials(ctx context.Context, addr PublicAddress) PublicCredentials {
@@ -12,5 +13,7 @@ func FetchPublicCredentials(ctx context.Context, addr PublicAddress) PublicCrede
 }
 
 func GetPublicCredentials(ctx context.Context, t *git.Tree) PublicCredentials {
-	return form.FromFile[PublicCredentials](ctx, t.Filesystem, PublicCredentialsNS.Path())
+	cred := form.FromFile[PublicCredentials](ctx, t.Filesystem, PublicCredentialsNS.Path())
+	must.Assertf(ctx, cred.IsValid(), "credentials are not valid")
+	return cred
 }

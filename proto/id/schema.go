@@ -2,8 +2,8 @@ package id
 
 import (
 	"crypto/ed25519"
+	"crypto/rand"
 
-	"github.com/google/uuid"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/lib4git/form"
 )
@@ -20,8 +20,11 @@ var (
 
 type ID string
 
-func GenerateUniqueID() ID {
-	return ID(uuid.New().String())
+func GenerateRandomID() ID {
+	const w = 512 / 8 // 512 bits, measured in bytes
+	buf := make([]byte, w)
+	rand.Read(buf)
+	return ID(form.BytesHashForFilename(buf))
 }
 
 type PublicCredentials struct {

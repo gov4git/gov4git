@@ -87,7 +87,7 @@ type Election struct {
 
 func NewElection(choice string, strength float64) Election {
 	return Election{
-		VoteID:             id.GenerateUniqueID(), //XXX
+		VoteID:             id.GenerateRandomID(),
 		VoteTime:           time.Now(),
 		VoteChoice:         choice,
 		VoteStrengthChange: strength,

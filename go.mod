@@ -3,7 +3,6 @@ module github.com/gov4git/gov4git
 go 1.19
 
 require (
-	github.com/google/uuid v1.3.0
 	github.com/gov4git/lib4git v0.0.17
 	github.com/gov4git/vendor4git v0.0.1
 	github.com/rogpeppe/go-internal v1.11.0

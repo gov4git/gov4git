@@ -1,0 +1,5 @@
+
+
+- (receiver id + ballot topic) is used to identify the receiver
+	- what happens if a malicious receiver picks the same ID as someone else
+	- this question applies to vote logging as well

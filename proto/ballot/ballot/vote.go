@@ -60,7 +60,7 @@ func VoteStageOnly(
 	voteLogNS := common.VoteLogPath(govCred.ID, ballotName)
 	// read current vote log
 	voteLog, err := git.TryFromFile[common.VoteLog](ctx, voterTree, voteLogNS.Path())
-	if err != nil {
+	if err != nil { // XXX: isolate file not found error only
 		voteLog = common.VoteLog{
 			GovID:         govCred.ID,
 			GovAddress:    govAddr,

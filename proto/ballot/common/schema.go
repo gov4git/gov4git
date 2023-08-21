@@ -32,6 +32,16 @@ type VoteLog struct {
 	VoteEnvelopes VoteEnvelopes  `json:"vote_envelopes"` // in the order in which they were sent
 }
 
+// VoterStatus reflects the state of an individual user's votes within a ballot.
+type VoterStatus struct {
+	GovID         id.ID             `json:"governance_id"`
+	GovAddress    gov.GovAddress    `json:"governance_address"`
+	Ballot        ns.NS             `json:"ballot_name"`
+	AcceptedVotes AcceptedElections `json:"accepted_votes"`
+	RejectedVotes RejectedElections `json:"rejected_votes"`
+	PendingVotes  Elections         `json:"pending_votes"`
+}
+
 func VoteLogPath(govID id.ID, ballotName ns.NS) ns.NS {
 	return VoteLogNS.Sub(
 		filepath.Join(

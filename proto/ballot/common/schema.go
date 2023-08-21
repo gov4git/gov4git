@@ -36,7 +36,7 @@ type VoteLog struct {
 type VoterStatus struct {
 	GovID         id.ID             `json:"governance_id"`
 	GovAddress    gov.GovAddress    `json:"governance_address"`
-	Ballot        ns.NS             `json:"ballot_name"`
+	BallotName    ns.NS             `json:"ballot_name"`
 	AcceptedVotes AcceptedElections `json:"accepted_votes"`
 	RejectedVotes RejectedElections `json:"rejected_votes"`
 	PendingVotes  Elections         `json:"pending_votes"`

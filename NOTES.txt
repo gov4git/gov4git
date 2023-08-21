@@ -6,4 +6,4 @@
 	- applies also when determining a user's name within the community, based on public credentials
 
 - [ ] address XXX
-- [ ] test
+- [x] test

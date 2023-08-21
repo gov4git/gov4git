@@ -35,8 +35,9 @@ func TrackStageOnly(
 
 	// determine the voter's username in the community
 	voterCred := id.GetPublicCredentials(ctx, voterOwner.Public.Tree())
-	user := member.LookupUserByIDLocal(ctx, govCloned.Tree(), voterCred.ID)
-	must.Assertf(ctx, len(user) > 0, "user not found in community")
+	users := member.LookupUserByIDLocal(ctx, govCloned.Tree(), voterCred.ID)
+	must.Assertf(ctx, len(users) > 0, "user not found in community")
+	user := users[0]
 
 	// read the ballot tally
 	tally := LoadTally(ctx, govCloned.Tree(), ballotName)
@@ -46,7 +47,36 @@ func TrackStageOnly(
 	voteLogNS := common.VoteLogPath(govCred.ID, ballotName)
 	voteLog := git.FromFile[common.VoteLog](ctx, voterOwner.Public.Tree(), voteLogNS.Path())
 
-	XXX
+	// calculate pending votes
+	pendingVotes := map[id.ID]bool{}
+	for _, env := range voteLog.VoteEnvelopes {
+		for _, el := range env.Elections {
+			pendingVotes[el.VoteID] = true
+		}
+	}
+	for _, acc := range tally.AcceptedVotes[user] {
+		delete(pendingVotes, acc.Vote.VoteID)
+	}
+	for _, rej := range tally.RejectedVotes[user] {
+		delete(pendingVotes, rej.Vote.VoteID)
+	}
 
-	return common.VoterStatus{XXX}
+	// collect votes in order of execution
+	pending := common.Elections{}
+	for _, env := range voteLog.VoteEnvelopes {
+		for _, el := range env.Elections {
+			if pendingVotes[el.VoteID] {
+				pending = append(pending, el)
+			}
+		}
+	}
+
+	return common.VoterStatus{
+		GovID:         voteLog.GovID,
+		GovAddress:    voteLog.GovAddress,
+		BallotName:    ballotName,
+		AcceptedVotes: tally.AcceptedVotes[user],
+		RejectedVotes: tally.RejectedVotes[user],
+		PendingVotes:  pending,
+	}
 }

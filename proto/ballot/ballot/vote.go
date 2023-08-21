@@ -60,13 +60,15 @@ func VoteStageOnly(
 	voteLogNS := common.VoteLogPath(govCred.ID, ballotName)
 	// read current vote log
 	voteLog, err := git.TryFromFile[common.VoteLog](ctx, voterTree, voteLogNS.Path())
-	if err != nil { // XXX: isolate file not found error only
+	if git.IsNotExist(err) {
 		voteLog = common.VoteLog{
 			GovID:         govCred.ID,
 			GovAddress:    govAddr,
 			Ballot:        ballotName,
 			VoteEnvelopes: nil,
 		}
+	} else {
+		must.NoError(ctx, err)
 	}
 	// append new vote
 	voteLog.VoteEnvelopes = append(voteLog.VoteEnvelopes, envelope)

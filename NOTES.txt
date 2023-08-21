@@ -1,9 +1,7 @@
-
+- [x] test
 - [ ] (receiver id + ballot topic) is used to identify the receiver
 	- what happens if a malicious receiver picks the same ID as someone else
 		- [ ] make id = hash of public key
 	- this question applies to vote logging as well
 	- applies also when determining a user's name within the community, based on public credentials
 
-- [ ] address XXX
-- [x] test

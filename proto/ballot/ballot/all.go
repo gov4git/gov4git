@@ -110,10 +110,12 @@ func clonePar(ctx context.Context, userAccounts map[member.User]member.Account, 
 		sem <- true
 		go func(u member.User, a member.Account) {
 
+			base.Infof("cloning voter %v repository %v", u, a.PublicAddress)
 			cloned, err := git.TryCloneOne(ctx, git.Address(a.PublicAddress))
 			if err != nil {
 				base.Infof("user %v repository %v unresponsive (%v)", u, a.PublicAddress, err)
 			} else {
+				base.Infof("user %v repository %v cloned successfully (%v)", u, a.PublicAddress, err)
 				allLock.Lock()
 				allClones[u] = cloned
 				allLock.Unlock()

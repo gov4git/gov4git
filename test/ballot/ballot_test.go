@@ -193,7 +193,7 @@ func TestTallyAll(t *testing.T) {
 	fmt.Println("vote 1: ", form.SprintJSON(voteChg1))
 
 	// tally
-	tallyChg := ballot.TallyAll(ctx, cty.Organizer())
+	tallyChg := ballot.TallyAll(ctx, cty.Organizer(), 2)
 	fmt.Println("tally: ", form.SprintJSON(tallyChg))
 
 	// verify tallies are correct

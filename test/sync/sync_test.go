@@ -45,7 +45,7 @@ func TestSync(t *testing.T) {
 	fmt.Println("vote 1: ", form.SprintJSON(voteChg1))
 
 	// tally
-	syncChg := sync.Sync(ctx, cty.Organizer())
+	syncChg := sync.Sync(ctx, cty.Organizer(), 2)
 	fmt.Println("sync: ", form.SprintJSON(syncChg))
 
 	// verify tallies are correct

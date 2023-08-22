@@ -14,10 +14,11 @@ import (
 func Sync(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
+	maxPar int,
 ) git.Change[form.Map, form.Map] {
 
 	// collect votes and tally all open ballots
-	tallyChg := ballot.TallyAll(ctx, govAddr)
+	tallyChg := ballot.TallyAll(ctx, govAddr, maxPar)
 
 	// process bureau requests by users
 	bureauChg := bureau.Process(ctx, govAddr, member.Everybody)

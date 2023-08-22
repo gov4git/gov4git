@@ -54,6 +54,27 @@ func VoteStageOnly(
 		Elections: elections,
 	}
 
+	// record vote in voter's repo
+	voterTree := voterOwner.Public.Tree()
+	govCred := id.GetPublicCredentials(ctx, govCloned.Tree())
+	voteLogNS := common.VoteLogPath(govCred.ID, ballotName)
+	// read current vote log
+	voteLog, err := git.TryFromFile[common.VoteLog](ctx, voterTree, voteLogNS.Path())
+	if git.IsNotExist(err) {
+		voteLog = common.VoteLog{
+			GovID:         govCred.ID,
+			GovAddress:    govAddr,
+			Ballot:        ballotName,
+			VoteEnvelopes: nil,
+		}
+	} else {
+		must.NoError(ctx, err)
+	}
+	// append new vote
+	voteLog.VoteEnvelopes = append(voteLog.VoteEnvelopes, envelope)
+	git.ToFileStage(ctx, voterTree, voteLogNS.Path(), voteLog)
+
+	// send vote to community by mail
 	sendChg := mail.SendSignedStageOnly(ctx, voterOwner, govCloned.Tree(), common.BallotTopic(ballotName), envelope)
 	return git.NewChange(
 		"Cast vote",

@@ -138,5 +138,4 @@ func rejectFetchedVotes(fv FetchedVotes, rej map[member.User]common.RejectedElec
 
 func LoadTally(ctx context.Context, communityTree *git.Tree, ballotName ns.NS) common.Tally {
 	tallyNS := common.BallotPath(ballotName).Sub(common.TallyFilebase)
-	return git.FromFile[common.Tally](ctx, communityTree, tallyNS.Path())
-}
+	return git.FromFile[common.Tally](ctx, communityTree, tallyNS.Path()) }

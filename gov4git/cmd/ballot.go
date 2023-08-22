@@ -160,6 +160,25 @@ var (
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
+
+	ballotTrackCmd = &cobra.Command{
+		Use:   "track",
+		Short: "Track the status of votes",
+		Long: `Track reports on the status of the user's votes on a given ballot.
+It returns a report listing accepted, rejected and pending votes.
+Rejected votes are associated with a reason, such as "ballot is frozen".
+Pending votes have not yet been processed by the community's governance.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
+			status := ballot.Track(
+				ctx,
+				setup.Member,
+				setup.Gov,
+				ns.ParseFromPath(ballotName),
+			)
+			fmt.Fprint(os.Stdout, form.SprintJSON(status))
+		},
+	}
 )
 
 var (
@@ -236,6 +255,11 @@ func init() {
 	ballotVoteCmd.MarkFlagRequired("choices")
 	ballotVoteCmd.Flags().Float64SliceVar(&ballotElectionStrength, "strengths", nil, "list of elected vote strengths")
 	ballotVoteCmd.MarkFlagRequired("strengths")
+
+	// track
+	ballotCmd.AddCommand(ballotTrackCmd)
+	ballotTrackCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotTrackCmd.MarkFlagRequired("name")
 }
 
 func parseElections(ctx context.Context, choices []string, strengths []float64) common.Elections {

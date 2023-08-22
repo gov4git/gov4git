@@ -1,11 +1,14 @@
 package common
 
 import (
+	"path/filepath"
 	"time"
 
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/ns"
 	"github.com/gov4git/lib4git/util"
@@ -17,10 +20,39 @@ var (
 	StrategyFilebase = "ballot_strategy.json"
 	TallyFilebase    = "ballot_tally.json"
 	OutcomeFilebase  = "ballot_outcome.json"
+
+	VoteLogNS = proto.RootNS.Sub("votes") // namespace in voter's repo for recording votes
 )
 
-func BallotTopic(name ns.NS) string {
-	return "ballot:" + name.Path()
+// VoteLog records the votes of a user to a ballot within a given governance.
+type VoteLog struct {
+	GovID         id.ID          `json:"governance_id"`
+	GovAddress    gov.GovAddress `json:"governance_address"`
+	Ballot        ns.NS          `json:"ballot_name"`
+	VoteEnvelopes VoteEnvelopes  `json:"vote_envelopes"` // in the order in which they were sent
+}
+
+// VoterStatus reflects the state of an individual user's votes within a ballot.
+type VoterStatus struct {
+	GovID         id.ID             `json:"governance_id"`
+	GovAddress    gov.GovAddress    `json:"governance_address"`
+	BallotName    ns.NS             `json:"ballot_name"`
+	AcceptedVotes AcceptedElections `json:"accepted_votes"`
+	RejectedVotes RejectedElections `json:"rejected_votes"`
+	PendingVotes  Elections         `json:"pending_votes"`
+}
+
+func VoteLogPath(govID id.ID, ballotName ns.NS) ns.NS {
+	return VoteLogNS.Sub(
+		filepath.Join(
+			form.StringHashForFilename(string(govID)),
+			form.StringHashForFilename(BallotTopic(ballotName)),
+		),
+	)
+}
+
+func BallotTopic(ballotName ns.NS) string {
+	return "ballot:" + ballotName.Path()
 }
 
 func BallotPath(path ns.NS) ns.NS {
@@ -47,13 +79,19 @@ type BallotAddress struct {
 }
 
 type Election struct {
+	VoteID             id.ID     `json:"vote_id"`
 	VoteTime           time.Time `json:"vote_time"`
 	VoteChoice         string    `json:"vote_choice"`
 	VoteStrengthChange float64   `json:"vote_strength_change"`
 }
 
 func NewElection(choice string, strength float64) Election {
-	return Election{VoteTime: time.Now(), VoteChoice: choice, VoteStrengthChange: strength}
+	return Election{
+		VoteID:             id.GenerateRandomID(),
+		VoteTime:           time.Now(),
+		VoteChoice:         choice,
+		VoteStrengthChange: strength,
+	}
 }
 
 type Elections []Election
@@ -63,6 +101,8 @@ type VoteEnvelope struct {
 	Ad        Advertisement  `json:"ballot_ad"`
 	Elections Elections      `json:"ballot_elections"`
 }
+
+type VoteEnvelopes []VoteEnvelope
 
 // Verify verifies that elections are consistent with the ballot ad.
 func (x VoteEnvelope) VerifyConsistency() bool {

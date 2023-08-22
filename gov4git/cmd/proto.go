@@ -14,6 +14,7 @@ const (
 )
 
 type Setup struct {
+	CacheDir  string
 	Gov       gov.GovAddress
 	Organizer gov.OrganizerAddress
 	Member    id.OwnerAddress
@@ -48,7 +49,7 @@ type UserPassword struct {
 
 func (cfg Config) Setup(ctx context.Context) Setup {
 
-	git.SetAuthor("gov4git governance", "no-reply@gov4git.xyz")
+	git.SetAuthor("gov4git governance", "no-reply@gov4git")
 
 	for url, auth := range cfg.Auth {
 		switch {
@@ -62,7 +63,8 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 	}
 
 	return Setup{
-		Gov: gov.GovAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
+		CacheDir: cfg.CacheDir,
+		Gov:      gov.GovAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
 		Organizer: gov.OrganizerAddress{
 			Public:  id.PublicAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
 			Private: id.PrivateAddress{Repo: cfg.GovPrivateURL, Branch: cfg.GovPrivateBranch},

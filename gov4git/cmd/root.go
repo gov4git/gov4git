@@ -22,7 +22,7 @@ var (
 	}
 )
 
-var ctx = git.WithAuth(context.Background(), nil)
+var ctx = git.WithTTL(git.WithAuth(context.Background(), nil), nil)
 
 var (
 	configPath string
@@ -48,6 +48,7 @@ func init() {
 	rootCmd.AddCommand(vendorCmd)
 	rootCmd.AddCommand(syncCmd)
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(cacheCmd)
 }
 
 func initAfterFlags() {

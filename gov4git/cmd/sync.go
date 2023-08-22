@@ -19,8 +19,16 @@ Sync fetches all outstanding votes from community users and incorporates them in
 Sync also fetches and processes all outstanding service requests from community users.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := sync.Sync(ctx, setup.Organizer)
+			chg := sync.Sync(ctx, setup.Organizer, syncMaxPar)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 )
+
+var (
+	syncMaxPar int
+)
+
+func init() {
+	syncCmd.Flags().IntVar(&syncMaxPar, "maxpar", 5, "parallelism while clonging member repos for vote collection")
+}

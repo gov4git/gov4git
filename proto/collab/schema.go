@@ -23,12 +23,12 @@ type ConcernName = Name
 
 // Concern is the current state of an concern.
 type Concern struct {
-	Name        ConcernName `json:"name"` // name of concern
-	Title       string      `json:"title"`
-	TrackerURL  string      `json:"tracker_url"` // link to concern on an external concern tracker, such as a GitHub issue
-	Closed      bool        `json:"closed"`
-	Cancelled   bool        `json:"cancelled"`
-	AddressedBy []string    `json:"addressed_by"` // prs addressing this concern
+	Name        ConcernName    `json:"name"` // name of concern
+	Title       string         `json:"title"`
+	TrackerURL  string         `json:"tracker_url"` // link to concern on an external concern tracker, such as a GitHub issue
+	Closed      bool           `json:"closed"`
+	Cancelled   bool           `json:"cancelled"`
+	AddressedBy []ProposalName `json:"addressed_by"` // prs addressing this concern
 }
 
 // ProposalName is the name of a pull request within the gov4git system.
@@ -43,4 +43,9 @@ type Proposal struct {
 	Closed     bool          `json:"closed"`
 	Cancelled  bool          `json:"cancelled"`
 	Addresses  []ConcernName `json:"addresses"` // concerns addressed by this proposal
+}
+
+type ProposalConcernPair struct {
+	Proposal Proposal `json:"proposal"`
+	Concern  Concern  `json:"concern"`
 }

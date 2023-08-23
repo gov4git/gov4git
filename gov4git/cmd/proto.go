@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"time"
 
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
@@ -15,6 +16,7 @@ const (
 
 type Setup struct {
 	CacheDir  string
+	CacheTTL  time.Duration
 	Gov       gov.GovAddress
 	Organizer gov.OrganizerAddress
 	Member    id.OwnerAddress
@@ -33,7 +35,8 @@ type Config struct {
 	MemberPrivateURL    git.URL    `json:"member_private_url"`
 	MemberPrivateBranch git.Branch `json:"member_private_branch"`
 	//
-	CacheDir string `json:"cache_dir"`
+	CacheDir        string `json:"cache_dir"`
+	CacheTTLSeconds int    `json:"cache_ttl_seconds"` // ttl of repo cache replicas in seconds
 }
 
 type AuthConfig struct {
@@ -51,6 +54,7 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 
 	git.SetAuthor("gov4git governance", "no-reply@gov4git")
 
+	// attach auth information to context
 	for url, auth := range cfg.Auth {
 		switch {
 		case auth.SSHPrivateKeysFile != nil:
@@ -62,8 +66,9 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 		}
 	}
 
-	return Setup{
+	s := Setup{
 		CacheDir: cfg.CacheDir,
+		CacheTTL: time.Second * time.Duration(cfg.CacheTTLSeconds),
 		Gov:      gov.GovAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
 		Organizer: gov.OrganizerAddress{
 			Public:  id.PublicAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
@@ -74,4 +79,13 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 			Private: id.PrivateAddress{Repo: cfg.MemberPrivateURL, Branch: cfg.MemberPrivateBranch},
 		},
 	}
+
+	// attach cache ttl information to context
+	git.SetTTL(ctx, setup.Gov.Repo, s.CacheTTL)
+	git.SetTTL(ctx, setup.Organizer.Public.Repo, s.CacheTTL)
+	git.SetTTL(ctx, setup.Organizer.Private.Repo, s.CacheTTL)
+	git.SetTTL(ctx, setup.Member.Public.Repo, s.CacheTTL)
+	git.SetTTL(ctx, setup.Member.Private.Repo, s.CacheTTL)
+
+	return s
 }

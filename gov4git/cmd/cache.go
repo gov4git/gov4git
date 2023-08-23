@@ -14,7 +14,7 @@ import (
 var (
 	cacheCmd = &cobra.Command{
 		Use:   "cache",
-		Short: "Manage local client cache",
+		Short: "Manage the client's local cache",
 		Long:  ``,
 		Run:   func(cmd *cobra.Command, args []string) {},
 	}
@@ -37,6 +37,7 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
+			must.Assertf(ctx, setup.CacheDir != "", "cache dir not specified in config")
 			if cacheUpdateIntervalSeconds > 0 {
 				for {
 					updateCacheBestEffort(ctx)

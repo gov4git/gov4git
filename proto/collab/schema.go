@@ -2,6 +2,7 @@ package collab
 
 import (
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/kv"
 )
 
@@ -28,6 +29,7 @@ type Concern struct {
 	TrackerURL  string         `json:"tracker_url"` // link to concern on an external concern tracker, such as a GitHub issue
 	Closed      bool           `json:"closed"`
 	Cancelled   bool           `json:"cancelled"`
+	Priority    Priority       `json:"priority"`
 	AddressedBy []ProposalName `json:"addressed_by"` // prs addressing this concern
 }
 
@@ -42,10 +44,18 @@ type Proposal struct {
 	TrackerURL string        `json:"tracker_url"` // link to proposal on an external proposal tracker, such as GitHub
 	Closed     bool          `json:"closed"`
 	Cancelled  bool          `json:"cancelled"`
+	Priority   Priority      `json:"priority"`
 	Addresses  []ConcernName `json:"addresses"` // concerns addressed by this proposal
 }
 
+// ProposalConcernPair is a pair of a proposal and a concern.
 type ProposalConcernPair struct {
 	Proposal Proposal `json:"proposal"`
 	Concern  Concern  `json:"concern"`
+}
+
+// Priority describes how a concern or a proposal is prioritized.
+type Priority struct {
+	Fixed  *float64           `json:"fixed"`
+	Ballot *common.BallotName `json:"ballot"`
 }

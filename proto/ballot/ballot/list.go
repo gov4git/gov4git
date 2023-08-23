@@ -8,7 +8,6 @@ import (
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func List(
@@ -24,7 +23,7 @@ func List_Local(
 	govTree *git.Tree,
 ) []common.Advertisement {
 
-	ballotsNS := common.BallotPath(ns.NS{})
+	ballotsNS := common.BallotPath(common.BallotName{})
 
 	files, err := git.ListFilesRecursively(govTree, ballotsNS)
 	must.NoError(ctx, err)

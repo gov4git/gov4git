@@ -9,14 +9,13 @@ import (
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func Track(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
 	govAddr gov.GovAddress,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 ) common.VoterStatus {
 
 	govCloned := git.CloneOne(ctx, git.Address(govAddr))
@@ -30,7 +29,7 @@ func Track_StageOnly(
 	govAddr gov.GovAddress,
 	voterOwner id.OwnerCloned,
 	govCloned git.Cloned,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 ) common.VoterStatus {
 
 	// determine the voter's username in the community

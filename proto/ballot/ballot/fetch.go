@@ -11,7 +11,6 @@ import (
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
-	"github.com/gov4git/lib4git/ns"
 )
 
 type FetchedVote struct {
@@ -38,7 +37,7 @@ func fetchVotes(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govOwner id.OwnerCloned,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 	user member.User,
 	account member.Account,
 ) git.Change[form.Map, FetchedVotes] {
@@ -50,7 +49,7 @@ func fetchVotesCloned(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govOwner id.OwnerCloned,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 	user member.User,
 	account member.Account,
 	userCloned git.Cloned,

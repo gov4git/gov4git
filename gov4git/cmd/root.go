@@ -83,7 +83,7 @@ func LoadConfig() {
 	}
 
 	if config.CacheDir != "" {
-		git.UseCache(ctx, config.CacheDir)
+		ctx = git.WithCache(ctx, config.CacheDir)
 	}
 
 	setup = config.Setup(ctx)

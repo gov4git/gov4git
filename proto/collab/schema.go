@@ -11,8 +11,8 @@ var (
 	concernNS = collabNS.Sub("concern")
 	concernKV = kv.KV[ConcernName, ConcernState]{}
 
-	prNS = collabNS.Sub("proposal")
-	prKV = kv.KV[ConcernName, ProposalState]{}
+	proposalNS = collabNS.Sub("proposal")
+	proposalKV = kv.KV[ProposalName, ProposalState]{}
 )
 
 // ConcernName is the name of an issue within the gov4git system.
@@ -34,9 +34,9 @@ type ProposalName string
 
 // ProposalState is the current state of a pull request.
 type ProposalState struct {
-	Name       ProposalName  `json:"name"`        // name of pr
-	TrackerURL string        `json:"tracker_url"` // link to pr on an external pr tracker, such as GitHub
+	Name       ProposalName  `json:"name"`        // name of proposal
+	TrackerURL string        `json:"tracker_url"` // link to proposal on an external proposal tracker, such as GitHub
 	Closed     bool          `json:"closed"`
 	Cancelled  bool          `json:"cancelled"`
-	Addresses  []ConcernName `json:"addresses"` // issues addressed by this pr
+	Addresses  []ConcernName `json:"addresses"` // concerns addressed by this proposal
 }

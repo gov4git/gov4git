@@ -39,7 +39,7 @@ func AddGroup(ctx context.Context, addr gov.GovAddress, name Group) {
 }
 
 func AddGroup_StageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
-	if IsGroupLocal(ctx, t, name) {
+	if IsGroup_Local(ctx, t, name) {
 		must.Panic(ctx, fmt.Errorf("group already exists"))
 	}
 	return SetGroup_StageOnly(ctx, t, name)

@@ -10,10 +10,10 @@ import (
 )
 
 func IsConcern(ctx context.Context, addr gov.GovAddress, name ConcernName) bool {
-	return IsConcernLocal(ctx, gov.Clone(ctx, addr).Tree(), name)
+	return IsConcern_Local(ctx, gov.Clone(ctx, addr).Tree(), name)
 }
 
-func IsConcernLocal(ctx context.Context, t *git.Tree, name ConcernName) bool {
+func IsConcern_Local(ctx context.Context, t *git.Tree, name ConcernName) bool {
 	err := must.Try(func() { concernKV.Get(ctx, concernNS, t, name) })
 	return err == nil
 }
@@ -26,7 +26,7 @@ func OpenConcern(ctx context.Context, addr gov.GovAddress, name ConcernName, tra
 }
 
 func OpenConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName, trackerURL string) git.ChangeNoResult {
-	must.Assert(ctx, !IsConcernLocal(ctx, t, name), ErrConcernAlreadyExists)
+	must.Assert(ctx, !IsConcern_Local(ctx, t, name), ErrConcernAlreadyExists)
 	state := ConcernState{
 		Name:       name,
 		TrackerURL: trackerURL,

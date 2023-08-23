@@ -83,3 +83,12 @@ func (x KV[K, V]) ListKeys(ctx context.Context, ns ns.NS, t *git.Tree) []K {
 	}
 	return r
 }
+
+func (x KV[K, V]) ListKeyValues(ctx context.Context, ns ns.NS, t *git.Tree) ([]K, []V) {
+	keys := x.ListKeys(ctx, ns, t)
+	values := make([]V, len(keys))
+	for i, key := range keys {
+		values[i] = x.Get(ctx, ns, t, key)
+	}
+	return keys, values
+}

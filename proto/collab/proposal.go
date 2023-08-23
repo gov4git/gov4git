@@ -18,17 +18,18 @@ func IsProposal_Local(ctx context.Context, t *git.Tree, name ProposalName) bool 
 	return err == nil
 }
 
-func OpenProposal(ctx context.Context, addr gov.GovAddress, name ProposalName, trackerURL string) {
+func OpenProposal(ctx context.Context, addr gov.GovAddress, name ProposalName, title string, trackerURL string) {
 	cloned := gov.Clone(ctx, addr)
-	chg := OpenProposal_StageOnly(ctx, cloned.Tree(), name, trackerURL)
+	chg := OpenProposal_StageOnly(ctx, cloned.Tree(), name, trackerURL, title)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func OpenProposal_StageOnly(ctx context.Context, t *git.Tree, name ProposalName, trackerURL string) git.ChangeNoResult {
+func OpenProposal_StageOnly(ctx context.Context, t *git.Tree, name ProposalName, title string, trackerURL string) git.ChangeNoResult {
 	must.Assert(ctx, !IsProposal_Local(ctx, t, name), ErrProposalAlreadyExists)
-	state := ProposalState{
+	state := Proposal{
 		Name:       name,
+		Title:      title,
 		TrackerURL: trackerURL,
 		Closed:     false,
 	}
@@ -47,4 +48,13 @@ func CloseProposal_StageOnly(ctx context.Context, t *git.Tree, name ProposalName
 	must.Assert(ctx, !state.Closed, ErrProposalAlreadyClosed)
 	state.Closed = true
 	return proposalKV.Set(ctx, proposalNS, t, name, state)
+}
+
+func ListProposals(ctx context.Context, addr gov.GovAddress) []Proposal {
+	return ListProposals_Local(ctx, gov.Clone(ctx, addr).Tree())
+}
+
+func ListProposals_Local(ctx context.Context, t *git.Tree) []Proposal {
+	_, proposals := proposalKV.ListKeyValues(ctx, proposalNS, t)
+	return proposals
 }

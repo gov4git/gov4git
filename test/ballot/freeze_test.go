@@ -14,7 +14,6 @@ import (
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 	"github.com/gov4git/lib4git/testutil"
 )
 
@@ -22,7 +21,7 @@ func TestVoteFreezeVote(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := ns.NS{"a", "b", "c"}
+	ballotName := common.BallotName{"a", "b", "c"}
 	choices := []string{"x", "y", "z"}
 
 	// open
@@ -83,7 +82,7 @@ func TestVoteFreezeTally(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := ns.NS{"a", "b", "c"}
+	ballotName := common.BallotName{"a", "b", "c"}
 	choices := []string{"x", "y", "z"}
 
 	// open

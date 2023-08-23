@@ -11,14 +11,13 @@ import (
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func Open(
 	ctx context.Context,
 	strat common.Strategy,
 	govAddr gov.GovAddress,
-	name ns.NS,
+	name common.BallotName,
 	title string,
 	description string,
 	choices []string,
@@ -37,7 +36,7 @@ func Open_StageOnly(
 	strat common.Strategy,
 	govAddr gov.GovAddress,
 	govCloned git.Cloned,
-	name ns.NS,
+	name common.BallotName,
 	title string,
 	description string,
 	choices []string,

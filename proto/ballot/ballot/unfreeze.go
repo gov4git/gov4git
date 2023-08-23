@@ -11,13 +11,12 @@ import (
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func Unfreeze(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 ) git.ChangeNoResult {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
@@ -31,7 +30,7 @@ func Unfreeze_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 ) git.ChangeNoResult {
 
 	govTree := govCloned.Public.Tree()

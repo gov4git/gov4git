@@ -8,10 +8,9 @@ import (
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
-func Show(ctx context.Context, govAddr gov.GovAddress, ballotName ns.NS) common.AdStrategyTally {
+func Show(ctx context.Context, govAddr gov.GovAddress, ballotName common.BallotName) common.AdStrategyTally {
 
 	return Show_Local(ctx, govAddr, git.CloneOne(ctx, git.Address(govAddr)).Tree(), ballotName)
 }
@@ -20,7 +19,7 @@ func Show_Local(
 	ctx context.Context,
 	govAddr gov.GovAddress,
 	govTree *git.Tree,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 ) common.AdStrategyTally {
 
 	ad, strat := load.LoadStrategy(ctx, govTree, ballotName)

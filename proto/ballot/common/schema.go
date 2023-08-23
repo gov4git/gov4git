@@ -27,7 +27,7 @@ var (
 type VoteLog struct {
 	GovID         id.ID          `json:"governance_id"`
 	GovAddress    gov.GovAddress `json:"governance_address"`
-	Ballot        ns.NS          `json:"ballot_name"`
+	Ballot        BallotName     `json:"ballot_name"`
 	VoteEnvelopes VoteEnvelopes  `json:"vote_envelopes"` // in the order in which they were sent
 }
 
@@ -35,32 +35,46 @@ type VoteLog struct {
 type VoterStatus struct {
 	GovID         id.ID             `json:"governance_id"`
 	GovAddress    gov.GovAddress    `json:"governance_address"`
-	BallotName    ns.NS             `json:"ballot_name"`
+	BallotName    BallotName        `json:"ballot_name"`
 	AcceptedVotes AcceptedElections `json:"accepted_votes"`
 	RejectedVotes RejectedElections `json:"rejected_votes"`
 	PendingVotes  Elections         `json:"pending_votes"`
 }
 
-func VoteLogPath(govID id.ID, ballotName ns.NS) ns.NS {
+func VoteLogPath(govID id.ID, ballotName BallotName) ns.NS {
 	return VoteLogNS.Append(
 		form.StringHashForFilename(string(govID)),
 		form.StringHashForFilename(BallotTopic(ballotName)),
 	)
 }
 
-func BallotTopic(ballotName ns.NS) string {
+func BallotTopic(ballotName BallotName) string {
 	// BallotTopic must produce the same string on every OS.
 	// It is essential to use ballotName.GitPath, instead of ballotName.Path which is OS-specific.
 	return "ballot:" + ballotName.GitPath()
 }
 
-func BallotPath(path ns.NS) ns.NS {
-	return BallotNS.Join(path)
+func BallotPath(name BallotName) ns.NS {
+	return BallotNS.Join(name.NS())
+}
+
+type BallotName ns.NS
+
+func (x BallotName) Path() string {
+	return ns.NS(x).Path()
+}
+
+func (x BallotName) NS() ns.NS {
+	return ns.NS(x)
+}
+
+func ParseBallotNameFromPath(p string) BallotName {
+	return BallotName(ns.ParseFromPath(p))
 }
 
 type Advertisement struct {
 	Gov          gov.GovAddress `json:"community"`
-	Name         ns.NS          `json:"path"`
+	Name         BallotName     `json:"name"`
 	Title        string         `json:"title"`
 	Description  string         `json:"description"`
 	Choices      []string       `json:"choices"`
@@ -74,7 +88,7 @@ type Advertisement struct {
 
 type BallotAddress struct {
 	Gov  gov.GovAddress
-	Name ns.NS
+	Name BallotName
 }
 
 type Election struct {

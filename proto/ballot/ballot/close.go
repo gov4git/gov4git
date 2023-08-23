@@ -11,13 +11,12 @@ import (
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func Close(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 	cancel bool,
 ) git.Change[form.Map, common.Outcome] {
 
@@ -32,7 +31,7 @@ func Close_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 	cancel bool,
 ) git.Change[form.Map, common.Outcome] {
 

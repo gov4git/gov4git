@@ -15,7 +15,7 @@ import (
 var (
 	rootCmd = &cobra.Command{
 		Use:   "gov4git",
-		Short: "gov4git is a command-line client for transparent community governance",
+		Short: "gov4git is a command-line client for the gov4git community governance protocol",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 		},

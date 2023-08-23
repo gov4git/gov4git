@@ -32,6 +32,8 @@ go install github.com/gov4git/gov4git/gov4git@latest
 
 cat <<EOF >> ~/.gov4git/config
 {
+     "cache_dir": "/Users/petar/.gov4git/cache",
+     "cache_ttl_seconds": 120,
      "auth" : {
           "git@github.com:petar/community.public.git": { "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa" },
           "git@github.com:petar/community.private.git": { "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa" },
@@ -49,6 +51,8 @@ cat <<EOF >> ~/.gov4git/config
 }
 EOF
 
+# `cache_dir`, if specified, sets the on-disk location for local caches of remote repos
+# `cache_ttl_seconds` sets the ttl for cached replicas of community and member repos
 # `ssh_private_keys_file` points to a local file containing your SSH credentials for cloning the private repos in the config.
 # `community_public_url` is the git URL of the public community repo
 # `community_public_branch` is the branch in the public community repo where the governance state will reside
@@ -66,6 +70,8 @@ EOF
 
 cat <<EOF >> ~/.gov4git/config
 {
+     "cache_dir": "/Users/petar/.gov4git/cache",
+     "cache_ttl_seconds": 120,
      "auth" : {
           "https://github.com/petar/community.public.git": { "access_token": "YOUR_ACCESS_TOKEN" },
           "https://github.com/petar/community.private.git": { "access_token": "YOUR_ACCESS_TOKEN" },

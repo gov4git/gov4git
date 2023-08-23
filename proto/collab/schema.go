@@ -18,6 +18,10 @@ var (
 
 type Name string
 
+func (x Name) String() string {
+	return string(x)
+}
+
 // ConcernName is the name of a concern within the gov4git system.
 // ConcernNames must be unique within a community.
 type ConcernName = Name
@@ -33,6 +37,10 @@ type Concern struct {
 	AddressedBy []ProposalName `json:"addressed_by"` // prs addressing this concern
 }
 
+func ConcernPriorityBallotName(concernName ConcernName) common.BallotName {
+	return common.BallotName{"concern", "priority", concernName.String()}
+}
+
 // ProposalName is the name of a pull request within the gov4git system.
 // ProposalNames must be unique within a community.
 type ProposalName = Name
@@ -46,6 +54,10 @@ type Proposal struct {
 	Cancelled  bool          `json:"cancelled"`
 	Priority   Priority      `json:"priority"`
 	Addresses  []ConcernName `json:"addresses"` // concerns addressed by this proposal
+}
+
+func ProposalPriorityBallotName(proposalName ProposalName) common.BallotName {
+	return common.BallotName{"proposal", "priority", proposalName.String()}
 }
 
 // ProposalConcernPair is a pair of a proposal and a concern.

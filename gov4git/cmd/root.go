@@ -15,14 +15,14 @@ import (
 var (
 	rootCmd = &cobra.Command{
 		Use:   "gov4git",
-		Short: "gov4git is a command-line client for transparent community governance",
+		Short: "gov4git is a command-line client for the gov4git community governance protocol",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 		},
 	}
 )
 
-var ctx = git.WithAuth(context.Background(), nil)
+var ctx = git.WithTTL(git.WithAuth(context.Background(), nil), nil)
 
 var (
 	configPath string
@@ -48,6 +48,7 @@ func init() {
 	rootCmd.AddCommand(vendorCmd)
 	rootCmd.AddCommand(syncCmd)
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(cacheCmd)
 }
 
 func initAfterFlags() {
@@ -82,7 +83,7 @@ func LoadConfig() {
 	}
 
 	if config.CacheDir != "" {
-		git.UseCache(ctx, config.CacheDir)
+		ctx = git.WithCache(ctx, config.CacheDir)
 	}
 
 	setup = config.Setup(ctx)

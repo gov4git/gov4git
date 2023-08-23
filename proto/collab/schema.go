@@ -9,32 +9,36 @@ var (
 	collabNS = proto.RootNS.Sub("collab")
 
 	concernNS = collabNS.Sub("concern")
-	concernKV = kv.KV[ConcernName, ConcernState]{}
+	concernKV = kv.KV[ConcernName, Concern]{}
 
 	proposalNS = collabNS.Sub("proposal")
-	proposalKV = kv.KV[ProposalName, ProposalState]{}
+	proposalKV = kv.KV[ProposalName, Proposal]{}
 )
 
-// ConcernName is the name of an issue within the gov4git system.
-// ConcernNames must be unique within a community.
-type ConcernName string
+type Name string
 
-// ConcernState is the current state of an issue.
-type ConcernState struct {
-	Name        ConcernName `json:"name"`        // name of issue
-	TrackerURL  string      `json:"tracker_url"` // link to issue on an external issue tracker, such as GitHub
+// ConcernName is the name of a concern within the gov4git system.
+// ConcernNames must be unique within a community.
+type ConcernName = Name
+
+// Concern is the current state of an concern.
+type Concern struct {
+	Name        ConcernName `json:"name"` // name of concern
+	Title       string      `json:"title"`
+	TrackerURL  string      `json:"tracker_url"` // link to concern on an external concern tracker, such as a GitHub issue
 	Closed      bool        `json:"closed"`
 	Cancelled   bool        `json:"cancelled"`
-	AddressedBy []string    `json:"addressed_by"` // prs addressing this issue
+	AddressedBy []string    `json:"addressed_by"` // prs addressing this concern
 }
 
 // ProposalName is the name of a pull request within the gov4git system.
 // ProposalNames must be unique within a community.
-type ProposalName string
+type ProposalName = Name
 
-// ProposalState is the current state of a pull request.
-type ProposalState struct {
-	Name       ProposalName  `json:"name"`        // name of proposal
+// Proposal is the current state of a pull request.
+type Proposal struct {
+	Name       ProposalName  `json:"name"` // name of proposal
+	Title      string        `json:"title"`
 	TrackerURL string        `json:"tracker_url"` // link to proposal on an external proposal tracker, such as GitHub
 	Closed     bool          `json:"closed"`
 	Cancelled  bool          `json:"cancelled"`

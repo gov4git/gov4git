@@ -18,17 +18,18 @@ func IsConcern_Local(ctx context.Context, t *git.Tree, name ConcernName) bool {
 	return err == nil
 }
 
-func OpenConcern(ctx context.Context, addr gov.GovAddress, name ConcernName, trackerURL string) {
+func OpenConcern(ctx context.Context, addr gov.GovAddress, name ConcernName, title string, trackerURL string) {
 	cloned := gov.Clone(ctx, addr)
-	chg := OpenConcern_StageOnly(ctx, cloned.Tree(), name, trackerURL)
+	chg := OpenConcern_StageOnly(ctx, cloned.Tree(), name, trackerURL, title)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func OpenConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName, trackerURL string) git.ChangeNoResult {
+func OpenConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName, title string, trackerURL string) git.ChangeNoResult {
 	must.Assert(ctx, !IsConcern_Local(ctx, t, name), ErrConcernAlreadyExists)
-	state := ConcernState{
+	state := Concern{
 		Name:       name,
+		Title:      title,
 		TrackerURL: trackerURL,
 		Closed:     false,
 	}
@@ -47,4 +48,13 @@ func CloseConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName) 
 	must.Assert(ctx, !state.Closed, ErrConcernAlreadyClosed)
 	state.Closed = true
 	return concernKV.Set(ctx, concernNS, t, name, state)
+}
+
+func ListConcerns(ctx context.Context, addr gov.GovAddress) []Concern {
+	return ListConcerns_Local(ctx, gov.Clone(ctx, addr).Tree())
+}
+
+func ListConcerns_Local(ctx context.Context, t *git.Tree) []Concern {
+	_, concerns := concernKV.ListKeyValues(ctx, concernNS, t)
+	return concerns
 }

@@ -3,6 +3,6 @@ package collab
 import "errors"
 
 var (
-	ErrIssueAlreadyExists = errors.New("issue already exists")
-	ErrIssueAlreadyClosed = errors.New("issue already closed")
+	ErrConcernAlreadyExists = errors.New("concern already exists")
+	ErrConcernAlreadyClosed = errors.New("concern already closed")
 )

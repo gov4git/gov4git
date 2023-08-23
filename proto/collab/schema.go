@@ -8,36 +8,35 @@ import (
 var (
 	collabNS = proto.RootNS.Sub("collab")
 
-	issuesNS = collabNS.Sub("issue")
-	issuesKV = kv.KV[IssueName, IssueState]{}
+	concernNS = collabNS.Sub("concern")
+	concernKV = kv.KV[ConcernName, ConcernState]{}
 
-	prNS = collabNS.Sub("pr")
-	prKV = kv.KV[IssueName, PRState]{}
+	prNS = collabNS.Sub("proposal")
+	prKV = kv.KV[ConcernName, ProposalState]{}
 )
 
-// QUESTIONS:
-//	What if PRs only address an issue partially?
+// ConcernName is the name of an issue within the gov4git system.
+// ConcernNames must be unique within a community.
+type ConcernName string
 
-// IssueName is the name of an issue within the gov4git system.
-// IssueNames must be unique within a community.
-type IssueName string
-
-// IssueState is the current state of an issue.
-type IssueState struct {
-	Name        IssueName `json:"name"`        // name of issue
-	TrackerURL  string    `json:"tracker_url"` // link to issue on an external issue tracker, such as GitHub
-	Closed      bool      `json:"closed"`
-	AddressedBy []string  `json:"addressed_by"` // prs addressing this issue
+// ConcernState is the current state of an issue.
+type ConcernState struct {
+	Name        ConcernName `json:"name"`        // name of issue
+	TrackerURL  string      `json:"tracker_url"` // link to issue on an external issue tracker, such as GitHub
+	Closed      bool        `json:"closed"`
+	Cancelled   bool        `json:"cancelled"`
+	AddressedBy []string    `json:"addressed_by"` // prs addressing this issue
 }
 
-// PRName is the name of a pull request within the gov4git system.
-// PRNames must be unique within a community.
-type PRName string
+// ProposalName is the name of a pull request within the gov4git system.
+// ProposalNames must be unique within a community.
+type ProposalName string
 
-// PRState is the current state of a pull request.
-type PRState struct {
-	Name       PRName      `json:"name"`        // name of pr
-	TrackerURL string      `json:"tracker_url"` // link to pr on an external pr tracker, such as GitHub
-	Closed     bool        `json:"closed"`
-	Addresses  []IssueName `json:"addresses"` // issues addressed by this pr
+// ProposalState is the current state of a pull request.
+type ProposalState struct {
+	Name       ProposalName  `json:"name"`        // name of pr
+	TrackerURL string        `json:"tracker_url"` // link to pr on an external pr tracker, such as GitHub
+	Closed     bool          `json:"closed"`
+	Cancelled  bool          `json:"cancelled"`
+	Addresses  []ConcernName `json:"addresses"` // issues addressed by this pr
 }

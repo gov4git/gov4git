@@ -7,10 +7,9 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
-func LoadStrategy(ctx context.Context, govTree *git.Tree, ballotName ns.NS) (common.Advertisement, common.Strategy) {
+func LoadStrategy(ctx context.Context, govTree *git.Tree, ballotName common.BallotName) (common.Advertisement, common.Strategy) {
 
 	// read ad
 	adNS := common.BallotPath(ballotName).Append(common.AdFilebase)

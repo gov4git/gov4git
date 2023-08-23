@@ -14,13 +14,12 @@ import (
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func Tally(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 	maxPar int,
 ) git.Change[form.Map, common.Tally] {
 
@@ -38,7 +37,7 @@ func Tally_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govOwner id.OwnerCloned,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 	maxPar int,
 ) (git.Change[form.Map, common.Tally], bool) {
 
@@ -56,7 +55,7 @@ func tallyVotersCloned_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govOwner id.OwnerCloned,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 	voterAccounts map[member.User]member.Account,
 	votersCloned map[member.User]git.Cloned,
 ) (git.Change[form.Map, common.Tally], bool) {
@@ -130,7 +129,7 @@ func rejectFetchedVotes(fv FetchedVotes, rej map[member.User]common.RejectedElec
 	}
 }
 
-func LoadTally(ctx context.Context, communityTree *git.Tree, ballotName ns.NS) common.Tally {
+func LoadTally(ctx context.Context, communityTree *git.Tree, ballotName common.BallotName) common.Tally {
 	tallyNS := common.BallotPath(ballotName).Append(common.TallyFilebase)
 	return git.FromFile[common.Tally](ctx, communityTree, tallyNS)
 }

@@ -33,13 +33,13 @@ func IsGroup_Local(ctx context.Context, t *git.Tree, name Group) bool {
 
 func AddGroup(ctx context.Context, addr gov.GovAddress, name Group) {
 	cloned := gov.Clone(ctx, addr)
-	chg := AddGroupStageOnly(ctx, cloned.Tree(), name)
+	chg := AddGroup_StageOnly(ctx, cloned.Tree(), name)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func AddGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
-	if IsGroup_Local(ctx, t, name) {
+func AddGroup_StageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
+	if IsGroupLocal(ctx, t, name) {
 		must.Panic(ctx, fmt.Errorf("group already exists"))
 	}
 	return SetGroup_StageOnly(ctx, t, name)

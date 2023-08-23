@@ -20,12 +20,12 @@ func IsConcernLocal(ctx context.Context, t *git.Tree, name ConcernName) bool {
 
 func OpenConcern(ctx context.Context, addr gov.GovAddress, name ConcernName, trackerURL string) {
 	cloned := gov.Clone(ctx, addr)
-	chg := OpenConcernStageOnly(ctx, cloned.Tree(), name, trackerURL)
+	chg := OpenConcern_StageOnly(ctx, cloned.Tree(), name, trackerURL)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func OpenConcernStageOnly(ctx context.Context, t *git.Tree, name ConcernName, trackerURL string) git.ChangeNoResult {
+func OpenConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName, trackerURL string) git.ChangeNoResult {
 	must.Assert(ctx, !IsConcernLocal(ctx, t, name), ErrConcernAlreadyExists)
 	state := ConcernState{
 		Name:       name,
@@ -37,12 +37,12 @@ func OpenConcernStageOnly(ctx context.Context, t *git.Tree, name ConcernName, tr
 
 func CloseConcern(ctx context.Context, addr gov.GovAddress, name ConcernName) {
 	cloned := gov.Clone(ctx, addr)
-	chg := CloseConcernStageOnly(ctx, cloned.Tree(), name)
+	chg := CloseConcern_StageOnly(ctx, cloned.Tree(), name)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func CloseConcernStageOnly(ctx context.Context, t *git.Tree, name ConcernName) git.ChangeNoResult {
+func CloseConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName) git.ChangeNoResult {
 	state := concernKV.Get(ctx, concernNS, t, name)
 	must.Assert(ctx, !state.Closed, ErrConcernAlreadyClosed)
 	state.Closed = true

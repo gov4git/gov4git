@@ -13,12 +13,12 @@ import (
 
 type SeqNo int64
 
-func SendStageOnly[M form.Form](
+func SendPkgStageOnly(
 	ctx context.Context,
 	sender *git.Tree,
 	receiver *git.Tree,
 	topic string,
-	msg M,
+	msg Pkg,
 ) git.Change[form.Map, SeqNo] {
 
 	// fetch receiver id
@@ -37,7 +37,7 @@ func SendStageOnly[M form.Form](
 
 	// write message
 	msgNS := topicNS.Sub(strconv.Itoa(int(nextSeqNo)))
-	git.ToFileStage(ctx, sender, msgNS.Path(), msg)
+	msg.stagePkg(ctx, sender, msgNS)
 
 	// write + stage next file
 	var newNextSeqNo SeqNo = nextSeqNo + 1
@@ -49,9 +49,41 @@ func SendStageOnly[M form.Form](
 	return git.NewChange(
 		fmt.Sprintf("Sent mail #%d", nextSeqNo),
 		"mail_send",
-		form.Map{"topic": topic, "msg": msg},
+		form.Map{"topic": topic},
 		nextSeqNo,
 		nil,
+	)
+}
+
+func SendStageOnly[M form.Form](
+	ctx context.Context,
+	sender *git.Tree,
+	receiver *git.Tree,
+	topic string,
+	msg M,
+) git.Change[form.Map, SeqNo] {
+
+	return SendPkgStageOnly(ctx, sender, receiver, topic, PkgFile(msg))
+}
+
+func SendSignedPkgStageOnly(
+	ctx context.Context,
+	senderCloned id.OwnerCloned,
+	receiver *git.Tree,
+	topic string,
+	msg Pkg,
+) git.Change[form.Map, SeqNo] {
+
+	senderPrivCred := id.GetPrivateCredentials(ctx, senderCloned.Private.Tree())
+	signed := id.Sign(ctx, senderPrivCred, msg) // sign package encoded as a single form
+	envelope := PkgDir{"signature": PkgFile(signed), "msg": msg}
+	sendOnly := SendPkgStageOnly(ctx, senderCloned.Public.Tree(), receiver, topic, envelope)
+	return git.NewChange(
+		fmt.Sprintf("Sent signed mail #%d", sendOnly.Result),
+		"mail_receive_signed",
+		form.Map{"topic": topic},
+		sendOnly.Result,
+		form.Forms{sendOnly},
 	)
 }
 
@@ -62,14 +94,6 @@ func SendSignedStageOnly[M form.Form](
 	topic string,
 	msg M,
 ) git.Change[form.Map, SeqNo] {
-	senderPrivCred := id.GetPrivateCredentials(ctx, senderCloned.Private.Tree())
-	signed := id.Sign(ctx, senderPrivCred, msg)
-	sendOnly := SendStageOnly(ctx, senderCloned.Public.Tree(), receiver, topic, signed)
-	return git.NewChange(
-		fmt.Sprintf("Sent signed mail #%d", sendOnly.Result),
-		"mail_receive_signed",
-		form.Map{"topic": topic},
-		sendOnly.Result,
-		form.Forms{sendOnly},
-	)
+
+	return SendSignedPkgStageOnly(ctx, senderCloned, receiver, topic, PkgFile(msg))
 }

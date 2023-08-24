@@ -39,7 +39,7 @@ func TestSendReceive(t *testing.T) {
 	if len(r0.Result) != 1 {
 		t.Fatalf("unexpecte length")
 	}
-	if r0.Result[0].Response != testMsg[0] {
+	if r0.Result[0].Effect != testMsg[0] {
 		t.Fatalf("expecting %v, got %v", testMsg[0], r0.Result[0])
 	}
 
@@ -64,10 +64,10 @@ func TestSendReceive(t *testing.T) {
 	if len(r12.Result) != 2 {
 		t.Fatalf("unexpecte length")
 	}
-	if r12.Result[0].Response != testMsg[1] {
+	if r12.Result[0].Effect != testMsg[1] {
 		t.Fatalf("expecting %v, got %v", testMsg[1], r12.Result[0])
 	}
-	if r12.Result[1].Response != testMsg[2] {
+	if r12.Result[1].Effect != testMsg[2] {
 		t.Fatalf("expecting %v, got %v", testMsg[2], r12.Result[1])
 	}
 }
@@ -102,7 +102,7 @@ func TestSendReceiveSigned(t *testing.T) {
 	if len(r0.Result) != 1 {
 		t.Fatalf("unexpecte length")
 	}
-	if r0.Result[0].Response != testMsg[0] {
+	if r0.Result[0].Effect != testMsg[0] {
 		t.Fatalf("expecting %v, got %v", testMsg[0], r0.Result[0])
 	}
 
@@ -127,10 +127,10 @@ func TestSendReceiveSigned(t *testing.T) {
 	if len(r12.Result) != 2 {
 		t.Fatalf("unexpecte length")
 	}
-	if r12.Result[0].Response != testMsg[1] {
+	if r12.Result[0].Effect != testMsg[1] {
 		t.Fatalf("expecting %v, got %v", testMsg[1], r12.Result[0])
 	}
-	if r12.Result[1].Response != testMsg[2] {
+	if r12.Result[1].Effect != testMsg[2] {
 		t.Fatalf("expecting %v, got %v", testMsg[2], r12.Result[1])
 	}
 }

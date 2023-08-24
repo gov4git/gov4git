@@ -18,6 +18,17 @@ type ReceiveBoxInfo struct {
 	Topic    string `json:"topic"`
 }
 
+type RequestEnvelope[Req form.Form] struct {
+	SeqNo   SeqNo `json:"request_seqno"`
+	Request Req   `json:"request_content"`
+}
+
+type ResponseEnvelope[Req form.Form, Resp form.Form] struct {
+	SeqNo           SeqNo                `json:"response_seqno"`
+	RequestEnvelope RequestEnvelope[Req] `json:"request_envelope"`
+	Response        Resp                 `json:"response_content"`
+}
+
 const (
 	BoxInfoFilebase = "box_info.json"
 	NextFilebase    = "next.json"

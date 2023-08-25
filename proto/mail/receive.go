@@ -102,7 +102,6 @@ func ReceiveSigned_StageOnly[Msg form.Form, Effect form.Form](
 ) git.Change[form.Map, []MsgEffect[Msg, Effect]] {
 
 	receiverPrivCred := id.GetOwnerCredentials(ctx, receiverCloned)
-	msgEffects := []MsgEffect[Msg, Effect]{} // XXX: won't be necessary when SignedPlaintext includes plain value
 	signRespond := func(
 		ctx context.Context,
 		seqNo SeqNo,
@@ -111,18 +110,21 @@ func ReceiveSigned_StageOnly[Msg form.Form, Effect form.Form](
 		if !signedReq.Verify(ctx) {
 			return signedResp, fmt.Errorf("signature not valid")
 		}
-		msg, err := form.DecodeBytes[Msg](ctx, signedReq.Plaintext)
-		if err != nil {
-			return signedResp, err
-		}
 		effect, err := receive(ctx, seqNo, signedReq)
 		if err != nil {
 			return signedResp, err
 		}
-		msgEffects = append(msgEffects, MsgEffect[Msg, Effect]{SeqNo: seqNo, Msg: msg, Effect: effect})
 		return id.Sign(ctx, receiverPrivCred, effect), nil
 	}
 	recvOnly := Receive_StageOnly(ctx, receiverCloned.Public.Tree(), senderAddr, senderPublic, topic, signRespond)
+	msgEffects := make([]MsgEffect[Msg, Effect], len(recvOnly.Result))
+	for i, signedMsgEffect := range recvOnly.Result {
+		msgEffects[i] = MsgEffect[Msg, Effect]{
+			SeqNo:  signedMsgEffect.SeqNo,
+			Msg:    signedMsgEffect.Msg.Value,
+			Effect: signedMsgEffect.Effect.Value,
+		}
+	}
 	return git.NewChange(
 		fmt.Sprintf("Received %d signed messages", len(msgEffects)),
 		"receive_signed",

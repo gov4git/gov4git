@@ -109,7 +109,7 @@ func fetchUserRequests(
 ) git.Change[form.Map, FetchedRequests] {
 
 	fetched := FetchedRequests{}
-	respond := func(ctx context.Context, _ mail.SeqNo, req Request, _ id.SignedPlaintext) (resp Request, err error) {
+	respond := func(ctx context.Context, _ mail.SeqNo, req Request, _ id.Signed[Request]) (resp Request, err error) {
 		fetched = append(fetched,
 			FetchedRequest{
 				User:     user,

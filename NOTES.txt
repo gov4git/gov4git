@@ -1,0 +1,13 @@
+- [ ] receive should record sent message with effect
+- [x] include original message in signed plaintext
+
+- [ ] test request/respond
+- [ ] test confirm
+- [ ] test confirm signed
+- [ ] test confirm request response
+
+
+- [ ] upgrade vote to request/response
+- [ ] upgrade bureau to request/response
+
+- [ ] address XXX

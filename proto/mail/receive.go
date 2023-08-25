@@ -3,6 +3,7 @@ package mail
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strconv"
 
 	"github.com/gov4git/gov4git/proto/id"
@@ -12,9 +13,17 @@ import (
 )
 
 type MsgEffect[Msg form.Form, Effect form.Form] struct {
-	Msg    Msg
-	Effect Effect
+	SeqNo  SeqNo  `json:"seqno"`
+	Msg    Msg    `json:"msg"`
+	Effect Effect `json:"effect"`
 }
+
+type MsgEffects[Msg form.Form, Effect form.Form] []MsgEffect[Msg, Effect]
+
+func (x MsgEffects[Msg, Effect]) Sort()              { sort.Sort(x) }
+func (x MsgEffects[Msg, Effect]) Len() int           { return len(x) }
+func (x MsgEffects[Msg, Effect]) Less(i, j int) bool { return x[i].SeqNo < x[j].SeqNo }
+func (x MsgEffects[Msg, Effect]) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 
 type Receiver[Msg form.Form, Effect form.Form] func(
 	ctx context.Context,
@@ -61,7 +70,7 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 			continue
 		}
 		git.ToFileStage(ctx, receiver, receiverTopicNS.Sub(msgFilebase).Path(), effect)
-		msgEffects = append(msgEffects, MsgEffect[Msg, Effect]{Msg: msg, Effect: effect})
+		msgEffects = append(msgEffects, MsgEffect[Msg, Effect]{SeqNo: i, Msg: msg, Effect: effect})
 		receiverLatestNextSeqNo = i + 1
 	}
 
@@ -80,8 +89,8 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 type SignedReceiver[Msg form.Form, Effect form.Form] func(
 	ctx context.Context,
 	seqNo SeqNo,
-	msg Msg,
-	signedMsg id.SignedPlaintext,
+	msg Msg, // XXX: this is no longer necessary
+	signedMsg id.Signed[Msg],
 ) (effect Effect, err error)
 
 func ReceiveSigned_StageOnly[Msg form.Form, Effect form.Form](
@@ -94,12 +103,12 @@ func ReceiveSigned_StageOnly[Msg form.Form, Effect form.Form](
 ) git.Change[form.Map, []MsgEffect[Msg, Effect]] {
 
 	receiverPrivCred := id.GetOwnerCredentials(ctx, receiverCloned)
-	msgEffects := []MsgEffect[Msg, Effect]{}
+	msgEffects := []MsgEffect[Msg, Effect]{} // XXX: won't be necessary when SignedPlaintext includes plain value
 	signRespond := func(
 		ctx context.Context,
 		seqNo SeqNo,
-		signedReq id.SignedPlaintext,
-	) (signedResp id.SignedPlaintext, err error) {
+		signedReq id.Signed[Msg],
+	) (signedResp id.Signed[Effect], err error) {
 		if !signedReq.Verify() {
 			return signedResp, fmt.Errorf("signature not valid")
 		}
@@ -111,7 +120,7 @@ func ReceiveSigned_StageOnly[Msg form.Form, Effect form.Form](
 		if err != nil {
 			return signedResp, err
 		}
-		msgEffects = append(msgEffects, MsgEffect[Msg, Effect]{Msg: msg, Effect: effect})
+		msgEffects = append(msgEffects, MsgEffect[Msg, Effect]{SeqNo: seqNo, Msg: msg, Effect: effect})
 		return id.Sign(ctx, receiverPrivCred, effect), nil
 	}
 	recvOnly := Receive_StageOnly(ctx, receiverCloned.Public.Tree(), senderAddr, senderPublic, topic, signRespond)

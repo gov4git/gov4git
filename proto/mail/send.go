@@ -13,12 +13,12 @@ import (
 
 type SeqNo int64
 
-func SendMakeMsg_StageOnly[M form.Form](
+func SendMakeMsg_StageOnly[Msg form.Form](
 	ctx context.Context,
 	sender *git.Tree,
 	receiver *git.Tree,
 	topic string,
-	mkMsg func(context.Context, SeqNo) M,
+	mkMsg func(context.Context, SeqNo) Msg,
 ) git.Change[form.Map, SeqNo] {
 
 	// fetch receiver id
@@ -56,27 +56,27 @@ func SendMakeMsg_StageOnly[M form.Form](
 	)
 }
 
-func Send_StageOnly[M form.Form](
+func Send_StageOnly[Msg form.Form](
 	ctx context.Context,
 	sender *git.Tree,
 	receiver *git.Tree,
 	topic string,
-	msg M,
+	msg Msg,
 ) git.Change[form.Map, SeqNo] {
 
-	return SendMakeMsg_StageOnly(ctx, sender, receiver, topic, func(context.Context, SeqNo) M { return msg })
+	return SendMakeMsg_StageOnly(ctx, sender, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
 }
 
-func SendSignedMakeMsg_StageOnly[M form.Form](
+func SendSignedMakeMsg_StageOnly[Msg form.Form](
 	ctx context.Context,
 	senderCloned id.OwnerCloned,
 	receiver *git.Tree,
 	topic string,
-	mkMsg func(context.Context, SeqNo) M,
+	mkMsg func(context.Context, SeqNo) Msg,
 ) git.Change[form.Map, SeqNo] {
 
 	senderPrivCred := id.GetPrivateCredentials(ctx, senderCloned.Private.Tree())
-	mkSignedMsg := func(ctx context.Context, seqNo SeqNo) id.SignedPlaintext {
+	mkSignedMsg := func(ctx context.Context, seqNo SeqNo) id.Signed[Msg] {
 		return id.Sign(ctx, senderPrivCred, mkMsg(ctx, seqNo))
 	}
 	sendOnly := SendMakeMsg_StageOnly(ctx, senderCloned.Public.Tree(), receiver, topic, mkSignedMsg)
@@ -89,13 +89,13 @@ func SendSignedMakeMsg_StageOnly[M form.Form](
 	)
 }
 
-func SendSigned_StageOnly[M form.Form](
+func SendSigned_StageOnly[Msg form.Form](
 	ctx context.Context,
 	senderCloned id.OwnerCloned,
 	receiver *git.Tree,
 	topic string,
-	msg M,
+	msg Msg,
 ) git.Change[form.Map, SeqNo] {
 
-	return SendSignedMakeMsg_StageOnly(ctx, senderCloned, receiver, topic, func(context.Context, SeqNo) M { return msg })
+	return SendSignedMakeMsg_StageOnly(ctx, senderCloned, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
 }

@@ -29,7 +29,7 @@ func Respond_StageOnly[Req form.Form, Resp form.Form](
 		ctx context.Context,
 		seqNo SeqNo,
 		reqEnv RequestEnvelope[Req],
-		signedReqEnv id.SignedPlaintext,
+		signedReqEnv id.Signed[RequestEnvelope[Req]],
 	) (ResponseEnvelope[Req, Resp], error) {
 
 		must.Assertf(ctx, reqEnv.SeqNo == seqNo, "request seqno %d does not match response seqno %d", reqEnv.SeqNo, seqNo)

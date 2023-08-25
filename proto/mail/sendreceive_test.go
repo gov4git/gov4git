@@ -24,7 +24,7 @@ func TestSendReceive(t *testing.T) {
 		t.Fatalf("unexpected seq no")
 	}
 
-	respond := func(ctx context.Context, req string) (resp string, err error) {
+	respond := func(ctx context.Context, seqNo SeqNo, req string) (resp string, err error) {
 		return req, nil
 	}
 
@@ -87,7 +87,7 @@ func TestSendReceiveSigned(t *testing.T) {
 		t.Fatalf("unexpected seq no")
 	}
 
-	respond := func(ctx context.Context, req string, _ id.SignedPlaintext) (resp string, err error) {
+	respond := func(ctx context.Context, _ SeqNo, req string, _ id.SignedPlaintext) (resp string, err error) {
 		return req, nil
 	}
 

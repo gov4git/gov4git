@@ -18,6 +18,7 @@ type MsgEffect[Msg form.Form, Effect form.Form] struct {
 
 type Receiver[Msg form.Form, Effect form.Form] func(
 	ctx context.Context,
+	seqNo SeqNo,
 	msg Msg,
 ) (effect Effect, err error)
 
@@ -27,7 +28,7 @@ func ReceiveStageOnly[Msg form.Form, Effect form.Form](
 	senderAddr id.PublicAddress,
 	sender *git.Tree,
 	topic string,
-	receive Receiver[Msg, Effect],
+	receive Receiver[Msg, Effect], // called multiple times, once for each incoming message
 ) git.Change[form.Map, []MsgEffect[Msg, Effect]] {
 
 	// prep
@@ -50,17 +51,17 @@ func ReceiveStageOnly[Msg form.Form, Effect form.Form](
 	// read unread messages
 	receiverLatestNextSeqNo := receiverNextSeqNo
 	base.Infof("receiving receiverSeqNo=%v senderSeqNo=%v", receiverNextSeqNo, senderNextSeqNo)
-	rr := []MsgEffect[Msg, Effect]{}
+	msgEffects := []MsgEffect[Msg, Effect]{}
 	for i := receiverNextSeqNo; i < senderNextSeqNo; i++ {
 		msgFilebase := strconv.Itoa(int(i))
 		msg := git.FromFile[Msg](ctx, sender, senderTopicNS.Sub(msgFilebase).Path())
-		effect, err := receive(ctx, msg)
+		effect, err := receive(ctx, i, msg)
 		if err != nil {
 			base.Infof("responding to message %d in sender repo (%v)", i, err)
 			continue
 		}
 		git.ToFileStage(ctx, receiver, receiverTopicNS.Sub(msgFilebase).Path(), effect)
-		rr = append(rr, MsgEffect[Msg, Effect]{Msg: msg, Effect: effect})
+		msgEffects = append(msgEffects, MsgEffect[Msg, Effect]{Msg: msg, Effect: effect})
 		receiverLatestNextSeqNo = i + 1
 	}
 
@@ -68,18 +69,19 @@ func ReceiveStageOnly[Msg form.Form, Effect form.Form](
 	git.ToFileStage(ctx, receiver, receiverNextNS.Path(), receiverLatestNextSeqNo)
 
 	return git.NewChange(
-		fmt.Sprintf("Received mail"),
-		"mail_receive",
+		fmt.Sprintf("Received %d messages", len(msgEffects)),
+		"receive",
 		form.Map{"topic": topic},
-		rr,
+		msgEffects,
 		nil,
 	)
 }
 
 type SignedReceiver[Msg form.Form, Effect form.Form] func(
 	ctx context.Context,
+	seqNo SeqNo,
 	msg Msg,
-	signedReq id.SignedPlaintext,
+	signedMsg id.SignedPlaintext,
 ) (effect Effect, err error)
 
 func ReceiveSignedStageOnly[Msg form.Form, Effect form.Form](
@@ -92,8 +94,12 @@ func ReceiveSignedStageOnly[Msg form.Form, Effect form.Form](
 ) git.Change[form.Map, []MsgEffect[Msg, Effect]] {
 
 	receiverPrivCred := id.GetOwnerCredentials(ctx, receiverCloned)
-	rr := []MsgEffect[Msg, Effect]{}
-	signRespond := func(ctx context.Context, signedReq id.SignedPlaintext) (signedResp id.SignedPlaintext, err error) {
+	msgEffects := []MsgEffect[Msg, Effect]{}
+	signRespond := func(
+		ctx context.Context,
+		seqNo SeqNo,
+		signedReq id.SignedPlaintext,
+	) (signedResp id.SignedPlaintext, err error) {
 		if !signedReq.Verify() {
 			return signedResp, fmt.Errorf("signature not valid")
 		}
@@ -101,19 +107,19 @@ func ReceiveSignedStageOnly[Msg form.Form, Effect form.Form](
 		if err != nil {
 			return signedResp, err
 		}
-		effect, err := receive(ctx, msg, signedReq)
+		effect, err := receive(ctx, seqNo, msg, signedReq)
 		if err != nil {
 			return signedResp, err
 		}
-		rr = append(rr, MsgEffect[Msg, Effect]{Msg: msg, Effect: effect})
+		msgEffects = append(msgEffects, MsgEffect[Msg, Effect]{Msg: msg, Effect: effect})
 		return id.Sign(ctx, receiverPrivCred, effect), nil
 	}
 	recvOnly := ReceiveStageOnly(ctx, receiverCloned.Public.Tree(), senderAddr, senderPublic, topic, signRespond)
 	return git.NewChange(
-		fmt.Sprintf("Received signed mail."),
-		"mail_receive_signed",
+		fmt.Sprintf("Received %d signed messages", len(msgEffects)),
+		"receive_signed",
 		form.Map{"topic": topic},
-		rr,
+		msgEffects,
 		form.Forms{recvOnly},
 	)
 }

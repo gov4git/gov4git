@@ -49,7 +49,7 @@ func SendMakeMsgStageOnly[M form.Form](
 
 	return git.NewChange(
 		fmt.Sprintf("Sent #%d", nextSeqNo),
-		"mail_send",
+		"send",
 		form.Map{"topic": topic, "msg": msg},
 		nextSeqNo,
 		nil,
@@ -82,7 +82,7 @@ func SendSignedMakeMsgStageOnly[M form.Form](
 	sendOnly := SendMakeMsgStageOnly(ctx, senderCloned.Public.Tree(), receiver, topic, mkSignedMsg)
 	return git.NewChange(
 		fmt.Sprintf("Sent signed #%d", sendOnly.Result),
-		"mail_receive_signed",
+		"send_signed",
 		form.Map{"topic": topic},
 		sendOnly.Result,
 		form.Forms{sendOnly},

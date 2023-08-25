@@ -72,7 +72,7 @@ func fetchVotesCloned(
 	}
 
 	voterPublicTree := userCloned.Tree()
-	mail.ReceiveSignedStageOnly(
+	mail.ReceiveSigned_StageOnly(
 		ctx,
 		govOwner,
 		account.PublicAddress,

@@ -16,7 +16,7 @@ type Responder[Req form.Form, Resp form.Form] func(
 	req Req,
 ) (resp Resp, err error)
 
-func RespondStageOnly[Req form.Form, Resp form.Form](
+func Respond_StageOnly[Req form.Form, Resp form.Form](
 	ctx context.Context,
 	receiverCloned id.OwnerCloned,
 	senderAddr id.PublicAddress,
@@ -45,7 +45,7 @@ func RespondStageOnly[Req form.Form, Resp form.Form](
 		}, nil
 	}
 
-	chg := ReceiveSignedStageOnly(ctx, receiverCloned, senderAddr, senderPublic, topic, receive)
+	chg := ReceiveSigned_StageOnly(ctx, receiverCloned, senderAddr, senderPublic, topic, receive)
 	respEnvs := make([]ResponseEnvelope[Req, Resp], len(chg.Result))
 	for i, msgEffect := range chg.Result {
 		respEnvs[i] = msgEffect.Effect

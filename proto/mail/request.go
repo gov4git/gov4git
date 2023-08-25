@@ -10,7 +10,7 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func RequestStageOnly[Req form.Form](
+func Request_StageOnly[Req form.Form](
 	ctx context.Context,
 	senderCloned id.OwnerCloned,
 	receiver *git.Tree,
@@ -30,7 +30,7 @@ func RequestStageOnly[Req form.Form](
 		return msg
 	}
 
-	chg := SendSignedMakeMsgStageOnly(ctx, senderCloned, receiver, topic, mkEnv)
+	chg := SendSignedMakeMsg_StageOnly(ctx, senderCloned, receiver, topic, mkEnv)
 
 	return git.NewChange(
 		fmt.Sprintf("Requested #%d", chg.Result),

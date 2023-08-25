@@ -75,7 +75,7 @@ func VoteStageOnly(
 	git.ToFileStage(ctx, voterTree, voteLogNS.Path(), voteLog)
 
 	// send vote to community by mail
-	sendChg := mail.SendSignedStageOnly(ctx, voterOwner, govCloned.Tree(), common.BallotTopic(ballotName), envelope)
+	sendChg := mail.SendSigned_StageOnly(ctx, voterOwner, govCloned.Tree(), common.BallotTopic(ballotName), envelope)
 	return git.NewChange(
 		"Cast vote",
 		"ballot_vote",

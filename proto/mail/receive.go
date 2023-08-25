@@ -22,7 +22,7 @@ type Receiver[Msg form.Form, Effect form.Form] func(
 	msg Msg,
 ) (effect Effect, err error)
 
-func ReceiveStageOnly[Msg form.Form, Effect form.Form](
+func Receive_StageOnly[Msg form.Form, Effect form.Form](
 	ctx context.Context,
 	receiver *git.Tree,
 	senderAddr id.PublicAddress,
@@ -84,7 +84,7 @@ type SignedReceiver[Msg form.Form, Effect form.Form] func(
 	signedMsg id.SignedPlaintext,
 ) (effect Effect, err error)
 
-func ReceiveSignedStageOnly[Msg form.Form, Effect form.Form](
+func ReceiveSigned_StageOnly[Msg form.Form, Effect form.Form](
 	ctx context.Context,
 	receiverCloned id.OwnerCloned,
 	senderAddr id.PublicAddress,
@@ -114,7 +114,7 @@ func ReceiveSignedStageOnly[Msg form.Form, Effect form.Form](
 		msgEffects = append(msgEffects, MsgEffect[Msg, Effect]{Msg: msg, Effect: effect})
 		return id.Sign(ctx, receiverPrivCred, effect), nil
 	}
-	recvOnly := ReceiveStageOnly(ctx, receiverCloned.Public.Tree(), senderAddr, senderPublic, topic, signRespond)
+	recvOnly := Receive_StageOnly(ctx, receiverCloned.Public.Tree(), senderAddr, senderPublic, topic, signRespond)
 	return git.NewChange(
 		fmt.Sprintf("Received %d signed messages", len(msgEffects)),
 		"receive_signed",

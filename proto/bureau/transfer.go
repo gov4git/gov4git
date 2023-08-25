@@ -72,7 +72,7 @@ func TransferStageOnly(
 		},
 	}
 
-	sendOnly := mail.SendSignedStageOnly(ctx, userOwner, govCloned.Tree(), BureauTopic, request)
+	sendOnly := mail.SendSigned_StageOnly(ctx, userOwner, govCloned.Tree(), BureauTopic, request)
 	return git.NewChange(
 		"Transfer account tokens.",
 		"bureau_transfer",

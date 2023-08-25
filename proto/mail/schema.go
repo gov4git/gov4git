@@ -23,9 +23,8 @@ type RequestEnvelope[Req form.Form] struct {
 	Request Req   `json:"request"`
 }
 
-type ResponseEnvelope[Req form.Form, Resp form.Form] struct {
+type ResponseEnvelope[Resp form.Form] struct {
 	SeqNo    SeqNo `json:"seqno"`
-	Request  Req   `json:"request"`
 	Response Resp  `json:"response"`
 }
 

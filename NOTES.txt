@@ -1,5 +1,6 @@
 - [x] receive should record sent message with effect
 - [x] include original message in signed plaintext
+- [x] confirm for req/resp
 
 - [ ] test request/respond
 - [ ] test confirm

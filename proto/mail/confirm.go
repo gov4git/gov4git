@@ -93,7 +93,7 @@ func ConfirmSigned[Msg form.Form, Effect form.Form](
 	senderAddr id.PublicAddress,
 	receiverAddr id.PublicAddress,
 	topic string,
-) (confirmed MsgEffects[id.Signed[Msg], id.Signed[Effect]], notConfirmed MsgEffects[id.Signed[Msg], form.None]) {
+) (confirmed MsgEffects[Msg, Effect], notConfirmed MsgEffects[Msg, form.None]) {
 
 	return ConfirmSigned_Local[Msg, Effect](
 		ctx,
@@ -108,7 +108,56 @@ func ConfirmSigned_Local[Msg form.Form, Effect form.Form](
 	sender *git.Tree,
 	receiver *git.Tree,
 	topic string,
-) (confirmed MsgEffects[id.Signed[Msg], id.Signed[Effect]], notConfirmed MsgEffects[id.Signed[Msg], form.None]) {
+) (confirmed MsgEffects[Msg, Effect], notConfirmed MsgEffects[Msg, form.None]) {
 
-	return Confirm_Local[id.Signed[Msg], id.Signed[Effect]](ctx, sender, receiver, topic)
+	signedConfirmed, signedNotConfirmed := Confirm_Local[id.Signed[Msg], id.Signed[Effect]](ctx, sender, receiver, topic)
+
+	confirmed = make(MsgEffects[Msg, Effect], len(signedConfirmed))
+	for i, s := range signedConfirmed {
+		confirmed[i] = MsgEffect[Msg, Effect]{SeqNo: s.SeqNo, Msg: s.Msg.Value, Effect: s.Effect.Value}
+	}
+
+	notConfirmed = make(MsgEffects[Msg, form.None], len(signedNotConfirmed))
+	for i, s := range signedNotConfirmed {
+		notConfirmed[i] = MsgEffect[Msg, form.None]{SeqNo: s.SeqNo, Msg: s.Msg.Value}
+	}
+
+	return
+}
+
+func ConfirmCall[Req form.Form, Resp form.Form](
+	ctx context.Context,
+	senderAddr id.PublicAddress,
+	receiverAddr id.PublicAddress,
+	topic string,
+) (confirmed MsgEffects[Req, Resp], notConfirmed MsgEffects[Req, form.None]) {
+
+	return ConfirmCall_Local[Req, Resp](
+		ctx,
+		git.CloneOne(ctx, git.Address(senderAddr)).Tree(),
+		git.CloneOne(ctx, git.Address(receiverAddr)).Tree(),
+		topic,
+	)
+}
+
+func ConfirmCall_Local[Req form.Form, Resp form.Form](
+	ctx context.Context,
+	sender *git.Tree,
+	receiver *git.Tree,
+	topic string,
+) (confirmed MsgEffects[Req, Resp], notConfirmed MsgEffects[Req, form.None]) {
+
+	envConfirmed, envNotConfirmed := ConfirmSigned_Local[RequestEnvelope[Req], ResponseEnvelope[Resp]](ctx, sender, receiver, topic)
+
+	confirmed = make(MsgEffects[Req, Resp], len(envConfirmed))
+	for i, s := range envConfirmed {
+		confirmed[i] = MsgEffect[Req, Resp]{SeqNo: s.SeqNo, Msg: s.Msg.Request, Effect: s.Effect.Response}
+	}
+
+	notConfirmed = make(MsgEffects[Req, form.None], len(envNotConfirmed))
+	for i, s := range envNotConfirmed {
+		notConfirmed[i] = MsgEffect[Req, form.None]{SeqNo: s.SeqNo, Msg: s.Msg.Request}
+	}
+
+	return
 }

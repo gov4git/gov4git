@@ -57,8 +57,9 @@ func fetchVotesCloned(
 ) git.Change[form.Map, FetchedVotes] {
 
 	fetched := FetchedVotes{}
-	respond := func(ctx context.Context, _ mail.SeqNo, req common.VoteEnvelope, _ id.Signed[common.VoteEnvelope]) (resp common.VoteEnvelope, err error) {
+	respond := func(ctx context.Context, _ mail.SeqNo, signedReq id.Signed[common.VoteEnvelope]) (resp common.VoteEnvelope, err error) {
 
+		req := signedReq.Value
 		if !req.VerifyConsistency() {
 			return common.VoteEnvelope{}, fmt.Errorf("vote envelope is not valid")
 		}

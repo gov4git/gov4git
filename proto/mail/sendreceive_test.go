@@ -87,8 +87,8 @@ func TestSendReceiveSigned(t *testing.T) {
 		t.Fatalf("unexpected seq no")
 	}
 
-	respond := func(ctx context.Context, _ SeqNo, req string, _ id.Signed[string]) (resp string, err error) {
-		return req, nil
+	respond := func(ctx context.Context, _ SeqNo, signedReq id.Signed[string]) (resp string, err error) {
+		return signedReq.Value, nil
 	}
 
 	r0 := ReceiveSigned_StageOnly(

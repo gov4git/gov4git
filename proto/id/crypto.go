@@ -1,6 +1,7 @@
 package id
 
 import (
+	"bytes"
 	"context"
 	"crypto/ed25519"
 
@@ -35,8 +36,25 @@ type Signed[V form.Form] struct {
 	PublicKeyEd25519 Ed25519PublicKey `json:"ed25519_public_key"`
 }
 
-func (signed *Signed[V]) Verify() bool {
-	// XXX: also verify Value encodes to Plaintext
+func (signed *Signed[V]) Verify(ctx context.Context) bool {
+
+	// verify that value and plaintext are consistent
+
+	// value -> encoding
+	enc1, err := form.EncodeBytes(ctx, signed.Value)
+	must.NoError(ctx, err)
+
+	// plaintext -> value -> encoding
+	var w V
+	err = form.DecodeBytesInto(ctx, signed.Plaintext.Bytes(), &w)
+	must.NoError(ctx, err)
+	enc2, err := form.EncodeBytes(ctx, w)
+	must.NoError(ctx, err)
+
+	if !bytes.Equal(enc1, enc2) {
+		return false
+	}
+
 	return ed25519.Verify(ed25519.PublicKey(signed.PublicKeyEd25519), signed.Plaintext, signed.Signature)
 }
 

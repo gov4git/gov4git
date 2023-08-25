@@ -89,7 +89,6 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 type SignedReceiver[Msg form.Form, Effect form.Form] func(
 	ctx context.Context,
 	seqNo SeqNo,
-	msg Msg, // XXX: this is no longer necessary
 	signedMsg id.Signed[Msg],
 ) (effect Effect, err error)
 
@@ -109,14 +108,14 @@ func ReceiveSigned_StageOnly[Msg form.Form, Effect form.Form](
 		seqNo SeqNo,
 		signedReq id.Signed[Msg],
 	) (signedResp id.Signed[Effect], err error) {
-		if !signedReq.Verify() {
+		if !signedReq.Verify(ctx) {
 			return signedResp, fmt.Errorf("signature not valid")
 		}
 		msg, err := form.DecodeBytes[Msg](ctx, signedReq.Plaintext)
 		if err != nil {
 			return signedResp, err
 		}
-		effect, err := receive(ctx, seqNo, msg, signedReq)
+		effect, err := receive(ctx, seqNo, signedReq)
 		if err != nil {
 			return signedResp, err
 		}

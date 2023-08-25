@@ -69,8 +69,9 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 			base.Infof("responding to message %d in sender repo (%v)", i, err)
 			continue
 		}
-		git.ToFileStage(ctx, receiver, receiverTopicNS.Sub(msgFilebase).Path(), effect)
-		msgEffects = append(msgEffects, MsgEffect[Msg, Effect]{SeqNo: i, Msg: msg, Effect: effect})
+		msgEffect := MsgEffect[Msg, Effect]{SeqNo: i, Msg: msg, Effect: effect}
+		git.ToFileStage(ctx, receiver, receiverTopicNS.Sub(msgFilebase).Path(), msgEffect)
+		msgEffects = append(msgEffects, msgEffect)
 		receiverLatestNextSeqNo = i + 1
 	}
 

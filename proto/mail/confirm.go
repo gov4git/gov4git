@@ -38,7 +38,7 @@ func Confirm_Local[Msg form.Form, Effect form.Form](
 	senderTopicNS := SendTopicNS(receiverCred.ID, topic)
 	receiverTopicNS := ReceiveTopicNS(senderCred.ID, topic)
 
-	// read all sent messages
+	// read all sent messages (at the sender)
 	sentMsgs := map[SeqNo]Msg{}
 	senderInfos, err := sender.Filesystem.ReadDir(senderTopicNS.Path())
 	must.NoError(ctx, err)
@@ -53,8 +53,8 @@ func Confirm_Local[Msg form.Form, Effect form.Form](
 		sentMsgs[SeqNo(seqno)] = git.FromFile[Msg](ctx, sender, senderTopicNS.Sub(info.Name()).Path())
 	}
 
-	// read all effects of received messages
-	receivedEffects := map[SeqNo]Effect{}
+	// read all received messages and the resulting effects (at the receiver)
+	receivedMsgEffects := map[SeqNo]MsgEffect[Msg, Effect]{}
 	receiverInfos, err := receiver.Filesystem.ReadDir(receiverTopicNS.Path())
 	must.NoError(ctx, err)
 	for _, info := range receiverInfos {
@@ -65,14 +65,16 @@ func Confirm_Local[Msg form.Form, Effect form.Form](
 		if err != nil {
 			continue
 		}
-		receivedEffects[SeqNo(seqno)] = git.FromFile[Effect](ctx, receiver, receiverTopicNS.Sub(info.Name()).Path())
+		msgEffect := git.FromFile[MsgEffect[Msg, Effect]](ctx, receiver, receiverTopicNS.Sub(info.Name()).Path())
+		must.Assertf(ctx, msgEffect.SeqNo == SeqNo(seqno), "receiver mailbox inconsistent")
+		receivedMsgEffects[SeqNo(seqno)] = msgEffect
 	}
 
 	// compute confirmed and not confirmed transmissions
 	for seqno, sentMsg := range sentMsgs {
-		if receivedEffect, ok := receivedEffects[seqno]; ok {
+		if receivedMsgEffect, ok := receivedMsgEffects[seqno]; ok {
 			confirmed = append(confirmed,
-				MsgEffect[Msg, Effect]{SeqNo: seqno, Msg: sentMsg, Effect: receivedEffect},
+				MsgEffect[Msg, Effect]{SeqNo: seqno, Msg: sentMsg, Effect: receivedMsgEffect.Effect},
 			)
 		} else {
 			notConfirmed = append(notConfirmed,

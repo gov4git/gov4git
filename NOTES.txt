@@ -1,4 +1,4 @@
-- [ ] receive should record sent message with effect
+- [x] receive should record sent message with effect
 - [x] include original message in signed plaintext
 
 - [ ] test request/respond

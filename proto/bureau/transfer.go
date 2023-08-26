@@ -23,7 +23,7 @@ func Transfer(
 	toUser member.User,
 	toBalance balance.Balance,
 	amount float64,
-) git.Change[form.Map, mail.SeqNo] {
+) git.Change[form.Map, mail.RequestEnvelope[Request]] {
 
 	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	// userRepo, userTree := id.CloneOwner(ctx, userAddr)
@@ -45,7 +45,7 @@ func TransferStageOnly(
 	toUser member.User,
 	toBalance balance.Balance,
 	amount float64,
-) git.Change[form.Map, mail.SeqNo] {
+) git.Change[form.Map, mail.RequestEnvelope[Request]] {
 
 	userCred := id.GetPublicCredentials(ctx, userOwner.Public.Tree())
 
@@ -72,7 +72,7 @@ func TransferStageOnly(
 		},
 	}
 
-	sendOnly := mail.SendSigned_StageOnly(ctx, userOwner, govCloned.Tree(), BureauTopic, request)
+	sendOnly := mail.Request_StageOnly(ctx, userOwner, govCloned.Tree(), BureauTopic, request)
 	return git.NewChange(
 		"Transfer account tokens.",
 		"bureau_transfer",

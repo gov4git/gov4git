@@ -2,13 +2,10 @@
 - [x] include original message in signed plaintext
 - [x] confirm for req/resp
 
-- [ ] test request/respond
+- [x] test request/respond
 - [ ] test confirm
 - [ ] test confirm signed
 - [ ] test confirm request response
 
-
-- [ ] upgrade vote to request/response
-- [ ] upgrade bureau to request/response
-
-- [ ] address XXX
+- [x] upgrade vote to request/response
+- [x] upgrade bureau to request/response

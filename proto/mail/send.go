@@ -11,15 +11,13 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-type SeqNo int64
-
 func SendMakeMsg_StageOnly[Msg form.Form](
 	ctx context.Context,
 	sender *git.Tree,
 	receiver *git.Tree,
 	topic string,
 	mkMsg func(context.Context, SeqNo) Msg,
-) git.Change[form.Map, SeqNo] {
+) git.Change[form.Map, SendReport[Msg]] {
 
 	// fetch receiver id
 	receiverCred := id.GetPublicCredentials(ctx, receiver)
@@ -51,7 +49,7 @@ func SendMakeMsg_StageOnly[Msg form.Form](
 		fmt.Sprintf("Sent #%d", nextSeqNo),
 		"send",
 		form.Map{"topic": topic, "msg": msg},
-		nextSeqNo,
+		SendReport[Msg]{SeqNo: nextSeqNo, Msg: msg},
 		nil,
 	)
 }
@@ -62,7 +60,7 @@ func Send_StageOnly[Msg form.Form](
 	receiver *git.Tree,
 	topic string,
 	msg Msg,
-) git.Change[form.Map, SeqNo] {
+) git.Change[form.Map, SendReport[Msg]] {
 
 	return SendMakeMsg_StageOnly(ctx, sender, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
 }
@@ -73,7 +71,7 @@ func SendSignedMakeMsg_StageOnly[Msg form.Form](
 	receiver *git.Tree,
 	topic string,
 	mkMsg func(context.Context, SeqNo) Msg,
-) git.Change[form.Map, SeqNo] {
+) git.Change[form.Map, SendReport[Msg]] {
 
 	senderPrivCred := id.GetPrivateCredentials(ctx, senderCloned.Private.Tree())
 	mkSignedMsg := func(ctx context.Context, seqNo SeqNo) id.Signed[Msg] {
@@ -81,10 +79,10 @@ func SendSignedMakeMsg_StageOnly[Msg form.Form](
 	}
 	sendOnly := SendMakeMsg_StageOnly(ctx, senderCloned.Public.Tree(), receiver, topic, mkSignedMsg)
 	return git.NewChange(
-		fmt.Sprintf("Sent signed #%d", sendOnly.Result),
+		fmt.Sprintf("Sent signed #%d", sendOnly.Result.SeqNo),
 		"send_signed",
 		form.Map{"topic": topic},
-		sendOnly.Result,
+		SendReport[Msg]{SeqNo: sendOnly.Result.SeqNo, Msg: sendOnly.Result.Msg.Value},
 		form.Forms{sendOnly},
 	)
 }
@@ -95,7 +93,7 @@ func SendSigned_StageOnly[Msg form.Form](
 	receiver *git.Tree,
 	topic string,
 	msg Msg,
-) git.Change[form.Map, SeqNo] {
+) git.Change[form.Map, SendReport[Msg]] {
 
 	return SendSignedMakeMsg_StageOnly(ctx, senderCloned, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
 }

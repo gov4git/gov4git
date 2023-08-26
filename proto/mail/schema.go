@@ -18,6 +18,13 @@ type ReceiveBoxInfo struct {
 	Topic    string `json:"topic"`
 }
 
+type SeqNo int64
+
+type SendReport[Msg form.Form] struct {
+	SeqNo SeqNo `json:"seqno"`
+	Msg   Msg   `json:"msg"`
+}
+
 type RequestEnvelope[Req form.Form] struct {
 	SeqNo   SeqNo `json:"seqno"`
 	Request Req   `json:"request"`

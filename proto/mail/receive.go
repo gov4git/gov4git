@@ -3,6 +3,7 @@ package mail
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"sort"
 	"strconv"
 
@@ -64,6 +65,8 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 	for i := receiverNextSeqNo; i < senderNextSeqNo; i++ {
 		msgFilebase := strconv.Itoa(int(i))
 		msg := git.FromFile[Msg](ctx, sender, senderTopicNS.Sub(msgFilebase).Path())
+		fmt.Println("MSG:", form.SprintJSON(msg))
+		fmt.Println("TYPE:", reflect.TypeOf(msg))
 		effect, err := receive(ctx, i, msg)
 		if err != nil {
 			base.Infof("responding to message %d in sender repo (%v)", i, err)
@@ -103,7 +106,7 @@ func ReceiveSigned_StageOnly[Msg form.Form, Effect form.Form](
 ) git.Change[form.Map, []MsgEffect[Msg, Effect]] {
 
 	receiverPrivCred := id.GetOwnerCredentials(ctx, receiverCloned)
-	signRespond := func(
+	var receiver Receiver[id.Signed[Msg], id.Signed[Effect]] = func(
 		ctx context.Context,
 		seqNo SeqNo,
 		signedReq id.Signed[Msg],
@@ -117,7 +120,7 @@ func ReceiveSigned_StageOnly[Msg form.Form, Effect form.Form](
 		}
 		return id.Sign(ctx, receiverPrivCred, effect), nil
 	}
-	recvOnly := Receive_StageOnly(ctx, receiverCloned.Public.Tree(), senderAddr, senderPublic, topic, signRespond)
+	recvOnly := Receive_StageOnly(ctx, receiverCloned.Public.Tree(), senderAddr, senderPublic, topic, receiver)
 	msgEffects := make([]MsgEffect[Msg, Effect], len(recvOnly.Result))
 	for i, signedMsgEffect := range recvOnly.Result {
 		msgEffects[i] = MsgEffect[Msg, Effect]{

@@ -31,7 +31,7 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 	for i := 0; i < numMembers; i++ {
 		memberID := id.NewTestID(ctx, t, git.MainBranch, true)
 		base.Infof("member_%d_public=%v member_%d_private=%v",
-			i, organizerID.PublicAddress(), i, organizerID.PrivateAddress())
+			i, memberID.Public.Address(), i, memberID.Private.Address())
 		id.Init(ctx, memberID.OwnerAddress())
 		members[i] = memberID.OwnerAddress()
 	}

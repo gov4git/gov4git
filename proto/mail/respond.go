@@ -25,7 +25,7 @@ func Respond_StageOnly[Req form.Form, Resp form.Form](
 	respond Responder[Req, Resp],
 ) git.Change[form.Map, []ResponseEnvelope[Resp]] {
 
-	receive := func(
+	var signedReceive SignedReceiver[RequestEnvelope[Req], ResponseEnvelope[Resp]] = func(
 		ctx context.Context,
 		seqNo SeqNo,
 		signedReqEnv id.Signed[RequestEnvelope[Req]],
@@ -43,7 +43,7 @@ func Respond_StageOnly[Req form.Form, Resp form.Form](
 		}, nil
 	}
 
-	chg := ReceiveSigned_StageOnly(ctx, receiverCloned, senderAddr, senderPublic, topic, receive)
+	chg := ReceiveSigned_StageOnly[RequestEnvelope[Req], ResponseEnvelope[Resp]](ctx, receiverCloned, senderAddr, senderPublic, topic, signedReceive)
 	respEnvs := make([]ResponseEnvelope[Resp], len(chg.Result))
 	for i, msgEffect := range chg.Result {
 		respEnvs[i] = msgEffect.Effect

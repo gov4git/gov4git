@@ -36,7 +36,7 @@ type Signed[V form.Form] struct {
 	PublicKeyEd25519 Ed25519PublicKey `json:"ed25519_public_key"`
 }
 
-func (signed *Signed[V]) Verify(ctx context.Context) bool {
+func (signed Signed[V]) Verify(ctx context.Context) bool {
 
 	// verify that value and plaintext are consistent
 

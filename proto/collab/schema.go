@@ -36,6 +36,7 @@ type ConcernName = Name
 type Concern struct {
 	Name        ConcernName    `json:"name"` // name of concern
 	Title       string         `json:"title"`
+	Desc        string         `json:"description"`
 	TrackerURL  string         `json:"tracker_url"` // link to concern on an external concern tracker, such as a GitHub issue
 	Closed      bool           `json:"closed"`
 	Cancelled   bool           `json:"cancelled"`
@@ -63,6 +64,7 @@ type ProposalName = Name
 type Proposal struct {
 	Name       ProposalName  `json:"name"` // name of proposal
 	Title      string        `json:"title"`
+	Desc       string        `json:"description"`
 	TrackerURL string        `json:"tracker_url"` // link to proposal on an external proposal tracker, such as GitHub
 	Closed     bool          `json:"closed"`
 	Cancelled  bool          `json:"cancelled"`

@@ -77,7 +77,7 @@ func PrioritizeConcernByBallot_StageOnly(
 		ballotName,
 		fmt.Sprintf("Priority poll for concern %v", concernName),            // title
 		fmt.Sprintf("Up/down vote the priority of concern %v", concernName), // description
-		[]string{"priority"}, // choices
+		[]string{PriorityBallotChoice},                                      // choices
 		member.Everybody,
 	)
 	concern.Priority.Ballot = &ballotName

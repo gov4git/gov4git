@@ -18,17 +18,18 @@ func IsProposal_Local(ctx context.Context, t *git.Tree, name ProposalName) bool 
 	return err == nil
 }
 
-func OpenProposal(ctx context.Context, addr gov.GovAddress, name ProposalName, title string, trackerURL string) {
+func OpenProposal(ctx context.Context, addr gov.GovAddress, name ProposalName, title string, desc string, trackerURL string) {
 	cloned := gov.Clone(ctx, addr)
-	chg := OpenProposal_StageOnly(ctx, cloned.Tree(), name, trackerURL, title)
+	chg := OpenProposal_StageOnly(ctx, cloned.Tree(), name, title, desc, trackerURL)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func OpenProposal_StageOnly(ctx context.Context, t *git.Tree, name ProposalName, title string, trackerURL string) git.ChangeNoResult {
+func OpenProposal_StageOnly(ctx context.Context, t *git.Tree, name ProposalName, title string, desc string, trackerURL string) git.ChangeNoResult {
 	must.Assert(ctx, !IsProposal_Local(ctx, t, name), ErrProposalAlreadyExists)
 	state := Proposal{
 		Name:       name,
+		Desc:       desc,
 		Title:      title,
 		TrackerURL: trackerURL,
 		Closed:     false,

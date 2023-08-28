@@ -42,8 +42,8 @@ github.com/google/go-github/v53 v53.2.0 h1:wvz3FyF53v4BK+AsnvCmeNhf8AkTaeh2SoYu/
 github.com/google/go-github/v53 v53.2.0/go.mod h1:XhFRObz+m/l+UCm9b7KSIC3lT3NWSXGt7mOsAWEloao=
 github.com/google/go-querystring v1.1.0 h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD/fhyJ8=
 github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17icRSOU623lUBU=
-github.com/gov4git/lib4git v0.0.20 h1:sM/WJeXWs5gWWdEUz63FjHqrD9cjRd3en+Dsc0NRbQs=
-github.com/gov4git/lib4git v0.0.20/go.mod h1:bXL67JOVTyh/5FkF5HyabaMk5BxAC08GYbqTjVyrY18=
+github.com/gov4git/lib4git v0.0.21 h1:e8qdFdakoyT5ZHYg1+p2NLNobC+qav2krp5OVwPTznE=
+github.com/gov4git/lib4git v0.0.21/go.mod h1:bXL67JOVTyh/5FkF5HyabaMk5BxAC08GYbqTjVyrY18=
 github.com/gov4git/vendor4git v0.0.1 h1:iB9vHqSdjjCDAHnyfDaA+VIY3OZQYJ5bLvApsdL4L0I=
 github.com/gov4git/vendor4git v0.0.1/go.mod h1:zceIOhS5G21y1FZxyLquUP3AqBuOT+M99uk6IexYlL0=
 github.com/imdario/mergo v0.3.15 h1:M8XP7IuFNsqUx6VPK2P9OSmsYsI/YFaGil0uD21V3dM=

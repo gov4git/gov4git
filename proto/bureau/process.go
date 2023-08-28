@@ -109,7 +109,11 @@ func fetchUserRequests(
 ) git.Change[form.Map, FetchedRequests] {
 
 	fetched := FetchedRequests{}
-	respond := func(ctx context.Context, req Request, _ id.SignedPlaintext) (resp Request, err error) {
+	var respond mail.Responder[Request, Request] = func(
+		ctx context.Context,
+		_ mail.SeqNo,
+		req Request,
+	) (resp Request, err error) {
 		fetched = append(fetched,
 			FetchedRequest{
 				User:     user,
@@ -120,7 +124,7 @@ func fetchUserRequests(
 	}
 
 	userPublic := git.CloneOne(ctx, git.Address(account.PublicAddress))
-	recvOnly := mail.ReceiveSignedStageOnly(
+	recvOnly := mail.Respond_StageOnly[Request, Request](
 		ctx,
 		govOwner,
 		account.PublicAddress,

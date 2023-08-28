@@ -21,7 +21,7 @@ func Vote(
 	govAddr gov.GovAddress,
 	ballotName ns.NS,
 	elections common.Elections,
-) git.Change[form.Map, mail.SeqNo] {
+) git.Change[form.Map, mail.RequestEnvelope[common.VoteEnvelope]] {
 
 	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	voterOwner := id.CloneOwner(ctx, voterAddr)
@@ -40,7 +40,7 @@ func VoteStageOnly(
 	govCloned git.Cloned,
 	ballotName ns.NS,
 	elections common.Elections,
-) git.Change[form.Map, mail.SeqNo] {
+) git.Change[form.Map, mail.RequestEnvelope[common.VoteEnvelope]] {
 
 	ad, strat := load.LoadStrategy(ctx, govCloned.Tree(), ballotName)
 
@@ -75,7 +75,7 @@ func VoteStageOnly(
 	git.ToFileStage(ctx, voterTree, voteLogNS.Path(), voteLog)
 
 	// send vote to community by mail
-	sendChg := mail.SendSignedStageOnly(ctx, voterOwner, govCloned.Tree(), common.BallotTopic(ballotName), envelope)
+	sendChg := mail.Request_StageOnly(ctx, voterOwner, govCloned.Tree(), common.BallotTopic(ballotName), envelope)
 	return git.NewChange(
 		"Cast vote",
 		"ballot_vote",

@@ -11,22 +11,20 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-type SeqNo int64
-
-func SendStageOnly[M form.Form](
+func SendMakeMsg_StageOnly[Msg form.Form](
 	ctx context.Context,
 	sender *git.Tree,
 	receiver *git.Tree,
 	topic string,
-	msg M,
-) git.Change[form.Map, SeqNo] {
+	mkMsg func(context.Context, SeqNo) Msg,
+) git.Change[form.Map, SentMsg[Msg]] {
 
 	// fetch receiver id
 	receiverCred := id.GetPublicCredentials(ctx, receiver)
 	topicNS := SendTopicNS(receiverCred.ID, topic)
 
 	// write receiver id + topic in send box file
-	infoValue := SendBoxInfo{ReceiverID: receiverCred.ID, Topic: topic}
+	infoValue := SendBoxInfo{ReceiverCred: receiverCred, Topic: topic}
 	infoNS := topicNS.Sub(BoxInfoFilebase)
 	git.ToFileStage(ctx, sender, infoNS.Path(), infoValue)
 
@@ -37,6 +35,7 @@ func SendStageOnly[M form.Form](
 
 	// write message
 	msgNS := topicNS.Sub(strconv.Itoa(int(nextSeqNo)))
+	msg := mkMsg(ctx, nextSeqNo)
 	git.ToFileStage(ctx, sender, msgNS.Path(), msg)
 
 	// write + stage next file
@@ -47,29 +46,54 @@ func SendStageOnly[M form.Form](
 	git.ToFileStage(ctx, sender, nextNS.Path(), newNextSeqNo)
 
 	return git.NewChange(
-		fmt.Sprintf("Sent mail #%d", nextSeqNo),
-		"mail_send",
+		fmt.Sprintf("Sent #%d", nextSeqNo),
+		"send",
 		form.Map{"topic": topic, "msg": msg},
-		nextSeqNo,
+		SentMsg[Msg]{SeqNo: nextSeqNo, Msg: msg},
 		nil,
 	)
 }
 
-func SendSignedStageOnly[M form.Form](
+func Send_StageOnly[Msg form.Form](
+	ctx context.Context,
+	sender *git.Tree,
+	receiver *git.Tree,
+	topic string,
+	msg Msg,
+) git.Change[form.Map, SentMsg[Msg]] {
+
+	return SendMakeMsg_StageOnly[Msg](ctx, sender, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
+}
+
+func SendSignedMakeMsg_StageOnly[Msg form.Form](
 	ctx context.Context,
 	senderCloned id.OwnerCloned,
 	receiver *git.Tree,
 	topic string,
-	msg M,
-) git.Change[form.Map, SeqNo] {
+	mkMsg func(context.Context, SeqNo) Msg,
+) git.Change[form.Map, SentMsg[Msg]] {
+
 	senderPrivCred := id.GetPrivateCredentials(ctx, senderCloned.Private.Tree())
-	signed := id.Sign(ctx, senderPrivCred, msg)
-	sendOnly := SendStageOnly(ctx, senderCloned.Public.Tree(), receiver, topic, signed)
+	mkSignedMsg := func(ctx context.Context, seqNo SeqNo) id.Signed[Msg] {
+		return id.Sign(ctx, senderPrivCred, mkMsg(ctx, seqNo))
+	}
+	sendOnly := SendMakeMsg_StageOnly[id.Signed[Msg]](ctx, senderCloned.Public.Tree(), receiver, topic, mkSignedMsg)
 	return git.NewChange(
-		fmt.Sprintf("Sent signed mail #%d", sendOnly.Result),
-		"mail_receive_signed",
+		fmt.Sprintf("Sent signed #%d", sendOnly.Result.SeqNo),
+		"send_signed",
 		form.Map{"topic": topic},
-		sendOnly.Result,
+		SentMsg[Msg]{SeqNo: sendOnly.Result.SeqNo, Msg: sendOnly.Result.Msg.Value},
 		form.Forms{sendOnly},
 	)
+}
+
+func SendSigned_StageOnly[Msg form.Form](
+	ctx context.Context,
+	senderCloned id.OwnerCloned,
+	receiver *git.Tree,
+	topic string,
+	msg Msg,
+) git.Change[form.Map, SentMsg[Msg]] {
+
+	return SendSignedMakeMsg_StageOnly[Msg](ctx, senderCloned, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
 }

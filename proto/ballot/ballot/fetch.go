@@ -57,7 +57,11 @@ func fetchVotesCloned(
 ) git.Change[form.Map, FetchedVotes] {
 
 	fetched := FetchedVotes{}
-	respond := func(ctx context.Context, req common.VoteEnvelope, _ id.SignedPlaintext) (resp common.VoteEnvelope, err error) {
+	var respond mail.Responder[common.VoteEnvelope, common.VoteEnvelope] = func(
+		ctx context.Context,
+		_ mail.SeqNo,
+		req common.VoteEnvelope,
+	) (resp common.VoteEnvelope, err error) {
 
 		if !req.VerifyConsistency() {
 			return common.VoteEnvelope{}, fmt.Errorf("vote envelope is not valid")
@@ -72,7 +76,7 @@ func fetchVotesCloned(
 	}
 
 	voterPublicTree := userCloned.Tree()
-	mail.ReceiveSignedStageOnly(
+	mail.Respond_StageOnly[common.VoteEnvelope, common.VoteEnvelope](
 		ctx,
 		govOwner,
 		account.PublicAddress,

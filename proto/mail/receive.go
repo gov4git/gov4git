@@ -55,7 +55,7 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 	senderNextSeqNo, _ := git.TryFromFile[SeqNo](ctx, sender, senderNextNS.Path())
 
 	// write receive box info
-	info := ReceiveBoxInfo{SenderID: senderCred.ID, Topic: topic}
+	info := ReceiveBoxInfo{SenderCred: senderCred, Topic: topic}
 	git.ToFileStage(ctx, receiver, receiverInfoNS.Path(), info)
 
 	// read unread messages

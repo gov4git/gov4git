@@ -17,14 +17,14 @@ func SendMakeMsg_StageOnly[Msg form.Form](
 	receiver *git.Tree,
 	topic string,
 	mkMsg func(context.Context, SeqNo) Msg,
-) git.Change[form.Map, SendReport[Msg]] {
+) git.Change[form.Map, SentMsg[Msg]] {
 
 	// fetch receiver id
 	receiverCred := id.GetPublicCredentials(ctx, receiver)
 	topicNS := SendTopicNS(receiverCred.ID, topic)
 
 	// write receiver id + topic in send box file
-	infoValue := SendBoxInfo{ReceiverID: receiverCred.ID, Topic: topic}
+	infoValue := SendBoxInfo{ReceiverCred: receiverCred, Topic: topic}
 	infoNS := topicNS.Sub(BoxInfoFilebase)
 	git.ToFileStage(ctx, sender, infoNS.Path(), infoValue)
 
@@ -49,7 +49,7 @@ func SendMakeMsg_StageOnly[Msg form.Form](
 		fmt.Sprintf("Sent #%d", nextSeqNo),
 		"send",
 		form.Map{"topic": topic, "msg": msg},
-		SendReport[Msg]{SeqNo: nextSeqNo, Msg: msg},
+		SentMsg[Msg]{SeqNo: nextSeqNo, Msg: msg},
 		nil,
 	)
 }
@@ -60,7 +60,7 @@ func Send_StageOnly[Msg form.Form](
 	receiver *git.Tree,
 	topic string,
 	msg Msg,
-) git.Change[form.Map, SendReport[Msg]] {
+) git.Change[form.Map, SentMsg[Msg]] {
 
 	return SendMakeMsg_StageOnly(ctx, sender, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
 }
@@ -71,7 +71,7 @@ func SendSignedMakeMsg_StageOnly[Msg form.Form](
 	receiver *git.Tree,
 	topic string,
 	mkMsg func(context.Context, SeqNo) Msg,
-) git.Change[form.Map, SendReport[Msg]] {
+) git.Change[form.Map, SentMsg[Msg]] {
 
 	senderPrivCred := id.GetPrivateCredentials(ctx, senderCloned.Private.Tree())
 	mkSignedMsg := func(ctx context.Context, seqNo SeqNo) id.Signed[Msg] {
@@ -82,7 +82,7 @@ func SendSignedMakeMsg_StageOnly[Msg form.Form](
 		fmt.Sprintf("Sent signed #%d", sendOnly.Result.SeqNo),
 		"send_signed",
 		form.Map{"topic": topic},
-		SendReport[Msg]{SeqNo: sendOnly.Result.SeqNo, Msg: sendOnly.Result.Msg.Value},
+		SentMsg[Msg]{SeqNo: sendOnly.Result.SeqNo, Msg: sendOnly.Result.Msg.Value},
 		form.Forms{sendOnly},
 	)
 }
@@ -93,7 +93,7 @@ func SendSigned_StageOnly[Msg form.Form](
 	receiver *git.Tree,
 	topic string,
 	msg Msg,
-) git.Change[form.Map, SendReport[Msg]] {
+) git.Change[form.Map, SentMsg[Msg]] {
 
 	return SendSignedMakeMsg_StageOnly(ctx, senderCloned, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
 }

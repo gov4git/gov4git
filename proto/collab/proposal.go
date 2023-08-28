@@ -2,6 +2,7 @@ package collab
 
 import (
 	"context"
+	"time"
 
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
@@ -28,6 +29,7 @@ func OpenProposal(ctx context.Context, addr gov.GovAddress, name ProposalName, t
 func OpenProposal_StageOnly(ctx context.Context, t *git.Tree, name ProposalName, title string, desc string, trackerURL string) git.ChangeNoResult {
 	must.Assert(ctx, !IsProposal_Local(ctx, t, name), ErrProposalAlreadyExists)
 	state := Proposal{
+		TimeOpened: time.Now(),
 		Name:       name,
 		Desc:       desc,
 		Title:      title,
@@ -48,6 +50,7 @@ func CloseProposal_StageOnly(ctx context.Context, t *git.Tree, name ProposalName
 	state := proposalKV.Get(ctx, proposalNS, t, name)
 	must.Assert(ctx, !state.Closed, ErrProposalAlreadyClosed)
 	state.Closed = true
+	state.TimeClosed = time.Now()
 	return proposalKV.Set(ctx, proposalNS, t, name, state)
 }
 

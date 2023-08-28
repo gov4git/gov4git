@@ -50,11 +50,11 @@ func CloseProposal_StageOnly(ctx context.Context, t *git.Tree, name ProposalName
 	return proposalKV.Set(ctx, proposalNS, t, name, state)
 }
 
-func ListProposals(ctx context.Context, addr gov.GovAddress) []Proposal {
+func ListProposals(ctx context.Context, addr gov.GovAddress) Proposals {
 	return ListProposals_Local(ctx, gov.Clone(ctx, addr).Tree())
 }
 
-func ListProposals_Local(ctx context.Context, t *git.Tree) []Proposal {
+func ListProposals_Local(ctx context.Context, t *git.Tree) Proposals {
 	_, proposals := proposalKV.ListKeyValues(ctx, proposalNS, t)
 	return proposals
 }

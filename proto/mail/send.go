@@ -62,7 +62,7 @@ func Send_StageOnly[Msg form.Form](
 	msg Msg,
 ) git.Change[form.Map, SentMsg[Msg]] {
 
-	return SendMakeMsg_StageOnly(ctx, sender, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
+	return SendMakeMsg_StageOnly[Msg](ctx, sender, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
 }
 
 func SendSignedMakeMsg_StageOnly[Msg form.Form](
@@ -77,7 +77,7 @@ func SendSignedMakeMsg_StageOnly[Msg form.Form](
 	mkSignedMsg := func(ctx context.Context, seqNo SeqNo) id.Signed[Msg] {
 		return id.Sign(ctx, senderPrivCred, mkMsg(ctx, seqNo))
 	}
-	sendOnly := SendMakeMsg_StageOnly(ctx, senderCloned.Public.Tree(), receiver, topic, mkSignedMsg)
+	sendOnly := SendMakeMsg_StageOnly[id.Signed[Msg]](ctx, senderCloned.Public.Tree(), receiver, topic, mkSignedMsg)
 	return git.NewChange(
 		fmt.Sprintf("Sent signed #%d", sendOnly.Result.SeqNo),
 		"send_signed",
@@ -95,5 +95,5 @@ func SendSigned_StageOnly[Msg form.Form](
 	msg Msg,
 ) git.Change[form.Map, SentMsg[Msg]] {
 
-	return SendSignedMakeMsg_StageOnly(ctx, senderCloned, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
+	return SendSignedMakeMsg_StageOnly[Msg](ctx, senderCloned, receiver, topic, func(context.Context, SeqNo) Msg { return msg })
 }

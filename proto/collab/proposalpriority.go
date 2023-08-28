@@ -68,6 +68,8 @@ func PrioritizeProposalByBallot_StageOnly(
 
 	proposal := proposalKV.Get(ctx, proposalNS, govCloned.Tree(), proposalName)
 
+	// XXX: what if there is a prior priority set
+
 	ballotName := ProposalPriorityBallotName(proposalName)
 	chg := ballot.Open_StageOnly(
 		ctx,

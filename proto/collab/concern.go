@@ -18,18 +18,19 @@ func IsConcern_Local(ctx context.Context, t *git.Tree, name ConcernName) bool {
 	return err == nil
 }
 
-func OpenConcern(ctx context.Context, addr gov.GovAddress, name ConcernName, title string, trackerURL string) {
+func OpenConcern(ctx context.Context, addr gov.GovAddress, name ConcernName, title string, desc string, trackerURL string) {
 	cloned := gov.Clone(ctx, addr)
-	chg := OpenConcern_StageOnly(ctx, cloned.Tree(), name, trackerURL, title)
+	chg := OpenConcern_StageOnly(ctx, cloned.Tree(), name, title, desc, trackerURL)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func OpenConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName, title string, trackerURL string) git.ChangeNoResult {
+func OpenConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName, title string, desc string, trackerURL string) git.ChangeNoResult {
 	must.Assert(ctx, !IsConcern_Local(ctx, t, name), ErrConcernAlreadyExists)
 	state := Concern{
 		Name:       name,
 		Title:      title,
+		Desc:       desc,
 		TrackerURL: trackerURL,
 		Closed:     false,
 	}

@@ -1,6 +1,8 @@
 package collab
 
 import (
+	"sort"
+
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/kv"
@@ -14,6 +16,10 @@ var (
 
 	proposalNS = collabNS.Sub("proposal")
 	proposalKV = kv.KV[ProposalName, Proposal]{}
+)
+
+var (
+	PriorityBallotChoice = "prioritize"
 )
 
 type Name string
@@ -34,8 +40,16 @@ type Concern struct {
 	Closed      bool           `json:"closed"`
 	Cancelled   bool           `json:"cancelled"`
 	Priority    Priority       `json:"priority"`
+	Score       float64        `json:"score"`        // priority score for this concern, computed during sync after tallying
 	AddressedBy []ProposalName `json:"addressed_by"` // prs addressing this concern
 }
+
+type Concerns []Concern
+
+func (x Concerns) Sort()              { sort.Sort(x) }
+func (x Concerns) Len() int           { return len(x) }
+func (x Concerns) Less(i, j int) bool { return x[i].Score < x[j].Score }
+func (x Concerns) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 
 func ConcernPriorityBallotName(concernName ConcernName) common.BallotName {
 	return common.BallotName{"concern", "priority", concernName.String()}
@@ -53,8 +67,16 @@ type Proposal struct {
 	Closed     bool          `json:"closed"`
 	Cancelled  bool          `json:"cancelled"`
 	Priority   Priority      `json:"priority"`
+	Score      float64       `json:"score"`     // priority score for this proposal, computed during sync after tallying
 	Addresses  []ConcernName `json:"addresses"` // concerns addressed by this proposal
 }
+
+type Proposals []Proposal
+
+func (x Proposals) Sort()              { sort.Sort(x) }
+func (x Proposals) Len() int           { return len(x) }
+func (x Proposals) Less(i, j int) bool { return x[i].Score < x[j].Score }
+func (x Proposals) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
 
 func ProposalPriorityBallotName(proposalName ProposalName) common.BallotName {
 	return common.BallotName{"proposal", "priority", proposalName.String()}

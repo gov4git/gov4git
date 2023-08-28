@@ -50,11 +50,11 @@ func CloseConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName) 
 	return concernKV.Set(ctx, concernNS, t, name, state)
 }
 
-func ListConcerns(ctx context.Context, addr gov.GovAddress) []Concern {
+func ListConcerns(ctx context.Context, addr gov.GovAddress) Concerns {
 	return ListConcerns_Local(ctx, gov.Clone(ctx, addr).Tree())
 }
 
-func ListConcerns_Local(ctx context.Context, t *git.Tree) []Concern {
+func ListConcerns_Local(ctx context.Context, t *git.Tree) Concerns {
 	_, concerns := concernKV.ListKeyValues(ctx, concernNS, t)
 	return concerns
 }

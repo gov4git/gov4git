@@ -18,7 +18,7 @@ func ListSent_Local[Msg form.Form](
 ) (SentMsgs[Msg], map[SeqNo]Msg) {
 
 	// prep
-	receiverCred := id.GetPublicCredentials(ctx, receiver) //XXX: vulnerability to get credentials from receiver and not from local box?
+	receiverCred := id.GetPublicCredentials(ctx, receiver)
 	senderTopicNS := SendTopicNS(receiverCred.ID, topic)
 
 	// read all sent messages (at the sender)

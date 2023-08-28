@@ -2,6 +2,7 @@ package collab
 
 import (
 	"sort"
+	"time"
 
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/ballot/common"
@@ -34,6 +35,9 @@ type ConcernName = Name
 
 // Concern is the current state of an concern.
 type Concern struct {
+	TimeOpened time.Time `json:"time_opened"`
+	TimeClosed time.Time `json:"time_closed"`
+	//
 	Name        ConcernName    `json:"name"` // name of concern
 	Title       string         `json:"title"`
 	Desc        string         `json:"description"`
@@ -62,6 +66,9 @@ type ProposalName = Name
 
 // Proposal is the current state of a pull request.
 type Proposal struct {
+	TimeOpened time.Time `json:"time_opened"`
+	TimeClosed time.Time `json:"time_closed"`
+	//
 	Name       ProposalName  `json:"name"` // name of proposal
 	Title      string        `json:"title"`
 	Desc       string        `json:"description"`

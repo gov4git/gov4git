@@ -28,7 +28,7 @@ var (
 			LoadConfig()
 			repo := github.GithubRepo{Owner: githubOwner, Name: githubRepo}
 			github.SetTokenSource(ctx, repo, github.MakeStaticTokenSource(ctx, githubToken))
-			importedIssues := github.ImportIssuesUsingPriorityBallots(ctx, repo, setup.Gov)
+			importedIssues := github.ImportIssuesForPrioritization(ctx, repo, setup.Gov)
 			fmt.Fprint(os.Stdout, form.SprintJSON(importedIssues))
 		},
 	}

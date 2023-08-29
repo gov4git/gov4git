@@ -2,12 +2,19 @@ package github
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/google/go-github/v54/github"
+	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
+	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/util"
@@ -40,7 +47,7 @@ func labelsToStrings(labels []*github.Label) []string {
 	return labelStrings
 }
 
-func IssueUsesGovernance(issue *github.Issue) bool {
+func IsIssueForPrioritization(issue *github.Issue) bool {
 	return util.IsIn(PrioritizeIssueByGovernanceLabel, labelsToStrings(issue.Labels)...)
 }
 
@@ -66,44 +73,134 @@ func unwrapTimestamp(ts *github.Timestamp) *time.Time {
 	return &ts.Time
 }
 
-func LoadBallotIssues(ctx context.Context, repo GithubRepo) GithubBallotIssues {
+func LoadIssuesForPrioritization(ctx context.Context, repo GithubRepo) (GithubBallotIssues, map[string]GithubBallotIssue) {
+
 	issues := FetchIssues(ctx, repo)
-	var concerns GithubBallotIssues
+	key := map[string]GithubBallotIssue{}
+	order := GithubBallotIssues{}
 	for _, issue := range issues {
-		if IssueUsesGovernance(issue) {
-			concerns = append(concerns, TransformIssue(ctx, issue))
+		if IsIssueForPrioritization(issue) {
+			ghIssue := TransformIssue(ctx, issue)
+			key[ghIssue.Key()] = ghIssue
+			order = append(order, ghIssue)
 		}
 	}
-	return concerns
+	order.Sort()
+	return order, key
 }
 
-func ImportIssuesUsingPriorityBallots(ctx context.Context, repo GithubRepo, govAddr gov.GovAddress) GithubBallotIssues {
-	return ImportIssuesUsingPriorityBallots_Local(ctx, repo, git.CloneOne(ctx, git.Address(govAddr)).Tree())
+func ImportIssuesForPrioritization(
+	ctx context.Context,
+	repo GithubRepo,
+	govAddr gov.OrganizerAddress,
+) git.Change[form.Map, GithubBallotIssues] {
+
+	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
+	ghIssues := ImportIssuesForPrioritization_Local(ctx, repo, govAddr, govCloned)
+	chg := git.NewChange[form.Map, GithubBallotIssues](
+		fmt.Sprintf("Import %d GitHub issues", len(ghIssues)),
+		"github_import",
+		form.Map{},
+		ghIssues,
+		nil,
+	)
+	proto.Commit(ctx, govCloned.Public.Tree(), chg)
+	govCloned.Public.Push(ctx)
+	return chg
 }
 
-func ImportIssuesUsingPriorityBallots_Local(ctx context.Context, repo GithubRepo, govTree *git.Tree) GithubBallotIssues {
+func ImportIssuesForPrioritization_Local(
+	ctx context.Context,
+	repo GithubRepo,
+	govAddr gov.OrganizerAddress,
+	govCloned id.OwnerCloned,
+) GithubBallotIssues {
 
-	// ghIssues := LoadBallotIssues(ctx, repo)
-	// govBallots := filterIssueBallots(ballot.ListLocal(ctx, govTree))
+	// load github issues and governance ballots, and
+	// index them under a common key space
+	ghOrderedIssues, ghIssues := LoadIssuesForPrioritization(ctx, repo)
+	govBallots := filterIssuesForPrioritization(ballot.ListLocal(ctx, govCloned.Public.Tree()))
 
-	// keyIssues := make(map[string]GithubBallotIssue)
-	// for _, issue := range ghIssues {
-	// 	XXX
-	// }
+	// ensure every issue has a corresponding up-to-date ballot
+	for k, ghIssue := range ghIssues {
+		if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
 
-	// keyBallots := make(map[string]common.Advertisement)
-	// XXX
+			switch {
+			case ghIssue.Closed && govBallot.Closed:
+				// nothing to do
+			case ghIssue.Closed && !govBallot.Closed:
+				UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+				ballot.CloseStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
+			case !ghIssue.Closed && govBallot.Closed:
+				UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+				UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+				XXX // reopen ballot
+			case !ghIssue.Closed && !govBallot.Closed:
+				UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+				UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+			}
 
+		} else { // no ballot for this issue, create it
+			ballot.OpenStageOnly(
+				ctx,
+				qv.QV{},
+				gov.GovAddress(govAddr.Public),
+				govCloned.Public,
+				ghIssue.BallotName(),
+				ghIssue.Title,
+				ghIssue.Body,
+				[]string{PrioritizeBallotChoice},
+				member.Everybody,
+			)
+		}
+	}
+
+	// don't touch ballots that have no corresponding issue
+
+	return ghOrderedIssues
 }
 
-func filterIssueBallots(ads []common.Advertisement) []common.Advertisement {
-	var filtered []common.Advertisement
+func filterIssuesForPrioritization(ads []common.Advertisement) map[string]common.Advertisement {
+	filtered := map[string]common.Advertisement{}
 	for _, ad := range ads {
 		if len(ad.Name) == 2 && ad.Name[0] == "issue" {
-			if _, err := strconv.Atoi(ad.Name[1]); err == nil {
-				filtered = append(filtered, ad)
+			key := ad.Name[1]
+			if _, err := strconv.Atoi(key); err == nil {
+				filtered[key] = ad
 			}
 		}
 	}
 	return filtered
+}
+
+func UpdateMeta_StageOnly(
+	ctx context.Context,
+	repo GithubRepo,
+	govAddr gov.OrganizerAddress,
+	govCloned id.OwnerCloned,
+	ghIssue GithubBallotIssue,
+	govBallot common.Advertisement,
+) {
+	if ghIssue.Title == govBallot.Title && ghIssue.Body == govBallot.Description {
+		return
+	}
+	ballot.ChangeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), ghIssue.Title, ghIssue.Body)
+}
+
+func UpdateFrozen_StageOnly(
+	ctx context.Context,
+	repo GithubRepo,
+	govAddr gov.OrganizerAddress,
+	govCloned id.OwnerCloned,
+	ghIssue GithubBallotIssue,
+	govBallot common.Advertisement,
+) {
+	switch {
+	case ghIssue.Locked && govBallot.Frozen:
+	case ghIssue.Locked && !govBallot.Frozen:
+		ballot.FreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+	case !ghIssue.Locked && govBallot.Frozen:
+		ballot.UnfreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+	case !ghIssue.Locked && !govBallot.Frozen:
+	}
 }

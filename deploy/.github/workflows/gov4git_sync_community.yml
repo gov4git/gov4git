@@ -1,4 +1,4 @@
-name: Update tallies
+name: Sync governance with community members (tally votes, deliver mail, etc)
 
 on:
   workflow_dispatch:

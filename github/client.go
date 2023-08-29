@@ -5,11 +5,10 @@ import (
 	"sync"
 
 	"github.com/google/go-github/v54/github"
-	"github.com/gov4git/lib4git/git"
 	"golang.org/x/oauth2"
 )
 
-func GetGithubClient(ctx context.Context, repo git.URL) *github.Client {
+func GetGithubClient(ctx context.Context, repo GithubRepo) *github.Client {
 	ts := GetTokenSource(ctx, repo)
 	tc := oauth2.NewClient(ctx, ts)
 	return github.NewClient(tc)
@@ -34,13 +33,13 @@ func WithTokenSource(ctx context.Context, m *TokenSourceManager) context.Context
 	return context.WithValue(ctx, contextKeyTokenSourceManager{}, m)
 }
 
-func SetTokenSource(ctx context.Context, forRepo git.URL, a oauth2.TokenSource) {
-	ctx.Value(contextKeyTokenSourceManager{}).(*TokenSourceManager).SetTokenSource(forRepo, a)
+func SetTokenSource(ctx context.Context, repo GithubRepo, a oauth2.TokenSource) {
+	ctx.Value(contextKeyTokenSourceManager{}).(*TokenSourceManager).SetTokenSource(repo, a)
 }
 
-func GetTokenSource(ctx context.Context, forRepo git.URL) oauth2.TokenSource {
+func GetTokenSource(ctx context.Context, repo GithubRepo) oauth2.TokenSource {
 	if am, ok := ctx.Value(contextKeyTokenSourceManager{}).(*TokenSourceManager); ok {
-		return am.GetTokenSource(forRepo)
+		return am.GetTokenSource(repo)
 	}
 	return nil
 }
@@ -48,20 +47,20 @@ func GetTokenSource(ctx context.Context, forRepo git.URL) oauth2.TokenSource {
 // TokenSourceManager provides authentication methods given a repo URL.
 type TokenSourceManager struct {
 	lk  sync.Mutex
-	url map[git.URL]oauth2.TokenSource
+	url map[GithubRepo]oauth2.TokenSource
 }
 
 func NewTokenSourceManager() *TokenSourceManager {
-	return &TokenSourceManager{url: map[git.URL]oauth2.TokenSource{}}
+	return &TokenSourceManager{url: map[GithubRepo]oauth2.TokenSource{}}
 }
 
-func (x *TokenSourceManager) SetTokenSource(forRepo git.URL, a oauth2.TokenSource) {
+func (x *TokenSourceManager) SetTokenSource(forRepo GithubRepo, a oauth2.TokenSource) {
 	x.lk.Lock()
 	defer x.lk.Unlock()
 	x.url[forRepo] = a
 }
 
-func (x *TokenSourceManager) GetTokenSource(forRepo git.URL) oauth2.TokenSource {
+func (x *TokenSourceManager) GetTokenSource(forRepo GithubRepo) oauth2.TokenSource {
 	x.lk.Lock()
 	defer x.lk.Unlock()
 	return x.url[forRepo]

@@ -49,6 +49,7 @@ func init() {
 	rootCmd.AddCommand(syncCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(cacheCmd)
+	rootCmd.AddCommand(githubCmd)
 }
 
 func initAfterFlags() {

@@ -141,6 +141,7 @@ func ImportIssuesForPrioritization_Local(
 					// nothing to do
 				case ghIssue.Closed && !govBallot.Closed:
 					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
 					ballot.CloseStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
 				case !ghIssue.Closed && govBallot.Closed:
 					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
@@ -165,6 +166,9 @@ func ImportIssuesForPrioritization_Local(
 				)
 				if ghIssue.Locked {
 					ballot.FreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+				}
+				if ghIssue.Closed {
+					ballot.CloseStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
 				}
 			}
 		} else { // issue is not for prioritization, freeze ballot if it exists and is open

@@ -92,7 +92,7 @@ var (
 				Locked: github.Bool(true),
 				State:  github.String("open"),
 			},
-			{ // issue with governance, closed
+			{ // issue with governance, closed, frozen
 				ID:     github.Int64(444),
 				Number: github.Int(4),
 				Title:  github.String("Issue 4"),
@@ -113,7 +113,7 @@ var (
 				Locked: github.Bool(false),
 				State:  github.String("open"),
 			},
-			{ // issue with governance, open, not-frozen -> without governance, open, frozen (XXX: this hits a bug: during filtering it is removed and not considered)
+			{ // issue with governance, open, not-frozen -> without governance, open, frozen
 				ID:     github.Int64(222),
 				Number: github.Int(2),
 				Title:  github.String("Issue 2"),
@@ -122,23 +122,23 @@ var (
 				Locked: github.Bool(false),
 				State:  github.String("open"),
 			},
-			{ // issue with governance, open, frozen -> with governance, closed
+			{ // issue with governance, open, frozen -> with governance, closed, frozen
 				ID:     github.Int64(333),
 				Number: github.Int(3),
 				Title:  github.String("Issue 3"),
 				URL:    github.String("https://test/issue/3"),
 				Labels: []*github.Label{{Name: github.String(govgh.PrioritizeIssueByGovernanceLabel)}},
 				Locked: github.Bool(true),
-				State:  github.String("open"),
+				State:  github.String("closed"),
 			},
-			{ // issue with governance, closed -> with govrnance reopen
+			{ // issue with governance, closed, frozen -> with governance re-open, frozen
 				ID:     github.Int64(444),
 				Number: github.Int(4),
 				Title:  github.String("Issue 4"),
 				URL:    github.String("https://test/issue/4"),
 				Labels: []*github.Label{{Name: github.String(govgh.PrioritizeIssueByGovernanceLabel)}},
 				Locked: github.Bool(true),
-				State:  github.String("closed"),
+				State:  github.String("open"),
 			},
 		},
 	}
@@ -168,6 +168,27 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 	if len(ads1) != 3 {
 		t.Errorf("expecting 3, got %v", len(ads1))
 	}
+	// issue-2: open, not-frozen
+	if ads1[0].Name.Path() != "issue/2" {
+		t.Errorf("expecting issue/2, got %v", ads1[0].Name.Path())
+	}
+	if ads1[0].Closed || ads1[0].Frozen {
+		t.Errorf("expecting open, not-frozen")
+	}
+	// issue-3: open, frozen
+	if ads1[1].Name.Path() != "issue/3" {
+		t.Errorf("expecting issue/3, got %v", ads1[1].Name.Path())
+	}
+	if ads1[1].Closed || !ads1[1].Frozen {
+		t.Errorf("expecting open, frozen")
+	}
+	// issue-4: closed, frozen
+	if ads1[2].Name.Path() != "issue/4" {
+		t.Errorf("expecting issue/4, got %v", ads1[2].Name.Path())
+	}
+	if !ads1[2].Closed || !ads1[2].Frozen {
+		t.Errorf("expecting closed, frozen")
+	}
 
 	// import issues #2
 	chg2 := govgh.ImportIssuesForPrioritization(ctx, ghRepo, ghClient, cty.Organizer())
@@ -178,6 +199,34 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 	fmt.Println("ADS#2", form.SprintJSON(ads2))
 	if len(ads2) != 4 {
 		t.Errorf("expecting 4, got %v", len(ads2))
+	}
+	// issue-1: open, not-frozen
+	if ads2[0].Name.Path() != "issue/1" {
+		t.Errorf("expecting issue/1, got %v", ads2[0].Name.Path())
+	}
+	if ads2[0].Closed || ads2[0].Frozen {
+		t.Errorf("expecting open, not-frozen")
+	}
+	// issue-2: open, frozen
+	if ads2[1].Name.Path() != "issue/2" {
+		t.Errorf("expecting issue/2, got %v", ads2[1].Name.Path())
+	}
+	if ads2[1].Closed || !ads2[1].Frozen {
+		t.Errorf("expecting open, frozen")
+	}
+	// issue-3: closed, frozen
+	if ads2[2].Name.Path() != "issue/3" {
+		t.Errorf("expecting issue/3, got %v", ads2[2].Name.Path())
+	}
+	if !ads2[2].Closed || !ads2[2].Frozen {
+		t.Errorf("expecting closed, frozen")
+	}
+	// issue-4: open, frozen
+	if ads2[3].Name.Path() != "issue/4" {
+		t.Errorf("expecting issue/4, got %v", ads2[3].Name.Path())
+	}
+	if ads2[3].Closed || !ads2[3].Frozen {
+		t.Errorf("expecting open, frozen")
 	}
 
 	// testutil.Hang()

@@ -31,7 +31,7 @@ the community must be present in your config file, as well as their respective a
 			LoadConfig()
 			repo := github.GithubRepo{Owner: githubOwner, Name: githubRepo}
 			github.SetTokenSource(ctx, repo, github.MakeStaticTokenSource(ctx, githubToken))
-			importedIssues := github.ImportIssuesForPrioritization(ctx, repo, setup.Organizer)
+			importedIssues := github.ImportIssuesForPrioritization(ctx, repo, nil, setup.Organizer)
 			fmt.Fprint(os.Stdout, form.SprintJSON(importedIssues))
 		},
 	}

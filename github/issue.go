@@ -17,6 +17,7 @@ import (
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
+	"github.com/gov4git/lib4git/ns"
 	"github.com/gov4git/lib4git/util"
 )
 
@@ -125,7 +126,8 @@ func ImportIssuesForPrioritization_Local(
 	for k, ghIssue := range ghIssues {
 		if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
 
-			// XXX: assert ghIssues.BallotName() == govBallot.Name
+			must.Assertf(ctx, ns.Equal(ghIssue.BallotName(), govBallot.Name),
+				"issue ballot name %v and actual ballot name %v mismatch", ghIssue.BallotName(), govBallot.Name)
 
 			switch {
 			case ghIssue.Closed && govBallot.Closed:

@@ -37,7 +37,7 @@ func FetchIssues(ctx context.Context, repo GithubRepo, ghc *github.Client) []*gi
 	return allIssues
 }
 
-func labelsToStrings(labels []*github.Label) []string {
+func LabelsToStrings(labels []*github.Label) []string {
 	var labelStrings []string
 	for _, label := range labels {
 		labelStrings = append(labelStrings, label.GetName())
@@ -46,7 +46,7 @@ func labelsToStrings(labels []*github.Label) []string {
 }
 
 func IsIssueForPrioritization(issue *github.Issue) bool {
-	return util.IsIn(PrioritizeIssueByGovernanceLabel, labelsToStrings(issue.Labels)...)
+	return util.IsIn(PrioritizeIssueByGovernanceLabel, LabelsToStrings(issue.Labels)...)
 }
 
 func TransformIssue(ctx context.Context, issue *github.Issue) GithubIssueBallot {
@@ -56,12 +56,12 @@ func TransformIssue(ctx context.Context, issue *github.Issue) GithubIssueBallot 
 		Number:            int64(issue.GetNumber()),
 		Title:             issue.GetTitle(),
 		Body:              issue.GetBody(),
-		Labels:            labelsToStrings(issue.Labels),
+		Labels:            LabelsToStrings(issue.Labels),
 		ClosedAt:          unwrapTimestamp(issue.ClosedAt),
 		CreatedAt:         unwrapTimestamp(issue.CreatedAt),
 		UpdatedAt:         unwrapTimestamp(issue.UpdatedAt),
 		Locked:            issue.GetLocked(),
-		Closed:            issue.GetState() == "closed", // XXX: test whether State or ClosedAt is more reliable
+		Closed:            issue.GetState() == "closed",
 	}
 }
 

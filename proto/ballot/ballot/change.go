@@ -24,13 +24,13 @@ func Change(
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 
-	chg := ChangeStageOnly(ctx, govAddr, govCloned, name, title, description)
+	chg := Change_StageOnly(ctx, govAddr, govCloned, name, title, description)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
 }
 
-func ChangeStageOnly(
+func Change_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,

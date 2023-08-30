@@ -125,6 +125,8 @@ func ImportIssuesForPrioritization_Local(
 	for k, ghIssue := range ghIssues {
 		if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
 
+			// XXX: assert ghIssues.BallotName() == govBallot.Name
+
 			switch {
 			case ghIssue.Closed && govBallot.Closed:
 				// nothing to do
@@ -133,8 +135,8 @@ func ImportIssuesForPrioritization_Local(
 				ballot.CloseStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
 			case !ghIssue.Closed && govBallot.Closed:
 				UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+				ballot.Reopen_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
 				UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-				XXX // reopen ballot
 			case !ghIssue.Closed && !govBallot.Closed:
 				UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
 				UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
@@ -184,7 +186,7 @@ func UpdateMeta_StageOnly(
 	if ghIssue.Title == govBallot.Title && ghIssue.Body == govBallot.Description {
 		return
 	}
-	ballot.ChangeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), ghIssue.Title, ghIssue.Body)
+	ballot.Change_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), ghIssue.Title, ghIssue.Body)
 }
 
 func UpdateFrozen_StageOnly(

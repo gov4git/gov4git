@@ -49,4 +49,11 @@ type Strategy interface {
 		ad *Advertisement,
 		tally *Tally,
 	) git.Change[form.Map, Outcome]
+
+	Reopen(
+		ctx context.Context,
+		gov id.OwnerCloned,
+		ad *Advertisement,
+		tally *Tally,
+	) git.Change[form.Map, form.None]
 }

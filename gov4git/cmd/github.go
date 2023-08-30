@@ -23,12 +23,15 @@ var (
 		Long: `Import GitHub issues and pull requests. Example usage:
 
 	gov4git github import --token=GITHUB_ACCESS_TOKEN --owner=GITHUB_USER_OR_ORG --repo=GITHUB_REPO
+
+You must be the organizer of the community to run this command. In particular, both public and private repos of
+the community must be present in your config file, as well as their respective authentication information.
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
 			repo := github.GithubRepo{Owner: githubOwner, Name: githubRepo}
 			github.SetTokenSource(ctx, repo, github.MakeStaticTokenSource(ctx, githubToken))
-			importedIssues := github.ImportIssuesForPrioritization(ctx, repo, setup.Gov)
+			importedIssues := github.ImportIssuesForPrioritization(ctx, repo, setup.Organizer)
 			fmt.Fprint(os.Stdout, form.SprintJSON(importedIssues))
 		},
 	}

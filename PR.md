@@ -1,4 +1,4 @@
-- [ ] unit tests for importing
+- [x] unit tests for importing
 - [ ] api tests for importing
 - [ ] integration test for importing
 

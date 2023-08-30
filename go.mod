@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/google/go-github/v54 v54.0.0
-	github.com/gov4git/lib4git v0.0.21
+	github.com/gov4git/lib4git v0.0.22
 	github.com/gov4git/vendor4git v0.0.1
 	github.com/migueleliasweb/go-github-mock v0.0.19
 	github.com/rogpeppe/go-internal v1.11.0

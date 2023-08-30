@@ -49,18 +49,19 @@ func IsIssueForPrioritization(issue *github.Issue) bool {
 	return util.IsIn(PrioritizeIssueByGovernanceLabel, labelsToStrings(issue.Labels)...)
 }
 
-func TransformIssue(ctx context.Context, issue *github.Issue) GithubBallotIssue {
-	return GithubBallotIssue{
-		URL:       issue.GetURL(),
-		Number:    int64(issue.GetNumber()),
-		Title:     issue.GetTitle(),
-		Body:      issue.GetBody(),
-		Labels:    labelsToStrings(issue.Labels),
-		ClosedAt:  unwrapTimestamp(issue.ClosedAt),
-		CreatedAt: unwrapTimestamp(issue.CreatedAt),
-		UpdatedAt: unwrapTimestamp(issue.UpdatedAt),
-		Locked:    issue.GetLocked(),
-		Closed:    issue.GetState() == "closed", // XXX: test whether State or ClosedAt is more reliable
+func TransformIssue(ctx context.Context, issue *github.Issue) GithubIssueBallot {
+	return GithubIssueBallot{
+		ForPrioritization: IsIssueForPrioritization(issue),
+		URL:               issue.GetURL(),
+		Number:            int64(issue.GetNumber()),
+		Title:             issue.GetTitle(),
+		Body:              issue.GetBody(),
+		Labels:            labelsToStrings(issue.Labels),
+		ClosedAt:          unwrapTimestamp(issue.ClosedAt),
+		CreatedAt:         unwrapTimestamp(issue.CreatedAt),
+		UpdatedAt:         unwrapTimestamp(issue.UpdatedAt),
+		Locked:            issue.GetLocked(),
+		Closed:            issue.GetState() == "closed", // XXX: test whether State or ClosedAt is more reliable
 	}
 }
 
@@ -71,22 +72,23 @@ func unwrapTimestamp(ts *github.Timestamp) *time.Time {
 	return &ts.Time
 }
 
-func LoadIssuesForPrioritization(ctx context.Context, repo GithubRepo) (GithubBallotIssues, map[string]GithubBallotIssue) {
-	ghc := GetGithubClient(ctx, repo)
-	return LoadIssuesForPrioritizationWithClient(ctx, repo, ghc)
-}
+func LoadIssuesForPrioritization(
+	ctx context.Context,
+	repo GithubRepo,
+	githubClient *github.Client, // if nil, a new client for repo will be created
+) (GithubIssueBallots, map[string]GithubIssueBallot) {
 
-func LoadIssuesForPrioritizationWithClient(ctx context.Context, repo GithubRepo, ghc *github.Client) (GithubBallotIssues, map[string]GithubBallotIssue) {
+	if githubClient == nil {
+		githubClient = GetGithubClient(ctx, repo)
+	}
 
-	issues := FetchIssues(ctx, repo, ghc)
-	key := map[string]GithubBallotIssue{}
-	order := GithubBallotIssues{}
+	issues := FetchIssues(ctx, repo, githubClient)
+	key := map[string]GithubIssueBallot{}
+	order := GithubIssueBallots{}
 	for _, issue := range issues {
-		if IsIssueForPrioritization(issue) {
-			ghIssue := TransformIssue(ctx, issue)
-			key[ghIssue.Key()] = ghIssue
-			order = append(order, ghIssue)
-		}
+		ghIssue := TransformIssue(ctx, issue)
+		key[ghIssue.Key()] = ghIssue
+		order = append(order, ghIssue)
 	}
 	order.Sort()
 	return order, key
@@ -95,12 +97,13 @@ func LoadIssuesForPrioritizationWithClient(ctx context.Context, repo GithubRepo,
 func ImportIssuesForPrioritization(
 	ctx context.Context,
 	repo GithubRepo,
+	githubClient *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
-) git.Change[form.Map, GithubBallotIssues] {
+) git.Change[form.Map, GithubIssueBallots] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	ghIssues := ImportIssuesForPrioritization_Local(ctx, repo, govAddr, govCloned)
-	chg := git.NewChange[form.Map, GithubBallotIssues](
+	ghIssues := ImportIssuesForPrioritization_Local(ctx, repo, githubClient, govAddr, govCloned)
+	chg := git.NewChange[form.Map, GithubIssueBallots](
 		fmt.Sprintf("Import %d GitHub issues", len(ghIssues)),
 		"github_import",
 		form.Map{},
@@ -115,49 +118,64 @@ func ImportIssuesForPrioritization(
 func ImportIssuesForPrioritization_Local(
 	ctx context.Context,
 	repo GithubRepo,
+	githubClient *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-) GithubBallotIssues {
+) GithubIssueBallots {
 
 	// load github issues and governance ballots, and
 	// index them under a common key space
-	ghOrderedIssues, ghIssues := LoadIssuesForPrioritization(ctx, repo)
+	ghOrderedIssues, ghIssues := LoadIssuesForPrioritization(ctx, repo, githubClient)
 	govBallots := filterIssuesForPrioritization(ballot.ListLocal(ctx, govCloned.Public.Tree()))
 
 	// ensure every issue has a corresponding up-to-date ballot
 	for k, ghIssue := range ghIssues {
-		if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
+		if ghIssue.ForPrioritization {
+			if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
 
-			must.Assertf(ctx, ns.Equal(ghIssue.BallotName(), govBallot.Name),
-				"issue ballot name %v and actual ballot name %v mismatch", ghIssue.BallotName(), govBallot.Name)
+				must.Assertf(ctx, ns.Equal(ghIssue.BallotName(), govBallot.Name),
+					"issue ballot name %v and actual ballot name %v mismatch", ghIssue.BallotName(), govBallot.Name)
 
-			switch {
-			case ghIssue.Closed && govBallot.Closed:
-				// nothing to do
-			case ghIssue.Closed && !govBallot.Closed:
-				UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-				ballot.CloseStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
-			case !ghIssue.Closed && govBallot.Closed:
-				UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-				ballot.Reopen_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
-				UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-			case !ghIssue.Closed && !govBallot.Closed:
-				UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-				UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+				switch {
+				case ghIssue.Closed && govBallot.Closed:
+					// nothing to do
+				case ghIssue.Closed && !govBallot.Closed:
+					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+					ballot.CloseStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
+				case !ghIssue.Closed && govBallot.Closed:
+					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+					ballot.Reopen_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+				case !ghIssue.Closed && !govBallot.Closed:
+					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+				}
+
+			} else { // no ballot for this issue, create it
+				ballot.OpenStageOnly(
+					ctx,
+					qv.QV{},
+					gov.GovAddress(govAddr.Public),
+					govCloned.Public,
+					ghIssue.BallotName(),
+					ghIssue.Title,
+					ghIssue.Body,
+					[]string{PrioritizeBallotChoice},
+					member.Everybody,
+				)
+				if ghIssue.Locked {
+					ballot.FreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+				}
 			}
-
-		} else { // no ballot for this issue, create it
-			ballot.OpenStageOnly(
-				ctx,
-				qv.QV{},
-				gov.GovAddress(govAddr.Public),
-				govCloned.Public,
-				ghIssue.BallotName(),
-				ghIssue.Title,
-				ghIssue.Body,
-				[]string{PrioritizeBallotChoice},
-				member.Everybody,
-			)
+		} else { // issue is not for prioritization, freeze ballot if it exists and is open
+			if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
+				// if ballot closed, do nothing
+				// if ballot frozen, do nothing
+				// otherwise, freeze ballot
+				if !govBallot.Closed && !govBallot.Frozen {
+					ballot.FreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+				}
+			}
 		}
 	}
 
@@ -184,7 +202,7 @@ func UpdateMeta_StageOnly(
 	repo GithubRepo,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-	ghIssue GithubBallotIssue,
+	ghIssue GithubIssueBallot,
 	govBallot common.Advertisement,
 ) {
 	if ghIssue.Title == govBallot.Title && ghIssue.Body == govBallot.Description {
@@ -198,7 +216,7 @@ func UpdateFrozen_StageOnly(
 	repo GithubRepo,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-	ghIssue GithubBallotIssue,
+	ghIssue GithubIssueBallot,
 	govBallot common.Advertisement,
 ) {
 	switch {

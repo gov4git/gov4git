@@ -18,41 +18,42 @@ const (
 	PrioritizeBallotChoice           = "prioritize"
 )
 
-type GithubBallotIssue struct {
-	URL       string
-	Number    int64
-	Title     string
-	Body      string
-	Labels    []string
-	ClosedAt  *time.Time
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
-	Locked    bool
-	Closed    bool
+type GithubIssueBallot struct {
+	ForPrioritization bool
+	URL               string
+	Number            int64
+	Title             string
+	Body              string
+	Labels            []string
+	ClosedAt          *time.Time
+	CreatedAt         *time.Time
+	UpdatedAt         *time.Time
+	Locked            bool
+	Closed            bool
 }
 
-func (x GithubBallotIssue) Key() string {
+func (x GithubIssueBallot) Key() string {
 	return strconv.Itoa(int(x.Number))
 }
 
-func (x GithubBallotIssue) BallotName() ns.NS {
+func (x GithubIssueBallot) BallotName() ns.NS {
 	return ns.NS{"issue", x.Key()}
 }
 
-type GithubBallotIssues []GithubBallotIssue
+type GithubIssueBallots []GithubIssueBallot
 
-func (x GithubBallotIssues) Sort() {
+func (x GithubIssueBallots) Sort() {
 	sort.Sort(x)
 }
 
-func (x GithubBallotIssues) Len() int {
+func (x GithubIssueBallots) Len() int {
 	return len(x)
 }
 
-func (x GithubBallotIssues) Less(i, j int) bool {
+func (x GithubIssueBallots) Less(i, j int) bool {
 	return x[i].Number < x[j].Number
 }
 
-func (x GithubBallotIssues) Swap(i, j int) {
+func (x GithubIssueBallots) Swap(i, j int) {
 	x[i], x[j] = x[j], x[i]
 }

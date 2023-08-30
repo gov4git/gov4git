@@ -2,14 +2,15 @@ package github
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/google/go-github/v54/github"
 	govgh "github.com/gov4git/gov4git/github"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
-	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/base"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/testutil"
 	"github.com/migueleliasweb/go-github-mock/src/mock"
 )
@@ -62,6 +63,7 @@ func TestGithubMock(t *testing.T) {
 
 var (
 	testImportIssuesForPrioritization = []interface{}{
+		// request #1
 		[]github.Issue{
 			{ // issue without governance
 				ID:     github.Int64(111),
@@ -100,22 +102,23 @@ var (
 				State:  github.String("closed"),
 			},
 		},
+		// request #2
 		[]github.Issue{
 			{ // issue without governance -> with governance, open, not-frozen
 				ID:     github.Int64(111),
 				Number: github.Int(1),
 				Title:  github.String("Issue 1"),
 				URL:    github.String("https://test/issue/1"),
-				Labels: []*github.Label{},
+				Labels: []*github.Label{{Name: github.String(govgh.PrioritizeIssueByGovernanceLabel)}},
 				Locked: github.Bool(false),
 				State:  github.String("open"),
 			},
-			{ // issue with governance, open, not-frozen -> without governance (XXX: this hits a bug: during filtering it is removed and not considered)
+			{ // issue with governance, open, not-frozen -> without governance, open, frozen (XXX: this hits a bug: during filtering it is removed and not considered)
 				ID:     github.Int64(222),
 				Number: github.Int(2),
 				Title:  github.String("Issue 2"),
 				URL:    github.String("https://test/issue/2"),
-				Labels: []*github.Label{{Name: github.String(govgh.PrioritizeIssueByGovernanceLabel)}},
+				Labels: []*github.Label{},
 				Locked: github.Bool(false),
 				State:  github.String("open"),
 			},
@@ -155,21 +158,26 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 	ctx := testutil.NewCtx()
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	// XXX: import issues #1
-	govgh.ImportIssuesForPrioritization(XXX)
+	// import issues #1
+	chg1 := govgh.ImportIssuesForPrioritization(ctx, ghRepo, ghClient, cty.Organizer())
+	fmt.Println("IMPORT#1", form.SprintJSON(chg1.Result))
 
-	// list
-	ads := ballot.List(ctx, cty.Gov())
-	if len(ads) != 1 {
-		t.Errorf("expecting 1 ad, got %v", len(ads))
+	// list #1
+	ads1 := ballot.List(ctx, cty.Gov())
+	fmt.Println("ADS#1", form.SprintJSON(ads1))
+	if len(ads1) != 3 {
+		t.Errorf("expecting 3, got %v", len(ads1))
 	}
 
-	// XXX: import issues #2
+	// import issues #2
+	chg2 := govgh.ImportIssuesForPrioritization(ctx, ghRepo, ghClient, cty.Organizer())
+	fmt.Println("IMPORT#2", form.SprintJSON(chg2.Result))
 
-	// verify ballots
-	ast := ballot.Show(ctx, gov.GovAddress(cty.Organizer().Public), ballotName)
-	if !ast.Ad.Closed {
-		t.Errorf("expecting closed flag")
+	// list #2
+	ads2 := ballot.List(ctx, cty.Gov())
+	fmt.Println("ADS#2", form.SprintJSON(ads2))
+	if len(ads2) != 4 {
+		t.Errorf("expecting 4, got %v", len(ads2))
 	}
 
 	// testutil.Hang()

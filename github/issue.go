@@ -21,14 +21,11 @@ import (
 	"github.com/gov4git/lib4git/util"
 )
 
-func FetchIssues(ctx context.Context, repo GithubRepo) []*github.Issue {
-
-	c := GetGithubClient(ctx, repo)
-
+func FetchIssues(ctx context.Context, repo GithubRepo, ghc *github.Client) []*github.Issue {
 	opt := &github.IssueListByRepoOptions{State: "all"}
 	var allIssues []*github.Issue
 	for {
-		issues, resp, err := c.Issues.ListByRepo(ctx, repo.Owner, repo.Name, opt)
+		issues, resp, err := ghc.Issues.ListByRepo(ctx, repo.Owner, repo.Name, opt)
 		must.NoError(ctx, err)
 		allIssues = append(allIssues, issues...)
 		if resp.NextPage == 0 {
@@ -63,7 +60,7 @@ func TransformIssue(ctx context.Context, issue *github.Issue) GithubBallotIssue 
 		CreatedAt: unwrapTimestamp(issue.CreatedAt),
 		UpdatedAt: unwrapTimestamp(issue.UpdatedAt),
 		Locked:    issue.GetLocked(),
-		Closed:    issue.GetState() == "closed",
+		Closed:    issue.GetState() == "closed", // XXX: test whether State or ClosedAt is more reliable
 	}
 }
 
@@ -75,8 +72,13 @@ func unwrapTimestamp(ts *github.Timestamp) *time.Time {
 }
 
 func LoadIssuesForPrioritization(ctx context.Context, repo GithubRepo) (GithubBallotIssues, map[string]GithubBallotIssue) {
+	ghc := GetGithubClient(ctx, repo)
+	return LoadIssuesForPrioritizationWithClient(ctx, repo, ghc)
+}
 
-	issues := FetchIssues(ctx, repo)
+func LoadIssuesForPrioritizationWithClient(ctx context.Context, repo GithubRepo, ghc *github.Client) (GithubBallotIssues, map[string]GithubBallotIssue) {
+
+	issues := FetchIssues(ctx, repo, ghc)
 	key := map[string]GithubBallotIssue{}
 	order := GithubBallotIssues{}
 	for _, issue := range issues {

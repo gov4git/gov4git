@@ -3,10 +3,13 @@ module github.com/gov4git/gov4git
 go 1.19
 
 require (
+	github.com/google/go-github/v54 v54.0.0
 	github.com/gov4git/lib4git v0.0.21
 	github.com/gov4git/vendor4git v0.0.1
+	github.com/migueleliasweb/go-github-mock v0.0.19
 	github.com/rogpeppe/go-internal v1.11.0
 	github.com/spf13/cobra v1.6.1
+	golang.org/x/oauth2 v0.11.0
 )
 
 // replace github.com/gov4git/lib4git => /Users/petar/src/github.com/gov4git/lib4git
@@ -24,8 +27,8 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-github/v53 v53.2.0 // indirect
-	github.com/google/go-github/v54 v54.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/imdario/mergo v0.3.15 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
@@ -40,7 +43,6 @@ require (
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
-	golang.org/x/oauth2 v0.11.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

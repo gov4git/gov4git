@@ -10,6 +10,9 @@ import (
 
 	"github.com/google/go-github/v54/github"
 	govgh "github.com/gov4git/gov4git/github"
+	"github.com/gov4git/gov4git/proto/ballot/ballot"
+	"github.com/gov4git/gov4git/test"
+	"github.com/gov4git/lib4git/testutil"
 	"github.com/gov4git/lib4git/util"
 )
 
@@ -70,4 +73,44 @@ func (x issuesByNumber) Less(i, j int) bool {
 
 func (x issuesByNumber) Swap(i, j int) {
 	x[i], x[j] = x[j], x[i]
+}
+
+func TestImportIssuesForPrioritization(t *testing.T) {
+
+	ghRepo := TestRepo
+	ghClient := client
+
+	// init governance
+	ctx := testutil.NewCtx()
+	cty := test.NewTestCommunity(t, ctx, 2)
+
+	// import issues
+	govgh.ImportIssuesForPrioritization(ctx, ghRepo, ghClient, cty.Organizer())
+
+	// list ballots
+	ads1 := ballot.List(ctx, cty.Gov())
+	if len(ads1) != 3 {
+		t.Errorf("expecting 3, got %v", len(ads1))
+	}
+	// issue-1: open, not-frozen
+	if ads1[0].Name.Path() != "issue/1" {
+		t.Errorf("expecting issue/1, got %v", ads1[0].Name.Path())
+	}
+	if ads1[0].Closed || ads1[0].Frozen {
+		t.Errorf("expecting open, not-frozen")
+	}
+	// issue-2: open, frozen
+	if ads1[1].Name.Path() != "issue/2" {
+		t.Errorf("expecting issue/2, got %v", ads1[1].Name.Path())
+	}
+	if ads1[1].Closed || !ads1[1].Frozen {
+		t.Errorf("expecting open, frozen")
+	}
+	// issue-3: closed, frozen
+	if ads1[2].Name.Path() != "issue/3" {
+		t.Errorf("expecting issue/3, got %v", ads1[2].Name.Path())
+	}
+	if !ads1[2].Closed || !ads1[2].Frozen {
+		t.Errorf("expecting closed, frozen")
+	}
 }

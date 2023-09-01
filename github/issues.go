@@ -62,6 +62,7 @@ func TransformIssue(ctx context.Context, issue *github.Issue) GithubIssueBallot 
 		UpdatedAt:         unwrapTimestamp(issue.UpdatedAt),
 		Locked:            issue.GetLocked(),
 		Closed:            issue.GetState() == "closed",
+		IsPullRequest:     issue.GetPullRequestLinks() != nil,
 	}
 }
 

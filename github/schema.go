@@ -30,6 +30,7 @@ type GithubIssueBallot struct {
 	UpdatedAt         *time.Time
 	Locked            bool
 	Closed            bool
+	IsPullRequest     bool
 }
 
 func (x GithubIssueBallot) Key() string {

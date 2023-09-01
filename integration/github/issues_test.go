@@ -55,6 +55,16 @@ func TestGithubIssueStructure(t *testing.T) {
 		t.Fatalf("Expected issue state 'open', got %v", issues[2].GetState())
 	}
 
+	// test issue 5 (pull request)
+	if issues[4].GetNumber() != 5 {
+		t.Fatalf("Expected issue number 5, got %v", issues[4].GetNumber())
+	}
+	if issues[4].GetState() != "open" {
+		t.Fatalf("Expected issue state 'open', got %v", issues[4].GetState())
+	}
+	if issues[4].GetPullRequestLinks() == nil {
+		t.Fatalf("Expected issue to be a pull request")
+	}
 }
 
 type issuesByNumber []*github.Issue

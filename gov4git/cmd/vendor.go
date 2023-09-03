@@ -28,7 +28,7 @@ var (
 This creates a public repo. Adding the flag --private will result in creating a private repo.
 		`,
 		Run: func(cmd *cobra.Command, args []string) {
-			vendor := github.NewGitHubVendor(vendorGithubToken)
+			vendor := github.NewGitHubVendor(ctx, vendorGithubToken)
 			repo, err := vendor.CreateRepo(ctx, vendorRepoName, vendorGithubOwner, vendorRepoPrivate)
 			must.NoError(ctx, err)
 			fmt.Fprint(os.Stdout, form.SprintJSON(repo))
@@ -43,7 +43,7 @@ This creates a public repo. Adding the flag --private will result in creating a 
 	gov4git vendor remove --owner=GITHUB_USER_OR_ORG --repo=REPO_NAME
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			vendor := github.NewGitHubVendor(vendorGithubToken)
+			vendor := github.NewGitHubVendor(ctx, vendorGithubToken)
 			err := vendor.RemoveRepo(ctx, vendorRepoName, vendorGithubOwner)
 			must.NoError(ctx, err)
 		},

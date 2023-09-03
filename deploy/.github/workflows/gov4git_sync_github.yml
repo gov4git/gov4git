@@ -1,0 +1,27 @@
+name: Sync GitHub issues and pull requests with the governance system
+
+on:
+     workflow_dispatch: # allows manual triggering
+     # schedule:
+     # - cron: '55 * * * *'
+
+jobs:
+     sync_issues:
+          environment: governance
+          runs-on: ubuntu-latest
+          permissions:
+               contents: write
+          steps:
+               - name: 'Install gov4git from release'
+                 uses: jaxxstorm/action-install-gh-release@v1.10.0
+                 with:
+                    repo: gov4git/gov4git
+                    tag: ${{ vars.GOV4GIT_RELEASE }}
+                    cache: enable
+                    platform: linux
+                    arch: arm64
+               - name: 'Show environment'
+                 shell: bash
+                 run: |
+                   echo current directory `pwd`
+                   echo home directory ~

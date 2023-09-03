@@ -15,13 +15,16 @@ jobs:
                - name: 'Install gov4git from release'
                  uses: jaxxstorm/action-install-gh-release@v1.10.0
                  with:
-                    repo: gov4git/gov4git
+                    repo: gov4git/gov4git # binary is added to the PATH as well
                     tag: ${{ vars.GOV4GIT_RELEASE }}
                     cache: enable
                     platform: linux
                     arch: arm64
-               - name: 'Show environment'
+               - name: 'Import issues and pull requests'
                  shell: bash
-                 run: |
-                   echo current directory `pwd`
-                   echo home directory ~
+                 run: .scripts/sync_github.sh
+                 env:
+                    GOV_AUTH_USER: ${{ secrets.GOV_AUTH_USER }}
+                    GOV_AUTH_TOKEN: ${{ secrets.GOV_AUTH_TOKEN }}
+                    GOV_PUB_REPO: ${{ vars.GOV_PUB_REPO }}
+                    GOV_PRIV_REPO: ${{ vars.GOV_PRIV_REPO }}

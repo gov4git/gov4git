@@ -1,16 +1,25 @@
 package github
 
 import (
+	"context"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
 type GithubRepo struct {
 	Owner string `json:"github_repo_owner"`
 	Name  string `json:"github_repo_name"`
+}
+
+func ParseGithubRepo(ctx context.Context, s string) GithubRepo {
+	first, second, ok := strings.Cut(s, "/")
+	must.Assertf(ctx, ok, "not a github repo: %v", s)
+	return GithubRepo{Owner: first, Name: second}
 }
 
 const (

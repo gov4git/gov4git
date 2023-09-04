@@ -1,4 +1,4 @@
-package cmd
+package api
 
 import (
 	"context"
@@ -81,11 +81,11 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 	}
 
 	// attach cache ttl information to context
-	git.SetTTL(ctx, setup.Gov.Repo, s.CacheTTL)
-	git.SetTTL(ctx, setup.Organizer.Public.Repo, s.CacheTTL)
-	git.SetTTL(ctx, setup.Organizer.Private.Repo, s.CacheTTL)
-	git.SetTTL(ctx, setup.Member.Public.Repo, s.CacheTTL)
-	git.SetTTL(ctx, setup.Member.Private.Repo, s.CacheTTL)
+	git.SetTTL(ctx, s.Gov.Repo, s.CacheTTL)
+	git.SetTTL(ctx, s.Organizer.Public.Repo, s.CacheTTL)
+	git.SetTTL(ctx, s.Organizer.Private.Repo, s.CacheTTL)
+	git.SetTTL(ctx, s.Member.Public.Repo, s.CacheTTL)
+	git.SetTTL(ctx, s.Member.Private.Repo, s.CacheTTL)
 
 	return s
 }

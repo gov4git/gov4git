@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/google/go-github/v54/github"
 	govgh "github.com/gov4git/gov4git/github"
 	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
-	"golang.org/x/oauth2"
 )
 
 var (
@@ -57,6 +55,11 @@ create and write access to the governance repos.
 governance repositories to be created. Their names will be repo_prefix:gov.public and repo_prefix:gov.private,
 respectively. If --gov is not specified, their names will default to project_repo:gov.public and
 project_repo:gov.private, respectively.
+
+Therefore, aside for debugging purposes, users should deploy with:
+
+	gov4git github deploy --token=GITHUB_ACCESS_TOKEN --project=PROJECT_OWNER/PROJECT_REPO
+
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			project := govgh.ParseGithubRepo(ctx, githubProject)
@@ -67,13 +70,8 @@ project_repo:gov.private, respectively.
 				govPrefix = govgh.ParseGithubRepo(ctx, githubGov)
 			}
 
-			// create authenticated GitHub client
-			ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: githubToken})
-			tc := oauth2.NewClient(ctx, ts)
-			client := github.NewClient(tc)
-
 			// deploy governance on GitHub (by way of placing GitHub actions in the public governance repo)
-			config := govgh.Deploy(ctx, client, project, govPrefix)
+			config := govgh.Deploy(ctx, githubToken, project, govPrefix)
 			fmt.Fprint(os.Stdout, form.SprintJSON(config))
 		},
 	}

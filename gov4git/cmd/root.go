@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/gov4git/gov4git/gov4git/api"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -70,7 +71,7 @@ func LoadConfig() {
 		base.AssertNoErr(err)
 
 		// search for config in ~/.gov4git/config.json
-		configPath = filepath.Join(home, LocalAgentPath, "config.json")
+		configPath = filepath.Join(home, api.LocalAgentPath, "config.json")
 	}
 
 	data, err := os.ReadFile(configPath)
@@ -78,7 +79,7 @@ func LoadConfig() {
 		base.Fatalf("reading config file (%v)", err)
 	}
 
-	config, err := form.DecodeBytes[Config](ctx, data)
+	config, err := form.DecodeBytes[api.Config](ctx, data)
 	if err != nil {
 		base.Fatalf("decoding config file (%v)", err)
 	}
@@ -91,7 +92,7 @@ func LoadConfig() {
 }
 
 var (
-	setup Setup
+	setup api.Setup
 )
 
 func Execute() int {

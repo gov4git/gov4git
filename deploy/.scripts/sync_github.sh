@@ -19,9 +19,6 @@
 # The auth token must have permission to write to the governance repositories and
 # read the issues and pull requests from the project repository.
 
-GITHUB_PROJECT_OWNER=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
-GITHUB_PROJECT_REPO=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
-
 mkdir -p ~/.gov4git/cache
 
 CACHE_DIR=~/.gov4git/cache

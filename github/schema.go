@@ -25,6 +25,8 @@ func ParseGithubRepo(ctx context.Context, s string) GithubRepo {
 const (
 	PrioritizeIssueByGovernanceLabel = "gov:prioritize"
 	PrioritizeBallotChoice           = "prioritize"
+
+	GithubDeployEnvName = "gov4git:governance"
 )
 
 type GithubIssueBallot struct {

@@ -9,10 +9,9 @@ require (
 	github.com/migueleliasweb/go-github-mock v0.0.19
 	github.com/rogpeppe/go-internal v1.11.0
 	github.com/spf13/cobra v1.6.1
+	golang.org/x/crypto v0.12.0
 	golang.org/x/oauth2 v0.11.0
 )
-
-// replace github.com/gov4git/lib4git => /Users/petar/src/github.com/gov4git/lib4git
 
 require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
@@ -41,7 +40,6 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
-	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect

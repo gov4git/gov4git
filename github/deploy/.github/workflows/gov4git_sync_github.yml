@@ -24,9 +24,9 @@ jobs:
                  shell: bash
                  run: ./.github/scripts/gov4git_sync_github.sh
                  env:
-                    GOV_AUTH_USER: ${{ secrets.GOV_AUTH_USER }}
-                    GOV_AUTH_TOKEN: ${{ secrets.GOV_AUTH_TOKEN }}
+                    ORGANIZER_GITHUB_USER: ${{ secrets.ORGANIZER_GITHUB_USER }}
+                    ORGANIZER_GITHUB_TOKEN: ${{ secrets.ORGANIZER_GITHUB_TOKEN }}
                     PROJECT_OWNER: ${{ vars.PROJECT_OWNER }}
                     PROJECT_REPO: ${{ vars.PROJECT_REPO }}
-                    GOV_PUB_REPO: ${{ vars.GOV_PUB_REPO }}
-                    GOV_PRIV_REPO: ${{ vars.GOV_PRIV_REPO }}
+                    GOV_PUBLIC_REPO_URL: ${{ vars.GOV_PUBLIC_REPO_URL }}
+                    GOV_PRIVATE_REPO_URL: ${{ vars.GOV_PRIVATE_REPO_URL }}

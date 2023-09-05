@@ -156,8 +156,8 @@ func createDeployEnvironment(
 
 	// create environment secrets
 	envSecrets := map[string]string{
-		"GOV_AUTH_TOKEN": token,
-		"GOV_AUTH_USER":  "",
+		"ORGANIZER_GITHUB_TOKEN": token,
+		"ORGANIZER_GITHUB_USER":  "",
 	}
 
 	govPubPubKey, _, err := ghClient.Actions.GetRepoPublicKey(ctx, govPublic.Owner, govPublic.Name)
@@ -176,11 +176,11 @@ func createDeployEnvironment(
 
 	// create environment variables
 	envVars := map[string]string{
-		"GOV4GIT_RELEASE": ghRelease,
-		"PROJECT_OWNER":   project.Owner,
-		"PROJECT_REPO":    project.Name,
-		"GOV_PUB_REPO":    govPublicURLs.HTTPSURL,
-		"GOV_PRIV_REPO":   govPrivateURLs.HTTPSURL,
+		"GOV4GIT_RELEASE":      ghRelease,
+		"PROJECT_OWNER":        project.Owner,
+		"PROJECT_REPO":         project.Name,
+		"GOV_PUBLIC_REPO_URL":  govPublicURLs.HTTPSURL,
+		"GOV_PRIVATE_REPO_URL": govPrivateURLs.HTTPSURL,
 	}
 	for k, v := range envVars {
 		_, err := ghClient.Actions.CreateEnvVariable(ctx, int(*ghGovPubRepo.ID), env.GetName(), &github.ActionsVariable{Name: k, Value: v})

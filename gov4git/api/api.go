@@ -40,9 +40,9 @@ type Config struct {
 }
 
 type AuthConfig struct {
-	SSHPrivateKeysFile *string       `json:"ssh_private_keys_file"`
-	AccessToken        *string       `json:"access_token"`
-	UserPassword       *UserPassword `json:"user_password"`
+	SSHPrivateKeysFile *string       `json:"ssh_private_keys_file,omitempty"`
+	AccessToken        *string       `json:"access_token,omitempty"`
+	UserPassword       *UserPassword `json:"user_password,omitempty"`
 }
 
 type UserPassword struct {

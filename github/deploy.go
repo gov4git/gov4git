@@ -123,8 +123,8 @@ func installGithubActions(
 	t := govCloned.Tree()
 
 	// helper scripts for github actions
-	git.StringToFileStage(ctx, t, ns.NS{".github", "scripts", "sync_github.sh"}, syncGithubSH)
-	git.StringToFileStage(ctx, t, ns.NS{".github", "scripts", "sync_community.sh"}, syncCommunitySH)
+	git.StringToFileStage(ctx, t, ns.NS{".github", "scripts", "gov4git_sync_github.sh"}, syncGithubSH)
+	git.StringToFileStage(ctx, t, ns.NS{".github", "scripts", "gov4git_sync_community.sh"}, syncCommunitySH)
 
 	// github actions
 	git.StringToFileStage(ctx, t, ns.NS{".github", "workflows", "gov4git_sync_github.yml"}, syncGithubYML)

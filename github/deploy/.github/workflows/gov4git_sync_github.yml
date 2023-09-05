@@ -7,11 +7,13 @@ on:
 
 jobs:
      sync_github:
-          environment: governance
+          environment: gov4git:governance
           runs-on: ubuntu-latest
           permissions:
                contents: write
           steps:
+               - name: 'Checkout gov4git code'
+                 uses: actions/checkout@v4
                - name: 'Install gov4git from release'
                  uses: jaxxstorm/action-install-gh-release@v1.10.0
                  with:

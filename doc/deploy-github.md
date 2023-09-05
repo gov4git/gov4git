@@ -3,10 +3,30 @@
 
 This guide will help you deploy governance for a GitHub project repository.
 
-# Prerequisites
+## Prerequisites
 
 
 
+## Access token fine-grain permissions
+
+### Repository permissions
+
+| category | access |
+| ----------- | ----------- |
+| actions | read-write |
+| admin | read-write |
+| contents | read-write |
+| environments | read-write |
+| issues | read-only |
+| meta | read-only |
+| pull-requests | read-only |
+| secrets | read-write |
+| variables | read-write |
+| workflows | read-write |
+
+### Organization permissions
+
+n/a
 
 
 

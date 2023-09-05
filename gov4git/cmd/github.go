@@ -7,6 +7,7 @@ import (
 	govgh "github.com/gov4git/gov4git/github"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
+	"github.com/gov4git/vendor4git/github"
 	"github.com/spf13/cobra"
 )
 
@@ -85,6 +86,39 @@ Therefore, aside for debugging purposes, users should deploy with:
 			fmt.Fprint(os.Stdout, form.SprintJSON(config))
 		},
 	}
+
+	githubCreateCmd = &cobra.Command{
+		Use:   "create",
+		Short: "Create a git repo hosted on GitHub",
+		Long: `Call the GitHub API to create a new repo. Example usage:
+
+	gov4git github create --token=GITHUB_ACCESS_TOKEN --repo=GITHUB_OWNER/GITHUB_REPO
+
+This creates a public repo. Adding the flag --private will result in creating a private repo.
+		`,
+		Run: func(cmd *cobra.Command, args []string) {
+			ghRepo := govgh.ParseGithubRepo(ctx, githubRepo)
+			vendor := github.NewGitHubVendor(ctx, githubToken)
+			repo, err := vendor.CreateRepo(ctx, ghRepo.Name, ghRepo.Owner, githubPrivate)
+			must.NoError(ctx, err)
+			fmt.Fprint(os.Stdout, form.SprintJSON(repo))
+		},
+	}
+
+	githubRemoveCmd = &cobra.Command{
+		Use:   "remove",
+		Short: "Remove a git repo hosted on GitHub",
+		Long: `Call the GitHub API to remove a repo. Example uage:
+
+	gov4git github remove --token=GITHUB_ACCESS_TOKEN --repo=GITHUB_OWNER/GITHUB_REPO
+`,
+		Run: func(cmd *cobra.Command, args []string) {
+			ghRepo := govgh.ParseGithubRepo(ctx, githubRepo)
+			vendor := github.NewGitHubVendor(ctx, githubToken)
+			err := vendor.RemoveRepo(ctx, ghRepo.Name, ghRepo.Owner)
+			must.NoError(ctx, err)
+		},
+	}
 )
 
 var (
@@ -92,6 +126,8 @@ var (
 	githubProject string
 	githubRelease string
 	githubGov     string
+	githubRepo    string
+	githubPrivate bool
 )
 
 func init() {
@@ -109,4 +145,18 @@ func init() {
 	githubDeployCmd.MarkFlagRequired("token")
 	githubDeployCmd.MarkFlagRequired("project")
 	githubDeployCmd.MarkFlagRequired("release")
+
+	githubCmd.AddCommand(githubCreateCmd)
+	githubCreateCmd.Flags().StringVar(&githubToken, "token", "", "GitHub access token")
+	githubCreateCmd.Flags().StringVar(&githubRepo, "repo", "", "GitHub owner/repo")
+	githubCreateCmd.Flags().BoolVar(&githubPrivate, "private", false, "Make private repo")
+	githubCreateCmd.MarkFlagRequired("token")
+	githubCreateCmd.MarkFlagRequired("repo")
+
+	githubCmd.AddCommand(githubRemoveCmd)
+	githubRemoveCmd.Flags().StringVar(&githubToken, "token", "", "GitHub access token")
+	githubRemoveCmd.Flags().StringVar(&githubRepo, "repo", "", "GitHub owner/repo")
+	githubRemoveCmd.MarkFlagRequired("token")
+	githubRemoveCmd.MarkFlagRequired("repo")
+
 }

@@ -46,7 +46,6 @@ func init() {
 	rootCmd.AddCommand(ballotCmd)
 	rootCmd.AddCommand(balanceCmd)
 	rootCmd.AddCommand(bureauCmd)
-	rootCmd.AddCommand(vendorCmd)
 	rootCmd.AddCommand(syncCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(cacheCmd)

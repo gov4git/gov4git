@@ -3,8 +3,8 @@
 # This script imports the issues and pull requests from a GitHub project repository into a governance repository.
 #
 # The GitHub project variables are inferred from the GitHub action shell environment.
-#    GITHUB_PROJECT_OWNER = GitHub owner of the project
-#    GITHUB_PROJECT_REPO = GitHub repository name of the project
+#    PROJECT_OWNER = GitHub owner of the project
+#    PROJECT_REPO = GitHub repository name of the project
 #
 # The governance variables must be set in the GitHub action workflow:
 #
@@ -47,4 +47,4 @@ cat ~/.gov4git/config.json
 
 ./gov4git github --config=~/.gov4git/config.json import \
      --token=$GOV_AUTH_TOKEN \
-     --project=$GITHUB_PROJECT_OWNER/$GITHUB_PROJECT_REPO
+     --project=$PROJECT_OWNER/$PROJECT_REPO

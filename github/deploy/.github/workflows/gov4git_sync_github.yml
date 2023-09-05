@@ -26,7 +26,7 @@ jobs:
                  env:
                     GOV_AUTH_USER: ${{ secrets.GOV_AUTH_USER }}
                     GOV_AUTH_TOKEN: ${{ secrets.GOV_AUTH_TOKEN }}
-                    GITHUB_PROJECT_OWNER: ${{ vars.GITHUB_PROJECT_OWNER }}
-                    GITHUB_PROJECT_REPO: ${{ vars.GITHUB_PROJECT_REPO }}
+                    PROJECT_OWNER: ${{ vars.PROJECT_OWNER }}
+                    PROJECT_REPO: ${{ vars.PROJECT_REPO }}
                     GOV_PUB_REPO: ${{ vars.GOV_PUB_REPO }}
                     GOV_PRIV_REPO: ${{ vars.GOV_PRIV_REPO }}

@@ -37,12 +37,12 @@ func Deploy(
 	// create governance public and private repos
 	v := vendor.NewGithubVendorWithClient(ctx, ghClient)
 
-	govPublic := GithubRepo{Owner: govPrefix.Owner, Name: govPrefix.Name + ":gov.public"}
+	govPublic := GithubRepo{Owner: govPrefix.Owner, Name: govPrefix.Name + "-gov.public"}
 	base.Infof("creating GitHub repository %v", govPublic)
 	govPublicURLs, err := v.CreateRepo(ctx, govPublic.Name, govPublic.Owner, false)
 	must.NoError(ctx, err)
 
-	govPrivate := GithubRepo{Owner: govPrefix.Owner, Name: govPrefix.Name + ":gov.private"}
+	govPrivate := GithubRepo{Owner: govPrefix.Owner, Name: govPrefix.Name + "-gov.private"}
 	base.Infof("creating GitHub repository %v", govPrivate)
 	govPrivateURLs, err := v.CreateRepo(ctx, govPrivate.Name, govPrivate.Owner, false)
 	must.NoError(ctx, err)
@@ -146,7 +146,7 @@ func createDeployEnvironment(
 ) {
 
 	// fetch repo id
-	ghRepo, _, err := ghClient.Repositories.Get(ctx, project.Owner, project.Name)
+	ghGovPubRepo, _, err := ghClient.Repositories.Get(ctx, govPublic.Owner, govPublic.Name)
 	must.NoError(ctx, err)
 
 	// create deploy environment
@@ -156,8 +156,8 @@ func createDeployEnvironment(
 
 	// create environment secrets
 	envSecrets := map[string]string{
-		"GOV_AUTH_USER":  "",
 		"GOV_AUTH_TOKEN": token,
+		"GOV_AUTH_USER":  "",
 	}
 
 	govPubPubKey, _, err := ghClient.Actions.GetRepoPublicKey(ctx, govPublic.Owner, govPublic.Name)
@@ -165,7 +165,7 @@ func createDeployEnvironment(
 
 	for k, v := range envSecrets {
 		encryptedValue := encryptValue(ctx, govPubPubKey, v)
-		_, err := ghClient.Actions.CreateOrUpdateEnvSecret(ctx, int(*ghRepo.ID), env.GetName(),
+		_, err := ghClient.Actions.CreateOrUpdateEnvSecret(ctx, int(*ghGovPubRepo.ID), env.GetName(),
 			&github.EncryptedSecret{
 				Name:           k,
 				KeyID:          govPubPubKey.GetKeyID(),
@@ -176,14 +176,14 @@ func createDeployEnvironment(
 
 	// create environment variables
 	envVars := map[string]string{
-		"GOV4GIT_RELEASE":      ghRelease,
-		"GITHUB_PROJECT_OWNER": project.Owner,
-		"GITHUB_PROJECT_REPO":  project.Name,
-		"GOV_PUB_REPO":         govPublicURLs.HTTPSURL,
-		"GOV_PRIV_REPO":        govPrivateURLs.HTTPSURL,
+		"GOV4GIT_RELEASE": ghRelease,
+		"PROJECT_OWNER":   project.Owner,
+		"PROJECT_REPO":    project.Name,
+		"GOV_PUB_REPO":    govPublicURLs.HTTPSURL,
+		"GOV_PRIV_REPO":   govPrivateURLs.HTTPSURL,
 	}
 	for k, v := range envVars {
-		_, err := ghClient.Actions.CreateEnvVariable(ctx, int(*ghRepo.ID), env.GetName(), &github.ActionsVariable{Name: k, Value: v})
+		_, err := ghClient.Actions.CreateEnvVariable(ctx, int(*ghGovPubRepo.ID), env.GetName(), &github.ActionsVariable{Name: k, Value: v})
 		must.NoError(ctx, err)
 	}
 }

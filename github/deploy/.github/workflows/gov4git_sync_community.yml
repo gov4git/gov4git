@@ -22,9 +22,12 @@ jobs:
                     cache: enable
                     platform: linux
                     arch: arm64
+               - name: 'Prepare script permissions'
+                 shell: bash
+                 run: chmod a+x .github/scripts/gov4git_sync_community.sh
                - name: 'Sync community votes and requests'
                  shell: bash
-                 run: ./.github/scripts/gov4git_sync_community.sh
+                 run: .github/scripts/gov4git_sync_community.sh
                  env:
                     ORGANIZER_GITHUB_USER: ${{ secrets.ORGANIZER_GITHUB_USER }}
                     ORGANIZER_GITHUB_TOKEN: ${{ secrets.ORGANIZER_GITHUB_TOKEN }}

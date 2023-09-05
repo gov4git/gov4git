@@ -6,6 +6,7 @@ import (
 
 	govgh "github.com/gov4git/gov4git/github"
 	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/must"
 	"github.com/spf13/cobra"
 )
 
@@ -44,12 +45,15 @@ the community must be present in your local config file, as well as their respec
 	gov4git github deploy \
 		--token=GITHUB_ACCESS_TOKEN \
 		--project=PROJECT_OWNER/PROJECT_REPO \
+		--release=GOV4GIT_RELEASE \
 		--gov=GOV_OWNER/GOV_REPO_PREFIX
 
 --token is a GitHub access token which has read access to the project repo's issues and pull requests; and
 create and write access to the governance repos.
 
 --project is the GitHub project_owner/project_repo of the project repository to be governed.
+
+--release specifies the GitHub release of gov4git to use for automation.
 
 --gov is the GitHub owner and repo name prefix (in the form owner/repo_prefix) of the public and private
 governance repositories to be created. Their names will be repo_prefix:gov.public and repo_prefix:gov.private,
@@ -58,11 +62,17 @@ project_repo:gov.private, respectively.
 
 Therefore, aside for debugging purposes, users should deploy with:
 
-	gov4git github deploy --token=GITHUB_ACCESS_TOKEN --project=PROJECT_OWNER/PROJECT_REPO
+	gov4git github deploy \
+		--token=GITHUB_ACCESS_TOKEN \
+		--project=PROJECT_OWNER/PROJECT_REPO \
+		--release=GOV4GIT_RELEASE
 
 `,
 		Run: func(cmd *cobra.Command, args []string) {
+			must.Assertf(ctx, githubRelease != "", "github release must be specified")
+
 			project := govgh.ParseGithubRepo(ctx, githubProject)
+
 			var govPrefix govgh.GithubRepo
 			if githubGov == "" {
 				govPrefix = project
@@ -71,7 +81,7 @@ Therefore, aside for debugging purposes, users should deploy with:
 			}
 
 			// deploy governance on GitHub (by way of placing GitHub actions in the public governance repo)
-			config := govgh.Deploy(ctx, githubToken, project, govPrefix)
+			config := govgh.Deploy(ctx, githubToken, project, govPrefix, githubRelease)
 			fmt.Fprint(os.Stdout, form.SprintJSON(config))
 		},
 	}
@@ -80,6 +90,7 @@ Therefore, aside for debugging purposes, users should deploy with:
 var (
 	githubToken   string
 	githubProject string
+	githubRelease string
 	githubGov     string
 )
 
@@ -93,8 +104,9 @@ func init() {
 	githubCmd.AddCommand(githubDeployCmd)
 	githubDeployCmd.Flags().StringVar(&githubToken, "token", "", "GitHub access token")
 	githubDeployCmd.Flags().StringVar(&githubProject, "project", "", "GitHub project owner/repo")
+	githubDeployCmd.Flags().StringVar(&githubRelease, "release", "", "GitHub release of gov4git to use for automation")
 	githubDeployCmd.Flags().StringVar(&githubGov, "gov", "", "governance Github owner/repo_prefix")
 	githubDeployCmd.MarkFlagRequired("token")
 	githubDeployCmd.MarkFlagRequired("project")
-	githubDeployCmd.MarkFlagRequired("gov")
+	githubDeployCmd.MarkFlagRequired("release")
 }

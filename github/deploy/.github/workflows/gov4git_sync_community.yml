@@ -1,26 +1,32 @@
 name: Sync governance with community members (tally votes, deliver mail, etc)
 
 on:
-  workflow_dispatch:
-  schedule:
-  - cron: '55 * * * *'
+     workflow_dispatch: # allows manual triggering
+     # schedule:
+     # - cron: '55 * * * *'   # every hour at 55 minutes past the hour
 
 jobs:
-  tally_votes:
-    environment: governance
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/setup-go@v3
-      with:
-        go-version: "1.21.x"
-    - uses: actions/checkout@v3 # checks out to /home/runner/work/gov4git
-    - shell: bash
-      run: |
-        echo current directory `pwd`
-        echo home directory ~
-    - run: .scripts/build-and-tally.sh
-      env:
-        GOVERNANCE_ACCESS_USER: ${{ secrets.GOVERNANCE_ACCESS_USER }}
-        GOVERNANCE_ACCESS_TOKEN: ${{ secrets.GOVERNANCE_ACCESS_TOKEN }}
+     sync_community:
+          environment: governance
+          runs-on: ubuntu-latest
+          permissions:
+               contents: write
+          steps:
+               - name: 'Install gov4git from release'
+                 uses: jaxxstorm/action-install-gh-release@v1.10.0
+                 with:
+                    repo: gov4git/gov4git # binary is added to the PATH as well
+                    tag: ${{ vars.GOV4GIT_RELEASE }}
+                    cache: enable
+                    platform: linux
+                    arch: arm64
+               - name: 'Sync community votes and requests'
+                 shell: bash
+                 run: ./.github/scripts/gov4git_sync_community.sh
+                 env:
+                    GOV_AUTH_USER: ${{ secrets.GOV_AUTH_USER }}
+                    GOV_AUTH_TOKEN: ${{ secrets.GOV_AUTH_TOKEN }}
+                    GITHUB_PROJECT_OWNER: ${{ vars.GITHUB_PROJECT_OWNER }}
+                    GITHUB_PROJECT_REPO: ${{ vars.GITHUB_PROJECT_REPO }}
+                    GOV_PUB_REPO: ${{ vars.GOV_PUB_REPO }}
+                    GOV_PRIV_REPO: ${{ vars.GOV_PRIV_REPO }}

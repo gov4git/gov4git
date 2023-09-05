@@ -26,6 +26,7 @@ func Deploy(
 	token string, // permissions: read project issues, create/write govPrefix
 	project GithubRepo,
 	govPrefix GithubRepo,
+	ghRelease string, // GitHub release of gov4git to install
 ) api.Config {
 
 	// create authenticated GitHub client
@@ -67,27 +68,27 @@ func Deploy(
 
 	// create GitHub environment for governance
 	base.Infof("creating GitHub environment for governance in %v", govPublic)
-	createDeployEnvironment(ctx, ghClient, token, project, govPublic, govPublicURLs, govPrivateURLs)
+	createDeployEnvironment(ctx, ghClient, token, project, govPublic, govPublicURLs, govPrivateURLs, ghRelease)
 
 	// install github automation in the public governance repo
 	base.Infof("installing GitHub actions for governance in %v, targetting %v", govPublic, project)
 	installGithubActions(ctx, govOwnerAddr)
 
-	// return config for gov4git admin
+	// return config for gov4git administrator
 	homeDir, err := os.UserHomeDir()
 	must.NoError(ctx, err)
 	return api.Config{
-		Auth: XXX,
+		Auth: map[git.URL]api.AuthConfig{},
 		//
-		GovPublicURL:     XXX,
-		GovPublicBranch:  XXX,
-		GovPrivateURL:    XXX,
-		GovPrivateBranch: XXX,
+		GovPublicURL:     git.URL(govPublicURLs.HTTPSURL),
+		GovPublicBranch:  git.MainBranch,
+		GovPrivateURL:    git.URL(govPrivateURLs.HTTPSURL),
+		GovPrivateBranch: git.MainBranch,
 		//
-		MemberPublicURL:     XXX,
-		MemberPublicBranch:  XXX,
-		MemberPrivateURL:    XXX,
-		MemberPrivateBranch: XXX,
+		MemberPublicURL:     "YOUR_MEMBER_PUBLIC_REPO_HTTPS_URL",
+		MemberPublicBranch:  git.MainBranch,
+		MemberPrivateURL:    "YOUR_MEMBER_PRIVATE_REPO_HTTPS_URL",
+		MemberPrivateBranch: git.MainBranch,
 		//
 		CacheDir:        path.Join(homeDir, ".gov4git", "cache"),
 		CacheTTLSeconds: 0,
@@ -136,6 +137,7 @@ func createDeployEnvironment(
 	govPublic GithubRepo,
 	govPublicURLs *vendor4git.Repository,
 	govPrivateURLs *vendor4git.Repository,
+	ghRelease string,
 ) {
 
 	// fetch repo id
@@ -169,6 +171,7 @@ func createDeployEnvironment(
 
 	// create environment variables
 	envVars := map[string]string{
+		"GOV4GIT_RELEASE":      ghRelease,
 		"GITHUB_PROJECT_OWNER": project.Owner,
 		"GITHUB_PROJECT_REPO":  project.Name,
 		"GOV_PUB_REPO":         govPublicURLs.HTTPSURL,

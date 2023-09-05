@@ -78,7 +78,12 @@ func Deploy(
 	homeDir, err := os.UserHomeDir()
 	must.NoError(ctx, err)
 	return api.Config{
-		Auth: map[git.URL]api.AuthConfig{},
+		Auth: map[git.URL]api.AuthConfig{
+			git.URL(govPublicURLs.HTTPSURL):               {AccessToken: github.String(token)},
+			git.URL(govPrivateURLs.HTTPSURL):              {AccessToken: github.String(token)},
+			git.URL("YOUR_MEMBER_PUBLIC_REPO_HTTPS_URL"):  {AccessToken: github.String("YOUR_MEMBER_ACCESS_TOKEN")},
+			git.URL("YOUR_MEMBER_PRIVATE_REPO_HTTPS_URL"): {AccessToken: github.String("YOUR_MEMBER_ACCESS_TOKEN")},
+		},
 		//
 		GovPublicURL:     git.URL(govPublicURLs.HTTPSURL),
 		GovPublicBranch:  git.MainBranch,

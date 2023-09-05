@@ -33,8 +33,8 @@ CONFIG_JSON=$(
           '{
                "cache_dir": $cache_dir,
                "auth" : {
-                    $gov_pub_repo: { "user_password": { "user": $gov_auth_user, "password": $gov_auth_token } },
-                    $gov_priv_repo: { "user_password": { "user": $gov_auth_user, "password": $gov_auth_token } }
+                    ($gov_pub_repo): { "user_password": { "user": $gov_auth_user, "password": $gov_auth_token } },
+                    ($gov_priv_repo): { "user_password": { "user": $gov_auth_user, "password": $gov_auth_token } }
                },
                "gov_public_url": $gov_pub_repo,
                "gov_public_branch": "main",

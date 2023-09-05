@@ -3,7 +3,10 @@ package github
 import (
 	"context"
 	crypto_rand "crypto/rand"
+	_ "embed"
 	"encoding/base64"
+	"os"
+	"path"
 
 	"github.com/google/go-github/v54/github"
 	"github.com/gov4git/gov4git/gov4git/api"
@@ -11,6 +14,7 @@ import (
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
+	"github.com/gov4git/lib4git/ns"
 	"github.com/gov4git/vendor4git"
 	vendor "github.com/gov4git/vendor4git/github"
 	"golang.org/x/crypto/nacl/box"
@@ -66,10 +70,12 @@ func Deploy(
 	createDeployEnvironment(ctx, ghClient, token, project, govPublic, govPublicURLs, govPrivateURLs)
 
 	// install github automation in the public governance repo
-	base.Infof("deploying GitHub actions for governance in %v, targetting %v", govPublic, project)
-	XXX
+	base.Infof("installing GitHub actions for governance in %v, targetting %v", govPublic, project)
+	installGithubActions(ctx, govOwnerAddr)
 
 	// return config for gov4git admin
+	homeDir, err := os.UserHomeDir()
+	must.NoError(ctx, err)
 	return api.Config{
 		Auth: XXX,
 		//
@@ -83,9 +89,43 @@ func Deploy(
 		MemberPrivateURL:    XXX,
 		MemberPrivateBranch: XXX,
 		//
-		CacheDir:        XXX,
-		CacheTTLSeconds: XXX,
+		CacheDir:        path.Join(homeDir, ".gov4git", "cache"),
+		CacheTTLSeconds: 0,
 	}
+}
+
+var (
+	//go:embed deploy/.github/scripts/gov4git_sync_github.sh
+	syncGithubSH string
+
+	//go:embed deploy/.github/scripts/gov4git_sync_community.sh
+	syncCommunitySH string
+
+	//go:embed deploy/.github/workflows/gov4git_sync_github.yml
+	syncGithubYML string
+
+	//go:embed deploy/.github/workflows/gov4git_sync_community.yml
+	syncCommunityYML string
+)
+
+func installGithubActions(
+	ctx context.Context,
+	govOwnerAddr id.OwnerAddress,
+) {
+
+	govCloned := git.CloneOne(ctx, git.Address(govOwnerAddr.Public))
+	t := govCloned.Tree()
+
+	// helper scripts for github actions
+	git.StringToFileStage(ctx, t, ns.NS{".github", "scripts", "sync_github.sh"}, syncGithubSH)
+	git.StringToFileStage(ctx, t, ns.NS{".github", "scripts", "sync_community.sh"}, syncCommunitySH)
+
+	// github actions
+	git.StringToFileStage(ctx, t, ns.NS{".github", "workflows", "gov4git_sync_github.yml"}, syncGithubYML)
+	git.StringToFileStage(ctx, t, ns.NS{".github", "workflows", "gov4git_sync_community.yml"}, syncCommunityYML)
+
+	git.Commit(ctx, t, "install gov4git github actions")
+	govCloned.Push(ctx)
 }
 
 func createDeployEnvironment(
@@ -138,8 +178,6 @@ func createDeployEnvironment(
 		_, err := ghClient.Actions.CreateEnvVariable(ctx, int(*ghRepo.ID), env.GetName(), &github.ActionsVariable{Name: k, Value: v})
 		must.NoError(ctx, err)
 	}
-
-	XXX
 }
 
 func encryptValue(ctx context.Context, pubKey *github.PublicKey, secretValue string) string {

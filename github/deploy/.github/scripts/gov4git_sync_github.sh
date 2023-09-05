@@ -47,5 +47,4 @@ cat ~/.gov4git/config.json
 
 ./gov4git github --config=~/.gov4git/config.json import \
      --token=$GOV_AUTH_TOKEN \
-     --owner=$GITHUB_PROJECT_OWNER \
-     --repo=$GITHUB_PROJECT_REPO
+     --project=$GITHUB_PROJECT_OWNER/$GITHUB_PROJECT_REPO

@@ -1,4 +1,4 @@
-name: Sync governance with community members (tally votes, deliver mail, etc)
+name: Sync governance with community members
 
 on:
      workflow_dispatch: # allows manual triggering

@@ -40,4 +40,4 @@ CONFIG_JSON=$(
 echo $CONFIG_JSON > ~/.gov4git/config.json
 cat ~/.gov4git/config.json
 
-./gov4git github --config=~/.gov4git/config.json sync
+gov4git github --config=~/.gov4git/config.json sync

@@ -13,6 +13,7 @@ import (
 	"github.com/gov4git/gov4git/proto/boot"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/base"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
@@ -165,12 +166,13 @@ func createDeployEnvironment(
 
 	for k, v := range envSecrets {
 		encryptedValue := encryptValue(ctx, govPubPubKey, v)
-		_, err := ghClient.Actions.CreateOrUpdateEnvSecret(ctx, int(*ghGovPubRepo.ID), env.GetName(),
-			&github.EncryptedSecret{
-				Name:           k,
-				KeyID:          govPubPubKey.GetKeyID(),
-				EncryptedValue: encryptedValue,
-			})
+		encryptedSecret := &github.EncryptedSecret{
+			Name:           k,
+			KeyID:          govPubPubKey.GetKeyID(),
+			EncryptedValue: encryptedValue,
+		}
+		base.Infof("adding secret to environment: %v", form.SprintJSON(encryptedSecret))
+		_, err := ghClient.Actions.CreateOrUpdateEnvSecret(ctx, int(*ghGovPubRepo.ID), env.GetName(), encryptedSecret)
 		must.NoError(ctx, err)
 	}
 

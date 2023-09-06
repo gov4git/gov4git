@@ -2,8 +2,8 @@ name: Sync GitHub issues and pull requests with the governance system
 
 on:
      workflow_dispatch: # allows manual triggering
-     # schedule:
-     # - cron: '*/2 * * * *'  # every 2 minutes
+     schedule:
+     - cron: '*/2 * * * *'  # every 2 minutes
 
 jobs:
      sync_github:

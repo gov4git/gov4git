@@ -3,9 +3,9 @@ module github.com/gov4git/gov4git
 go 1.19
 
 require (
-	github.com/google/go-github/v54 v54.0.0
+	github.com/google/go-github/v55 v55.0.0
 	github.com/gov4git/lib4git v0.0.22
-	github.com/gov4git/vendor4git v0.0.2
+	github.com/gov4git/vendor4git v0.0.3
 	github.com/migueleliasweb/go-github-mock v0.0.19
 	github.com/rogpeppe/go-internal v1.11.0
 	github.com/spf13/cobra v1.6.1

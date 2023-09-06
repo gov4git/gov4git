@@ -8,7 +8,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/google/go-github/v54/github"
+	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/gov4git/api"
 	"github.com/gov4git/gov4git/proto/boot"
 	"github.com/gov4git/gov4git/proto/id"
@@ -171,8 +171,14 @@ func createDeployEnvironment(
 			KeyID:          govPubPubKey.GetKeyID(),
 			EncryptedValue: encryptedValue,
 		}
-		base.Infof("adding secret to environment: %v", form.SprintJSON(encryptedSecret))
-		_, err := ghClient.Actions.CreateOrUpdateEnvSecret(ctx, int(*ghGovPubRepo.ID), env.GetName(), encryptedSecret)
+		// NOTE: go-github@v55 seems to have a bug in CreateOrUpdateEnvSecret.
+		// As a workaround, we use CreateOrUpdateRepoSecret instead.
+		//
+		// base.Infof("adding secret to environment: %v", form.SprintJSON(encryptedSecret))
+		// _, err := ghClient.Actions.CreateOrUpdateEnvSecret(ctx, int(ghGovPubRepo.GetID()), env.GetName(), encryptedSecret)
+		// must.NoError(ctx, err)
+		base.Infof("adding secret to repo: %v", form.SprintJSON(encryptedSecret))
+		_, err = ghClient.Actions.CreateOrUpdateRepoSecret(ctx, govPublic.Owner, govPublic.Name, encryptedSecret)
 		must.NoError(ctx, err)
 	}
 

@@ -14,5 +14,4 @@
 
 BUGS
 
-- [ ] auth token is not set in the environment correctly ???
 - [ ] when auth token is missing, the github action does not fail ???

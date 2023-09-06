@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/google/go-github/v54/github"
+	"github.com/google/go-github/v55/github"
 	govgh "github.com/gov4git/gov4git/github"
 )
 

@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/go-github/v54/github"
 	"github.com/gov4git/gov4git/gov4git/api"
+	"github.com/gov4git/gov4git/proto/boot"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/git"
@@ -64,7 +65,7 @@ func Deploy(
 
 	// initialize governance identity
 	base.Infof("initializing governance for %v", project)
-	id.Init(ctx, govOwnerAddr)
+	boot.Boot(ctx, govOwnerAddr)
 
 	// create GitHub environment for governance
 	base.Infof("creating GitHub environment for governance in %v", govPublic)

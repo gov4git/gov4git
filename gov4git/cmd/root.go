@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/gov4git/gov4git/github"
 	"github.com/gov4git/gov4git/gov4git/api"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
@@ -23,7 +24,7 @@ var (
 	}
 )
 
-var ctx = git.WithTTL(git.WithAuth(context.Background(), nil), nil)
+var ctx = github.WithTokenSource(git.WithTTL(git.WithAuth(context.Background(), nil), nil), nil)
 
 var (
 	configPath string

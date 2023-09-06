@@ -158,7 +158,6 @@ func createDeployEnvironment(
 	// create environment secrets
 	envSecrets := map[string]string{
 		"ORGANIZER_GITHUB_TOKEN": token,
-		"ORGANIZER_GITHUB_USER":  "",
 	}
 
 	govPubPubKey, _, err := ghClient.Actions.GetRepoPublicKey(ctx, govPublic.Owner, govPublic.Name)

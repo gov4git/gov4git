@@ -29,7 +29,6 @@ jobs:
                  shell: bash
                  run: .github/scripts/gov4git_sync_community.sh
                  env:
-                    ORGANIZER_GITHUB_USER: ${{ secrets.ORGANIZER_GITHUB_USER }}
                     ORGANIZER_GITHUB_TOKEN: ${{ secrets.ORGANIZER_GITHUB_TOKEN }}
                     PROJECT_OWNER: ${{ vars.PROJECT_OWNER }}
                     PROJECT_REPO: ${{ vars.PROJECT_REPO }}

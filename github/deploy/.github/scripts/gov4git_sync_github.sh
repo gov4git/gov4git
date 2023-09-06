@@ -13,7 +13,6 @@
 #
 # The authentication variables must be set in the GitHub action workflow:
 #
-#    ORGANIZER_GITHUB_USER = authentication user for the project and governance repositories
 #    ORGANIZER_GITHUB_TOKEN = authentication token for the project and governance repositories
 #
 # The auth token must have permission to write to the governance repositories and
@@ -28,13 +27,12 @@ CONFIG_JSON=$(
           --arg cache_dir "$CACHE_DIR" \
           --arg gov_pub_repo "$GOV_PUBLIC_REPO_URL" \
           --arg gov_priv_repo "$GOV_PRIVATE_REPO_URL" \
-          --arg gov_auth_user "$ORGANIZER_GITHUB_USER" \
           --arg gov_auth_token "$ORGANIZER_GITHUB_TOKEN" \
           '{
                "cache_dir": $cache_dir,
                "auth" : {
-                    ($gov_pub_repo): { "user_password": { "user": $gov_auth_user, "password": $gov_auth_token } },
-                    ($gov_priv_repo): { "user_password": { "user": $gov_auth_user, "password": $gov_auth_token } }
+                    ($gov_pub_repo): { "access_token": $gov_auth_token },
+                    ($gov_priv_repo): { "access_token": $gov_auth_token }
                },
                "gov_public_url": $gov_pub_repo,
                "gov_public_branch": "main",

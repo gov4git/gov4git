@@ -18,5 +18,6 @@ func main() {
 			fmt.Fprintln(os.Stderr, string(stk))
 		}
 		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
 	}
 }

@@ -1,4 +1,4 @@
-package cmd
+package api
 
 import (
 	"context"
@@ -40,9 +40,9 @@ type Config struct {
 }
 
 type AuthConfig struct {
-	SSHPrivateKeysFile *string       `json:"ssh_private_keys_file"`
-	AccessToken        *string       `json:"access_token"`
-	UserPassword       *UserPassword `json:"user_password"`
+	SSHPrivateKeysFile *string       `json:"ssh_private_keys_file,omitempty"`
+	AccessToken        *string       `json:"access_token,omitempty"`
+	UserPassword       *UserPassword `json:"user_password,omitempty"`
 }
 
 type UserPassword struct {
@@ -81,11 +81,11 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 	}
 
 	// attach cache ttl information to context
-	git.SetTTL(ctx, setup.Gov.Repo, s.CacheTTL)
-	git.SetTTL(ctx, setup.Organizer.Public.Repo, s.CacheTTL)
-	git.SetTTL(ctx, setup.Organizer.Private.Repo, s.CacheTTL)
-	git.SetTTL(ctx, setup.Member.Public.Repo, s.CacheTTL)
-	git.SetTTL(ctx, setup.Member.Private.Repo, s.CacheTTL)
+	git.SetTTL(ctx, s.Gov.Repo, s.CacheTTL)
+	git.SetTTL(ctx, s.Organizer.Public.Repo, s.CacheTTL)
+	git.SetTTL(ctx, s.Organizer.Private.Repo, s.CacheTTL)
+	git.SetTTL(ctx, s.Member.Public.Repo, s.CacheTTL)
+	git.SetTTL(ctx, s.Member.Private.Repo, s.CacheTTL)
 
 	return s
 }

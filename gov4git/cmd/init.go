@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gov4git/gov4git/proto/boot"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
@@ -27,7 +28,7 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := id.Init(ctx, id.OwnerAddress(setup.Organizer))
+			chg := boot.Boot(ctx, id.OwnerAddress(setup.Organizer))
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}

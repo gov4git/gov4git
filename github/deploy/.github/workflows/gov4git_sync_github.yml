@@ -1,0 +1,36 @@
+name: Sync GitHub issues and pull requests with the governance system
+
+on:
+     workflow_dispatch: # allows manual triggering
+     schedule:
+     - cron: '*/2 * * * *'  # every 2 minutes
+
+jobs:
+     sync_github:
+          environment: gov4git:governance
+          runs-on: ubuntu-latest
+          permissions:
+               contents: write
+          steps:
+               - name: 'Checkout gov4git code'
+                 uses: actions/checkout@v4
+               - name: 'Install gov4git from release'
+                 uses: jaxxstorm/action-install-gh-release@v1.10.0
+                 with:
+                    repo: gov4git/gov4git # binary is added to the PATH as well
+                    tag: ${{ vars.GOV4GIT_RELEASE }}
+                    cache: enable
+                    platform: linux
+                    arch: x86_64
+               - name: 'Prepare script permissions'
+                 shell: bash
+                 run: chmod a+x .github/scripts/gov4git_sync_github.sh
+               - name: 'Sync GitHub issues and pull requests'
+                 shell: bash
+                 run: .github/scripts/gov4git_sync_github.sh
+                 env:
+                    ORGANIZER_GITHUB_TOKEN: ${{ secrets.ORGANIZER_GITHUB_TOKEN }}
+                    PROJECT_OWNER: ${{ vars.PROJECT_OWNER }}
+                    PROJECT_REPO: ${{ vars.PROJECT_REPO }}
+                    GOV_PUBLIC_REPO_URL: ${{ vars.GOV_PUBLIC_REPO_URL }}
+                    GOV_PRIVATE_REPO_URL: ${{ vars.GOV_PRIVATE_REPO_URL }}

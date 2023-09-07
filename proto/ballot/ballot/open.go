@@ -52,7 +52,7 @@ func OpenStageOnly(
 
 	// verify group exists
 	if !member.IsGroupLocal(ctx, govCloned.Tree(), participants) {
-		must.Errorf(ctx, "participant group does not exist")
+		must.Errorf(ctx, "participant group %v does not exist", participants)
 	}
 
 	// write ad

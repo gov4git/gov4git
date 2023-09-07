@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	BallotNS         = proto.RootNS.Sub("ballots")
+	BallotNS         = proto.RootNS.Sub("ballot")
 	AdFilebase       = "ballot_ad.json"
 	StrategyFilebase = "ballot_strategy.json"
 	TallyFilebase    = "ballot_tally.json"

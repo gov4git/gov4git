@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 type GithubRepo struct {
@@ -63,11 +63,11 @@ const (
 	ImportedPullPrefix   = "pull"
 )
 
-func (x GithubIssueBallot) BallotName() ns.NS {
+func (x GithubIssueBallot) BallotName() common.BallotName {
 	if x.IsPullRequest {
-		return ns.NS{ImportedGithubPrefix, ImportedPullPrefix, x.Key()}
+		return common.BallotName{ImportedGithubPrefix, ImportedPullPrefix, x.Key()}
 	} else {
-		return ns.NS{ImportedGithubPrefix, ImportedIssuePrefix, x.Key()}
+		return common.BallotName{ImportedGithubPrefix, ImportedIssuePrefix, x.Key()}
 	}
 }
 

@@ -43,6 +43,6 @@ CONFIG_JSON=$(
 echo $CONFIG_JSON > ~/.gov4git/config.json
 cat ~/.gov4git/config.json
 
-gov4git --config=$HOME/.gov4git/config.json github import \
+gov4git -v --config=$HOME/.gov4git/config.json github import \
      --token=$ORGANIZER_GITHUB_TOKEN \
      --project=$PROJECT_OWNER/$PROJECT_REPO

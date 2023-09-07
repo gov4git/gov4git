@@ -138,7 +138,7 @@ func ImportIssuesForPrioritization_StageOnly(
 		if ghIssue.ForPrioritization {
 			if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
 
-				must.Assertf(ctx, ns.Equal(ghIssue.BallotName(), govBallot.Name),
+				must.Assertf(ctx, ns.Equal(ghIssue.BallotName().NS(), govBallot.Name.NS()),
 					"issue ballot name %v and actual ballot name %v mismatch", ghIssue.BallotName(), govBallot.Name)
 
 				switch {

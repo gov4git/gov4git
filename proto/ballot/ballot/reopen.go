@@ -11,13 +11,12 @@ import (
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func Reopen(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 ) git.Change[form.Map, form.None] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
@@ -31,7 +30,7 @@ func Reopen_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 ) git.Change[form.Map, form.None] {
 
 	govTree := govCloned.Public.Tree()

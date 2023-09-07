@@ -161,24 +161,19 @@ func createDeployEnvironment(
 		"ORGANIZER_GITHUB_TOKEN": token,
 	}
 
-	govPubPubKey, _, err := ghClient.Actions.GetRepoPublicKey(ctx, govPublic.Owner, govPublic.Name)
+	govEnvPubKey, _, err := ghClient.Actions.GetEnvPublicKey(ctx, int(ghGovPubRepo.GetID()), env.GetName())
+	// govPubPubKey, _, err := ghClient.Actions.GetRepoPublicKey(ctx, govPublic.Owner, govPublic.Name)
 	must.NoError(ctx, err)
 
 	for k, v := range envSecrets {
-		encryptedValue := encryptValue(ctx, govPubPubKey, v)
+		encryptedValue := encryptValue(ctx, govEnvPubKey, v)
 		encryptedSecret := &github.EncryptedSecret{
 			Name:           k,
-			KeyID:          govPubPubKey.GetKeyID(),
+			KeyID:          govEnvPubKey.GetKeyID(),
 			EncryptedValue: encryptedValue,
 		}
-		// NOTE: go-github@v55 seems to have a bug in CreateOrUpdateEnvSecret.
-		// As a workaround, we use CreateOrUpdateRepoSecret instead.
-		//
-		// base.Infof("adding secret to environment: %v", form.SprintJSON(encryptedSecret))
-		// _, err := ghClient.Actions.CreateOrUpdateEnvSecret(ctx, int(ghGovPubRepo.GetID()), env.GetName(), encryptedSecret)
-		// must.NoError(ctx, err)
-		base.Infof("adding secret to repo: %v", form.SprintJSON(encryptedSecret))
-		_, err = ghClient.Actions.CreateOrUpdateRepoSecret(ctx, govPublic.Owner, govPublic.Name, encryptedSecret)
+		base.Infof("adding secret to environment: %v", form.SprintJSON(encryptedSecret))
+		_, err := ghClient.Actions.CreateOrUpdateEnvSecret(ctx, int(ghGovPubRepo.GetID()), env.GetName(), encryptedSecret)
 		must.NoError(ctx, err)
 	}
 

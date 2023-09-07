@@ -30,33 +30,82 @@ Your token must have permissions to:
 - manage GitHub Actions within these repositories (i.e. environments, secrets, variables, workflows)
 - read the issues and pull requests of your project repository
 
-XXX
+To create the token:
+- Go to your GitHub profile settings
+- Click on "Developer settings"
+- Click on "Personal access tokens"
+- Click on "Fine-grained tokens"
+- Click on "Generate new token"
+- Choose a name, description and expiration for your token
+- Under "Resource owner" pick the user or organization that owns the project repository
+- Under "Repository access" select "All repositories"
+- Under "Repository permissions" make the following choices:
 
-#### Repository permissions
+     | category | access |
+     | ----------- | ----------- |
+     | actions | read-write |
+     | admin | read-write |
+     | contents | read-write |
+     | environments | read-write |
+     | issues | read-only |
+     | meta | read-only |
+     | pull-requests | read-only |
+     | secrets | read-write |
+     | variables | read-write |
+     | workflows | read-write |
 
-| category | access |
-| ----------- | ----------- |
-| actions | read-write |
-| admin | read-write |
-| contents | read-write |
-| environments | read-write |
-| issues | read-only |
-| meta | read-only |
-| pull-requests | read-only |
-| secrets | read-write |
-| variables | read-write |
-| workflows | read-write |
-
-#### Organization permissions
-
-None.
-
+- No changes are needed under "Organization permissions"
+- Click on "Generate token" and write down the generated token
 
 
 ## Deploy governance for your project repository
 
-XXX
+You are now ready to deploy governance on your project repository. This can be accomplished with a single command:
 
-## How does governance integration with GitHub work?
+```bash
+gov4git -v github deploy \
+     --token=$YOUR_ACCESS_TOKEN \
+     --project=$PROJECT_OWNER/$PROJECT_REPO \
+     --release=$GOV4GIT_RELEASE
+```
 
-XXX
+Here `$GOV4GIT_RELEASE` specifies the gov4git release on GitHub that you want to use for the deployment.
+
+## What does the deployment command do?
+
+During the deployment, the following steps are performed:
+
+- Two new repositories — one public, one private — are created within the GitHub organization of your project repository. The public repository is named `$PROJECT_REPO-gov.public` and the private repository is named `$PROJECT_REPO-gov.private`.
+
+- Both repositories are initialized with a newly-generated identity for your governance system. This step corresponds to the `gov4git init-gov` command.
+
+- Two GitHub actions are created in the public governance repository, named `.github/workflows/gov4git_sync_github.yml` and `.github/workflows/gov4git_sync_community.yml`. These actions are also accompanies by helper scripts `.github/scripts/gov4git_sync_github.sh` and `.github/scripts/gov4git_sync_community.sh`, respectively.
+
+     The first action, `gov4git_sync_github.yml`, runs every two minutes. It is responsible for reading all issues and pull requests from your project repositories and updating the governance system accordingly.
+
+     The second action, `gov4git_sync_community.yml`, runs every hour. It is responsible for fetching votes and other user requests from your community members and incorporating them into the governance system.
+
+- A new GitHub environment called `gov4git:governance` is created, where the GitHub actions `gov4git_sync_github.yml` and `gov4git_sync_community.yml` run. This environment contains a set of variables:
+  - `GOV4GIT_RELEASE` is the gov4git release to use for the automation
+  - `GOV_PUBLIC_REPO_URL` is the HTTPS URL of the public governance repository
+  - `GOV_PRIVATE_REPO_URL` is the HTTPS URL of the private governance repository
+  - `PROJECT_OWNER` is the GitHub user or organization owning your project repository
+  - `PROJECT_REPO` is the name of your project repository
+
+     Additionally, a GitHub secret called `ORGANIZER_GITHUB_TOKEN` is created in the public governance repository. This secret contains the GitHub access token you provided to the deployment command. It is used by the GitHub actions to access your project repository, as well as the governance repositories.
+
+## Managing your deployment
+
+All governance write operations are strictly contained within the public and private governance repositories. In particular, governance does not write to your project repository.
+
+The entire state of governance is captured in the most recent commit of the public and private governance repositories.
+
+This allows you to perform a few basic administrative tasks, using standard git and GitHub operations:
+
+- _If you want to stop and erase a deployment_, simply delete the public and private governance repositories.
+
+- _If you want to stop a deployment but keep the governance state_, simply edit the GitHub actions and comment out the cron triggers.
+
+- _If you want to reduce the size of your governance repositories_, archive their `main`-branch history in another branch or repository, and reset the `main` branch to contain only the most recent commit.
+
+- _If you want to upgrade your deployment to a newer version of gov4git_, simply edit the GitHub environment and change the `GOV4GIT_RELEASE` variable to the new release.

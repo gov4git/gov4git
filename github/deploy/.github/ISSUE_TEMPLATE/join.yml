@@ -4,13 +4,17 @@ title: I'd like to join this project's community
 labels:
   - community
 assignees:
-  - petar
+  - ORGANIZER_GITHUB_USER
 body:
   - type: markdown
     attributes:
       value: |
         Thank you for your interest in our community!
-        Use the form below to join our community governance.
+        Use this form to join our community governance.
+        This community is governed by [gov4git](https://gov4git.org).
+        You will need to install the [gov4git desktop app](https://gov4git.org)
+        on your machine. The app will guide you through initializing your identity and will
+        provide you with the necessary information to fill this form.
   - type: input
     id: contributor_public_url
     attributes:
@@ -25,6 +29,7 @@ body:
       label: Your public branch
       description: The branch within your gov4git public repo that holds your identity
       placeholder: e.g. main
+      default: main
     validations:
       required: true
   - type: input

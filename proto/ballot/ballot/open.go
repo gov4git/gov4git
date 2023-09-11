@@ -47,7 +47,7 @@ func OpenStageOnly(
 	// check no open ballots by the same name
 	openAdNS := common.BallotPath(name).Sub(common.AdFilebase)
 	if _, err := govCloned.Tree().Filesystem.Stat(openAdNS.Path()); err == nil {
-		must.Errorf(ctx, "ballot already exists")
+		must.Errorf(ctx, "ballot already exists: %v", openAdNS.Path())
 	}
 
 	// verify group exists

@@ -198,8 +198,8 @@ func ImportIssuesForPrioritization_Local(
 func filterIssuesForPrioritization(ads []common.Advertisement) map[string]common.Advertisement {
 	filtered := map[string]common.Advertisement{}
 	for _, ad := range ads {
-		if len(ad.Name) == 2 && ad.Name[0] == "issue" {
-			key := ad.Name[1]
+		if len(ad.Name) == 3 && ad.Name[0] == ImportedGithubPrefix && (ad.Name[1] == ImportedIssuePrefix || ad.Name[1] == ImportedPullPrefix) {
+			key := ad.Name[2]
 			if _, err := strconv.Atoi(key); err == nil {
 				filtered[key] = ad
 			}

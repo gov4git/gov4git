@@ -48,8 +48,18 @@ func (x GithubIssueBallot) Key() string {
 	return strconv.Itoa(int(x.Number))
 }
 
+const (
+	ImportedGithubPrefix = "github"
+	ImportedIssuePrefix  = "issues"
+	ImportedPullPrefix   = "pull"
+)
+
 func (x GithubIssueBallot) BallotName() ns.NS {
-	return ns.NS{"issue", x.Key()}
+	if x.IsPullRequest {
+		return ns.NS{ImportedGithubPrefix, ImportedPullPrefix, x.Key()}
+	} else {
+		return ns.NS{ImportedGithubPrefix, ImportedIssuePrefix, x.Key()}
+	}
 }
 
 type GithubIssueBallots []GithubIssueBallot

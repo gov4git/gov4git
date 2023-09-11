@@ -30,5 +30,30 @@ gov4git user add \
 
 If you choose to deny their request, you can explain your reasoning in the form of a response comment on the GitHub issue itself.
 
-## Governing issues and prioritization
+## Concerns and proposals
 
+Most collaborative projects — be it public and open-source, or private and enterprise-specific — share a few core workflow management principles.
+
+They are invariably centered around two mechanisms: One for managing _concerns_, and one for managing _proposals_.
+
+_Concerns_ are a device for nucleating, discussing and tracking project improvement tasks and their dependencies. 
+
+In the context of GitHub, GitLab or Gitea, for instance, concerns are embodied by "issues". Other platforms may attribute different names to the analogous concept. For instance, Jira embodies concerns in the form of "tickets".
+
+_Proposals_ encapsulate a solution (possibly partial) to one or more concerns in the form of a proposed change to the contents of the project repository.
+
+GitHub and Gitea call their proposals "pull requests". GitLab uses the term "merge requests". And a litter of other terms, such as "change requests", can be found in other systems.
+
+gov4git incorporates native support for concerns and proposals, and it can interoperate with any source management system that meets a few basic criteria. In particular, their analog of concerns and proposals supports:
+
+- incorporating free-form text
+- including references to other concerns and proposals
+- assigning opaque labels for categorization
+
+We adhere to the terminology of concerns and proposals, but the reader can treat them synonymously with GitHub issues and GitHub pull requests.
+
+## Prioritization
+
+
+
+XXX

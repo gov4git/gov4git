@@ -14,6 +14,7 @@ import (
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -111,8 +112,13 @@ func ImportIssuesForPrioritization(
 		ghIssues,
 		nil,
 	)
-	proto.Commit(ctx, govCloned.Public.Tree(), chg)
-	govCloned.Public.Push(ctx)
+	status, err := govCloned.Public.Tree().Status()
+	must.NoError(ctx, err)
+	if !status.IsClean() {
+		base.Infof("import from github caused changes")
+		proto.Commit(ctx, govCloned.Public.Tree(), chg)
+		govCloned.Public.Push(ctx)
+	}
 	return chg
 }
 
@@ -209,11 +215,12 @@ func UpdateMeta_StageOnly(
 	govCloned id.OwnerCloned,
 	ghIssue GithubIssueBallot,
 	govBallot common.Advertisement,
-) {
+) (changed bool) {
 	if ghIssue.Title == govBallot.Title && ghIssue.Body == govBallot.Description {
-		return
+		return false
 	}
 	ballot.Change_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), ghIssue.Title, ghIssue.Body)
+	return true
 }
 
 func UpdateFrozen_StageOnly(
@@ -223,13 +230,18 @@ func UpdateFrozen_StageOnly(
 	govCloned id.OwnerCloned,
 	ghIssue GithubIssueBallot,
 	govBallot common.Advertisement,
-) {
+) (changed bool) {
 	switch {
 	case ghIssue.Locked && govBallot.Frozen:
+		return false
 	case ghIssue.Locked && !govBallot.Frozen:
 		ballot.FreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+		return true
 	case !ghIssue.Locked && govBallot.Frozen:
 		ballot.UnfreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+		return true
 	case !ghIssue.Locked && !govBallot.Frozen:
+		return false
 	}
+	panic("unreachable")
 }

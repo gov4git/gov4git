@@ -23,9 +23,11 @@ func Process(
 ) git.ChangeNoResult {
 
 	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg := ProcessStageOnly(ctx, govAddr, govOwner, group)
-	proto.Commit(ctx, govOwner.Public.Tree(), chg)
-	govOwner.Public.Push(ctx)
+	chg, changed := ProcessStageOnly(ctx, govAddr, govOwner, group)
+	if changed {
+		proto.Commit(ctx, govOwner.Public.Tree(), chg)
+		govOwner.Public.Push(ctx)
+	}
 	return chg
 }
 
@@ -34,7 +36,7 @@ func ProcessStageOnly(
 	govAddr gov.OrganizerAddress,
 	govOwner id.OwnerCloned,
 	group member.Group,
-) git.ChangeNoResult {
+) (change git.ChangeNoResult, changed bool) {
 
 	communityTree := govOwner.Public.Tree()
 
@@ -56,13 +58,16 @@ func ProcessStageOnly(
 
 	// process requests
 	for _, fetched := range fetchedReqs {
-		processRequestStageOnly(ctx, govAddr, govOwner, fetched)
+		nOK, nErr := processRequestStageOnly(ctx, govAddr, govOwner, fetched)
+		if nOK+nErr > 0 {
+			changed = true
+		}
 	}
 
 	return git.NewChangeNoResult(
 		fmt.Sprintf("Process bureau requests of users in group %v", group),
 		"bureau_process",
-	)
+	), changed
 }
 
 func processRequestStageOnly(
@@ -70,13 +75,15 @@ func processRequestStageOnly(
 	govAddr gov.OrganizerAddress,
 	govOwner id.OwnerCloned,
 	fetched FetchedRequest,
-) {
+) (numOK int, numErr int) {
 	for _, req := range fetched.Requests {
 		if req.Transfer == nil {
+			numErr++
 			continue
 		}
 		if req.Transfer.FromUser != fetched.User {
 			base.Infof("bureau: invalid transfer request from user %v; origin of transfer is not the requesting user", fetched.User)
+			numErr++
 			continue
 		}
 		err := must.Try(func() {
@@ -90,14 +97,17 @@ func processRequestStageOnly(
 		})
 		if err != nil {
 			base.Infof("bureau: transfer error (%v)", err)
+			numErr++
 			continue
 		}
+		numOK++
 		base.Infof("bureau: transferred %v from %v:%v to %v:%v",
 			req.Transfer.Amount,
 			req.Transfer.FromUser, req.Transfer.FromBalance,
 			req.Transfer.ToUser, req.Transfer.ToBalance,
 		)
 	}
+	return
 }
 
 func fetchUserRequests(

@@ -10,17 +10,12 @@ There are two distinct roles (i.e. types of users) involved in a gov4git-governe
 
 The organizer is responsible for:
 - **deploying** the governance system
-- **managing** the day-to-day operations of the governance system (such as managing membership and access rights, creating polls and referendums, etc.)
+- **governing** the day-to-day operations of the community (such as managing membership and access rights, creating polls and referendums, etc.)
+
+These are covered in the [Organizer's Manual](ORGANIZE.md).
 
 The members are responsible for:
-- **participating** in the governance system (such as voting, proposing issues and pull requests, contributing to the project, and so on.)
+- **joining** the community and 
+- **participating** in the community governance (such as voting, proposing issues and pull requests, contributing to the project, and so on.)
 
-## Community organizer's manual
-
-The first responsibility of the organizer is to deploy the governance system. This task is documented in the [Deployment Guide](DEPLOY.md).
-
-TBD
-
-## Community member's manual
-
-TBD
+These are covered in the [Member's Manual](PARTICIPATE.md)

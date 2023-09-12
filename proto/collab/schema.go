@@ -35,8 +35,8 @@ type ConcernName = Name
 
 // Concern is the current state of an concern.
 type Concern struct {
-	TimeOpened time.Time `json:"time_opened"`
-	TimeClosed time.Time `json:"time_closed"`
+	OpenedAt time.Time `json:"opened_at"`
+	ClosedAt time.Time `json:"closed_at"`
 	//
 	Name        ConcernName    `json:"name"` // name of concern
 	Title       string         `json:"title"`
@@ -66,8 +66,8 @@ type ProposalName = Name
 
 // Proposal is the current state of a pull request.
 type Proposal struct {
-	TimeOpened time.Time `json:"time_opened"`
-	TimeClosed time.Time `json:"time_closed"`
+	OpenedAt time.Time `json:"opened_at"`
+	ClosedAt time.Time `json:"closed_at"`
 	//
 	Name       ProposalName  `json:"name"` // name of proposal
 	Title      string        `json:"title"`

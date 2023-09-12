@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -29,10 +30,6 @@ func TestScript(t *testing.T) {
 
 func scriptProvisionCommunity(ts *testscript.TestScript, neg bool, args []string) {
 
-	// create config.json
-	configPath := path.Join(ts.Getenv("WORK"), "config.json")
-	os.WriteFile(configPath, []byte(srcConfigJSON), 0644)
-
 	ts.Setenv("HOME", ts.Getenv("WORK"))
 	ts.Exec("git", "config", "--global", "init.defaultBranch", "main")
 	os.MkdirAll(path.Join(ts.Getenv("WORK"), "cache"), 0755)
@@ -52,19 +49,31 @@ func scriptProvisionCommunity(ts *testscript.TestScript, neg bool, args []string
 	memberPrivatePath := path.Join(ts.Getenv("WORK"), "member_private")
 	os.MkdirAll(memberPrivatePath, 0755)
 	ts.Exec("git", "init", "--bare", memberPrivatePath)
+
+	// create config.json
+	configPath := path.Join(ts.Getenv("WORK"), "config.json")
+	src := fmt.Sprintf(srcConfigJSONFmt,
+		"cache",
+		"gov_public",
+		"gov_private",
+		"member_public",
+		"member_private",
+	)
+	fmt.Println("CONFIG:", src)
+	os.WriteFile(configPath, []byte(src), 0644)
 }
 
 const (
-	srcConfigJSON = `
+	srcConfigJSONFmt = `
 {
-	"cache_dir": "$WORK/cache",
-	"gov_public_url": "~/gov_public",
+	"cache_dir": %q,
+	"gov_public_url": %q,
 	"gov_public_branch": "main",
-	"gov_private_url": "~/gov_private",
+	"gov_private_url": %q,
 	"gov_private_branch": "main",
-	"member_public_url": "~/member_public",
+	"member_public_url": %q,
 	"member_public_branch": "main",
-	"member_private_url": "~/member_private",
+	"member_private_url": %q,
 	"member_private_branch": "main"
 }
 `

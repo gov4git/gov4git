@@ -9,6 +9,8 @@
   - [ ] cli proposals
   - [ ] ???
 
+- [ ] import concerns and proposals from github
+
 - [ ] test score concerns and proposals
 
 - [ ] XXX

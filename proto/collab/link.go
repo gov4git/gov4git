@@ -11,15 +11,15 @@ import (
 	"github.com/gov4git/lib4git/util"
 )
 
-func ProposalAddressesConcern(ctx context.Context, addr gov.GovAddress, proposal Name, concern Name) git.Change[form.Map, ProposalConcernPair] {
+func LinkProposalToConcern(ctx context.Context, addr gov.GovAddress, proposal Name, concern Name) git.Change[form.Map, ProposalConcernPair] {
 	cloned := gov.Clone(ctx, addr)
-	chg := ProposalAddressesConcern_StageOnly(ctx, cloned.Tree(), proposal, concern)
+	chg := LinkProposalToConcern_StageOnly(ctx, cloned.Tree(), proposal, concern)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 	return chg
 }
 
-func ProposalAddressesConcern_StageOnly(ctx context.Context, t *git.Tree, proposalName Name, concernName Name) git.Change[form.Map, ProposalConcernPair] {
+func LinkProposalToConcern_StageOnly(ctx context.Context, t *git.Tree, proposalName Name, concernName Name) git.Change[form.Map, ProposalConcernPair] {
 
 	// read state
 	proposal := proposalKV.Get(ctx, proposalNS, t, proposalName)

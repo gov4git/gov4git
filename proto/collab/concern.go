@@ -29,7 +29,7 @@ func OpenConcern(ctx context.Context, addr gov.GovAddress, name ConcernName, tit
 func OpenConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName, title string, desc string, trackerURL string) git.ChangeNoResult {
 	must.Assert(ctx, !IsConcern_Local(ctx, t, name), ErrConcernAlreadyExists)
 	state := Concern{
-		TimeOpened: time.Now(),
+		OpenedAt:   time.Now(),
 		Name:       name,
 		Title:      title,
 		Desc:       desc,
@@ -50,7 +50,7 @@ func CloseConcern_StageOnly(ctx context.Context, t *git.Tree, name ConcernName) 
 	state := concernKV.Get(ctx, concernNS, t, name)
 	must.Assert(ctx, !state.Closed, ErrConcernAlreadyClosed)
 	state.Closed = true
-	state.TimeClosed = time.Now()
+	state.ClosedAt = time.Now()
 	return concernKV.Set(ctx, concernNS, t, name, state)
 }
 

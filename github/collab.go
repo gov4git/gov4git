@@ -26,7 +26,7 @@ func SyncGovernedIssues(
 		fmt.Sprintf("Sync %d GitHub issues participating in governance", len(ghIssues)),
 		"github_sync",
 		form.Map{},
-		ghIssues,
+		ghIssues, // XXX: may be too verbose
 		nil,
 	)
 	return proto.CommitIfChanged(ctx, govCloned.Public, chg)
@@ -82,9 +82,16 @@ func SyncGovernedIssues_Local(
 
 	// don't touch motions that have no corresponding issue
 
-	// XXX: sync references
+	matchingMotions := indexMotions(collab.ListMotions_Local(ctx, t))
+	syncRefs(ctx, t, ghIssues, matchingMotions)
 
 	return ghOrderedIssues
+}
+
+func syncRefs(ctx context.Context, t *git.Tree, issues map[string]ImportedIssue, motions map[collab.MotionID]collab.Motion) {
+
+	panic("XXX")
+	// XXX
 }
 
 func syncMeta(ctx context.Context, t *git.Tree, issue ImportedIssue, id collab.MotionID) {

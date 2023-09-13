@@ -19,7 +19,16 @@ import (
 	"github.com/gov4git/lib4git/util"
 )
 
-func TestGithubIssueStructure(t *testing.T) {
+func TestViewIssueStructure(t *testing.T) {
+	issues, _, err := client.Issues.ListByRepo(context.Background(), TestRepo.Owner, TestRepo.Name, &github.IssueListByRepoOptions{State: "all"})
+	if err != nil {
+		t.Fatalf("Issues.ListByRepo returned error: %v", err)
+	}
+	issuesByNumber(issues).Sort()
+	fmt.Println("ISSUES", form.SprintJSON(issues))
+}
+
+func TestIssueStructure(t *testing.T) {
 	issues, _, err := client.Issues.ListByRepo(context.Background(), TestRepo.Owner, TestRepo.Name, &github.IssueListByRepoOptions{State: "all"})
 	if err != nil {
 		t.Fatalf("Issues.ListByRepo returned error: %v", err)

@@ -31,7 +31,7 @@ the community must be present in your local config file, as well as their respec
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			repo := govgh.ParseGithubRepo(ctx, githubProject)
+			repo := govgh.ParseRepo(ctx, githubProject)
 			govgh.SetTokenSource(ctx, repo, govgh.MakeStaticTokenSource(ctx, githubToken))
 			ghc := govgh.GetGithubClient(ctx, repo)
 			importedIssues := govgh.Import(ctx, repo, ghc, setup.Organizer)
@@ -73,13 +73,13 @@ Therefore, aside for debugging purposes, users should deploy with:
 		Run: func(cmd *cobra.Command, args []string) {
 			must.Assertf(ctx, githubRelease != "", "github release must be specified")
 
-			project := govgh.ParseGithubRepo(ctx, githubProject)
+			project := govgh.ParseRepo(ctx, githubProject)
 
-			var govPrefix govgh.GithubRepo
+			var govPrefix govgh.Repo
 			if githubGov == "" {
 				govPrefix = project
 			} else {
-				govPrefix = govgh.ParseGithubRepo(ctx, githubGov)
+				govPrefix = govgh.ParseRepo(ctx, githubGov)
 			}
 
 			// deploy governance on GitHub (by way of placing GitHub actions in the public governance repo)
@@ -98,7 +98,7 @@ Therefore, aside for debugging purposes, users should deploy with:
 This creates a public repo. Adding the flag --private will result in creating a private repo.
 		`,
 		Run: func(cmd *cobra.Command, args []string) {
-			ghRepo := govgh.ParseGithubRepo(ctx, githubRepo)
+			ghRepo := govgh.ParseRepo(ctx, githubRepo)
 			vendor := github.NewGitHubVendor(ctx, githubToken)
 			repo, err := vendor.CreateRepo(ctx, ghRepo.Name, ghRepo.Owner, githubPrivate)
 			must.NoError(ctx, err)
@@ -114,7 +114,7 @@ This creates a public repo. Adding the flag --private will result in creating a 
 	gov4git github remove --token=GITHUB_ACCESS_TOKEN --repo=GITHUB_OWNER/GITHUB_REPO
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			ghRepo := govgh.ParseGithubRepo(ctx, githubRepo)
+			ghRepo := govgh.ParseRepo(ctx, githubRepo)
 			vendor := github.NewGitHubVendor(ctx, githubToken)
 			err := vendor.RemoveRepo(ctx, ghRepo.Name, ghRepo.Owner)
 			must.NoError(ctx, err)

@@ -27,8 +27,8 @@ import (
 func Deploy(
 	ctx context.Context,
 	token string, // permissions: read project issues, create/write govPrefix
-	project GithubRepo,
-	govPrefix GithubRepo,
+	project Repo,
+	govPrefix Repo,
 	ghRelease string, // GitHub release of gov4git to install
 ) api.Config {
 
@@ -40,12 +40,12 @@ func Deploy(
 	// create governance public and private repos
 	v := vendor.NewGithubVendorWithClient(ctx, ghClient)
 
-	govPublic := GithubRepo{Owner: govPrefix.Owner, Name: govPrefix.Name + "-gov.public"}
+	govPublic := Repo{Owner: govPrefix.Owner, Name: govPrefix.Name + "-gov.public"}
 	base.Infof("creating GitHub repository %v", govPublic)
 	govPublicURLs, err := v.CreateRepo(ctx, govPublic.Name, govPublic.Owner, false)
 	must.NoError(ctx, err)
 
-	govPrivate := GithubRepo{Owner: govPrefix.Owner, Name: govPrefix.Name + "-gov.private"}
+	govPrivate := Repo{Owner: govPrefix.Owner, Name: govPrefix.Name + "-gov.private"}
 	base.Infof("creating GitHub repository %v", govPrivate)
 	govPrivateURLs, err := v.CreateRepo(ctx, govPrivate.Name, govPrivate.Owner, true)
 	must.NoError(ctx, err)
@@ -133,8 +133,8 @@ func createDeployEnvironment(
 	ctx context.Context,
 	ghClient *github.Client,
 	token string,
-	project GithubRepo,
-	govPublic GithubRepo,
+	project Repo,
+	govPublic Repo,
 	govPublicURLs *vendor4git.Repository,
 	govPrivateURLs *vendor4git.Repository,
 	ghRelease string,
@@ -146,7 +146,7 @@ func createDeployEnvironment(
 
 	// create deploy environment
 	createEnv := &github.CreateUpdateEnvironment{}
-	env, _, err := ghClient.Repositories.CreateUpdateEnvironment(ctx, govPublic.Owner, govPublic.Name, GithubDeployEnvName, createEnv)
+	env, _, err := ghClient.Repositories.CreateUpdateEnvironment(ctx, govPublic.Owner, govPublic.Name, DeployEnvName, createEnv)
 	must.NoError(ctx, err)
 
 	// create environment secrets

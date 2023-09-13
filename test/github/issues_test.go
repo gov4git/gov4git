@@ -152,7 +152,7 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 	mockedHTTPClient := mock.NewMockedHTTPClient(
 		mock.WithRequestMatch(mock.GetReposIssuesByOwnerByRepo, testImportIssuesForPrioritization...),
 	)
-	ghRepo := govgh.GithubRepo{Owner: "owner1", Name: "repo1"}
+	ghRepo := govgh.Repo{Owner: "owner1", Name: "repo1"}
 	ghClient := github.NewClient(mockedHTTPClient)
 
 	// init governance

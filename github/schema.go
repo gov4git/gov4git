@@ -8,18 +8,19 @@ import (
 	"time"
 
 	"github.com/gov4git/gov4git/proto/ballot/common"
+	"github.com/gov4git/gov4git/proto/collab"
 	"github.com/gov4git/lib4git/must"
 )
 
-type GithubRepo struct {
+type Repo struct {
 	Owner string `json:"github_repo_owner"`
 	Name  string `json:"github_repo_name"`
 }
 
-func ParseGithubRepo(ctx context.Context, s string) GithubRepo {
+func ParseRepo(ctx context.Context, s string) Repo {
 	first, second, ok := strings.Cut(s, "/")
 	must.Assertf(ctx, ok, "not a github repo: %v", s)
-	return GithubRepo{Owner: first, Name: second}
+	return Repo{Owner: first, Name: second}
 }
 
 const (
@@ -38,22 +39,26 @@ const (
 	GithubDeployEnvName = "gov4git:governance"
 )
 
-type GithubIssueBallot struct {
-	ForPrioritization bool
-	URL               string
-	Number            int64
-	Title             string
-	Body              string
-	Labels            []string
-	ClosedAt          *time.Time
-	CreatedAt         *time.Time
-	UpdatedAt         *time.Time
-	Locked            bool
-	Closed            bool
-	IsPullRequest     bool
+type ImportedIssue struct {
+	Number int64 `json:"number"`
+	// meta
+	URL    string   `json:"url"`
+	Title  string   `json:"title"`
+	Body   string   `json:"body"`
+	Labels []string `json:"labels"`
+	//
+	ClosedAt  *time.Time `json:"closed_at"`
+	CreatedAt *time.Time `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
+	//
+	Locked            bool `json:"locked"`
+	Closed            bool `json:"closed"`
+	IsPullRequest     bool `json:"is_pull_request"`
+	IsGoverned        bool `json:"is_governed"`
+	ForPrioritization bool `json:"for_prioritization"`
 }
 
-func (x GithubIssueBallot) Key() string {
+func (x ImportedIssue) Key() string {
 	return strconv.Itoa(int(x.Number))
 }
 
@@ -63,7 +68,7 @@ const (
 	ImportedPullPrefix   = "pull"
 )
 
-func (x GithubIssueBallot) BallotName() common.BallotName {
+func (x ImportedIssue) BallotName() common.BallotName {
 	if x.IsPullRequest {
 		return common.BallotName{ImportedGithubPrefix, ImportedPullPrefix, x.Key()}
 	} else {
@@ -71,20 +76,28 @@ func (x GithubIssueBallot) BallotName() common.BallotName {
 	}
 }
 
-type GithubIssueBallots []GithubIssueBallot
+func (x ImportedIssue) MotionType() collab.MotionType {
+	if x.IsPullRequest {
+		return collab.MotionProposalType
+	} else {
+		return collab.MotionConcernType
+	}
+}
 
-func (x GithubIssueBallots) Sort() {
+type ImportedIssues []ImportedIssue
+
+func (x ImportedIssues) Sort() {
 	sort.Sort(x)
 }
 
-func (x GithubIssueBallots) Len() int {
+func (x ImportedIssues) Len() int {
 	return len(x)
 }
 
-func (x GithubIssueBallots) Less(i, j int) bool {
+func (x ImportedIssues) Less(i, j int) bool {
 	return x[i].Number < x[j].Number
 }
 
-func (x GithubIssueBallots) Swap(i, j int) {
+func (x ImportedIssues) Swap(i, j int) {
 	x[i], x[j] = x[j], x[i]
 }

@@ -60,6 +60,7 @@ type Motion struct {
 	TrackerURL string   `json:"tracker_url"` // link to concern on an external concern tracker, such as a GitHub issue
 	Labels     []string `json:"labels"`
 	// state
+	Frozen    bool `json:"frozen"`
 	Closed    bool `json:"closed"`
 	Cancelled bool `json:"cancelled"`
 	// attention ranking

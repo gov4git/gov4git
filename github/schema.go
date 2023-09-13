@@ -51,6 +51,8 @@ type ImportedIssue struct {
 	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
 	//
+	Refs []ImportedRef `json:"refs"`
+	//
 	Locked            bool `json:"locked"`
 	Closed            bool `json:"closed"`
 	IsPullRequest     bool `json:"is_pull_request"`
@@ -82,6 +84,11 @@ func (x ImportedIssue) MotionType() collab.MotionType {
 	} else {
 		return collab.MotionConcernType
 	}
+}
+
+type ImportedRef struct {
+	To   int64  `json:"to"`
+	Type string `json:"type"`
 }
 
 type ImportedIssues []ImportedIssue

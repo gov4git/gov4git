@@ -48,7 +48,7 @@ func FetchIssues(ctx context.Context, repo Repo, ghc *github.Client) []*github.I
 	return allIssues
 }
 
-func labelsToStrings(labels []*github.Label) []string {
+func LabelsToStrings(labels []*github.Label) []string {
 	var labelStrings []string
 	for _, label := range labels {
 		labelStrings = append(labelStrings, label.GetName())
@@ -57,11 +57,11 @@ func labelsToStrings(labels []*github.Label) []string {
 }
 
 func IsIssueForPrioritization(issue *github.Issue) bool {
-	return util.IsIn(PrioritizeIssueByGovernanceLabel, labelsToStrings(issue.Labels)...)
+	return util.IsIn(PrioritizeIssueByGovernanceLabel, LabelsToStrings(issue.Labels)...)
 }
 
 func IsIssueGoverned(issue *github.Issue) bool {
-	return util.IsIn(IssueIsGovernedLabel, labelsToStrings(issue.Labels)...)
+	return util.IsIn(IssueIsGovernedLabel, LabelsToStrings(issue.Labels)...)
 }
 
 func TransformIssue(ctx context.Context, issue *github.Issue) ImportedIssue {
@@ -72,10 +72,11 @@ func TransformIssue(ctx context.Context, issue *github.Issue) ImportedIssue {
 		Number:            int64(issue.GetNumber()),
 		Title:             issue.GetTitle(),
 		Body:              issue.GetBody(),
-		Labels:            labelsToStrings(issue.Labels),
+		Labels:            LabelsToStrings(issue.Labels),
 		ClosedAt:          unwrapTimestamp(issue.ClosedAt),
 		CreatedAt:         unwrapTimestamp(issue.CreatedAt),
 		UpdatedAt:         unwrapTimestamp(issue.UpdatedAt),
+		Refs:              parseIssueRefs(issue),
 		Locked:            issue.GetLocked(),
 		Closed:            issue.GetState() == "closed",
 		IsPullRequest:     issue.GetPullRequestLinks() != nil,
@@ -87,4 +88,15 @@ func unwrapTimestamp(ts *github.Timestamp) *time.Time {
 		return nil
 	}
 	return &ts.Time
+}
+
+// parseIssueRefs parses all references to issues or pull requests from the body of an issue.
+// Reference directives are of the form: "addresses|resolves|etc. https://github.com/gov4git/testing.project/issues/2"
+func parseIssueRefs(issue *github.Issue) []ImportedRef {
+
+	refs := []ImportedRef{}
+	// body := issue.GetBody()
+	panic("XXX")
+
+	return refs
 }

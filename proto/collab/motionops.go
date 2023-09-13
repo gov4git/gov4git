@@ -71,11 +71,27 @@ func CloseMotion(ctx context.Context, addr gov.GovAddress, id MotionID) {
 
 func CloseMotion_StageOnly(ctx context.Context, t *git.Tree, id MotionID) git.ChangeNoResult {
 
-	state := motionKV.Get(ctx, motionNS, t, id)
-	must.Assert(ctx, !state.Closed, ErrMotionAlreadyClosed)
-	state.Closed = true
-	state.ClosedAt = time.Now()
-	return motionKV.Set(ctx, motionNS, t, id, state)
+	motion := motionKV.Get(ctx, motionNS, t, id)
+	must.Assert(ctx, !motion.Closed, ErrMotionAlreadyClosed)
+	motion.Closed = true
+	motion.ClosedAt = time.Now()
+	return motionKV.Set(ctx, motionNS, t, id, motion)
+}
+
+func FreezeMotion_StageOnly(ctx context.Context, t *git.Tree, id MotionID) git.ChangeNoResult {
+
+	motion := motionKV.Get(ctx, motionNS, t, id)
+	must.Assert(ctx, !motion.Frozen, ErrMotionAlreadyFrozen)
+	motion.Frozen = true
+	return motionKV.Set(ctx, motionNS, t, id, motion)
+}
+
+func UnfreezeMotion_StageOnly(ctx context.Context, t *git.Tree, id MotionID) git.ChangeNoResult {
+
+	motion := motionKV.Get(ctx, motionNS, t, id)
+	must.Assert(ctx, motion.Frozen, ErrMotionNotFrozen)
+	motion.Frozen = false
+	return motionKV.Set(ctx, motionNS, t, id, motion)
 }
 
 func ListMotions(ctx context.Context, addr gov.GovAddress) Motions {

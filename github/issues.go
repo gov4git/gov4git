@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto"
@@ -19,92 +18,21 @@ import (
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
-	"github.com/gov4git/lib4git/util"
 )
-
-func FetchIssues(ctx context.Context, repo GithubRepo, ghc *github.Client) []*github.Issue {
-	opt := &github.IssueListByRepoOptions{State: "all"}
-	var allIssues []*github.Issue
-	for {
-		issues, resp, err := ghc.Issues.ListByRepo(ctx, repo.Owner, repo.Name, opt)
-		must.NoError(ctx, err)
-		allIssues = append(allIssues, issues...)
-		if resp.NextPage == 0 {
-			break
-		}
-		opt.Page = resp.NextPage
-	}
-
-	return allIssues
-}
-
-func LabelsToStrings(labels []*github.Label) []string {
-	var labelStrings []string
-	for _, label := range labels {
-		labelStrings = append(labelStrings, label.GetName())
-	}
-	return labelStrings
-}
-
-func IsIssueForPrioritization(issue *github.Issue) bool {
-	return util.IsIn(PrioritizeIssueByGovernanceLabel, LabelsToStrings(issue.Labels)...)
-}
-
-func TransformIssue(ctx context.Context, issue *github.Issue) GithubIssueBallot {
-	return GithubIssueBallot{
-		ForPrioritization: IsIssueForPrioritization(issue),
-		URL:               issue.GetURL(),
-		Number:            int64(issue.GetNumber()),
-		Title:             issue.GetTitle(),
-		Body:              issue.GetBody(),
-		Labels:            LabelsToStrings(issue.Labels),
-		ClosedAt:          unwrapTimestamp(issue.ClosedAt),
-		CreatedAt:         unwrapTimestamp(issue.CreatedAt),
-		UpdatedAt:         unwrapTimestamp(issue.UpdatedAt),
-		Locked:            issue.GetLocked(),
-		Closed:            issue.GetState() == "closed",
-		IsPullRequest:     issue.GetPullRequestLinks() != nil,
-	}
-}
-
-func unwrapTimestamp(ts *github.Timestamp) *time.Time {
-	if ts == nil {
-		return nil
-	}
-	return &ts.Time
-}
-
-func LoadIssuesForPrioritization(
-	ctx context.Context,
-	repo GithubRepo,
-	githubClient *github.Client, // if nil, a new client for repo will be created
-) (GithubIssueBallots, map[string]GithubIssueBallot) {
-
-	issues := FetchIssues(ctx, repo, githubClient)
-	key := map[string]GithubIssueBallot{}
-	order := GithubIssueBallots{}
-	for _, issue := range issues {
-		ghIssue := TransformIssue(ctx, issue)
-		key[ghIssue.Key()] = ghIssue
-		order = append(order, ghIssue)
-	}
-	order.Sort()
-	return order, key
-}
 
 func ImportIssuesForPrioritization(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	githubClient *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
-) git.Change[form.Map, GithubIssueBallots] {
+) git.Change[form.Map, ImportedIssues] {
 
 	base.Infof("importing issues for prioritization ...")
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	ghIssues := ImportIssuesForPrioritization_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
-	chg := git.NewChange[form.Map, GithubIssueBallots](
-		fmt.Sprintf("Import %d GitHub issues for prioritization", len(ghIssues)),
-		"github_import_for_prioritization",
+	chg := git.NewChange[form.Map, ImportedIssues](
+		fmt.Sprintf("Import %d GitHub issues", len(ghIssues)),
+		"github_import",
 		form.Map{},
 		ghIssues,
 		nil,
@@ -121,11 +49,11 @@ func ImportIssuesForPrioritization(
 
 func ImportIssuesForPrioritization_StageOnly(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	githubClient *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-) GithubIssueBallots {
+) ImportedIssues {
 
 	// load github issues and governance ballots, and
 	// index them under a common key space
@@ -216,10 +144,10 @@ func filterIssuesForPrioritization(ads []common.Advertisement) map[string]common
 
 func UpdateMeta_StageOnly(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-	ghIssue GithubIssueBallot,
+	ghIssue ImportedIssue,
 	govBallot common.Advertisement,
 ) (changed bool) {
 	if ghIssue.Title == govBallot.Title && ghIssue.Body == govBallot.Description {
@@ -231,10 +159,10 @@ func UpdateMeta_StageOnly(
 
 func UpdateFrozen_StageOnly(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-	ghIssue GithubIssueBallot,
+	ghIssue ImportedIssue,
 	govBallot common.Advertisement,
 ) (changed bool) {
 	switch {

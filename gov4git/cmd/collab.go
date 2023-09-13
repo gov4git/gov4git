@@ -14,5 +14,5 @@ var (
 )
 
 func init() {
-	collabCmd.AddCommand(concernCmd)
+	collabCmd.AddCommand(motionCmd)
 }

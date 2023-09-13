@@ -52,12 +52,12 @@ type Motion struct {
 	OpenedAt time.Time `json:"opened_at"`
 	ClosedAt time.Time `json:"closed_at"`
 	//
-	ID    MotionID   `json:"id"`
-	Title string     `json:"title"`
-	Desc  string     `json:"description"`
-	Type  MotionType `json:"type"`
-	// cat
+	ID   MotionID   `json:"id"`
+	Type MotionType `json:"type"`
+	// meta
 	TrackerURL string   `json:"tracker_url"` // link to concern on an external concern tracker, such as a GitHub issue
+	Title      string   `json:"title"`
+	Desc       string   `json:"description"`
 	Labels     []string `json:"labels"`
 	// state
 	Frozen    bool `json:"frozen"`

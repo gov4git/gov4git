@@ -20,9 +20,7 @@ func LinkMotions(
 
 	cloned := gov.Clone(ctx, addr)
 	chg := LinkMotions_StageOnly(ctx, cloned.Tree(), fromID, toID, typ)
-	proto.Commit(ctx, cloned.Tree(), chg) // XXX: if no change
-	cloned.Push(ctx)
-	return chg
+	return proto.CommitIfChanged(ctx, cloned, chg)
 }
 
 func LinkMotions_StageOnly(

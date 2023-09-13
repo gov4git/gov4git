@@ -6,13 +6,11 @@ import (
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto"
-	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/collab"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
-	"github.com/gov4git/lib4git/must"
 )
 
 func SyncGovernedIssues(
@@ -31,13 +29,7 @@ func SyncGovernedIssues(
 		ghIssues,
 		nil,
 	)
-	status, err := govCloned.Public.Tree().Status()
-	must.NoError(ctx, err)
-	if !status.IsClean() {
-		proto.Commit(ctx, govCloned.Public.Tree(), chg)
-		govCloned.Public.Push(ctx)
-	}
-	return chg
+	return proto.CommitIfChanged(ctx, govCloned.Public, chg)
 }
 
 func SyncGovernedIssues_Local(
@@ -59,30 +51,29 @@ func SyncGovernedIssues_Local(
 	for key, issue := range ghIssues {
 		id := collab.MotionID(key)
 		if issue.IsGoverned {
-			if govMotion, ok := govMotions[id]; ok { // if motion for issue already exists, update it
-				syncUpdateMeta(ctx, t, issue, id)
+			if motion, ok := govMotions[id]; ok { // if motion for issue already exists, update it
+				syncMeta(ctx, t, issue, id)
 				switch {
-				case issue.Closed && govMotion.Closed:
-					XXX
+				case issue.Closed && motion.Closed:
 					// nothing to do
-				case issue.Closed && !govMotion.Closed:
-					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, issue, govMotion)
-					ballot.Close_StageOnly(ctx, govAddr, govCloned, issue.BallotName(), false)
-				case !issue.Closed && govMotion.Closed:
-					ballot.Reopen_StageOnly(ctx, govAddr, govCloned, issue.BallotName())
-					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, issue, govMotion)
-				case !issue.Closed && !govMotion.Closed:
-					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, issue, govMotion)
+				case issue.Closed && !motion.Closed:
+					syncFrozen(ctx, t, issue, motion)
+					collab.CloseMotion_StageOnly(ctx, t, id)
+				case !issue.Closed && motion.Closed:
+					collab.ReopenMotion_StageOnly(ctx, t, id)
+					syncFrozen(ctx, t, issue, motion)
+				case !issue.Closed && !motion.Closed:
+					syncFrozen(ctx, t, issue, motion)
 				}
 			} else { // otherwise, no motion for this issue exists, so create one
 				syncCreateMotionForIssue(ctx, t, issue, id)
 			}
 		} else { // issue is not for prioritization, freeze motion if it exists and is open
-			if govMotion, ok := govMotions[id]; ok { // motion for issue already exists, update it
+			if motion, ok := govMotions[id]; ok { // motion for issue already exists, update it
 				// if motion closed, do nothing
 				// if motion frozen, do nothing
 				// otherwise, freeze motion
-				if !govMotion.Closed && !govMotion.Frozen {
+				if !motion.Closed && !motion.Frozen {
 					collab.FreezeMotion_StageOnly(ctx, t, id)
 				}
 			}
@@ -96,8 +87,37 @@ func SyncGovernedIssues_Local(
 	return ghOrderedIssues
 }
 
-func syncUpdateMeta(ctx context.Context, t *git.Tree, issue ImportedIssue, id collab.MotionID) {
-	XXX
+func syncMeta(ctx context.Context, t *git.Tree, issue ImportedIssue, id collab.MotionID) {
+	collab.UpdateMotionMeta_StageOnly(
+		ctx,
+		t,
+		id,
+		issue.URL,
+		issue.Title,
+		issue.Body,
+		issue.Labels,
+	)
+}
+
+func syncFrozen(
+	ctx context.Context,
+	t *git.Tree,
+	ghIssue ImportedIssue,
+	govMotion collab.Motion,
+) {
+	switch {
+	case ghIssue.Locked && govMotion.Frozen:
+		return
+	case ghIssue.Locked && !govMotion.Frozen:
+		collab.FreezeMotion_StageOnly(ctx, t, govMotion.ID)
+		return
+	case !ghIssue.Locked && govMotion.Frozen:
+		collab.UnfreezeMotion_StageOnly(ctx, t, govMotion.ID)
+		return
+	case !ghIssue.Locked && !govMotion.Frozen:
+		return
+	}
+	panic("unreachable")
 }
 
 func syncCreateMotionForIssue(ctx context.Context, t *git.Tree, issue ImportedIssue, id collab.MotionID) {
@@ -121,9 +141,9 @@ func syncCreateMotionForIssue(ctx context.Context, t *git.Tree, issue ImportedIs
 }
 
 func indexMotions(ms collab.Motions) map[collab.MotionID]collab.Motion {
-	x := map[string]collab.Motion{}
+	x := map[collab.MotionID]collab.Motion{}
 	for _, m := range ms {
-		x[m.ID.String()] = m
+		x[m.ID] = m
 	}
 	return x
 }

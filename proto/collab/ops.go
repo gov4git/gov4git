@@ -28,12 +28,11 @@ func OpenMotion(
 	typ MotionType,
 	trackerURL string,
 	labels []string,
-) {
+) git.ChangeNoResult {
 
 	cloned := gov.Clone(ctx, addr)
 	chg := OpenMotion_StageOnly(ctx, cloned.Tree(), id, title, desc, typ, trackerURL, labels)
-	proto.Commit(ctx, cloned.Tree(), chg)
-	cloned.Push(ctx)
+	return proto.CommitIfChanged(ctx, cloned, chg)
 }
 
 func OpenMotion_StageOnly(
@@ -61,12 +60,11 @@ func OpenMotion_StageOnly(
 	return motionKV.Set(ctx, motionNS, t, id, state)
 }
 
-func CloseMotion(ctx context.Context, addr gov.GovAddress, id MotionID) {
+func CloseMotion(ctx context.Context, addr gov.GovAddress, id MotionID) git.ChangeNoResult {
 
 	cloned := gov.Clone(ctx, addr)
 	chg := CloseMotion_StageOnly(ctx, cloned.Tree(), id)
-	proto.Commit(ctx, cloned.Tree(), chg)
-	cloned.Push(ctx)
+	return proto.CommitIfChanged(ctx, cloned, chg)
 }
 
 func CloseMotion_StageOnly(ctx context.Context, t *git.Tree, id MotionID) git.ChangeNoResult {
@@ -75,6 +73,14 @@ func CloseMotion_StageOnly(ctx context.Context, t *git.Tree, id MotionID) git.Ch
 	must.Assert(ctx, !motion.Closed, ErrMotionAlreadyClosed)
 	motion.Closed = true
 	motion.ClosedAt = time.Now()
+	return motionKV.Set(ctx, motionNS, t, id, motion)
+}
+
+func ReopenMotion_StageOnly(ctx context.Context, t *git.Tree, id MotionID) git.ChangeNoResult {
+
+	motion := motionKV.Get(ctx, motionNS, t, id)
+	must.Assert(ctx, motion.Closed, ErrMotionNotClosed)
+	motion.Closed = false
 	return motionKV.Set(ctx, motionNS, t, id, motion)
 }
 
@@ -91,6 +97,24 @@ func UnfreezeMotion_StageOnly(ctx context.Context, t *git.Tree, id MotionID) git
 	motion := motionKV.Get(ctx, motionNS, t, id)
 	must.Assert(ctx, motion.Frozen, ErrMotionNotFrozen)
 	motion.Frozen = false
+	return motionKV.Set(ctx, motionNS, t, id, motion)
+}
+
+func UpdateMotionMeta_StageOnly(
+	ctx context.Context,
+	t *git.Tree,
+	id MotionID,
+	trackerURL string,
+	title string,
+	desc string,
+	labels []string,
+) git.ChangeNoResult {
+
+	motion := motionKV.Get(ctx, motionNS, t, id)
+	motion.TrackerURL = trackerURL
+	motion.Title = title
+	motion.Desc = desc
+	motion.Labels = labels
 	return motionKV.Set(ctx, motionNS, t, id, motion)
 }
 

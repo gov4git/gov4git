@@ -23,9 +23,7 @@ func FixMotionScore(
 
 	cloned := gov.Clone(ctx, addr)
 	chg := FixMotionScore_StageOnly(ctx, addr, cloned, id, score)
-	proto.Commit(ctx, cloned.Tree(), chg) // XXX: no change
-	cloned.Push(ctx)
-	return chg
+	return proto.CommitIfChanged(ctx, cloned, chg)
 }
 
 func FixMotionScore_StageOnly(
@@ -57,9 +55,7 @@ func ScoreMotionByPoll(
 
 	cloned := gov.Clone(ctx, addr)
 	chg := ScoreMotionByPoll_StageOnly(ctx, addr, cloned, id)
-	proto.Commit(ctx, cloned.Tree(), chg) // XXX: no change
-	cloned.Push(ctx)
-	return chg
+	return proto.CommitIfChanged(ctx, cloned, chg)
 }
 
 func ScoreMotionByPoll_StageOnly(

@@ -15,9 +15,7 @@ func ScoreMotions(ctx context.Context, addr gov.GovAddress) git.Change[form.Map,
 
 	cloned := gov.Clone(ctx, addr)
 	chg := ScoreMotions_StageOnly(ctx, addr, cloned.Tree())
-	proto.Commit(ctx, cloned.Tree(), chg) // XXX: if no change
-	cloned.Push(ctx)
-	return chg
+	return proto.CommitIfChanged(ctx, cloned, chg)
 }
 
 func ScoreMotions_StageOnly(ctx context.Context, govAddr gov.GovAddress, t *git.Tree) git.Change[form.Map, Motions] {

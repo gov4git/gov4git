@@ -17,6 +17,10 @@ type Repo struct {
 	Name  string `json:"github_repo_name"`
 }
 
+func (x Repo) HTTPS() string {
+	return `https://github.com/` + x.Owner + `/` + x.Name
+}
+
 func ParseRepo(ctx context.Context, s string) Repo {
 	first, second, ok := strings.Cut(s, "/")
 	must.Assertf(ctx, ok, "not a github repo: %v", s)

@@ -2,6 +2,7 @@ package github
 
 import (
 	"context"
+	"regexp"
 	"time"
 
 	"github.com/google/go-github/v55/github"
@@ -92,11 +93,17 @@ func unwrapTimestamp(ts *github.Timestamp) *time.Time {
 
 // parseIssueRefs parses all references to issues or pull requests from the body of an issue.
 // Reference directives are of the form: "addresses|resolves|etc. https://github.com/gov4git/testing.project/issues/2"
-func parseIssueRefs(issue *github.Issue) []ImportedRef {
+func parseIssueRefs(ctx context.Context, repo Repo, issue *github.Issue) []ImportedRef {
 
 	refs := []ImportedRef{}
-	// body := issue.GetBody()
+	matches := refRegexp.FindAllStringSubmatch(issue.GetBody(), -1)
+
 	panic("XXX")
 
+	//XXX: some references may be invalid, i.e. point to non-existent issues
 	return refs
 }
+
+const refRegexpSrc = `^([a-zA-Z0-9\-]+)\s+https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)/(issues|pull)/(\d+)$`
+
+var refRegexp = regexp.MustCompile(refRegexpSrc)

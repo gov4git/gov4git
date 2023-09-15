@@ -32,7 +32,8 @@ func scriptProvisionCommunity(ts *testscript.TestScript, neg bool, args []string
 
 	ts.Setenv("HOME", ts.Getenv("WORK"))
 	ts.Exec("git", "config", "--global", "init.defaultBranch", "main")
-	os.MkdirAll(path.Join(ts.Getenv("WORK"), "cache"), 0755)
+	cachePath := path.Join(ts.Getenv("WORK"), "cache")
+	os.MkdirAll(cachePath, 0755)
 
 	govPublicPath := path.Join(ts.Getenv("WORK"), "gov_public")
 	os.MkdirAll(govPublicPath, 0755)
@@ -65,16 +66,18 @@ func scriptProvisionCommunity(ts *testscript.TestScript, neg bool, args []string
 
 const (
 	srcConfigJSONFmt = `
-{
-	"cache_dir": %q,
-	"gov_public_url": %q,
-	"gov_public_branch": "main",
-	"gov_private_url": %q,
-	"gov_private_branch": "main",
-	"member_public_url": %q,
-	"member_public_branch": "main",
-	"member_private_url": %q,
-	"member_private_branch": "main"
-}
+
+	{
+		"cache_dir": %q,
+		"gov_public_url": %q,
+		"gov_public_branch": "main",
+		"gov_private_url": %q,
+		"gov_private_branch": "main",
+		"member_public_url": %q,
+		"member_public_branch": "main",
+		"member_private_url": %q,
+		"member_private_branch": "main"
+	}
+
 `
 )

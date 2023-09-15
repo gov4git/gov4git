@@ -12,7 +12,7 @@ stdout private_key_ed25519
 
 # add user and balance
 
-gov4git user add --name member1 --repo ~/member_public --branch main
+gov4git user add --name member1 --repo member_public --branch main
 gov4git balance add --key voting_credits --user member1 --value 30.0
 
 # ballot

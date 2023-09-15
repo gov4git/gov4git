@@ -1,1 +1,1 @@
-v1.1.8-nogitbinary
+v1.1.8-rc-nogitbinary

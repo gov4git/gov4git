@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	gov4git_root "github.com/gov4git/gov4git"
 	"github.com/gov4git/gov4git/github"
 	"github.com/gov4git/gov4git/gov4git/api"
 	"github.com/gov4git/lib4git/base"
@@ -59,6 +60,7 @@ func initAfterFlags() {
 	} else {
 		base.LogQuietly()
 	}
+	base.Infof("gov4git version: %v", gov4git_root.Short())
 }
 
 func LoadConfig() {

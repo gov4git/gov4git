@@ -13,6 +13,7 @@ jobs:
       with:
         go-version: ${{ matrix.go-version }}
         cache: false
+    - run: git version
     - run: go test ./...
 
   test-cache:
@@ -22,4 +23,5 @@ jobs:
     - uses: actions/setup-go@v4
       with:
         go-version: 1.21.x
+    - run: git version
     - run: go test ./...

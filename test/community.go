@@ -26,7 +26,6 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 	// initialize organizer and community
 	organizerID := id.NewTestID(ctx, t, git.MainBranch, true)
 	boot.Boot(ctx, organizerID.OwnerAddress())
-	// id.Init(ctx, organizerID.OwnerAddress())
 	base.Infof("gov_public=%v gov_private=%v", organizerID.PublicAddress(), organizerID.PrivateAddress())
 
 	// initialize members

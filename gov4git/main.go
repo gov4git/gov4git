@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gov4git/gov4git/gov4git/cmd"
+	_ "github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/must"
 )

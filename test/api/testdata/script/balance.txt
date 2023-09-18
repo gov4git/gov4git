@@ -12,7 +12,7 @@ stdout private_key_ed25519
 
 # add/verify user
 
-gov4git user add --name member1 --repo ~/member_public --branch main
+gov4git user add --name member1 --repo member_public --branch main
 gov4git group list --name everybody
 stdout member1
 

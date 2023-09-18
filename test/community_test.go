@@ -8,7 +8,7 @@ import (
 
 func TestTestCommunity(t *testing.T) {
 	// base.LogVerbosely()
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	NewTestCommunity(t, ctx, 3)
 	// testutil.Hang()
 }

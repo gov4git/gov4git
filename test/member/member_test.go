@@ -11,7 +11,7 @@ import (
 )
 
 func TestUserAddRemove(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	name := member.User("testuser")
@@ -31,7 +31,7 @@ func TestUserAddRemove(t *testing.T) {
 }
 
 func TestGroupAddRemove(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	u1 := member.User("testuser1")

@@ -11,7 +11,7 @@ import (
 )
 
 func TestBureau(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	usd := balance.Balance("usd")

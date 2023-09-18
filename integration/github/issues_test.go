@@ -91,7 +91,7 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 	ghClient := client
 
 	// init governance
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	// import issues

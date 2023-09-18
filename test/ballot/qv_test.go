@@ -16,7 +16,7 @@ import (
 )
 
 func TestQV(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	ballotName := ns.NS{"a", "b", "c"}

@@ -10,7 +10,7 @@ import (
 )
 
 func TestSendReceive(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
 	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
@@ -73,7 +73,7 @@ func TestSendReceive(t *testing.T) {
 }
 
 func TestSendReceiveSigned(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
 	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())

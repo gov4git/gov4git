@@ -9,7 +9,7 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	testID := NewTestID(ctx, t, git.MainBranch, true)
 	Init(ctx, testID.OwnerAddress())
 	if err := must.Try(func() { Init(ctx, testID.OwnerAddress()) }); err == nil {

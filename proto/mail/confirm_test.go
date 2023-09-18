@@ -12,7 +12,7 @@ import (
 )
 
 func TestConfirm(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
 	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
@@ -49,7 +49,7 @@ func TestConfirm(t *testing.T) {
 }
 
 func TestConfirmSigned(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
 	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
@@ -86,7 +86,7 @@ func TestConfirmSigned(t *testing.T) {
 }
 
 func TestConfirmCall(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, true)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
 	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())

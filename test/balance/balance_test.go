@@ -11,7 +11,7 @@ import (
 )
 
 func TestBalance(t *testing.T) {
-	ctx := testutil.NewCtx(t, true)
+	ctx := testutil.NewCtx(t, false)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	bal := balance.Balance("test_balance")

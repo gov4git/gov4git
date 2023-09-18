@@ -11,7 +11,7 @@ import (
 
 func TestBoot(t *testing.T) {
 	base.LogVerbosely()
-	ctx := testutil.NewCtx(t, true)
+	ctx := testutil.NewCtx(t, false)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	if !member.IsGroup(ctx, cty.Gov(), member.Everybody) {

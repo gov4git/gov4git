@@ -18,7 +18,7 @@ import (
 
 func TestReopen(t *testing.T) {
 	base.LogVerbosely()
-	ctx := testutil.NewCtx(t, true)
+	ctx := testutil.NewCtx(t, false)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	ballotName := ns.NS{"a", "b", "c"}

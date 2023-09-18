@@ -155,7 +155,7 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 	ghClient := github.NewClient(mockedHTTPClient)
 
 	// init governance
-	ctx := testutil.NewCtx(t, true)
+	ctx := testutil.NewCtx(t, false)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	// import issues #1

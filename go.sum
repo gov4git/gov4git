@@ -66,8 +66,8 @@ github.com/google/go-querystring v1.1.0 h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD
 github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17icRSOU623lUBU=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
-github.com/gov4git/lib4git v0.0.24 h1:defSyM7wLWGebaI3anixVj+LsIbtZuskMSOauJY1mkE=
-github.com/gov4git/lib4git v0.0.24/go.mod h1:j1C76DZlCBRwveTdM81dPwpBvvwAdd391IsxxXkicS8=
+github.com/gov4git/lib4git v0.0.26 h1:GxkqmLI+4u/d9UKRcznzBGAyzEk+u8zwWdi1iXJEjEk=
+github.com/gov4git/lib4git v0.0.26/go.mod h1:GSwpsblyJyDsZK1Rs6V3Wl1200dpPLy1LKeD9kFOZ10=
 github.com/gov4git/vendor4git v0.0.3 h1:kT2umpVus0qa+Bqu+8AaX+L1LNyIGnLoaaBR2T6R154=
 github.com/gov4git/vendor4git v0.0.3/go.mod h1:pS09dCJdMmSCfvZefOlPgOBhF5goWxLKAxwHJ9X0d8c=
 github.com/inconshreveable/mousetrap v1.0.1 h1:U3uMjPSQEBMNp1lFxmllqCPM6P5u/Xq7Pgzkat/bFNc=

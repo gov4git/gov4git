@@ -11,6 +11,7 @@ import (
 	"github.com/google/go-github/v55/github"
 	govgh "github.com/gov4git/gov4git/github"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
+	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/testutil"
 	"github.com/gov4git/lib4git/util"
@@ -91,7 +92,7 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 	ghClient := client
 
 	// init governance
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	// import issues

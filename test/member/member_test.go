@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/testutil"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestUserAddRemove(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	name := member.User("testuser")
@@ -31,7 +32,7 @@ func TestUserAddRemove(t *testing.T) {
 }
 
 func TestGroupAddRemove(t *testing.T) {
-	ctx := testutil.NewCtx()
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	u1 := member.User("testuser1")

@@ -1,2 +1,0 @@
-- the ballot tally structure is new, more comprehensive and incompatible with the previous one
-- command `ballot close` drops the flag `summary` and adds a flag `cancel`

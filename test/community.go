@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/boot"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
@@ -24,7 +25,7 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 
 	// initialize organizer and community
 	organizerID := id.NewTestID(ctx, t, git.MainBranch, true)
-	id.Init(ctx, organizerID.OwnerAddress())
+	boot.Boot(ctx, organizerID.OwnerAddress())
 	base.Infof("gov_public=%v gov_private=%v", organizerID.PublicAddress(), organizerID.PrivateAddress())
 
 	// initialize members

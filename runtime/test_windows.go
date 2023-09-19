@@ -2,4 +2,4 @@
 
 package runtime
 
-const TestWithCache = false
+const TestWithCache = true

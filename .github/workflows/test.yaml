@@ -14,7 +14,7 @@ jobs:
         go-version: ${{ matrix.go-version }}
         cache: false
     - run: git version
-    - run: go test ./...
+    - run: go test -v ./...
 
   test-cache:
     runs-on: ubuntu-latest
@@ -24,4 +24,4 @@ jobs:
       with:
         go-version: 1.21.x
     - run: git version
-    - run: go test ./...
+    - run: go test -v ./...

@@ -6,12 +6,13 @@ import (
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/bureau"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/testutil"
 )
 
 func TestBureau(t *testing.T) {
-	ctx := testutil.NewCtx(t, false)
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	usd := balance.Balance("usd")

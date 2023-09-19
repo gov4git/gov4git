@@ -11,6 +11,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
@@ -20,7 +21,7 @@ import (
 
 func TestOpenClose(t *testing.T) {
 	base.LogVerbosely()
-	ctx := testutil.NewCtx(t, false)
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	ballotName := ns.NS{"a", "b", "c"}
@@ -74,7 +75,7 @@ func TestOpenClose(t *testing.T) {
 }
 
 func TestOpenCancel(t *testing.T) {
-	ctx := testutil.NewCtx(t, false)
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	ballotName := ns.NS{"a", "b", "c"}
@@ -128,7 +129,7 @@ func TestOpenCancel(t *testing.T) {
 }
 
 func TestTallyAll(t *testing.T) {
-	ctx := testutil.NewCtx(t, false)
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	ballotName0 := ns.NS{"a", "b", "c"}

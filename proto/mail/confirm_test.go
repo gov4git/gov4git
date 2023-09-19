@@ -6,13 +6,14 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/testutil"
 )
 
 func TestConfirm(t *testing.T) {
-	ctx := testutil.NewCtx(t, false)
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
 	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
@@ -49,7 +50,7 @@ func TestConfirm(t *testing.T) {
 }
 
 func TestConfirmSigned(t *testing.T) {
-	ctx := testutil.NewCtx(t, false)
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
 	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
@@ -86,7 +87,7 @@ func TestConfirmSigned(t *testing.T) {
 }
 
 func TestConfirmCall(t *testing.T) {
-	ctx := testutil.NewCtx(t, false)
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
 	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())

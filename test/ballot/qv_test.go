@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/ns"
@@ -16,7 +17,7 @@ import (
 )
 
 func TestQV(t *testing.T) {
-	ctx := testutil.NewCtx(t, false)
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	ballotName := ns.NS{"a", "b", "c"}

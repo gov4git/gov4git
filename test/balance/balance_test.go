@@ -5,13 +5,14 @@ import (
 
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/testutil"
 )
 
 func TestBalance(t *testing.T) {
-	ctx := testutil.NewCtx(t, false)
+	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	bal := balance.Balance("test_balance")

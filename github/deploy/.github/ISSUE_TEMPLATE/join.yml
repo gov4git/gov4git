@@ -2,7 +2,7 @@ name: Join the community
 description: Use this form to join the community
 title: I'd like to join this project's community
 labels:
-  - community
+  - gov4git:join
 assignees:
   - ORGANIZER_GITHUB_USER
 body:
@@ -29,7 +29,6 @@ body:
       label: Your public branch
       description: The branch within your gov4git public repo that holds your identity
       placeholder: e.g. main
-      default: main
     validations:
       required: true
   - type: input

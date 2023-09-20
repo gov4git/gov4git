@@ -23,8 +23,12 @@ func ParseGithubRepo(ctx context.Context, s string) GithubRepo {
 }
 
 const (
-	PrioritizeIssueByGovernanceLabel = "gov:prioritize"
+	// prioritizing issues by ballot
+	PrioritizeIssueByGovernanceLabel = "gov4git:prioritize"
 	PrioritizeBallotChoice           = "prioritize"
+
+	// member join
+	JoinRequestLabel = "gov4git:join"
 
 	GithubDeployEnvName = "gov4git:governance"
 )

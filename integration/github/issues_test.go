@@ -5,6 +5,7 @@ package github_test
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"testing"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/testutil"
 	"github.com/gov4git/lib4git/util"
 )
@@ -66,6 +68,8 @@ func TestGithubIssueStructure(t *testing.T) {
 	if issues[4].GetPullRequestLinks() == nil {
 		t.Fatalf("Expected issue to be a pull request")
 	}
+
+	fmt.Println(form.SprintJSON(issues))
 }
 
 type issuesByNumber []*github.Issue

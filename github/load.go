@@ -24,7 +24,7 @@ func LoadIssues(
 	key := map[string]ImportedIssue{}
 	order := ImportedIssues{}
 	for _, issue := range issues {
-		ghIssue := TransformIssue(ctx, issue)
+		ghIssue := TransformIssue(ctx, repo, issue)
 		key[ghIssue.Key()] = ghIssue
 		order = append(order, ghIssue)
 	}
@@ -65,7 +65,7 @@ func IsIssueGoverned(issue *github.Issue) bool {
 	return util.IsIn(IssueIsGovernedLabel, LabelsToStrings(issue.Labels)...)
 }
 
-func TransformIssue(ctx context.Context, issue *github.Issue) ImportedIssue {
+func TransformIssue(ctx context.Context, repo Repo, issue *github.Issue) ImportedIssue {
 	return ImportedIssue{
 		IsGoverned:        IsIssueGoverned(issue),
 		ForPrioritization: IsIssueForPrioritization(issue),
@@ -77,7 +77,7 @@ func TransformIssue(ctx context.Context, issue *github.Issue) ImportedIssue {
 		ClosedAt:          unwrapTimestamp(issue.ClosedAt),
 		CreatedAt:         unwrapTimestamp(issue.CreatedAt),
 		UpdatedAt:         unwrapTimestamp(issue.UpdatedAt),
-		Refs:              parseIssueRefs(issue),
+		Refs:              parseIssueRefs(ctx, repo, issue),
 		Locked:            issue.GetLocked(),
 		Closed:            issue.GetState() == "closed",
 		IsPullRequest:     issue.GetPullRequestLinks() != nil,

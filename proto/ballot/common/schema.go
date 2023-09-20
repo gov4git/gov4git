@@ -64,6 +64,10 @@ func (x BallotName) Path() string {
 	return ns.NS(x).Path()
 }
 
+func (x BallotName) GitPath() string {
+	return ns.NS(x).GitPath()
+}
+
 func (x BallotName) NS() ns.NS {
 	return ns.NS(x)
 }

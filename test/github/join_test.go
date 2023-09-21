@@ -80,11 +80,11 @@ func TestProcessJoinRequests(t *testing.T) {
 
 	// process join requests
 	chg := govgh.ProcessJoinRequestIssues(ctx, ghRepo, ghClient, cty.Organizer(), []string{testProcessJoinRequestsOrganizerGithubUser})
-	if len(chg.Result) != 1 {
+	if len(chg.Result.Joined) != 1 {
 		t.Fatalf("expecting 1 join")
 	}
-	if chg.Result[0] != testProcessJoinRequestsApplicantGithubUser {
-		t.Errorf("expecting %v, got %v", testProcessJoinRequestsApplicantGithubUser, chg.Result[0])
+	if chg.Result.Joined[0] != testProcessJoinRequestsApplicantGithubUser {
+		t.Errorf("expecting %v, got %v", testProcessJoinRequestsApplicantGithubUser, chg.Result.Joined[0])
 	}
 
 	// <-(chan int(nil))

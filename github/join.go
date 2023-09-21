@@ -23,15 +23,15 @@ func ProcessJoinRequestIssues(
 	githubClient *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 	approverGitHubUsers []string,
-) git.Change[form.Map, []string] {
+) git.Change[form.Map, ProcessJoinRequestIssuesReport] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	newMembers := ProcessJoinRequestIssues_Local(ctx, repo, githubClient, govAddr, govCloned, approverGitHubUsers)
-	chg := git.NewChange[form.Map, []string](
-		fmt.Sprintf("Add %d new community members", len(newMembers)),
+	report := ProcessJoinRequestIssues_Local(ctx, repo, githubClient, govAddr, govCloned, approverGitHubUsers)
+	chg := git.NewChange[form.Map, ProcessJoinRequestIssuesReport](
+		fmt.Sprintf("Add %d new community members; skipped %d", len(report.Joined), len(report.NotJoined)),
 		"github_process_join_request_issues",
 		form.Map{},
-		newMembers,
+		report,
 		nil,
 	)
 	status, err := govCloned.Public.Tree().Status()
@@ -43,6 +43,11 @@ func ProcessJoinRequestIssues(
 	return chg
 }
 
+type ProcessJoinRequestIssuesReport struct {
+	Joined    []string `json:"joined"`
+	NotJoined []string `json:"not_joined"`
+}
+
 func ProcessJoinRequestIssues_Local(
 	ctx context.Context,
 	repo GithubRepo,
@@ -50,18 +55,23 @@ func ProcessJoinRequestIssues_Local(
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
 	approvers []string,
-) []string { // return list of new member usernames
+) ProcessJoinRequestIssuesReport { // return list of new member usernames
+
+	report := ProcessJoinRequestIssuesReport{}
 
 	// fetch open issues labelled gov4git:join
 	issues := fetchOpenJoinRequestIssues(ctx, repo, githubClient)
-	newMembers := []string{}
 	for _, issue := range issues {
 		newMember := processJoinRequestIssue_Local(ctx, repo, githubClient, govAddr, govCloned, approvers, issue)
 		if newMember != "" {
-			newMembers = append(newMembers, newMember)
+			report.Joined = append(report.Joined, newMember)
+		} else {
+			if issue.User != nil {
+				report.NotJoined = append(report.NotJoined, issue.User.GetLogin())
+			}
 		}
 	}
-	return newMembers
+	return report
 }
 
 func fetchOpenJoinRequestIssues(ctx context.Context, repo GithubRepo, ghc *github.Client) []*github.Issue {

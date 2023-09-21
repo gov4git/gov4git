@@ -9,9 +9,12 @@ import (
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
+	"github.com/gov4git/lib4git/util"
 )
 
 func ProcessJoinRequestIssues(
@@ -63,61 +66,74 @@ func ProcessJoinRequestIssues_Local(
 
 func fetchOpenJoinRequestIssues(ctx context.Context, repo GithubRepo, ghc *github.Client) []*github.Issue {
 	opt := &github.IssueListByRepoOptions{State: "open", Labels: []string{JoinRequestLabel}}
-	var issues []*github.Issue
+	var allIssues []*github.Issue
 	for {
 		issues, resp, err := ghc.Issues.ListByRepo(ctx, repo.Owner, repo.Name, opt)
 		must.NoError(ctx, err)
-		issues = append(issues, issues...)
+		allIssues = append(allIssues, issues...)
 		if resp.NextPage == 0 {
 			break
 		}
 		opt.Page = resp.NextPage
 	}
-	return issues
+	return allIssues
 }
-
-//	parse form info
-//	fetch comments
-//	find approval comment by an approver GitHub user
-//	add requesting user to community
-//		if success, reply to GitHub issue, close issue
-//		if user already exists, reply to GitHub issue, close issue
-//		if other error, log it
 
 func processJoinRequestIssue_Local(
 	ctx context.Context,
 	repo GithubRepo,
-	githubClient *github.Client, // if nil, a new client for repo will be created
+	ghc *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
 	approverGitHubUsers []string,
 	issue *github.Issue,
 ) string { // return new member username, if joined
 
+	must.Assertf(ctx, len(approverGitHubUsers) > 0, "no membership approvers")
+
 	u := issue.GetUser()
 	if u == nil {
-		// XXX // reply to issue
-		// XXX // close issue
+		base.Infof("github identity of issue author is not available: %v", form.SprintJSON(issue))
+		replyAndCloseIssue(ctx, repo, ghc, issue, "GitHub identity of issue author is not available.")
 		return ""
 	}
 	login := u.GetLogin()
 	if login == "" {
-		// XXX // reply to issue
-		// XXX // close issue
+		base.Infof("github user of issue author is not available: %v", form.SprintJSON(issue))
+		replyAndCloseIssue(ctx, repo, ghc, issue, "GitHub user of issue author is not available.")
 		return ""
 	}
 
 	info, err := parseJoinRequest(login, issue.GetBody())
 	if err != nil {
-		// XXX // reply to issue
-		// XXX // close issue
+		base.Infof("request form cannot be parsed: %q", issue.GetBody())
+		replyAndCloseIssue(ctx, repo, ghc, issue, "Request form cannot be parsed.")
 		return ""
 	}
 	if info.Email == "" {
 		info.Email = u.GetEmail()
 	}
 
-	panic("XXX")
+	// fetch comments and find a join approval
+	comments := fetchIssueComments(ctx, repo, ghc, issue)
+	if !isJoinApprovalPresent(ctx, approverGitHubUsers, comments) {
+		return ""
+	}
+
+	// add user to community members
+	err = must.Try(
+		func() {
+			member.AddUserByPublicAddressStageOnly(ctx, govCloned.Public.Tree(), member.User(login), info.PublicAddress())
+		},
+	)
+	if err != nil {
+		base.Infof("could not add member %v (%v)", login, err)
+		replyAndCloseIssue(ctx, repo, ghc, issue, fmt.Sprintf("Could not add member due to (%v). Reopen the issue to retry.", err))
+		return ""
+	}
+
+	replyAndCloseIssue(ctx, repo, ghc, issue, fmt.Sprintf("%v added to community.", login))
+	return login
 }
 
 type JoinRequest struct {
@@ -125,6 +141,13 @@ type JoinRequest struct {
 	PublicURL    git.URL    `json:"public_url"`
 	PublicBranch git.Branch `json:"public_branch"`
 	Email        string     `json:"email"`
+}
+
+func (x JoinRequest) PublicAddress() id.PublicAddress {
+	return id.PublicAddress{
+		Repo:   git.URL(x.PublicURL),
+		Branch: git.Branch(x.PublicBranch),
+	}
 }
 
 // example request body:
@@ -167,4 +190,78 @@ func parseJoinRequest(authorLogin string, body string) (*JoinRequest, error) {
 		PublicURL:    git.URL(lines[2]),
 		PublicBranch: git.Branch(lines[6]),
 	}, nil
+}
+
+func replyAndCloseIssue(
+	ctx context.Context,
+	repo GithubRepo,
+	ghc *github.Client,
+	issue *github.Issue,
+	payload string,
+) {
+	replyToIssue(ctx, repo, ghc, issue, payload)
+	closeIssue(ctx, repo, ghc, issue)
+}
+
+func replyToIssue(
+	ctx context.Context,
+	repo GithubRepo,
+	ghc *github.Client,
+	issue *github.Issue,
+	payload string,
+) {
+
+	comment := &github.IssueComment{
+		Body: github.String(payload),
+	}
+	_, _, err := ghc.Issues.CreateComment(ctx, repo.Owner, repo.Name, issue.GetNumber(), comment)
+	must.NoError(ctx, err)
+}
+
+func closeIssue(
+	ctx context.Context,
+	repo GithubRepo,
+	ghc *github.Client,
+	issue *github.Issue,
+) {
+	req := &github.IssueRequest{
+		State: github.String("closed"),
+	}
+	_, _, err := ghc.Issues.Edit(ctx, repo.Owner, repo.Name, issue.GetNumber(), req)
+	must.NoError(ctx, err)
+}
+
+func fetchIssueComments(
+	ctx context.Context,
+	repo GithubRepo,
+	ghc *github.Client,
+	issue *github.Issue,
+) []*github.IssueComment {
+
+	if issue.GetComments() == 0 {
+		return nil
+	}
+	opts := &github.IssueListCommentsOptions{}
+	comments, _, err := ghc.Issues.ListComments(ctx, repo.Owner, repo.Name, issue.GetNumber(), opts)
+	must.NoError(ctx, err)
+	return comments
+}
+
+func isJoinApprovalPresent(ctx context.Context, approvers []string, comments []*github.IssueComment) bool {
+	for _, comment := range comments {
+		u := comment.GetUser()
+		if u == nil {
+			continue
+		}
+		if !util.IsIn(u.GetLogin(), approvers...) {
+			continue
+		}
+		// trim empty lines and spaces
+		trimmed := strings.ToLower(strings.Trim(comment.GetBody(), ". \t\n\r"))
+		if strings.Index(trimmed, JoinRequestApprovalWord) < 0 {
+			continue
+		}
+		return true
+	}
+	return false
 }

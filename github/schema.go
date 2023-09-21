@@ -28,7 +28,8 @@ const (
 	PrioritizeBallotChoice           = "prioritize"
 
 	// member join
-	JoinRequestLabel = "gov4git:join"
+	JoinRequestLabel        = "gov4git:join"
+	JoinRequestApprovalWord = "approve"
 
 	GithubDeployEnvName = "gov4git:governance"
 )

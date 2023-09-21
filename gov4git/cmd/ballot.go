@@ -179,6 +179,21 @@ Pending votes have not yet been processed by the community's governance.`,
 			fmt.Fprint(os.Stdout, form.SprintJSON(status))
 		},
 	}
+
+	ballotEraseCmd = &cobra.Command{
+		Use:   "erase",
+		Short: "Erase a ballot",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
+			chg := ballot.Erase(
+				ctx,
+				setup.Organizer,
+				ns.ParseFromPath(ballotName),
+			)
+			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
+		},
+	}
 )
 
 var (
@@ -260,6 +275,11 @@ func init() {
 	ballotCmd.AddCommand(ballotTrackCmd)
 	ballotTrackCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
 	ballotTrackCmd.MarkFlagRequired("name")
+
+	// erase
+	ballotCmd.AddCommand(ballotEraseCmd)
+	ballotEraseCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotEraseCmd.MarkFlagRequired("name")
 }
 
 func parseElections(ctx context.Context, choices []string, strengths []float64) common.Elections {

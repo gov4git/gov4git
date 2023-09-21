@@ -104,7 +104,7 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 
 	// list ballots
 	ads1 := ballot.List(ctx, cty.Gov())
-	if len(ads1) < 3 {
+	if len(ads1) < 4 {
 		t.Errorf("expecting at least 3, got %v,\n%v", len(ads1), form.SprintJSON(ads1))
 	}
 	// issue-1: open, not-frozen

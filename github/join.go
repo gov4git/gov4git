@@ -17,16 +17,47 @@ import (
 	"github.com/gov4git/lib4git/util"
 )
 
+func ProcessJoinRequestIssuesApprovedByMaintainer(
+	ctx context.Context,
+	repo GithubRepo,
+	ghc *github.Client, // if nil, a new client for repo will be created
+	govAddr gov.OrganizerAddress,
+) git.Change[form.Map, ProcessJoinRequestIssuesReport] {
+
+	maintainers := fetchRepoMaintainers(ctx, repo, ghc)
+	base.Infof("maintainers for %v are %v", repo, form.SprintJSON(maintainers))
+	return ProcessJoinRequestIssues(ctx, repo, ghc, govAddr, maintainers)
+}
+
+func fetchRepoMaintainers(
+	ctx context.Context,
+	repo GithubRepo,
+	ghc *github.Client, // if nil, a new client for repo will be created
+) []string {
+
+	opts := &github.ListCollaboratorsOptions{}
+	users, _, err := ghc.Repositories.ListCollaborators(ctx, repo.Owner, repo.Name, opts)
+	must.NoError(ctx, err)
+
+	m := []string{}
+	for _, u := range users {
+		if u.GetPermissions()["maintainer"] || u.GetPermissions()["admin"] {
+			m = append(m, u.GetLogin())
+		}
+	}
+	return m
+}
+
 func ProcessJoinRequestIssues(
 	ctx context.Context,
 	repo GithubRepo,
-	githubClient *github.Client, // if nil, a new client for repo will be created
+	ghc *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 	approverGitHubUsers []string,
 ) git.Change[form.Map, ProcessJoinRequestIssuesReport] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	report := ProcessJoinRequestIssues_Local(ctx, repo, githubClient, govAddr, govCloned, approverGitHubUsers)
+	report := ProcessJoinRequestIssues_Local(ctx, repo, ghc, govAddr, govCloned, approverGitHubUsers)
 	chg := git.NewChange[form.Map, ProcessJoinRequestIssuesReport](
 		fmt.Sprintf("Add %d new community members; skipped %d", len(report.Joined), len(report.NotJoined)),
 		"github_process_join_request_issues",
@@ -51,7 +82,7 @@ type ProcessJoinRequestIssuesReport struct {
 func ProcessJoinRequestIssues_Local(
 	ctx context.Context,
 	repo GithubRepo,
-	githubClient *github.Client, // if nil, a new client for repo will be created
+	ghc *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
 	approvers []string,
@@ -60,9 +91,9 @@ func ProcessJoinRequestIssues_Local(
 	report := ProcessJoinRequestIssuesReport{}
 
 	// fetch open issues labelled gov4git:join
-	issues := fetchOpenJoinRequestIssues(ctx, repo, githubClient)
+	issues := fetchOpenJoinRequestIssues(ctx, repo, ghc)
 	for _, issue := range issues {
-		newMember := processJoinRequestIssue_Local(ctx, repo, githubClient, govAddr, govCloned, approvers, issue)
+		newMember := processJoinRequestIssue_Local(ctx, repo, ghc, govAddr, govCloned, approvers, issue)
 		if newMember != "" {
 			report.Joined = append(report.Joined, newMember)
 		} else {

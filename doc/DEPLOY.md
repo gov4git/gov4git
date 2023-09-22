@@ -54,7 +54,12 @@ To create the token:
      | variables | read-write |
      | workflows | read-write |
 
-- No changes are needed under "Organization permissions"
+- Under "Organization permissions" make the following choices:
+
+     | category | access |
+     | ----------- | ----------- |
+     | members | read-only |
+
 - Click on "Generate token" and write down the generated token
 
 

@@ -5,6 +5,7 @@ package github_test
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"testing"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/testutil"
 	"github.com/gov4git/lib4git/util"
 )
@@ -66,6 +68,8 @@ func TestGithubIssueStructure(t *testing.T) {
 	if issues[4].GetPullRequestLinks() == nil {
 		t.Fatalf("Expected issue to be a pull request")
 	}
+
+	fmt.Println(form.SprintJSON(issues))
 }
 
 type issuesByNumber []*github.Issue
@@ -100,26 +104,26 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 
 	// list ballots
 	ads1 := ballot.List(ctx, cty.Gov())
-	if len(ads1) != 3 {
-		t.Errorf("expecting 3, got %v", len(ads1))
+	if len(ads1) < 4 {
+		t.Errorf("expecting at least 3, got %v,\n%v", len(ads1), form.SprintJSON(ads1))
 	}
 	// issue-1: open, not-frozen
-	if ads1[0].Name.Path() != "issue/1" {
-		t.Errorf("expecting issue/1, got %v", ads1[0].Name.Path())
+	if ads1[0].Name.Path() != "github/issues/1" {
+		t.Errorf("expecting github/issues/1, got %v", ads1[0].Name.Path())
 	}
 	if ads1[0].Closed || ads1[0].Frozen {
 		t.Errorf("expecting open, not-frozen")
 	}
 	// issue-2: open, frozen
-	if ads1[1].Name.Path() != "issue/2" {
-		t.Errorf("expecting issue/2, got %v", ads1[1].Name.Path())
+	if ads1[1].Name.Path() != "github/issues/2" {
+		t.Errorf("expecting github/issues/2, got %v", ads1[1].Name.Path())
 	}
 	if ads1[1].Closed || !ads1[1].Frozen {
 		t.Errorf("expecting open, frozen")
 	}
 	// issue-3: closed, frozen
-	if ads1[2].Name.Path() != "issue/3" {
-		t.Errorf("expecting issue/3, got %v", ads1[2].Name.Path())
+	if ads1[2].Name.Path() != "github/issues/3" {
+		t.Errorf("expecting github/issues/3, got %v", ads1[2].Name.Path())
 	}
 	if !ads1[2].Closed || !ads1[2].Frozen {
 		t.Errorf("expecting closed, frozen")

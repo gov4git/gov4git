@@ -21,7 +21,7 @@ var (
 
 	githubImportCmd = &cobra.Command{
 		Use:   "import",
-		Short: "Import GitHub issues and pull requests",
+		Short: "Import GitHub artifacts for governance",
 		Long: `Import GitHub issues and pull requests. Example usage:
 
 	gov4git github import --token=GITHUB_ACCESS_TOKEN --project=PROJECT_OWNER/PROJECT_REPO
@@ -33,7 +33,7 @@ the community must be present in your local config file, as well as their respec
 			LoadConfig()
 			repo := govgh.ParseGithubRepo(ctx, githubProject)
 			govgh.SetTokenSource(ctx, repo, govgh.MakeStaticTokenSource(ctx, githubToken))
-			importedIssues := govgh.ImportIssuesForPrioritization(ctx, repo, nil, setup.Organizer)
+			importedIssues := govgh.Import(ctx, repo, nil, setup.Organizer)
 			fmt.Fprint(os.Stdout, form.SprintJSON(importedIssues))
 		},
 	}

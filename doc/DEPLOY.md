@@ -54,7 +54,12 @@ To create the token:
      | variables | read-write |
      | workflows | read-write |
 
-- No changes are needed under "Organization permissions"
+- Under "Organization permissions" make the following choices:
+
+     | category | access |
+     | ----------- | ----------- |
+     | members | read-only |
+
 - Click on "Generate token" and write down the generated token
 
 
@@ -102,10 +107,10 @@ The entire state of governance is captured in the most recent commit of the publ
 
 This allows you to perform a few basic administrative tasks, using standard git and GitHub operations:
 
-- _If you want to stop and erase a deployment_, simply delete the public and private governance repositories.
+- _If you want to stop and erase a deployment_, delete the public and private governance repositories.
 
-- _If you want to stop a deployment but keep the governance state_, simply edit the GitHub actions and comment out the cron triggers.
+- _If you want to stop a deployment but keep the governance state_, edit the GitHub actions and comment out the cron triggers.
 
 - _If you want to reduce the size of your governance repositories_, archive their `main`-branch history in another branch or repository, and reset the `main` branch to contain only the most recent commit.
 
-- _If you want to upgrade your deployment to a newer version of gov4git_, simply edit the GitHub environment and change the `GOV4GIT_RELEASE` variable to the new release.
+- _If you want to upgrade your deployment to a newer version of gov4git_, edit the GitHub environment and change the `GOV4GIT_RELEASE` variable to the new release.

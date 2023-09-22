@@ -106,8 +106,8 @@ func ImportIssuesForPrioritization(
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	ghIssues := ImportIssuesForPrioritization_Local(ctx, repo, githubClient, govAddr, govCloned)
 	chg := git.NewChange[form.Map, GithubIssueBallots](
-		fmt.Sprintf("Import %d GitHub issues", len(ghIssues)),
-		"github_import",
+		fmt.Sprintf("Import %d GitHub issues for prioritization", len(ghIssues)),
+		"github_import_for_prioritization",
 		form.Map{},
 		ghIssues,
 		nil,

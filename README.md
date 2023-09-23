@@ -1,4 +1,10 @@
-# Decentralized governance for git communities
+# gov4git: Decentralized governance for git communities
+
+![Release](https://github.com/gov4git/gov4git/actions/workflows/release.yaml/badge.svg)
+
+## Quick demo
+
+This video demonstrates the basics of using the gov4git command-line client for the gov4git governance protocol.
 
 [![gov4git walkthrough](https://img.youtube.com/vi/9oWkN9VNGhI/0.jpg)](https://www.youtube.com/watch?v=9oWkN9VNGhI)
 
@@ -20,6 +26,5 @@ Historical project documentation, including talks, white papers, long-term visio
 
 ## Communications
 
-[@gov4git](https://twitter.com/gov4git) on Twitter.
-
-[gov4git](https://discord.gg/FqweERMB) on Discord.
+- [@gov4git](https://twitter.com/gov4git) on Twitter
+- [gov4git](https://discord.gg/FqweERMB) on Discord

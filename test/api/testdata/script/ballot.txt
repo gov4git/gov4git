@@ -48,5 +48,5 @@ stdout ballot_1
 gov4git ballot show --name ballot_1/xyz
 stdout '"score": 4'
 
-# display contents of cache directory
-exec ls -l cache
+# display contents of cache directory (ls is not present on Windows)
+# exec ls -l cache

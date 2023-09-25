@@ -2,13 +2,11 @@ package github
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
-	"github.com/gov4git/lib4git/git"
-	"github.com/gov4git/lib4git/must"
 )
 
 func Import(
@@ -16,28 +14,31 @@ func Import(
 	repo GithubRepo,
 	githubClient *github.Client,
 	govAddr gov.OrganizerAddress,
-) git.Change[form.Map, form.Map] {
+) form.Map {
 
-	var chg1 git.Change[map[string]form.Form, GithubIssueBallots]
-	err1 := must.Try(func() {
-		chg1 = ImportIssuesForPrioritization(ctx, repo, githubClient, govAddr)
-	})
+	chg1 := ImportIssuesForPrioritization(ctx, repo, githubClient, govAddr)
+	chg2 := ImportJoinsAndDirectives(ctx, repo, githubClient, govAddr)
 
-	var chg2 git.Change[map[string]form.Form, ProcessJoinRequestIssuesReport]
-	err2 := must.Try(func() {
-		chg2 = ProcessJoinRequestIssuesApprovedByMaintainer(ctx, repo, githubClient, govAddr)
-	})
+	return form.Map{
+		"issues_for_prioritization": chg1.Result,
+		"join_requests":             chg2,
+	}
+}
 
-	return git.NewChange[form.Map, form.Map](
-		fmt.Sprintf("Import from GitHub"),
-		"github_import",
-		form.Map{},
-		form.Map{
-			"issues_for_prioritization":       chg1.Result,
-			"join_requests":                   chg2.Result,
-			"issues_for_prioritization_error": err1,
-			"join_requests_error":             err2,
-		},
-		nil,
-	)
+func ImportJoinsAndDirectives(
+	ctx context.Context,
+	repo GithubRepo,
+	ghc *github.Client,
+	govAddr gov.OrganizerAddress,
+) form.Map {
+
+	maintainers := fetchRepoMaintainers(ctx, repo, ghc)
+	base.Infof("maintainers for %v are %v", repo, form.SprintJSON(maintainers))
+
+	chg1 := ProcessJoinRequestIssues(ctx, repo, ghc, govAddr, maintainers)
+	chg2 := ProcessDirectiveIssues(ctx, repo, ghc, govAddr, maintainers)
+	return form.Map{
+		"joins":      chg1.Result,
+		"directives": chg2.Result,
+	}
 }

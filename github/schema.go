@@ -31,6 +31,10 @@ const (
 	JoinRequestLabel        = "gov4git:join"
 	JoinRequestApprovalWord = "approve"
 
+	// organizer directives
+	DirectiveLabel = "gov4git:directive"
+
+	// Github deploy environment
 	GithubDeployEnvName = "gov4git:governance"
 )
 

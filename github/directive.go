@@ -28,8 +28,8 @@ type ProcessDirectiveIssueReport struct {
 }
 
 type DirectiveIssue struct {
-	IssueVotingCredits    *IssueVotingCreditsDirective    `json:"issue_voting_credits"`
-	TransferVotingCredits *TransferVotingCreditsDirective `json:"transfer_voting_credits"`
+	IssueVotingCredits    *IssueVotingCreditsDirective    `json:"issue_voting_credits,omitempty"`
+	TransferVotingCredits *TransferVotingCreditsDirective `json:"transfer_voting_credits,omitempty"`
 }
 
 type IssueVotingCreditsDirective struct {
@@ -211,7 +211,7 @@ func parseDirective(body string) (DirectiveIssue, error) {
 	body = strings.ReplaceAll(body, "\n", " ")
 	body = strings.ReplaceAll(body, "\r", " ")
 	body = strings.ReplaceAll(body, "\t", " ")
-	body = strings.Trim(body, "\t ")
+	body = strings.Trim(body, "\t .")
 	words := []string{}
 	for _, w := range strings.Split(body, " ") {
 		if w != "" {
@@ -223,7 +223,7 @@ func parseDirective(body string) (DirectiveIssue, error) {
 	if len(words) == 6 &&
 		words[0] == "issue" &&
 		words[2] == "voting" &&
-		words[3] == "credits" &&
+		(words[3] == "credit" || words[3] == "credits") &&
 		words[4] == "to" {
 		amount, err := strconv.ParseFloat(words[1], 64)
 		if err != nil {
@@ -242,7 +242,7 @@ func parseDirective(body string) (DirectiveIssue, error) {
 	if len(words) == 8 &&
 		words[0] == "transfer" &&
 		words[2] == "voting" &&
-		words[3] == "credits" &&
+		(words[3] == "credit" || words[3] == "credits") &&
 		words[4] == "from" &&
 		words[6] == "to" {
 		amount, err := strconv.ParseFloat(words[1], 64)

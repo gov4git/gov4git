@@ -91,7 +91,7 @@ func ProcessJoinRequestIssues_Local(
 	report := ProcessJoinRequestIssuesReport{}
 
 	// fetch open issues labelled gov4git:join
-	issues := fetchOpenJoinRequestIssues(ctx, repo, ghc)
+	issues := fetchOpenIssues(ctx, repo, ghc, JoinRequestLabel)
 	for _, issue := range issues {
 		newMember := processJoinRequestIssue_Local(ctx, repo, ghc, govAddr, govCloned, approvers, issue)
 		if newMember != "" {
@@ -103,21 +103,6 @@ func ProcessJoinRequestIssues_Local(
 		}
 	}
 	return report
-}
-
-func fetchOpenJoinRequestIssues(ctx context.Context, repo GithubRepo, ghc *github.Client) []*github.Issue {
-	opt := &github.IssueListByRepoOptions{State: "open", Labels: []string{JoinRequestLabel}}
-	var allIssues []*github.Issue
-	for {
-		issues, resp, err := ghc.Issues.ListByRepo(ctx, repo.Owner, repo.Name, opt)
-		must.NoError(ctx, err)
-		allIssues = append(allIssues, issues...)
-		if resp.NextPage == 0 {
-			break
-		}
-		opt.Page = resp.NextPage
-	}
-	return allIssues
 }
 
 func processJoinRequestIssue_Local(

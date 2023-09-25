@@ -6,8 +6,7 @@ import (
 )
 
 const (
-	VotingCredits       balance.Balance = "voting_credits"
-	VotingCreditsOnHold balance.Balance = "voting_credits_on_hold"
+	VotingCredits balance.Balance = "voting_credits"
 )
 
 const (

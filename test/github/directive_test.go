@@ -49,7 +49,7 @@ func TestDirective(t *testing.T) {
 				Locked: github.Bool(false),
 				State:  github.String("open"),
 				Body: github.String(
-					fmt.Sprintf("issue %v voting credits to @%v", testIssueAmount, cty.MemberUser(0)),
+					fmt.Sprintf("issue %v credits to @%v", testIssueAmount, cty.MemberUser(0)),
 				),
 				User: &github.User{Login: github.String(testDirectiveOrganizerGithubUser)},
 			},
@@ -62,7 +62,7 @@ func TestDirective(t *testing.T) {
 				Locked: github.Bool(false),
 				State:  github.String("open"),
 				Body: github.String(
-					fmt.Sprintf("transfer %v voting credits from @%v to @%v", testTransferAmount, cty.MemberUser(0), cty.MemberUser(1)),
+					fmt.Sprintf("transfer %v credits from @%v to @%v", testTransferAmount, cty.MemberUser(0), cty.MemberUser(1)),
 				),
 				User: &github.User{Login: github.String(testDirectiveOrganizerGithubUser)},
 			},

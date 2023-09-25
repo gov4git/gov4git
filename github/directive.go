@@ -17,6 +17,7 @@ import (
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
+	"github.com/gov4git/lib4git/util"
 )
 
 type ProcessDirectiveIssueReports []ProcessDirectiveIssueReport
@@ -157,16 +158,16 @@ func processDirectiveIssue_Local(
 			},
 		)
 		if err != nil {
-			base.Infof("could not issue %v voting credits to member %v (%v)",
+			base.Infof("could not issue %v credits to member %v (%v)",
 				d.IssueVotingCredits.Amount, d.IssueVotingCredits.To, err)
 			replyAndCloseIssue(
 				ctx, repo, ghc, issue,
-				fmt.Sprintf("Could not issue %v voting credits to member %v (%v). Reopen the issue to retry.",
+				fmt.Sprintf("Could not issue %v credits to member %v (%v). Reopen the issue to retry.",
 					d.IssueVotingCredits.Amount, d.IssueVotingCredits.To, err))
 			return DirectiveIssue{}, err
 		}
 		replyAndCloseIssue(ctx, repo, ghc, issue,
-			fmt.Sprintf("Issued %v voting credits to member %v.",
+			fmt.Sprintf("Issued %v credits to member %v.",
 				d.IssueVotingCredits.Amount, d.IssueVotingCredits.To))
 		return d, nil
 
@@ -185,16 +186,16 @@ func processDirectiveIssue_Local(
 			},
 		)
 		if err != nil {
-			base.Infof("could not transfer %v voting credits from member %v to member %v (%v)",
+			base.Infof("could not transfer %v credits from member %v to member %v (%v)",
 				d.TransferVotingCredits.Amount, d.TransferVotingCredits.From, d.TransferVotingCredits.To, err)
 			replyAndCloseIssue(
 				ctx, repo, ghc, issue,
-				fmt.Sprintf("Could not transfer %v voting credits from member %v to member %v (%v). Reopen the issue to retry.",
+				fmt.Sprintf("Could not transfer %v credits from member %v to member %v (%v). Reopen the issue to retry.",
 					d.TransferVotingCredits.Amount, d.TransferVotingCredits.From, d.TransferVotingCredits.To, err))
 			return DirectiveIssue{}, err
 		}
 		replyAndCloseIssue(ctx, repo, ghc, issue,
-			fmt.Sprintf("Transferred %v voting credits from member %v to member %v.",
+			fmt.Sprintf("Transferred %v credits from member %v to member %v.",
 				d.TransferVotingCredits.Amount, d.TransferVotingCredits.From, d.TransferVotingCredits.To))
 		return d, nil
 
@@ -204,8 +205,8 @@ func processDirectiveIssue_Local(
 
 // example directives:
 //
-//	"issue 30 voting credits to @user"
-//	"transfer 20 voting credits from @user1 to @user2"
+//	"issue 30 credits to @user"
+//	"transfer 20 credits from @user1 to @user2"
 func parseDirective(body string) (DirectiveIssue, error) {
 	body = strings.ToLower(body)
 	body = strings.ReplaceAll(body, "\n", " ")
@@ -219,17 +220,16 @@ func parseDirective(body string) (DirectiveIssue, error) {
 		}
 	}
 
-	// "issue 30 voting credits to @user"
-	if len(words) == 6 &&
+	// "issue 30 credits to @user"
+	if len(words) == 5 &&
 		words[0] == "issue" &&
-		words[2] == "voting" &&
-		(words[3] == "credit" || words[3] == "credits") &&
-		words[4] == "to" {
+		util.IsIn(words[2], "credit", "credits", "token", "tokens") &&
+		words[3] == "to" {
 		amount, err := strconv.ParseFloat(words[1], 64)
 		if err != nil {
-			return DirectiveIssue{}, fmt.Errorf("cannot parse amount of voting credits")
+			return DirectiveIssue{}, fmt.Errorf("cannot parse amount of credits")
 		}
-		user, err := parseUser(words[5])
+		user, err := parseUser(words[4])
 		if err != nil {
 			return DirectiveIssue{}, err
 		}
@@ -238,22 +238,21 @@ func parseDirective(body string) (DirectiveIssue, error) {
 		}, nil
 	}
 
-	// "transfer 20 voting credits from @user1 to @user2"
-	if len(words) == 8 &&
+	// "transfer 20 credits from @user1 to @user2"
+	if len(words) == 7 &&
 		words[0] == "transfer" &&
-		words[2] == "voting" &&
-		(words[3] == "credit" || words[3] == "credits") &&
-		words[4] == "from" &&
-		words[6] == "to" {
+		util.IsIn(words[2], "credit", "credits", "token", "tokens") &&
+		words[3] == "from" &&
+		words[5] == "to" {
 		amount, err := strconv.ParseFloat(words[1], 64)
 		if err != nil {
-			return DirectiveIssue{}, fmt.Errorf("cannot parse amount of voting credits")
+			return DirectiveIssue{}, fmt.Errorf("cannot parse amount of credits")
 		}
-		from, err := parseUser(words[5])
+		from, err := parseUser(words[4])
 		if err != nil {
 			return DirectiveIssue{}, err
 		}
-		to, err := parseUser(words[7])
+		to, err := parseUser(words[6])
 		if err != nil {
 			return DirectiveIssue{}, err
 		}

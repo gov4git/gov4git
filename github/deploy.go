@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"os"
 	"path"
+	"strconv"
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/gov4git/api"
@@ -103,17 +104,11 @@ func Deploy(
 }
 
 var (
-	//go:embed deploy/.github/scripts/gov4git_sync_github.sh
-	syncGithubSH string
+	//go:embed deploy/.github/scripts/gov4git_cron.sh
+	cronSH string
 
-	//go:embed deploy/.github/scripts/gov4git_sync_community.sh
-	syncCommunitySH string
-
-	//go:embed deploy/.github/workflows/gov4git_sync_github.yml
-	syncGithubYML string
-
-	//go:embed deploy/.github/workflows/gov4git_sync_community.yml
-	syncCommunityYML string
+	//go:embed deploy/.github/workflows/gov4git_cron.yml
+	cronYML string
 )
 
 func installGithubActions(
@@ -125,12 +120,10 @@ func installGithubActions(
 	t := govCloned.Tree()
 
 	// helper scripts for github actions
-	git.StringToFileStage(ctx, t, ns.NS{".github", "scripts", "gov4git_sync_github.sh"}, syncGithubSH)
-	git.StringToFileStage(ctx, t, ns.NS{".github", "scripts", "gov4git_sync_community.sh"}, syncCommunitySH)
+	git.StringToFileStage(ctx, t, ns.NS{".github", "scripts", "gov4git_cron.sh"}, cronSH)
 
 	// github actions
-	git.StringToFileStage(ctx, t, ns.NS{".github", "workflows", "gov4git_sync_github.yml"}, syncGithubYML)
-	git.StringToFileStage(ctx, t, ns.NS{".github", "workflows", "gov4git_sync_community.yml"}, syncCommunityYML)
+	git.StringToFileStage(ctx, t, ns.NS{".github", "workflows", "gov4git_cron.yml"}, cronYML)
 
 	git.Commit(ctx, t, "install gov4git github actions")
 	govCloned.Push(ctx)
@@ -184,12 +177,21 @@ func createDeployEnvironment(
 		"PROJECT_REPO":         project.Name,
 		"GOV_PUBLIC_REPO_URL":  govPublicURLs.HTTPSURL,
 		"GOV_PRIVATE_REPO_URL": govPrivateURLs.HTTPSURL,
+		"GITHUB_FREQ":          strconv.Itoa(DefaultGithubFreq),
+		"COMMUNITY_FREQ":       strconv.Itoa(DefaultCommunityFreq),
+		"FETCH_PAR":            strconv.Itoa(DefaultFetchParallelism),
 	}
 	for k, v := range envVars {
 		_, err := ghClient.Actions.CreateEnvVariable(ctx, int(*ghGovPubRepo.ID), env.GetName(), &github.ActionsVariable{Name: k, Value: v})
 		must.NoError(ctx, err)
 	}
 }
+
+const (
+	DefaultGithubFreq       = 120     // seconds
+	DefaultCommunityFreq    = 60 * 60 // seconds
+	DefaultFetchParallelism = 5
+)
 
 func encryptValue(ctx context.Context, pubKey *github.PublicKey, secretValue string) string {
 

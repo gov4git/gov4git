@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gov4git/gov4git/github"
 	govgh "github.com/gov4git/gov4git/github"
 	"github.com/gov4git/gov4git/proto/cron"
 	"github.com/gov4git/lib4git/form"
@@ -33,7 +34,7 @@ It will ensure that:
 				setup.Organizer,
 				time.Duration(cronGithubFreqSeconds)*time.Second,
 				time.Duration(cronCommunityFreqSeconds)*time.Second,
-				syncMaxPar,
+				syncFetchPar,
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(result))
 		},
@@ -48,13 +49,13 @@ var (
 func init() {
 	cronCmd.Flags().StringVar(&githubProject, "project", "", "GitHub project owner/repo")
 	cronCmd.Flags().StringVar(&githubToken, "token", "", "GitHub access token")
-	cronCmd.Flags().IntVar(&cronGithubFreqSeconds, "github_freq", 120, "frequency of GitHub import, in seconds")
-	cronCmd.Flags().IntVar(&cronCommunityFreqSeconds, "community_freq", 60*60, "frequency of community tallies, in seconds")
-	cronCmd.Flags().IntVar(&syncMaxPar, "maxpar", 5, "parallelism while clonging member repos for vote collection")
+	cronCmd.Flags().IntVar(&cronGithubFreqSeconds, "github_freq", github.DefaultGithubFreq, "frequency of GitHub import, in seconds")
+	cronCmd.Flags().IntVar(&cronCommunityFreqSeconds, "community_freq", github.DefaultCommunityFreq, "frequency of community tallies, in seconds")
+	cronCmd.Flags().IntVar(&syncFetchPar, "fetch_par", github.DefaultFetchParallelism, "parallelism while clonging member repos for vote collection")
 
 	cronCmd.MarkFlagRequired("project")
 	cronCmd.MarkFlagRequired("token")
 	cronCmd.MarkFlagRequired("github_freq")
 	cronCmd.MarkFlagRequired("community_freq")
-	cronCmd.MarkFlagRequired("maxpar")
+	cronCmd.MarkFlagRequired("fetch_par")
 }

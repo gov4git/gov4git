@@ -1,22 +1,28 @@
 #!/bin/sh
 #
-# This script imports the issues and pull requests from a GitHub project repository into a governance repository.
+# This script updates the governance system. It is intended as the target of a regular cron job.
 #
-# The GitHub project variables are inferred from the GitHub action shell environment.
+# The GitHub project variables are inferred from the GitHub action environment.
 #    PROJECT_OWNER = GitHub owner of the project
 #    PROJECT_REPO = GitHub repository name of the project
 #
-# The governance variables must be set in the GitHub action workflow:
+# The governance variables must be set in the GitHub action environment:
 #
 #    GOV_PUBLIC_REPO_URL = HTTPS URL of the public governance repository
 #    GOV_PRIVATE_REPO_URL = HTTPS URL of the private governance repository
 #
-# The authentication variables must be set in the GitHub action workflow:
+# The authentication variables must be set in the GitHub action environment:
 #
 #    ORGANIZER_GITHUB_TOKEN = authentication token for the project and governance repositories
 #
 # The auth token must have permission to write to the governance repositories and
 # read the issues and pull requests from the project repository.
+#
+# Cron configuration properties must be set in the GitHub action environment:
+#
+#    GITHUB_FREQ = the frequency of updates from GitHub, in seconds
+#    COMMUNITY_FREQ = the frequency of updates from the community members, in seconds
+#    FETCH_PAR = the maximum parallelism when fetching community members repos
 
 mkdir -p ~/.gov4git/cache
 
@@ -43,6 +49,9 @@ CONFIG_JSON=$(
 echo $CONFIG_JSON > ~/.gov4git/config.json
 cat ~/.gov4git/config.json
 
-gov4git -v --config=$HOME/.gov4git/config.json github import \
+gov4git -v --config=$HOME/.gov4git/config.json cron \
      --token=$ORGANIZER_GITHUB_TOKEN \
-     --project=$PROJECT_OWNER/$PROJECT_REPO
+     --project=$PROJECT_OWNER/$PROJECT_REPO \
+     --github_freq=$GITHUB_FREQ \
+     --community_freq=$COMMUNITY_FREQ \
+     --fetch_par=$FETCH_PAR

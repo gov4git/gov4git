@@ -1,4 +1,4 @@
-name: Sync GitHub issues and pull requests with the governance system
+name: Governance cron
 
 on:
      workflow_dispatch: # allows manual triggering
@@ -24,13 +24,16 @@ jobs:
                     arch: x86_64
                - name: 'Prepare script permissions'
                  shell: bash
-                 run: chmod a+x .github/scripts/gov4git_sync_github.sh
-               - name: 'Sync GitHub issues and pull requests'
+                 run: chmod a+x .github/scripts/gov4git_cron.sh
+               - name: 'Perform cron tasks'
                  shell: bash
-                 run: .github/scripts/gov4git_sync_github.sh
+                 run: .github/scripts/gov4git_cron.sh
                  env:
                     ORGANIZER_GITHUB_TOKEN: ${{ secrets.ORGANIZER_GITHUB_TOKEN }}
                     PROJECT_OWNER: ${{ vars.PROJECT_OWNER }}
                     PROJECT_REPO: ${{ vars.PROJECT_REPO }}
                     GOV_PUBLIC_REPO_URL: ${{ vars.GOV_PUBLIC_REPO_URL }}
                     GOV_PRIVATE_REPO_URL: ${{ vars.GOV_PRIVATE_REPO_URL }}
+                    GITHUB_FREQ: ${{ vars.GITHUB_FREQ }}
+                    COMMUNITY_FREQ: ${{ vars.COMMUNITY_FREQ }}
+                    FETCH_PAR: ${{ vars.FETCH_PAR }}

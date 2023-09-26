@@ -33,7 +33,8 @@ the community must be present in your local config file, as well as their respec
 			LoadConfig()
 			repo := govgh.ParseGithubRepo(ctx, githubProject)
 			govgh.SetTokenSource(ctx, repo, govgh.MakeStaticTokenSource(ctx, githubToken))
-			importedIssues := govgh.Import(ctx, repo, nil, setup.Organizer)
+			ghc := govgh.GetGithubClient(ctx, repo)
+			importedIssues := govgh.Import(ctx, repo, ghc, setup.Organizer)
 			fmt.Fprint(os.Stdout, form.SprintJSON(importedIssues))
 		},
 	}

@@ -9,6 +9,25 @@ import (
 	"github.com/gov4git/lib4git/util"
 )
 
+func FetchRepoMaintainers(
+	ctx context.Context,
+	repo GithubRepo,
+	ghc *github.Client,
+) []string {
+
+	opts := &github.ListCollaboratorsOptions{}
+	users, _, err := ghc.Repositories.ListCollaborators(ctx, repo.Owner, repo.Name, opts)
+	must.NoError(ctx, err)
+
+	m := []string{}
+	for _, u := range users {
+		if u.GetPermissions()["maintainer"] || u.GetPermissions()["admin"] {
+			m = append(m, u.GetLogin())
+		}
+	}
+	return m
+}
+
 func fetchOpenIssues(ctx context.Context, repo GithubRepo, ghc *github.Client, labelled string) []*github.Issue {
 	opt := &github.IssueListByRepoOptions{State: "open", Labels: []string{labelled}}
 	var allIssues []*github.Issue

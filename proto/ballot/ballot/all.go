@@ -22,6 +22,8 @@ func TallyAll(
 	maxPar int,
 ) git.Change[form.Map, []common.Tally] {
 
+	base.Infof("fetching and tallying community votes ...")
+
 	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg := TallyAllStageOnly(ctx, govAddr, govOwner, maxPar)
 	if len(chg.Result) == 0 {

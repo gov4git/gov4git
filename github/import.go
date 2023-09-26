@@ -32,7 +32,9 @@ func ImportJoinsAndDirectives(
 	govAddr gov.OrganizerAddress,
 ) form.Map {
 
-	maintainers := fetchRepoMaintainers(ctx, repo, ghc)
+	base.Infof("importing join requests and organizer directives ...")
+
+	maintainers := FetchRepoMaintainers(ctx, repo, ghc)
 	base.Infof("maintainers for %v are %v", repo, form.SprintJSON(maintainers))
 
 	chg1 := ProcessJoinRequestIssues(ctx, repo, ghc, govAddr, maintainers)

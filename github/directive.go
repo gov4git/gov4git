@@ -51,7 +51,7 @@ func ProcessDirectiveIssuesByMaintainer(
 	govAddr gov.OrganizerAddress,
 ) git.Change[form.Map, ProcessDirectiveIssueReports] {
 
-	maintainers := fetchRepoMaintainers(ctx, repo, ghc)
+	maintainers := FetchRepoMaintainers(ctx, repo, ghc)
 	base.Infof("maintainers for %v are %v", repo, form.SprintJSON(maintainers))
 	return ProcessDirectiveIssues(ctx, repo, ghc, govAddr, maintainers)
 }
@@ -65,7 +65,7 @@ func ProcessDirectiveIssues(
 ) git.Change[form.Map, ProcessDirectiveIssueReports] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	report := ProcessDirectiveIssues_Local(ctx, repo, ghc, govAddr, govCloned, approverGitHubUsers)
+	report := ProcessDirectiveIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned, approverGitHubUsers)
 	chg := git.NewChange[form.Map, ProcessDirectiveIssueReports](
 		fmt.Sprintf("Process %d organizer directives", len(report)),
 		"github_directive_issues",
@@ -82,7 +82,7 @@ func ProcessDirectiveIssues(
 	return chg
 }
 
-func ProcessDirectiveIssues_Local(
+func ProcessDirectiveIssues_StageOnly(
 	ctx context.Context,
 	repo GithubRepo,
 	ghc *github.Client, // if nil, a new client for repo will be created
@@ -96,7 +96,7 @@ func ProcessDirectiveIssues_Local(
 	// fetch open issues labelled gov4git:directive
 	issues := fetchOpenIssues(ctx, repo, ghc, DirectiveLabel)
 	for _, issue := range issues {
-		directive, err := processDirectiveIssue_Local(ctx, repo, ghc, govAddr, govCloned, maintainers, issue)
+		directive, err := processDirectiveIssue_StageOnly(ctx, repo, ghc, govAddr, govCloned, maintainers, issue)
 		if err != nil {
 			report = append(report, ProcessDirectiveIssueReport{
 				Directive: directive,
@@ -112,7 +112,7 @@ func ProcessDirectiveIssues_Local(
 	return report
 }
 
-func processDirectiveIssue_Local(
+func processDirectiveIssue_StageOnly(
 	ctx context.Context,
 	repo GithubRepo,
 	ghc *github.Client,

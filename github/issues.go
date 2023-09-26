@@ -80,10 +80,6 @@ func LoadIssuesForPrioritization(
 	githubClient *github.Client, // if nil, a new client for repo will be created
 ) (GithubIssueBallots, map[string]GithubIssueBallot) {
 
-	if githubClient == nil {
-		githubClient = GetGithubClient(ctx, repo)
-	}
-
 	issues := FetchIssues(ctx, repo, githubClient)
 	key := map[string]GithubIssueBallot{}
 	order := GithubIssueBallots{}
@@ -103,6 +99,7 @@ func ImportIssuesForPrioritization(
 	govAddr gov.OrganizerAddress,
 ) git.Change[form.Map, GithubIssueBallots] {
 
+	base.Infof("importing issues for prioritization ...")
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	ghIssues := ImportIssuesForPrioritization_Local(ctx, repo, githubClient, govAddr, govCloned)
 	chg := git.NewChange[form.Map, GithubIssueBallots](

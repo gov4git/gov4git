@@ -3,6 +3,7 @@ package cron
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/google/go-github/v55/github"
@@ -14,6 +15,7 @@ import (
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -35,7 +37,8 @@ func Cron(
 	t := govCloned.Public.Tree()
 
 	// read cron state
-	state, _ := git.TryFromFile[CronState](ctx, t, CronNS.Path()) // XXX: if file is missing, use zero state
+	state, err := git.TryFromFile[CronState](ctx, t, CronNS.Path())
+	must.Assertf(ctx, err == nil || err == os.ErrNotExist, "opening cron state (%v)", err)
 
 	now := time.Now()
 	shouldSyncGithub := now.Sub(state.LastGithubImport) > githubFreq

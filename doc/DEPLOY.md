@@ -84,18 +84,19 @@ During the deployment, the following steps are performed:
 
 - Both repositories are initialized with a newly-generated identity for your governance system. This step corresponds to the `gov4git init-gov` command.
 
-- Two GitHub actions are created in the public governance repository, named `.github/workflows/gov4git_sync_github.yml` and `.github/workflows/gov4git_sync_community.yml`. These actions are also accompanies by helper scripts `.github/scripts/gov4git_sync_github.sh` and `.github/scripts/gov4git_sync_community.sh`, respectively.
+- One GitHub actions are created in the public governance repository, named `.github/workflows/gov4git_cron.yml`. This action is accompanied by a helper script `.github/scripts/gov4git_cron.sh`. The action runs every two minutes. It is responsible for:
+     - Reading all issues and pull requests from your project repositories and updating the governance system accordingly, and
+     - Fetching votes and other service requests by your community members and incorporating them into the governance system.
 
-     The first action, `gov4git_sync_github.yml`, runs every two minutes. It is responsible for reading all issues and pull requests from your project repositories and updating the governance system accordingly.
-
-     The second action, `gov4git_sync_community.yml`, runs every hour. It is responsible for fetching votes and other user requests from your community members and incorporating them into the governance system.
-
-- A new GitHub environment called `gov4git:governance` is created, where the GitHub actions `gov4git_sync_github.yml` and `gov4git_sync_community.yml` run. This environment contains a set of variables:
+- A new GitHub environment called `gov4git:governance` is created, where the GitHub action `gov4git_cron.yml` runs. This environment contains a set of variables:
   - `GOV4GIT_RELEASE` is the gov4git release to use for the automation
   - `GOV_PUBLIC_REPO_URL` is the HTTPS URL of the public governance repository
   - `GOV_PRIVATE_REPO_URL` is the HTTPS URL of the private governance repository
   - `PROJECT_OWNER` is the GitHub user or organization owning your project repository
   - `PROJECT_REPO` is the name of your project repository
+  - `GITHUB_FREQ` is the number of seconds between updates from GitHub.
+  - `COMMUNITY_FREQ`is the number of seconds between updates from community members.
+  - `FETCH_PAR` is the number of parallel repository fetches performed during updates from community members.
 
      Additionally, a GitHub secret called `ORGANIZER_GITHUB_TOKEN` is created in the public governance repository. This secret contains the GitHub access token you provided to the deployment command. It is used by the GitHub actions to access your project repository, as well as the governance repositories.
 

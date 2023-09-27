@@ -20,9 +20,9 @@
 #
 # Cron configuration properties must be set in the GitHub action environment:
 #
-#    GITHUB_FREQ = the frequency of updates from GitHub, in seconds
-#    COMMUNITY_FREQ = the frequency of updates from the community members, in seconds
-#    FETCH_PAR = the maximum parallelism when fetching community members repos
+#    SYNC_GITHUB_FREQ = the frequency of updates from GitHub, in seconds
+#    SYNC_COMMUNITY_FREQ = the frequency of updates from the community members, in seconds
+#    SYNC_FETCH_PAR = the maximum parallelism when fetching community members repos
 
 mkdir -p ~/.gov4git/cache
 
@@ -52,6 +52,6 @@ cat ~/.gov4git/config.json
 gov4git -v --config=$HOME/.gov4git/config.json cron \
      --token=$ORGANIZER_GITHUB_TOKEN \
      --project=$PROJECT_OWNER/$PROJECT_REPO \
-     --github_freq=$GITHUB_FREQ \
-     --community_freq=$COMMUNITY_FREQ \
-     --fetch_par=$FETCH_PAR
+     --github_freq=$SYNC_GITHUB_FREQ \
+     --community_freq=$SYNC_COMMUNITY_FREQ \
+     --fetch_par=$SYNC_FETCH_PAR

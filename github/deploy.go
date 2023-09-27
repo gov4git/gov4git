@@ -177,9 +177,9 @@ func createDeployEnvironment(
 		"PROJECT_REPO":         project.Name,
 		"GOV_PUBLIC_REPO_URL":  govPublicURLs.HTTPSURL,
 		"GOV_PRIVATE_REPO_URL": govPrivateURLs.HTTPSURL,
-		"GITHUB_FREQ":          strconv.Itoa(DefaultGithubFreq),
-		"COMMUNITY_FREQ":       strconv.Itoa(DefaultCommunityFreq),
-		"FETCH_PAR":            strconv.Itoa(DefaultFetchParallelism),
+		"SYNC_GITHUB_FREQ":     strconv.Itoa(DefaultGithubFreq),
+		"SYNC_COMMUNITY_FREQ":  strconv.Itoa(DefaultCommunityFreq),
+		"SYNC_FETCH_PAR":       strconv.Itoa(DefaultFetchParallelism),
 	}
 	for k, v := range envVars {
 		_, err := ghClient.Actions.CreateEnvVariable(ctx, int(*ghGovPubRepo.ID), env.GetName(), &github.ActionsVariable{Name: k, Value: v})

@@ -34,6 +34,6 @@ jobs:
                     PROJECT_REPO: ${{ vars.PROJECT_REPO }}
                     GOV_PUBLIC_REPO_URL: ${{ vars.GOV_PUBLIC_REPO_URL }}
                     GOV_PRIVATE_REPO_URL: ${{ vars.GOV_PRIVATE_REPO_URL }}
-                    GITHUB_FREQ: ${{ vars.GITHUB_FREQ }}
-                    COMMUNITY_FREQ: ${{ vars.COMMUNITY_FREQ }}
-                    FETCH_PAR: ${{ vars.FETCH_PAR }}
+                    SYNC_GITHUB_FREQ: ${{ vars.SYNC_GITHUB_FREQ }}
+                    SYNC_COMMUNITY_FREQ: ${{ vars.SYNC_COMMUNITY_FREQ }}
+                    SYNC_FETCH_PAR: ${{ vars.SYNC_FETCH_PAR }}

@@ -94,9 +94,9 @@ During the deployment, the following steps are performed:
   - `GOV_PRIVATE_REPO_URL` is the HTTPS URL of the private governance repository
   - `PROJECT_OWNER` is the GitHub user or organization owning your project repository
   - `PROJECT_REPO` is the name of your project repository
-  - `GITHUB_FREQ` is the number of seconds between updates from GitHub.
-  - `COMMUNITY_FREQ`is the number of seconds between updates from community members.
-  - `FETCH_PAR` is the number of parallel repository fetches performed during updates from community members.
+  - `SYNC_GITHUB_FREQ` is the number of seconds between updates from GitHub.
+  - `SYNC_COMMUNITY_FREQ`is the number of seconds between updates from community members.
+  - `SYNC_FETCH_PAR` is the number of parallel repository fetches performed during updates from community members.
 
      Additionally, a GitHub secret called `ORGANIZER_GITHUB_TOKEN` is created in the public governance repository. This secret contains the GitHub access token you provided to the deployment command. It is used by the GitHub actions to access your project repository, as well as the governance repositories.
 

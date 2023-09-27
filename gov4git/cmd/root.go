@@ -50,6 +50,7 @@ func init() {
 	rootCmd.AddCommand(balanceCmd)
 	rootCmd.AddCommand(bureauCmd)
 	rootCmd.AddCommand(syncCmd)
+	rootCmd.AddCommand(cronCmd)
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(cacheCmd)
 	rootCmd.AddCommand(githubCmd)

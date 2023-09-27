@@ -22,6 +22,8 @@ func Process(
 	group member.Group,
 ) git.ChangeNoResult {
 
+	base.Infof("fetching service requests from the community ...")
+
 	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	chg, changed := ProcessStageOnly(ctx, govAddr, govOwner, group)
 	if changed {

@@ -101,7 +101,7 @@ func ImportIssuesForPrioritization(
 
 	base.Infof("importing issues for prioritization ...")
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	ghIssues := ImportIssuesForPrioritization_Local(ctx, repo, githubClient, govAddr, govCloned)
+	ghIssues := ImportIssuesForPrioritization_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
 	chg := git.NewChange[form.Map, GithubIssueBallots](
 		fmt.Sprintf("Import %d GitHub issues for prioritization", len(ghIssues)),
 		"github_import_for_prioritization",
@@ -119,7 +119,7 @@ func ImportIssuesForPrioritization(
 	return chg
 }
 
-func ImportIssuesForPrioritization_Local(
+func ImportIssuesForPrioritization_StageOnly(
 	ctx context.Context,
 	repo GithubRepo,
 	githubClient *github.Client, // if nil, a new client for repo will be created

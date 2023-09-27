@@ -53,6 +53,9 @@ func Cron(
 		maintainers := govgh.FetchRepoMaintainers(ctx, repo, ghc)
 		base.Infof("maintainers for %v are %v", repo, form.SprintJSON(maintainers))
 
+		// process issues and pull requests
+		report["processed_issues"] = govgh.ImportIssuesForPrioritization_StageOnly(ctx, repo, ghc, govAddr, govCloned)
+
 		// process joins
 		report["processed_joins"] = govgh.ProcessJoinRequestIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned, maintainers)
 

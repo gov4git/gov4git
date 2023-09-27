@@ -1,10 +1,14 @@
 # v1.1.10
 
-## Changes
+## Features
 
 * the organizer can approve join requests by replying to github issues
 * the organizer can send directives to the governance system by writing github issues
 * add license apache/mit
+
+## Changes
+
+* updates to deployment setup, not backwards compatible
 
 # v1.1.9
 

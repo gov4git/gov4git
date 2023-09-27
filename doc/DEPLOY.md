@@ -47,9 +47,9 @@ To create the token:
      | admin | read-write |
      | contents | read-write |
      | environments | read-write |
-     | issues | read-only |
+     | issues | read-write |
      | meta | read-only |
-     | pull-requests | read-only |
+     | pull-requests | read-write |
      | secrets | read-write |
      | variables | read-write |
      | workflows | read-write |

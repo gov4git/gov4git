@@ -38,7 +38,7 @@ func Cron(
 
 	// use a separate branch for cron logs
 	cronAddr := git.Address(govAddr.Public)
-	cronAddr.Branch = cronAddr.Branch + "/cron"
+	cronAddr.Branch = cronAddr.Branch + ".cron"
 	cronCloned := git.CloneOne(ctx, cronAddr)
 	cronTree := cronCloned.Tree()
 

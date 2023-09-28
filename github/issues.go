@@ -129,10 +129,11 @@ func ImportIssuesForPrioritization_StageOnly(
 
 	// load github issues and governance ballots, and
 	// index them under a common key space
-	ghOrderedIssues, ghIssues := LoadIssuesForPrioritization(ctx, repo, githubClient)
+	_, ghIssues := LoadIssuesForPrioritization(ctx, repo, githubClient)
 	govBallots := filterIssuesForPrioritization(ballot.List_Local(ctx, govCloned.Public.Tree()))
 
 	// ensure every issue has a corresponding up-to-date ballot
+	causedChange := GithubIssueBallots{}
 	for k, ghIssue := range ghIssues {
 		if ghIssue.ForPrioritization {
 			if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
@@ -147,13 +148,18 @@ func ImportIssuesForPrioritization_StageOnly(
 					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
 					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
 					ballot.Close_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
+					causedChange = append(causedChange, ghIssue)
 				case !ghIssue.Closed && govBallot.Closed:
 					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
 					ballot.Reopen_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
 					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+					causedChange = append(causedChange, ghIssue)
 				case !ghIssue.Closed && !govBallot.Closed:
-					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+					c1 := UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+					c2 := UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+					if c1 || c2 {
+						causedChange = append(causedChange, ghIssue)
+					}
 				}
 
 			} else { // no ballot for this issue, create it
@@ -174,6 +180,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				if ghIssue.Closed {
 					ballot.Close_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
 				}
+				causedChange = append(causedChange, ghIssue)
 			}
 		} else { // issue is not for prioritization, freeze ballot if it exists and is open
 			if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
@@ -182,14 +189,16 @@ func ImportIssuesForPrioritization_StageOnly(
 				// otherwise, freeze ballot
 				if !govBallot.Closed && !govBallot.Frozen {
 					ballot.Freeze_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+					causedChange = append(causedChange, ghIssue)
 				}
 			}
 		}
 	}
+	causedChange.Sort()
 
 	// don't touch ballots that have no corresponding issue
 
-	return ghOrderedIssues
+	return causedChange
 }
 
 func filterIssuesForPrioritization(ads []common.Advertisement) map[string]common.Advertisement {

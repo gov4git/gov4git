@@ -75,7 +75,7 @@ func Cron(
 	if shouldSyncCommunity {
 
 		// tally votes for all ballots from all community members
-		report["tally"] = ballot.TallyAllStageOnly(ctx, govAddr, govCloned, maxPar).Result
+		report["tally"] = ballot.TallyAll_StageOnly(ctx, govAddr, govCloned, maxPar).Result
 
 		state.LastCommunityTally = time.Now()
 	}

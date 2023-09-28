@@ -17,10 +17,10 @@ func List(
 	govAddr gov.GovAddress,
 ) []common.Advertisement {
 
-	return ListLocal(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree())
+	return List_Local(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree())
 }
 
-func ListLocal(
+func List_Local(
 	ctx context.Context,
 	govTree *git.Tree,
 ) []common.Advertisement {
@@ -55,10 +55,10 @@ func ListFilter(
 	withParticipant member.User,
 ) []common.Advertisement {
 
-	return ListFilterLocal(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree(), onlyOpen, onlyClosed, onlyFrozen, withParticipant)
+	return ListFilter_Local(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree(), onlyOpen, onlyClosed, onlyFrozen, withParticipant)
 }
 
-func ListFilterLocal(
+func ListFilter_Local(
 	ctx context.Context,
 	govTree *git.Tree,
 	onlyOpen bool,
@@ -67,7 +67,7 @@ func ListFilterLocal(
 	withParticipant member.User,
 ) []common.Advertisement {
 
-	ads := ListLocal(ctx, govTree)
+	ads := List_Local(ctx, govTree)
 	if onlyOpen {
 		ads = common.FilterOpenClosedAds(false, ads)
 	}
@@ -78,7 +78,7 @@ func ListFilterLocal(
 		ads = common.FilterFrozenAds(true, ads)
 	}
 	if withParticipant != "" {
-		userGroups := member.ListUserGroupsLocal(ctx, govTree, withParticipant)
+		userGroups := member.ListUserGroups_Local(ctx, govTree, withParticipant)
 		ads = common.FilterWithParticipants(userGroups, ads)
 	}
 	return ads

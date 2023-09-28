@@ -22,13 +22,13 @@ func Close(
 ) git.Change[form.Map, common.Outcome] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg := CloseStageOnly(ctx, govAddr, govCloned, ballotName, cancel)
+	chg := Close_StageOnly(ctx, govAddr, govCloned, ballotName, cancel)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
 }
 
-func CloseStageOnly(
+func Close_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,

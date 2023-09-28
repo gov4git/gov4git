@@ -54,7 +54,7 @@ func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 	govCloned := git.CloneOne(ctx, git.Address(x.gov))
 
 	for i, m := range x.members {
-		member.AddUserByPublicAddressStageOnly(ctx, govCloned.Tree(), x.MemberUser(i), m.Public)
+		member.AddUserByPublicAddress_StageOnly(ctx, govCloned.Tree(), x.MemberUser(i), m.Public)
 	}
 
 	chg := git.NewChangeNoResult("add everybody", "test_add_everybody")

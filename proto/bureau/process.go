@@ -25,7 +25,7 @@ func Process(
 	base.Infof("fetching service requests from the community ...")
 
 	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg, changed := ProcessStageOnly(ctx, govAddr, govOwner, group)
+	chg, changed := Process_StageOnly(ctx, govAddr, govOwner, group)
 	if changed {
 		proto.Commit(ctx, govOwner.Public.Tree(), chg)
 		govOwner.Public.Push(ctx)
@@ -33,7 +33,7 @@ func Process(
 	return chg
 }
 
-func ProcessStageOnly(
+func Process_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govOwner id.OwnerCloned,
@@ -43,12 +43,12 @@ func ProcessStageOnly(
 	communityTree := govOwner.Public.Tree()
 
 	// list participating users
-	users := member.ListGroupUsersLocal(ctx, communityTree, group)
+	users := member.ListGroupUsers_Local(ctx, communityTree, group)
 
 	// get user accounts
 	accounts := make([]member.Account, len(users))
 	for i, user := range users {
-		accounts[i] = member.GetUserLocal(ctx, communityTree, user)
+		accounts[i] = member.GetUser_Local(ctx, communityTree, user)
 	}
 
 	// fetch user requests
@@ -60,7 +60,7 @@ func ProcessStageOnly(
 
 	// process requests
 	for _, fetched := range fetchedReqs {
-		nOK, nErr := processRequestStageOnly(ctx, govAddr, govOwner, fetched)
+		nOK, nErr := processRequest_StageOnly(ctx, govAddr, govOwner, fetched)
 		if nOK+nErr > 0 {
 			changed = true
 		}
@@ -72,7 +72,7 @@ func ProcessStageOnly(
 	), changed
 }
 
-func processRequestStageOnly(
+func processRequest_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govOwner id.OwnerCloned,
@@ -89,7 +89,7 @@ func processRequestStageOnly(
 			continue
 		}
 		err := must.Try(func() {
-			balance.TransferStageOnly(
+			balance.Transfer_StageOnly(
 				ctx,
 				govOwner.Public.Tree(),
 				req.Transfer.FromUser, req.Transfer.FromBalance,

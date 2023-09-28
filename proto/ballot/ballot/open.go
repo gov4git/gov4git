@@ -26,13 +26,13 @@ func Open(
 ) git.Change[form.Map, common.BallotAddress] {
 
 	govCloned := git.CloneOne(ctx, git.Address(govAddr))
-	chg := OpenStageOnly(ctx, strat, govAddr, govCloned, name, title, description, choices, participants)
+	chg := Open_StageOnly(ctx, strat, govAddr, govCloned, name, title, description, choices, participants)
 	proto.Commit(ctx, govCloned.Tree(), chg)
 	govCloned.Push(ctx)
 	return chg
 }
 
-func OpenStageOnly(
+func Open_StageOnly(
 	ctx context.Context,
 	strat common.Strategy,
 	govAddr gov.GovAddress,
@@ -51,7 +51,7 @@ func OpenStageOnly(
 	}
 
 	// verify group exists
-	if !member.IsGroupLocal(ctx, govCloned.Tree(), participants) {
+	if !member.IsGroup_Local(ctx, govCloned.Tree(), participants) {
 		must.Errorf(ctx, "participant group %v does not exist", participants)
 	}
 

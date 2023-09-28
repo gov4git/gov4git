@@ -13,20 +13,20 @@ import (
 
 func SetGroup(ctx context.Context, addr gov.GovAddress, name Group) {
 	cloned := gov.Clone(ctx, addr)
-	chg := SetGroupStageOnly(ctx, cloned.Tree(), name)
+	chg := SetGroup_StageOnly(ctx, cloned.Tree(), name)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func SetGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
+func SetGroup_StageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
 	return groupsKV.Set(ctx, groupsNS, t, name, form.None{})
 }
 
 func IsGroup(ctx context.Context, addr gov.GovAddress, name Group) bool {
-	return IsGroupLocal(ctx, gov.Clone(ctx, addr).Tree(), name)
+	return IsGroup_Local(ctx, gov.Clone(ctx, addr).Tree(), name)
 }
 
-func IsGroupLocal(ctx context.Context, t *git.Tree, name Group) bool {
+func IsGroup_Local(ctx context.Context, t *git.Tree, name Group) bool {
 	err := must.Try(func() { groupsKV.Get(ctx, groupsNS, t, name) })
 	return err == nil
 }
@@ -39,20 +39,20 @@ func AddGroup(ctx context.Context, addr gov.GovAddress, name Group) {
 }
 
 func AddGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
-	if IsGroupLocal(ctx, t, name) {
+	if IsGroup_Local(ctx, t, name) {
 		must.Panic(ctx, fmt.Errorf("group already exists"))
 	}
-	return SetGroupStageOnly(ctx, t, name)
+	return SetGroup_StageOnly(ctx, t, name)
 }
 
 func RemoveGroup(ctx context.Context, addr gov.GovAddress, name Group) {
 	cloned := gov.Clone(ctx, addr)
-	chg := RemoveGroupStageOnly(ctx, cloned.Tree(), name)
+	chg := RemoveGroup_StageOnly(ctx, cloned.Tree(), name)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func RemoveGroupStageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
+func RemoveGroup_StageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
 	groupsKV.Remove(ctx, groupsNS, t, name)
 	groupUsersKKV.RemovePrimary(ctx, groupUsersNS, t, name) // remove memberships
 	return git.NewChangeNoResult(fmt.Sprintf("Remove group %v", name), "member_remove_group")

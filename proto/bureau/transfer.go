@@ -28,13 +28,13 @@ func Transfer(
 	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	// userRepo, userTree := id.CloneOwner(ctx, userAddr)
 	userOwner := id.CloneOwner(ctx, userAddr)
-	chg := TransferStageOnly(ctx, userAddr, govAddr, userOwner, govCloned, fromUserOpt, fromBalance, toUser, toBalance, amount)
+	chg := Transfer_StageOnly(ctx, userAddr, govAddr, userOwner, govCloned, fromUserOpt, fromBalance, toUser, toBalance, amount)
 	proto.Commit(ctx, userOwner.Public.Tree(), chg)
 	userOwner.Public.Push(ctx)
 	return chg
 }
 
-func TransferStageOnly(
+func Transfer_StageOnly(
 	ctx context.Context,
 	userAddr id.OwnerAddress,
 	govAddr gov.GovAddress,
@@ -51,7 +51,7 @@ func TransferStageOnly(
 
 	// find the user name of userAddr in the community repo
 	if fromUserOpt == "" {
-		us := member.LookupUserByIDLocal(ctx, govCloned.Tree(), userCred.ID)
+		us := member.LookupUserByID_Local(ctx, govCloned.Tree(), userCred.ID)
 		switch len(us) {
 		case 0:
 			must.Errorf(ctx, "%s not found in community %v", userAddr.Public, govAddr)

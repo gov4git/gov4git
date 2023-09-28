@@ -148,7 +148,7 @@ func processDirectiveIssue_StageOnly(
 	case d.IssueVotingCredits != nil:
 		err = must.Try(
 			func() {
-				balance.AddStageOnly(
+				balance.Add_StageOnly(
 					ctx,
 					govCloned.Public.Tree(),
 					member.User(d.IssueVotingCredits.To),
@@ -174,7 +174,7 @@ func processDirectiveIssue_StageOnly(
 	case d.TransferVotingCredits != nil:
 		err = must.Try(
 			func() {
-				balance.TransferStageOnly(
+				balance.Transfer_StageOnly(
 					ctx,
 					govCloned.Public.Tree(),
 					member.User(d.TransferVotingCredits.From),

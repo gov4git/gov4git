@@ -130,7 +130,7 @@ func ImportIssuesForPrioritization_StageOnly(
 	// load github issues and governance ballots, and
 	// index them under a common key space
 	ghOrderedIssues, ghIssues := LoadIssuesForPrioritization(ctx, repo, githubClient)
-	govBallots := filterIssuesForPrioritization(ballot.ListLocal(ctx, govCloned.Public.Tree()))
+	govBallots := filterIssuesForPrioritization(ballot.List_Local(ctx, govCloned.Public.Tree()))
 
 	// ensure every issue has a corresponding up-to-date ballot
 	for k, ghIssue := range ghIssues {
@@ -146,7 +146,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				case ghIssue.Closed && !govBallot.Closed:
 					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
 					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-					ballot.CloseStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
+					ballot.Close_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
 				case !ghIssue.Closed && govBallot.Closed:
 					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
 					ballot.Reopen_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
@@ -157,7 +157,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				}
 
 			} else { // no ballot for this issue, create it
-				ballot.OpenStageOnly(
+				ballot.Open_StageOnly(
 					ctx,
 					qv.QV{},
 					gov.GovAddress(govAddr.Public),
@@ -169,10 +169,10 @@ func ImportIssuesForPrioritization_StageOnly(
 					member.Everybody,
 				)
 				if ghIssue.Locked {
-					ballot.FreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+					ballot.Freeze_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
 				}
 				if ghIssue.Closed {
-					ballot.CloseStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
+					ballot.Close_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
 				}
 			}
 		} else { // issue is not for prioritization, freeze ballot if it exists and is open
@@ -181,7 +181,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				// if ballot frozen, do nothing
 				// otherwise, freeze ballot
 				if !govBallot.Closed && !govBallot.Frozen {
-					ballot.FreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+					ballot.Freeze_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
 				}
 			}
 		}
@@ -232,10 +232,10 @@ func UpdateFrozen_StageOnly(
 	case ghIssue.Locked && govBallot.Frozen:
 		return false
 	case ghIssue.Locked && !govBallot.Frozen:
-		ballot.FreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+		ballot.Freeze_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
 		return true
 	case !ghIssue.Locked && govBallot.Frozen:
-		ballot.UnfreezeStageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+		ballot.Unfreeze_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
 		return true
 	case !ghIssue.Locked && !govBallot.Frozen:
 		return false

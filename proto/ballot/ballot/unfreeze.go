@@ -21,13 +21,13 @@ func Unfreeze(
 ) git.ChangeNoResult {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg := UnfreezeStageOnly(ctx, govAddr, govCloned, ballotName)
+	chg := Unfreeze_StageOnly(ctx, govAddr, govCloned, ballotName)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
 }
 
-func UnfreezeStageOnly(
+func Unfreeze_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,

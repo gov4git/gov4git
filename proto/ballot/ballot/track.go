@@ -21,10 +21,10 @@ func Track(
 
 	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	voterOwner := id.CloneOwner(ctx, voterAddr)
-	return TrackStageOnly(ctx, voterAddr, govAddr, voterOwner, govCloned, ballotName)
+	return Track_StageOnly(ctx, voterAddr, govAddr, voterOwner, govCloned, ballotName)
 }
 
-func TrackStageOnly(
+func Track_StageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
 	govAddr gov.GovAddress,
@@ -35,7 +35,7 @@ func TrackStageOnly(
 
 	// determine the voter's username in the community
 	voterCred := id.GetPublicCredentials(ctx, voterOwner.Public.Tree())
-	users := member.LookupUserByIDLocal(ctx, govCloned.Tree(), voterCred.ID)
+	users := member.LookupUserByID_Local(ctx, govCloned.Tree(), voterCred.ID)
 	must.Assertf(ctx, len(users) > 0, "user not found in community")
 	user := users[0]
 

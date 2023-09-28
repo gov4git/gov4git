@@ -13,10 +13,10 @@ import (
 
 func Show(ctx context.Context, govAddr gov.GovAddress, ballotName ns.NS) common.AdStrategyTally {
 
-	return ShowLocal(ctx, govAddr, git.CloneOne(ctx, git.Address(govAddr)).Tree(), ballotName)
+	return Show_Local(ctx, govAddr, git.CloneOne(ctx, git.Address(govAddr)).Tree(), ballotName)
 }
 
-func ShowLocal(
+func Show_Local(
 	ctx context.Context,
 	govAddr gov.GovAddress,
 	govTree *git.Tree,

@@ -16,8 +16,8 @@ func TestConfirm(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
-	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
-	id.InitLocal(ctx, testReceiverID.OwnerAddress(), testReceiverID.OwnerCloned())
+	id.Init_Local(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
+	id.Init_Local(ctx, testReceiverID.OwnerAddress(), testReceiverID.OwnerCloned())
 
 	const testTopic = "topic"
 	var testMsg []string = []string{"a", "b", "c"}
@@ -53,8 +53,8 @@ func TestConfirmSigned(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
-	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
-	id.InitLocal(ctx, testReceiverID.OwnerAddress(), testReceiverID.OwnerCloned())
+	id.Init_Local(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
+	id.Init_Local(ctx, testReceiverID.OwnerAddress(), testReceiverID.OwnerCloned())
 
 	const testTopic = "topic"
 	var testMsg []string = []string{"a", "b", "c"}
@@ -90,8 +90,8 @@ func TestConfirmCall(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	testSenderID := id.NewTestID(ctx, t, git.MainBranch, false)
 	testReceiverID := id.NewTestID(ctx, t, git.MainBranch, false)
-	id.InitLocal(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
-	id.InitLocal(ctx, testReceiverID.OwnerAddress(), testReceiverID.OwnerCloned())
+	id.Init_Local(ctx, testSenderID.OwnerAddress(), testSenderID.OwnerCloned())
+	id.Init_Local(ctx, testReceiverID.OwnerAddress(), testReceiverID.OwnerCloned())
 
 	const testTopic = "topic"
 	var testMsg []string = []string{"a", "b", "c"}

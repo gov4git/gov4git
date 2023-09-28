@@ -34,10 +34,16 @@ func Cron(
 ) form.Map {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	t := govCloned.Public.Tree()
+	govTree := govCloned.Public.Tree()
+
+	// use a separate branch for cron logs
+	cronAddr := git.Address(govAddr.Public)
+	cronAddr.Branch = cronAddr.Branch + "/cron"
+	cronCloned := git.CloneOne(ctx, cronAddr)
+	cronTree := cronCloned.Tree()
 
 	// read cron state
-	state, err := git.TryFromFile[CronState](ctx, t, CronNS.Path())
+	state, err := git.TryFromFile[CronState](ctx, cronTree, CronNS.Path())
 	must.Assertf(ctx, err == nil || err == os.ErrNotExist, "opening cron state (%v)", err)
 
 	now := time.Now()
@@ -69,14 +75,12 @@ func Cron(
 	if shouldSyncCommunity {
 
 		// tally votes for all ballots from all community members
-		report["tally"] = ballot.TallyAllStageOnly(ctx, govAddr, govCloned, maxPar).Result
+		report["tally"] = ballot.TallyAll_StageOnly(ctx, govAddr, govCloned, maxPar).Result
 
 		state.LastCommunityTally = time.Now()
 	}
 
-	// write cron state
 	report["cron"] = state
-	git.ToFileStage(ctx, t, CronNS.Path(), state)
 	cronChg := git.NewChange[form.Map, form.Map](
 		fmt.Sprintf("Cron job."),
 		"cron",
@@ -85,9 +89,18 @@ func Cron(
 		nil,
 	)
 
-	// commit and push
-	proto.Commit(ctx, govCloned.Public.Tree(), cronChg)
-	govCloned.Public.Push(ctx)
+	// push gov state
+	govStatus, err := govTree.Status()
+	must.NoError(ctx, err)
+	if !govStatus.IsClean() {
+		proto.Commit(ctx, govCloned.Public.Tree(), cronChg)
+		govCloned.Public.Push(ctx)
+	}
+
+	// push cron state
+	git.ToFileStage(ctx, cronTree, CronNS.Path(), state)
+	proto.Commit(ctx, cronTree, cronChg)
+	cronCloned.Push(ctx)
 
 	return report
 }

@@ -23,7 +23,7 @@ func (qv QV) VerifyElections(
 ) {
 
 	voterCred := id.GetPublicCredentials(ctx, voterCloned.Public.Tree())
-	user := member.LookupUserByIDLocal(ctx, govCloned.Tree(), voterCred.ID)
+	user := member.LookupUserByID_Local(ctx, govCloned.Tree(), voterCred.ID)
 	if len(user) == 0 {
 		must.Errorf(ctx, "cannot find user with id %v in the community", voterCred.ID)
 	}

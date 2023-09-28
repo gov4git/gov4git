@@ -16,20 +16,20 @@ func Boot(
 ) git.Change[form.None, id.PrivateCredentials] {
 
 	ownerCloned := id.CloneOwner(ctx, ownerAddr)
-	privChg := BootLocal(ctx, ownerAddr, ownerCloned)
+	privChg := Boot_Local(ctx, ownerAddr, ownerCloned)
 	ownerCloned.Public.Push(ctx)
 	ownerCloned.Private.Push(ctx)
 	return privChg
 }
 
-func BootLocal(
+func Boot_Local(
 	ctx context.Context,
 	ownerAddr id.OwnerAddress,
 	ownerCloned id.OwnerCloned,
 ) git.Change[form.None, id.PrivateCredentials] {
 
-	chg := id.InitLocal(ctx, ownerAddr, ownerCloned)
-	chg2 := member.SetGroupStageOnly(ctx, ownerCloned.Public.Tree(), member.Everybody)
+	chg := id.Init_Local(ctx, ownerAddr, ownerCloned)
+	chg2 := member.SetGroup_StageOnly(ctx, ownerCloned.Public.Tree(), member.Everybody)
 	proto.Commit(ctx, ownerCloned.Public.Tree(), chg2)
 
 	return chg

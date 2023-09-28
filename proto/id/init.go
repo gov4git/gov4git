@@ -14,27 +14,27 @@ func Init(
 	ownerAddr OwnerAddress,
 ) git.Change[form.None, PrivateCredentials] {
 	ownerCloned := CloneOwner(ctx, ownerAddr)
-	privChg := InitLocal(ctx, ownerAddr, ownerCloned)
+	privChg := Init_Local(ctx, ownerAddr, ownerCloned)
 
 	ownerCloned.Public.Push(ctx)
 	ownerCloned.Private.Push(ctx)
 	return privChg
 }
 
-func InitLocal(
+func Init_Local(
 	ctx context.Context,
 	ownerAddr OwnerAddress,
 	ownerCloned OwnerCloned,
 ) git.Change[form.None, PrivateCredentials] {
 
-	privChg := initPrivateStageOnly(ctx, ownerCloned.Private.Tree(), ownerAddr)
-	pubChg := initPublicStageOnly(ctx, ownerCloned.Public.Tree(), privChg.Result.PublicCredentials)
+	privChg := initPrivate_StageOnly(ctx, ownerCloned.Private.Tree(), ownerAddr)
+	pubChg := initPublic_StageOnly(ctx, ownerCloned.Public.Tree(), privChg.Result.PublicCredentials)
 	proto.Commit(ctx, ownerCloned.Private.Tree(), privChg)
 	proto.Commit(ctx, ownerCloned.Public.Tree(), pubChg)
 	return privChg
 }
 
-func initPrivateStageOnly(ctx context.Context, priv *git.Tree, ownerAddr OwnerAddress) git.Change[form.None, PrivateCredentials] {
+func initPrivate_StageOnly(ctx context.Context, priv *git.Tree, ownerAddr OwnerAddress) git.Change[form.None, PrivateCredentials] {
 	if _, err := priv.Filesystem.Stat(PrivateCredentialsNS.Path()); err == nil {
 		must.Errorf(ctx, "private credentials file already exists")
 	}
@@ -50,7 +50,7 @@ func initPrivateStageOnly(ctx context.Context, priv *git.Tree, ownerAddr OwnerAd
 	)
 }
 
-func initPublicStageOnly(ctx context.Context, pub *git.Tree, cred PublicCredentials) git.ChangeNoResult {
+func initPublic_StageOnly(ctx context.Context, pub *git.Tree, cred PublicCredentials) git.ChangeNoResult {
 	if _, err := pub.Filesystem.Stat(PublicCredentialsNS.Path()); err == nil {
 		must.Errorf(ctx, "public credentials file already exists")
 	}

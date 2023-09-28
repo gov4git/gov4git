@@ -91,5 +91,5 @@ func (qv QV) tally(
 }
 
 func chargeUser(ctx context.Context, govCloned git.Cloned, user member.User, charge float64) error {
-	return balance.TryChargeStageOnly(ctx, govCloned.Tree(), user, VotingCredits, charge)
+	return balance.TryCharge_StageOnly(ctx, govCloned.Tree(), user, VotingCredits, charge)
 }

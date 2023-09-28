@@ -20,7 +20,7 @@ func (qv QV) Cancel(
 
 	// refund users
 	for user, spent := range tally.Charges {
-		balance.AddStageOnly(ctx, govOwner.Public.Tree(), user, VotingCredits, spent)
+		balance.Add_StageOnly(ctx, govOwner.Public.Tree(), user, VotingCredits, spent)
 	}
 
 	return git.NewChange(

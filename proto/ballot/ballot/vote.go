@@ -25,14 +25,14 @@ func Vote(
 
 	govCloned := git.CloneOne(ctx, git.Address(govAddr))
 	voterOwner := id.CloneOwner(ctx, voterAddr)
-	chg := VoteStageOnly(ctx, voterAddr, govAddr, voterOwner, govCloned, ballotName, elections)
+	chg := Vote_StageOnly(ctx, voterAddr, govAddr, voterOwner, govCloned, ballotName, elections)
 	proto.Commit(ctx, voterOwner.Public.Tree(), chg)
 	voterOwner.Public.Push(ctx)
 
 	return chg
 }
 
-func VoteStageOnly(
+func Vote_StageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
 	govAddr gov.GovAddress,

@@ -25,7 +25,7 @@ func TallyAll(
 	base.Infof("fetching and tallying community votes ...")
 
 	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg := TallyAllStageOnly(ctx, govAddr, govOwner, maxPar)
+	chg := TallyAll_StageOnly(ctx, govAddr, govOwner, maxPar)
 	if len(chg.Result) == 0 {
 		return chg
 	}
@@ -34,7 +34,7 @@ func TallyAll(
 	return chg
 }
 
-func TallyAllStageOnly(
+func TallyAll_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govOwner id.OwnerCloned,
@@ -43,7 +43,7 @@ func TallyAllStageOnly(
 
 	// list all open ballots
 	communityTree := govOwner.Public.Tree()
-	ads := common.FilterOpenClosedAds(false, ListLocal(ctx, communityTree))
+	ads := common.FilterOpenClosedAds(false, List_Local(ctx, communityTree))
 
 	// compute union of all voter accounts from all open ballots
 	adVoters := make([]adVoters, len(ads))
@@ -52,9 +52,9 @@ func TallyAllStageOnly(
 		adVoters[i].Ad = ad
 		adVoters[i].VoterAccounts = map[member.User]member.Account{}
 		adVoters[i].VoterClones = map[member.User]git.Cloned{}
-		adVoters[i].Voters = member.ListGroupUsersLocal(ctx, communityTree, ad.Participants)
+		adVoters[i].Voters = member.ListGroupUsers_Local(ctx, communityTree, ad.Participants)
 		for _, user := range adVoters[i].Voters {
-			account := member.GetUserLocal(ctx, communityTree, user)
+			account := member.GetUser_Local(ctx, communityTree, user)
 			adVoters[i].VoterAccounts[user] = account
 			allVoters[user] = account
 		}
@@ -74,7 +74,7 @@ func TallyAllStageOnly(
 	tallyChanges := []git.Change[map[string]form.Form, common.Tally]{}
 	tallies := []common.Tally{}
 	for _, adv := range adVoters {
-		if tallyChg, changed := tallyVotersClonedStageOnly(ctx, govAddr, govOwner, adv.Ad.Name, adv.VoterAccounts, adv.VoterClones); changed {
+		if tallyChg, changed := tallyVotersCloned_StageOnly(ctx, govAddr, govOwner, adv.Ad.Name, adv.VoterAccounts, adv.VoterClones); changed {
 			tallyChanges = append(tallyChanges, tallyChg)
 			tallies = append(tallies, tallyChg.Result)
 		}

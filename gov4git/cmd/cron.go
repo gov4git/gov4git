@@ -24,7 +24,7 @@ It will ensure that:
 `,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			repo := govgh.ParseGithubRepo(ctx, githubProject)
+			repo := govgh.ParseRepo(ctx, githubProject)
 			govgh.SetTokenSource(ctx, repo, govgh.MakeStaticTokenSource(ctx, githubToken))
 			ghc := govgh.GetGithubClient(ctx, repo)
 			result := cron.Cron(

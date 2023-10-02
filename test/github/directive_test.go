@@ -80,7 +80,7 @@ func TestDirective(t *testing.T) {
 		mock.WithRequestMatch(mock.PatchReposIssuesByOwnerByRepoByIssueNumber,
 			testDirectiveEditIssue...),
 	)
-	ghRepo := govgh.GithubRepo{Owner: "owner1", Name: "repo1"}
+	ghRepo := govgh.Repo{Owner: "owner1", Name: "repo1"}
 	ghClient := github.NewClient(mockedHTTPClient)
 
 	// process directives

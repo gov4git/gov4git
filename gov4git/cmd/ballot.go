@@ -11,7 +11,6 @@ import (
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 	"github.com/spf13/cobra"
 )
 
@@ -190,7 +189,7 @@ Pending votes have not yet been processed by the community's governance.`,
 			chg := ballot.Erase(
 				ctx,
 				setup.Organizer,
-				ns.ParseFromGitPath(ballotName),
+				common.ParseBallotNameFromPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},

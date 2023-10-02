@@ -46,7 +46,7 @@ type TransferVotingCreditsDirective struct {
 
 func ProcessDirectiveIssuesByMaintainer(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	ghc *github.Client,
 	govAddr gov.OrganizerAddress,
 ) git.Change[form.Map, ProcessDirectiveIssueReports] {
@@ -58,7 +58,7 @@ func ProcessDirectiveIssuesByMaintainer(
 
 func ProcessDirectiveIssues(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	ghc *github.Client,
 	govAddr gov.OrganizerAddress,
 	approverGitHubUsers []string,
@@ -84,7 +84,7 @@ func ProcessDirectiveIssues(
 
 func ProcessDirectiveIssues_StageOnly(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
@@ -114,7 +114,7 @@ func ProcessDirectiveIssues_StageOnly(
 
 func processDirectiveIssue_StageOnly(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	ghc *github.Client,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,

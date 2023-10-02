@@ -39,8 +39,11 @@ const (
 	// organizer directives
 	DirectiveLabel = "gov4git:directive"
 
+	// labels for issues that are managed
+	IssueIsGovernedLabel = "gov4git:governed"
+
 	// Github deploy environment
-	GithubDeployEnvName = "gov4git:governance"
+	DeployEnvName = "gov4git:governance"
 )
 
 type ImportedIssue struct {

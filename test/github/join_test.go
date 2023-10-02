@@ -75,7 +75,7 @@ func TestProcessJoinRequests(t *testing.T) {
 		mock.WithRequestMatch(mock.PostReposIssuesCommentsByOwnerByRepoByIssueNumber, testProcessJoinRequestsCreateComments...),
 		mock.WithRequestMatch(mock.PatchReposIssuesByOwnerByRepoByIssueNumber, testProcessJoinRequestsEditIssue...),
 	)
-	ghRepo := govgh.GithubRepo{Owner: "owner1", Name: "repo1"}
+	ghRepo := govgh.Repo{Owner: "owner1", Name: "repo1"}
 	ghClient := github.NewClient(mockedHTTPClient)
 
 	// process join requests

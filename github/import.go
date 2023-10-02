@@ -11,7 +11,7 @@ import (
 
 func Import(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	githubClient *github.Client,
 	govAddr gov.OrganizerAddress,
 ) form.Map {
@@ -27,7 +27,7 @@ func Import(
 
 func ImportJoinsAndDirectives(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	ghc *github.Client,
 	govAddr gov.OrganizerAddress,
 ) form.Map {

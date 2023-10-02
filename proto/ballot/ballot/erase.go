@@ -12,13 +12,12 @@ import (
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func Erase(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 ) git.Change[form.Map, bool] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
@@ -32,7 +31,7 @@ func Erase_StageOnly(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-	ballotName ns.NS,
+	ballotName common.BallotName,
 ) git.Change[form.Map, bool] {
 
 	govTree := govCloned.Public.Tree()

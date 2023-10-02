@@ -18,7 +18,7 @@ import (
 
 func ProcessJoinRequestIssuesApprovedByMaintainer(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 ) git.Change[form.Map, ProcessJoinRequestIssuesReport] {
@@ -30,7 +30,7 @@ func ProcessJoinRequestIssuesApprovedByMaintainer(
 
 func ProcessJoinRequestIssues(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 	approverGitHubUsers []string,
@@ -61,7 +61,7 @@ type ProcessJoinRequestIssuesReport struct {
 
 func ProcessJoinRequestIssues_StageOnly(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
@@ -87,7 +87,7 @@ func ProcessJoinRequestIssues_StageOnly(
 
 func processJoinRequestIssue_StageOnly(
 	ctx context.Context,
-	repo GithubRepo,
+	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,

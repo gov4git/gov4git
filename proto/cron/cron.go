@@ -23,7 +23,7 @@ var CronNS = ns.NS{"cron", "cron.json"}
 
 func Cron(
 	ctx context.Context,
-	repo govgh.GithubRepo,
+	repo govgh.Repo,
 	ghc *github.Client,
 	govAddr gov.OrganizerAddress,
 	//

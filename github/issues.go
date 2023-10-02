@@ -57,11 +57,11 @@ func ImportIssuesForPrioritization_StageOnly(
 
 	// load github issues and governance ballots, and
 	// index them under a common key space
-	_, ghIssues := LoadIssuesForPrioritization(ctx, repo, githubClient)
+	_, ghIssues := LoadIssues(ctx, repo, githubClient)
 	govBallots := filterIssuesForPrioritization(ballot.List_Local(ctx, govCloned.Public.Tree()))
 
 	// ensure every issue has a corresponding up-to-date ballot
-	causedChange := GithubIssueBallots{}
+	causedChange := ImportedIssues{}
 	for k, ghIssue := range ghIssues {
 		if ghIssue.ForPrioritization {
 			if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it

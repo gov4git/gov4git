@@ -2,7 +2,6 @@ package github
 
 import (
 	"context"
-	"regexp"
 	"time"
 
 	"github.com/google/go-github/v55/github"
@@ -77,10 +76,10 @@ func TransformIssue(ctx context.Context, repo Repo, issue *github.Issue) Importe
 		ClosedAt:          unwrapTimestamp(issue.ClosedAt),
 		CreatedAt:         unwrapTimestamp(issue.CreatedAt),
 		UpdatedAt:         unwrapTimestamp(issue.UpdatedAt),
-		Refs:              parseIssueRefs(ctx, repo, issue),
-		Locked:            issue.GetLocked(),
-		Closed:            issue.GetState() == "closed",
-		IsPullRequest:     issue.GetPullRequestLinks() != nil,
+		// Refs:              parseIssueRefs(ctx, repo, issue), //XXX
+		Locked:        issue.GetLocked(),
+		Closed:        issue.GetState() == "closed",
+		IsPullRequest: issue.GetPullRequestLinks() != nil,
 	}
 }
 
@@ -91,6 +90,7 @@ func unwrapTimestamp(ts *github.Timestamp) *time.Time {
 	return &ts.Time
 }
 
+/*
 // parseIssueRefs parses all references to issues or pull requests from the body of an issue.
 // Reference directives are of the form: "addresses|resolves|etc. https://github.com/gov4git/testing.project/issues/2"
 func parseIssueRefs(ctx context.Context, repo Repo, issue *github.Issue) []ImportedRef {
@@ -107,3 +107,4 @@ func parseIssueRefs(ctx context.Context, repo Repo, issue *github.Issue) []Impor
 const refRegexpSrc = `^([a-zA-Z0-9\-]+)\s+https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)/(issues|pull)/(\d+)$`
 
 var refRegexp = regexp.MustCompile(refRegexpSrc)
+*/

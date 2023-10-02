@@ -51,7 +51,7 @@ func OpenMotion_StageOnly(
 		OpenedAt:   time.Now(),
 		ID:         id,
 		Title:      title,
-		Desc:       desc,
+		Body:       desc,
 		Type:       typ,
 		TrackerURL: trackerURL,
 		Labels:     labels,
@@ -113,7 +113,7 @@ func UpdateMotionMeta_StageOnly(
 	motion := motionKV.Get(ctx, motionNS, t, id)
 	motion.TrackerURL = trackerURL
 	motion.Title = title
-	motion.Desc = desc
+	motion.Body = desc
 	motion.Labels = labels
 	return motionKV.Set(ctx, motionNS, t, id, motion)
 }

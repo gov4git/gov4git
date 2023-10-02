@@ -29,22 +29,15 @@ func ImportIssuesForPrioritization(
 
 	base.Infof("importing issues for prioritization ...")
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	ghIssues := ImportIssuesForPrioritization_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
+	issuesCausingChange := ImportIssuesForPrioritization_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
 	chg := git.NewChange[form.Map, ImportedIssues](
-		fmt.Sprintf("Import %d GitHub issues", len(ghIssues)),
+		fmt.Sprintf("Import %d GitHub issues", len(issuesCausingChange)),
 		"github_import",
 		form.Map{},
-		ghIssues,
+		issuesCausingChange,
 		nil,
 	)
-	status, err := govCloned.Public.Tree().Status()
-	must.NoError(ctx, err)
-	if !status.IsClean() {
-		base.Infof("import from github caused changes")
-		proto.Commit(ctx, govCloned.Public.Tree(), chg)
-		govCloned.Public.Push(ctx)
-	}
-	return chg
+	return proto.CommitIfChanged(ctx, govCloned.Public, chg)
 }
 
 func ImportIssuesForPrioritization_StageOnly(
@@ -57,14 +50,14 @@ func ImportIssuesForPrioritization_StageOnly(
 
 	// load github issues and governance ballots, and
 	// index them under a common key space
-	_, ghIssues := LoadIssues(ctx, repo, githubClient)
-	govBallots := filterIssuesForPrioritization(ballot.List_Local(ctx, govCloned.Public.Tree()))
+	_, issues := LoadIssues(ctx, repo, githubClient)
+	ballots := filterIssuesForPrioritization(ballot.List_Local(ctx, govCloned.Public.Tree()))
 
 	// ensure every issue has a corresponding up-to-date ballot
 	causedChange := ImportedIssues{}
-	for k, ghIssue := range ghIssues {
+	for k, ghIssue := range issues {
 		if ghIssue.ForPrioritization {
-			if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
+			if govBallot, ok := ballots[k]; ok { // ballot for issue already exists, update it
 
 				must.Assertf(ctx, ns.Equal(ghIssue.BallotName().NS(), govBallot.Name.NS()),
 					"issue ballot name %v and actual ballot name %v mismatch", ghIssue.BallotName(), govBallot.Name)
@@ -111,7 +104,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				causedChange = append(causedChange, ghIssue)
 			}
 		} else { // issue is not for prioritization, freeze ballot if it exists and is open
-			if govBallot, ok := govBallots[k]; ok { // ballot for issue already exists, update it
+			if govBallot, ok := ballots[k]; ok { // ballot for issue already exists, update it
 				// if ballot closed, do nothing
 				// if ballot frozen, do nothing
 				// otherwise, freeze ballot

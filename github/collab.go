@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto"
@@ -16,26 +17,26 @@ import (
 func SyncGovernedIssues(
 	ctx context.Context,
 	repo Repo,
-	githubClient *github.Client, // if nil, a new client for repo will be created
+	githubClient *github.Client,
 	govAddr gov.OrganizerAddress,
 ) git.Change[form.Map, ImportedIssues] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	ghIssues := SyncGovernedIssues_Local(ctx, repo, githubClient, govAddr, govCloned)
+	issuesCausingChange := SyncGovernedIssues_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
 	chg := git.NewChange[form.Map, ImportedIssues](
-		fmt.Sprintf("Sync %d GitHub issues participating in governance", len(ghIssues)),
+		fmt.Sprintf("Sync %d GitHub issues participating in governance", len(issuesCausingChange)),
 		"github_sync",
 		form.Map{},
-		ghIssues, // XXX: may be too verbose
+		issuesCausingChange,
 		nil,
 	)
 	return proto.CommitIfChanged(ctx, govCloned.Public, chg)
 }
 
-func SyncGovernedIssues_Local(
+func SyncGovernedIssues_StageOnly(
 	ctx context.Context,
 	repo Repo,
-	githubClient *github.Client, // if nil, a new client for repo will be created
+	githubClient *github.Client,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
 ) ImportedIssues {
@@ -44,37 +45,45 @@ func SyncGovernedIssues_Local(
 
 	// load github issues and governance motions, and
 	// index them under a common key space
-	ghOrderedIssues, ghIssues := LoadIssues(ctx, repo, githubClient)
-	govMotions := indexMotions(collab.ListMotions_Local(ctx, t))
+	_, issues := LoadIssues(ctx, repo, githubClient)
+	motions := indexMotions(collab.ListMotions_Local(ctx, t))
 
 	// ensure every issue has a corresponding up-to-date motion
-	for key, issue := range ghIssues {
+	causedChange := ImportedIssues{}
+	for key, issue := range issues {
 		id := collab.MotionID(key)
 		if issue.IsGoverned {
-			if motion, ok := govMotions[id]; ok { // if motion for issue already exists, update it
-				syncMeta(ctx, t, issue, id)
+			if motion, ok := motions[id]; ok { // if motion for issue already exists, update it
+				changed := syncMeta(ctx, t, issue, motion)
 				switch {
 				case issue.Closed && motion.Closed:
 					// nothing to do
 				case issue.Closed && !motion.Closed:
 					syncFrozen(ctx, t, issue, motion)
 					collab.CloseMotion_StageOnly(ctx, t, id)
+					changed = true
 				case !issue.Closed && motion.Closed:
 					collab.ReopenMotion_StageOnly(ctx, t, id)
 					syncFrozen(ctx, t, issue, motion)
+					changed = true
 				case !issue.Closed && !motion.Closed:
-					syncFrozen(ctx, t, issue, motion)
+					changed = changed || syncFrozen(ctx, t, issue, motion)
+				}
+				if changed {
+					causedChange = append(causedChange, issue)
 				}
 			} else { // otherwise, no motion for this issue exists, so create one
 				syncCreateMotionForIssue(ctx, t, issue, id)
+				causedChange = append(causedChange, issue)
 			}
-		} else { // issue is not for prioritization, freeze motion if it exists and is open
-			if motion, ok := govMotions[id]; ok { // motion for issue already exists, update it
+		} else { // issue is not governed, freeze motion if it exists and is open
+			if motion, ok := motions[id]; ok { // motion for issue already exists, update it
 				// if motion closed, do nothing
 				// if motion frozen, do nothing
 				// otherwise, freeze motion
 				if !motion.Closed && !motion.Frozen {
 					collab.FreezeMotion_StageOnly(ctx, t, id)
+					causedChange = append(causedChange, issue)
 				}
 			}
 		}
@@ -83,9 +92,10 @@ func SyncGovernedIssues_Local(
 	// don't touch motions that have no corresponding issue
 
 	matchingMotions := indexMotions(collab.ListMotions_Local(ctx, t))
-	syncRefs(ctx, t, ghIssues, matchingMotions)
+	syncRefs(ctx, t, issues, matchingMotions)
 
-	return ghOrderedIssues
+	causedChange.Sort()
+	return causedChange
 }
 
 func syncRefs(ctx context.Context, t *git.Tree, issues map[string]ImportedIssue, motions map[collab.MotionID]collab.Motion) {
@@ -94,16 +104,23 @@ func syncRefs(ctx context.Context, t *git.Tree, issues map[string]ImportedIssue,
 	// XXX
 }
 
-func syncMeta(ctx context.Context, t *git.Tree, issue ImportedIssue, id collab.MotionID) {
+func syncMeta(ctx context.Context, t *git.Tree, issue ImportedIssue, motion collab.Motion) bool {
+	if motion.TrackerURL == issue.URL &&
+		motion.Title == issue.Title &&
+		motion.Body == issue.Body &&
+		reflect.DeepEqual(motion.Labels, issue.Labels) {
+		return false
+	}
 	collab.UpdateMotionMeta_StageOnly(
 		ctx,
 		t,
-		id,
+		motion.ID,
 		issue.URL,
 		issue.Title,
 		issue.Body,
 		issue.Labels,
 	)
+	return true
 }
 
 func syncFrozen(
@@ -111,18 +128,18 @@ func syncFrozen(
 	t *git.Tree,
 	ghIssue ImportedIssue,
 	govMotion collab.Motion,
-) {
+) bool {
 	switch {
 	case ghIssue.Locked && govMotion.Frozen:
-		return
+		return false
 	case ghIssue.Locked && !govMotion.Frozen:
 		collab.FreezeMotion_StageOnly(ctx, t, govMotion.ID)
-		return
+		return true
 	case !ghIssue.Locked && govMotion.Frozen:
 		collab.UnfreezeMotion_StageOnly(ctx, t, govMotion.ID)
-		return
+		return true
 	case !ghIssue.Locked && !govMotion.Frozen:
-		return
+		return false
 	}
 	panic("unreachable")
 }

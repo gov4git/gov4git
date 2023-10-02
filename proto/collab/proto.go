@@ -57,7 +57,7 @@ type Motion struct {
 	// meta
 	TrackerURL string   `json:"tracker_url"` // link to concern on an external concern tracker, such as a GitHub issue
 	Title      string   `json:"title"`
-	Desc       string   `json:"description"`
+	Body       string   `json:"description"`
 	Labels     []string `json:"labels"`
 	// state
 	Frozen    bool `json:"frozen"`

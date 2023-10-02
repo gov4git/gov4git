@@ -2,9 +2,12 @@ package github
 
 import (
 	"context"
+	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/google/go-github/v55/github"
+	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/util"
 )
@@ -76,10 +79,10 @@ func TransformIssue(ctx context.Context, repo Repo, issue *github.Issue) Importe
 		ClosedAt:          unwrapTimestamp(issue.ClosedAt),
 		CreatedAt:         unwrapTimestamp(issue.CreatedAt),
 		UpdatedAt:         unwrapTimestamp(issue.UpdatedAt),
-		// Refs:              parseIssueRefs(ctx, repo, issue), //XXX
-		Locked:        issue.GetLocked(),
-		Closed:        issue.GetState() == "closed",
-		IsPullRequest: issue.GetPullRequestLinks() != nil,
+		Refs:              parseIssueRefs(ctx, repo, issue),
+		Locked:            issue.GetLocked(),
+		Closed:            issue.GetState() == "closed",
+		IsPullRequest:     issue.GetPullRequestLinks() != nil,
 	}
 }
 
@@ -90,21 +93,26 @@ func unwrapTimestamp(ts *github.Timestamp) *time.Time {
 	return &ts.Time
 }
 
-/*
 // parseIssueRefs parses all references to issues or pull requests from the body of an issue.
 // Reference directives are of the form: "addresses|resolves|etc. https://github.com/gov4git/testing.project/issues/2"
+// References are extracted syntactically and are not guaranteed to correspond to real issues.
 func parseIssueRefs(ctx context.Context, repo Repo, issue *github.Issue) []ImportedRef {
 
 	refs := []ImportedRef{}
 	matches := refRegexp.FindAllStringSubmatch(issue.GetBody(), -1)
-
-	panic("XXX")
-
-	//XXX: some references may be invalid, i.e. point to non-existent issues
+	for _, m := range matches {
+		n, err := strconv.Atoi(m[5])
+		if err != nil {
+			// an attacker could inject invalid github issue links
+			base.Infof("reference %q has unparsable issue number %q", m[0], m[5])
+			continue
+		}
+		ref := ImportedRef{To: int64(n), Type: m[1]}
+		refs = append(refs, ref)
+	}
 	return refs
 }
 
 const refRegexpSrc = `^([a-zA-Z0-9\-]+)\s+https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)/(issues|pull)/(\d+)$`
 
 var refRegexp = regexp.MustCompile(refRegexpSrc)
-*/

@@ -4,9 +4,9 @@
 
 ## Quick demo
 
-This video demonstrates the basics of using the gov4git command-line client for the gov4git governance protocol.
+This video walks through the basics of using gov4git to govern a collaborative community on GitHub:
 
-[![gov4git walkthrough](https://img.youtube.com/vi/9oWkN9VNGhI/0.jpg)](https://www.youtube.com/watch?v=9oWkN9VNGhI)
+[![gov4git walkthrough](https://img.youtube.com/vi/l0Cz-2xaajY/maxresdefault.jpg)](https://www.youtube.com/watch?v=l0Cz-2xaajY)
 
 ## Introduction
 

@@ -52,7 +52,9 @@ func VoteLogPath(govID id.ID, ballotName ns.NS) ns.NS {
 }
 
 func BallotTopic(ballotName ns.NS) string {
-	return "ballot:" + ballotName.Path()
+	// BallotTopic must produce the same string on every OS.
+	// It is essential to use ballotName.GitPath, instead of ballotName.Path which is OS-specific.
+	return "ballot:" + ballotName.GitPath()
 }
 
 func BallotPath(path ns.NS) ns.NS {

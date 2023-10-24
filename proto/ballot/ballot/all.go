@@ -66,7 +66,11 @@ func TallyAll_StageOnly(
 	// populate ad voter structures
 	for i, ad := range adVoters {
 		for u := range ad.VoterAccounts {
-			adVoters[i].VoterClones[u] = allVoterClones[u]
+			if cloned, clonedOK := allVoterClones[u]; clonedOK {
+				adVoters[i].VoterClones[u] = cloned
+			} else {
+				delete(adVoters[i].VoterAccounts, u)
+			}
 		}
 	}
 

@@ -34,7 +34,7 @@ func TestTrack(t *testing.T) {
 	ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections1)
 
 	// tally: collect and accept first vote
-	ballot.Tally(ctx, cty.Organizer(), ballotName)
+	ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 
 	// vote 2: rejected vote
 	elections2 := common.Elections{common.NewElection(choices[0], 2.0)}
@@ -44,7 +44,7 @@ func TestTrack(t *testing.T) {
 	ballot.Freeze(ctx, cty.Organizer(), ballotName)
 
 	// tally: collect and reject second vote (because ballot is frozen)
-	ballot.Tally(ctx, cty.Organizer(), ballotName)
+	ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 
 	// unfreeze ballot
 	ballot.Unfreeze(ctx, cty.Organizer(), ballotName)

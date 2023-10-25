@@ -3,9 +3,11 @@ package id
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/testutil"
 )
 
@@ -39,4 +41,9 @@ func NewTestID(ctx context.Context, t *testing.T, branch git.Branch, isBare bool
 		Public:  testutil.NewLocalAddress(ctx, t, branch, isBare),
 		Private: testutil.NewLocalAddress(ctx, t, branch, isBare),
 	}
+}
+
+func (x TestID) Erase(ctx context.Context) {
+	must.NoError(ctx, os.RemoveAll(x.Public.Dir()))
+	must.NoError(ctx, os.RemoveAll(x.Private.Dir()))
 }

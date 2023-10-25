@@ -139,6 +139,7 @@ var (
 				ctx,
 				setup.Organizer,
 				ns.ParseFromPath(ballotName),
+				ballotFetchPar,
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -211,6 +212,7 @@ var (
 	ballotOnlyClosed       bool
 	ballotOnlyFrozen       bool
 	ballotWithParticipant  string
+	ballotFetchPar         int
 )
 
 func init() {
@@ -260,6 +262,7 @@ func init() {
 	// tally
 	ballotCmd.AddCommand(ballotTallyCmd)
 	ballotTallyCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotTallyCmd.Flags().IntVar(&ballotFetchPar, "fetch_par", 5, "parallelism while clonging member repos for vote collection")
 	ballotTallyCmd.MarkFlagRequired("name")
 
 	// vote

@@ -59,7 +59,7 @@ func TestQV(t *testing.T) {
 	fmt.Println("vote 0/1: ", form.SprintJSON(voteChg01))
 
 	// first tally
-	tallyChg0 := ballot.Tally(ctx, cty.Organizer(), ballotName)
+	tallyChg0 := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	fmt.Println("tally 0: ", form.SprintJSON(tallyChg0))
 	expScores0 := map[string]float64{
 		choices[0]: -1.0352761804100827,
@@ -91,7 +91,7 @@ func TestQV(t *testing.T) {
 	fmt.Println("vote 1/1: ", form.SprintJSON(voteChg11))
 
 	// second tally
-	tallyChg1 := ballot.Tally(ctx, cty.Organizer(), ballotName)
+	tallyChg1 := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	fmt.Println("tally 1: ", form.SprintJSON(tallyChg1))
 	expScores1 := map[string]float64{
 		choices[0]: 0.0,

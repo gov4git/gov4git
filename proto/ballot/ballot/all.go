@@ -46,35 +46,28 @@ func TallyAll_StageOnly(
 	ads := common.FilterOpenClosedAds(false, List_Local(ctx, communityTree))
 
 	// compute union of all voter accounts from all open ballots
-	adVoters := make([]adVoters, len(ads))
+	participatingVoters := make([]participatingVoters, len(ads))
 	allVoters := map[member.User]member.Account{}
 	for i, ad := range ads {
-		adVoters[i].Ad = ad
-		adVoters[i].VoterAccounts = map[member.User]member.Account{}
-		adVoters[i].VoterClones = map[member.User]git.Cloned{}
-		adVoters[i].Voters = member.ListGroupUsers_Local(ctx, communityTree, ad.Participants)
-		for _, user := range adVoters[i].Voters {
-			account := member.GetUser_Local(ctx, communityTree, user)
-			adVoters[i].VoterAccounts[user] = account
-			allVoters[user] = account
+		participatingVoters[i] = *loadParticipatingVoters(ctx, communityTree, ad)
+		for user, acct := range participatingVoters[i].VoterAccounts {
+			allVoters[user] = acct
 		}
 	}
 
 	// fetch repos of all participating users
 	allVoterClones := clonePar(ctx, allVoters, maxPar)
 
-	// populate ad voter structures
-	for i, ad := range adVoters {
-		for u := range ad.VoterAccounts {
-			adVoters[i].VoterClones[u] = allVoterClones[u]
-		}
+	// populate participating voter clones
+	for _, pv := range participatingVoters {
+		pv.attachVoterClones(ctx, allVoterClones)
 	}
 
 	// perform tallies for all open ballots
 	tallyChanges := []git.Change[map[string]form.Form, common.Tally]{}
 	tallies := []common.Tally{}
-	for _, adv := range adVoters {
-		if tallyChg, changed := tallyVotersCloned_StageOnly(ctx, govAddr, govOwner, adv.Ad.Name, adv.VoterAccounts, adv.VoterClones); changed {
+	for _, pv := range participatingVoters {
+		if tallyChg, changed := tallyVotersCloned_StageOnly(ctx, govAddr, govOwner, pv.Ad.Name, pv.VoterAccounts, pv.VoterClones); changed {
 			tallyChanges = append(tallyChanges, tallyChg)
 			tallies = append(tallies, tallyChg.Result)
 		}
@@ -87,13 +80,6 @@ func TallyAll_StageOnly(
 		tallies,
 		form.ToForms(tallyChanges),
 	)
-}
-
-type adVoters struct {
-	Ad            common.Advertisement
-	Voters        []member.User
-	VoterAccounts map[member.User]member.Account
-	VoterClones   map[member.User]git.Cloned
 }
 
 func clonePar(ctx context.Context, userAccounts map[member.User]member.Account, maxPar int) map[member.User]git.Cloned {

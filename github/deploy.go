@@ -47,7 +47,7 @@ func Deploy(
 
 	govPrivate := GithubRepo{Owner: govPrefix.Owner, Name: govPrefix.Name + "-gov.private"}
 	base.Infof("creating GitHub repository %v", govPrivate)
-	govPrivateURLs, err := v.CreateRepo(ctx, govPrivate.Name, govPrivate.Owner, false)
+	govPrivateURLs, err := v.CreateRepo(ctx, govPrivate.Name, govPrivate.Owner, true)
 	must.NoError(ctx, err)
 
 	govOwnerAddr := id.OwnerAddress{

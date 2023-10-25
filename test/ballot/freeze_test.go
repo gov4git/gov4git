@@ -65,7 +65,7 @@ func TestVoteFreezeVote(t *testing.T) {
 	fmt.Println("unfreeze: ", form.SprintJSON(unfreezeChg))
 
 	// tally
-	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName)
+	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	fmt.Println("tally: ", form.SprintJSON(tallyChg))
 	if tallyChg.Result.Scores[choices[0]] != 1.0 {
 		t.Errorf("expecting %v, got %v", 1.0, tallyChg.Result.Scores[choices[0]])
@@ -112,7 +112,7 @@ func TestVoteFreezeTally(t *testing.T) {
 	}
 
 	// tally
-	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName)
+	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	fmt.Println("tally: ", form.SprintJSON(tallyChg))
 	if tallyChg.Result.Scores[choices[0]] != 0.0 {
 		t.Errorf("expecting %v, got %v", 0.0, tallyChg.Result.Scores[choices[0]])

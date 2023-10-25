@@ -21,10 +21,11 @@ func Tally(
 	ctx context.Context,
 	govAddr gov.OrganizerAddress,
 	ballotName ns.NS,
+	maxPar int,
 ) git.Change[form.Map, common.Tally] {
 
 	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg, changed := Tally_StageOnly(ctx, govAddr, govOwner, ballotName)
+	chg, changed := Tally_StageOnly(ctx, govAddr, govOwner, ballotName, maxPar)
 	if !changed {
 		return chg
 	}
@@ -38,24 +39,17 @@ func Tally_StageOnly(
 	govAddr gov.OrganizerAddress,
 	govOwner id.OwnerCloned,
 	ballotName ns.NS,
+	maxPar int,
 ) (git.Change[form.Map, common.Tally], bool) {
 
 	communityTree := govOwner.Public.Tree()
 	ad, _ := load.LoadStrategy(ctx, communityTree, ballotName)
 
-	// compute all participating voter accounts
-	voterAccounts := map[member.User]member.Account{}
-	for _, user := range member.ListGroupUsers_Local(ctx, communityTree, ad.Participants) {
-		voterAccounts[user] = member.GetUser_Local(ctx, communityTree, user)
-	}
+	pv := loadParticipatingVoters(ctx, communityTree, ad)
+	votersCloned := clonePar(ctx, pv.VoterAccounts, maxPar)
+	pv.attachVoterClones(ctx, votersCloned)
 
-	// fetch repos of all participating voters
-	votersCloned := map[member.User]git.Cloned{}
-	for u, a := range voterAccounts {
-		votersCloned[u] = git.CloneOne(ctx, git.Address(a.PublicAddress))
-	}
-
-	return tallyVotersCloned_StageOnly(ctx, govAddr, govOwner, ballotName, voterAccounts, votersCloned)
+	return tallyVotersCloned_StageOnly(ctx, govAddr, govOwner, ballotName, pv.VoterAccounts, pv.VoterClones)
 }
 
 func tallyVotersCloned_StageOnly(

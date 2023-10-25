@@ -43,19 +43,28 @@ func Tally_StageOnly(
 	communityTree := govOwner.Public.Tree()
 	ad, _ := load.LoadStrategy(ctx, communityTree, ballotName)
 
-	// compute all participating voter accounts
-	voterAccounts := map[member.User]member.Account{}
-	for _, user := range member.ListGroupUsers_Local(ctx, communityTree, ad.Participants) {
-		voterAccounts[user] = member.GetUser_Local(ctx, communityTree, user)
+	//XXX
+	adVoters := adVoters{}
+	adVoters.Ad = ad
+	adVoters.VoterAccounts = map[member.User]member.Account{}
+	adVoters.VoterClones = map[member.User]git.Cloned{}
+	adVoters.Voters = member.ListGroupUsers_Local(ctx, communityTree, ad.Participants)
+	for _, user := range adVoters.Voters {
+		account := member.GetUser_Local(ctx, communityTree, user)
+		adVoters.VoterAccounts[user] = account
 	}
 
-	// fetch repos of all participating voters
-	votersCloned := map[member.User]git.Cloned{}
-	for u, a := range voterAccounts {
-		votersCloned[u] = git.CloneOne(ctx, git.Address(a.PublicAddress))
+	votersCloned := clonePar(ctx, adVoters.VoterAccounts, 1) //XXX
+
+	for u := range adVoters.VoterAccounts {
+		if cloned, clonedOK := votersCloned[u]; clonedOK {
+			adVoters.VoterClones[u] = cloned
+		} else {
+			delete(adVoters.VoterAccounts, u)
+		}
 	}
 
-	return tallyVotersCloned_StageOnly(ctx, govAddr, govOwner, ballotName, voterAccounts, votersCloned)
+	return tallyVotersCloned_StageOnly(ctx, govAddr, govOwner, ballotName, adVoters.VoterAccounts, adVoters.VoterClones)
 }
 
 func tallyVotersCloned_StageOnly(

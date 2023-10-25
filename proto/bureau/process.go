@@ -54,8 +54,11 @@ func Process_StageOnly(
 	// fetch user requests
 	var fetchedReqs FetchedRequests
 	for i, account := range accounts {
-		fetchedReqs = append(fetchedReqs,
-			fetchUserRequests(ctx, govAddr, govOwner, users[i], account).Result...)
+		if fetched, err := fetchUserRequests(ctx, govAddr, govOwner, users[i], account); err != nil {
+			base.Infof("fetching bureau requests for user %v (%v)", users[i], err)
+		} else {
+			fetchedReqs = append(fetchedReqs, fetched.Result...)
+		}
 	}
 
 	// process requests
@@ -118,7 +121,7 @@ func fetchUserRequests(
 	govOwner id.OwnerCloned,
 	user member.User,
 	account member.Account,
-) git.Change[form.Map, FetchedRequests] {
+) (git.Change[form.Map, FetchedRequests], error) {
 
 	fetched := FetchedRequests{}
 	var respond mail.Responder[Request, Request] = func(
@@ -135,7 +138,11 @@ func fetchUserRequests(
 		return req, nil
 	}
 
-	userPublic := git.CloneOne(ctx, git.Address(account.PublicAddress))
+	userPublic, err := git.TryCloneOne(ctx, git.Address(account.PublicAddress))
+	if err != nil {
+		return git.Change[form.Map, FetchedRequests]{}, err
+	}
+
 	recvOnly := mail.Respond_StageOnly[Request, Request](
 		ctx,
 		govOwner,
@@ -151,5 +158,5 @@ func fetchUserRequests(
 		form.Map{"user": user, "account": account},
 		fetched,
 		form.Forms{recvOnly},
-	)
+	), nil
 }

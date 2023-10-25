@@ -16,9 +16,10 @@ import (
 )
 
 type TestCommunity struct {
-	gov       gov.GovAddress
-	organizer gov.OrganizerAddress
-	members   []id.OwnerAddress
+	gov           gov.GovAddress
+	organizer     gov.OrganizerAddress
+	members       []id.OwnerAddress
+	silentMembers []id.OwnerAddress
 }
 
 func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCommunity {
@@ -38,13 +39,31 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 		members[i] = memberID.OwnerAddress()
 	}
 
+	// initialize silent members (their repos become unreachable after joining the community)
+	silentMembers := make([]id.OwnerAddress, numMembers)
+	silentTestIDs := make([]id.TestID, numMembers)
+	for i := 0; i < numMembers; i++ {
+		memberID := id.NewTestID(ctx, t, git.MainBranch, true)
+		base.Infof("silent_member_%d_public=%v silent_member_%d_private=%v",
+			i, memberID.Public.Address(), i, memberID.Private.Address())
+		id.Init(ctx, memberID.OwnerAddress())
+		silentMembers[i] = memberID.OwnerAddress()
+		silentTestIDs[i] = memberID
+	}
+
 	comty := &TestCommunity{
-		gov:       gov.GovAddress(organizerID.PublicAddress()),
-		organizer: gov.OrganizerAddress(organizerID.OwnerAddress()),
-		members:   members,
+		gov:           gov.GovAddress(organizerID.PublicAddress()),
+		organizer:     gov.OrganizerAddress(organizerID.OwnerAddress()),
+		members:       members,
+		silentMembers: silentMembers,
 	}
 
 	comty.addEverybody(t, ctx)
+
+	// erase silent memers' repos
+	for _, tid := range silentTestIDs {
+		tid.Erase(ctx)
+	}
 
 	return comty
 }
@@ -55,6 +74,10 @@ func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 
 	for i, m := range x.members {
 		member.AddUserByPublicAddress_StageOnly(ctx, govCloned.Tree(), x.MemberUser(i), m.Public)
+	}
+
+	for i, m := range x.silentMembers {
+		member.AddUserByPublicAddress_StageOnly(ctx, govCloned.Tree(), x.InvalidMemberUser(i), m.Public)
 	}
 
 	chg := git.NewChangeNoResult("add everybody", "test_add_everybody")
@@ -71,9 +94,17 @@ func (x *TestCommunity) Organizer() gov.OrganizerAddress {
 }
 
 func (x *TestCommunity) MemberUser(i int) member.User {
-	return member.User("m" + strconv.Itoa(i))
+	return member.User("member_" + strconv.Itoa(i))
 }
 
 func (x *TestCommunity) MemberOwner(i int) id.OwnerAddress {
 	return x.members[i]
+}
+
+func (x *TestCommunity) InvalidMemberUser(i int) member.User {
+	return member.User("silent_member_" + strconv.Itoa(i))
+}
+
+func (x *TestCommunity) InvalidMemberOwner(i int) id.OwnerAddress {
+	return x.silentMembers[i]
 }

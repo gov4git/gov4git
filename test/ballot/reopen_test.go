@@ -39,7 +39,7 @@ func TestReopen(t *testing.T) {
 	ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections)
 
 	// tally#1
-	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName)
+	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	if tallyChg.Result.Scores[choices[0]] != math.Sqrt(2.0) {
 		t.Errorf("expecting %v vote, got %v", math.Sqrt(2.0), tallyChg.Result.Scores[choices[0]])
 	}
@@ -66,7 +66,7 @@ func TestReopen(t *testing.T) {
 	ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections)
 
 	// tally#2
-	tallyChg = ballot.Tally(ctx, cty.Organizer(), ballotName)
+	tallyChg = ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	if tallyChg.Result.Scores[choices[0]] != 2.0 {
 		t.Errorf("expecting %v vote, got %v", 2.0, tallyChg.Result.Scores[choices[0]])
 	}

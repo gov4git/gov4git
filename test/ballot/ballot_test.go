@@ -19,6 +19,8 @@ import (
 	"github.com/gov4git/lib4git/testutil"
 )
 
+const testMaxPar = 3
+
 func TestOpenClose(t *testing.T) {
 	base.LogVerbosely()
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
@@ -47,11 +49,7 @@ func TestOpenClose(t *testing.T) {
 	ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections)
 
 	// tally
-	tallyChg := ballot.Tally(
-		ctx,
-		cty.Organizer(),
-		ballotName,
-	)
+	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	if tallyChg.Result.Scores[choices[0]] != 1.0 {
 		t.Errorf("expecting %v vote, got %v", 1.0, tallyChg.Result.Scores[choices[0]])
 	}
@@ -101,11 +99,7 @@ func TestOpenCancel(t *testing.T) {
 	ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections)
 
 	// tally
-	tallyChg := ballot.Tally(
-		ctx,
-		cty.Organizer(),
-		ballotName,
-	)
+	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	if tallyChg.Result.Scores[choices[0]] != 1.0 {
 		t.Errorf("expecting %v vote, got %v", 1.0, tallyChg.Result.Scores[choices[0]])
 	}

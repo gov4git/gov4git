@@ -1,5 +1,4 @@
 - [ ] import concerns and proposals from github
-  - [ ] XXX
 
 - [ ] prohibit re-opening on gov4git side
 

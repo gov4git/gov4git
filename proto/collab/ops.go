@@ -2,6 +2,7 @@ package collab
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/gov4git/gov4git/proto"
@@ -45,6 +46,9 @@ func OpenMotion_StageOnly(
 	trackerURL string,
 	labels []string,
 ) git.ChangeNoResult {
+
+	labels = slices.Clone(labels)
+	slices.Sort(labels)
 
 	must.Assert(ctx, !IsMotion_Local(ctx, t, id), ErrMotionAlreadyExists)
 	state := Motion{
@@ -109,6 +113,9 @@ func UpdateMotionMeta_StageOnly(
 	desc string,
 	labels []string,
 ) git.ChangeNoResult {
+
+	labels = slices.Clone(labels)
+	slices.Sort(labels)
 
 	motion := motionKV.Get(ctx, motionNS, t, id)
 	motion.TrackerURL = trackerURL

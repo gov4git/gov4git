@@ -3,7 +3,7 @@ package github
 import (
 	"context"
 	"fmt"
-	"reflect"
+	"slices"
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto"
@@ -98,17 +98,11 @@ func SyncGovernedIssues_StageOnly(
 	return causedChange
 }
 
-func syncRefs(ctx context.Context, t *git.Tree, issues map[string]ImportedIssue, motions map[collab.MotionID]collab.Motion) {
-
-	panic("XXX")
-	// XXX
-}
-
 func syncMeta(ctx context.Context, t *git.Tree, issue ImportedIssue, motion collab.Motion) bool {
 	if motion.TrackerURL == issue.URL &&
 		motion.Title == issue.Title &&
 		motion.Body == issue.Body &&
-		reflect.DeepEqual(motion.Labels, issue.Labels) {
+		slices.Equal(motion.Labels, issue.Labels) {
 		return false
 	}
 	collab.UpdateMotionMeta_StageOnly(

@@ -71,6 +71,10 @@ func (x ImportedIssue) Key() string {
 	return strconv.Itoa(int(x.Number))
 }
 
+func IssueNumberToMotionID(no int64) collab.MotionID {
+	return collab.MotionID(strconv.Itoa(int(no)))
+}
+
 const (
 	ImportedGithubPrefix = "github"
 	ImportedIssuePrefix  = "issues"

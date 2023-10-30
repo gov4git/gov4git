@@ -3,6 +3,7 @@ package collab
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
@@ -39,11 +40,14 @@ func LinkMotions_StageOnly(
 
 	// update
 	if !from.RefersTo(toID, typ) {
-		from.RefTo = append(from.RefTo, &ref)
+		from.RefTo = append(from.RefTo, ref)
 	}
 	if !to.ReferredBy(fromID, typ) {
-		to.RefBy = append(to.RefBy, &ref)
+		to.RefBy = append(to.RefBy, ref)
 	}
+
+	sort.Sort(from.RefTo)
+	sort.Sort(to.RefBy)
 
 	// write state
 	motionKV.Set(ctx, motionNS, t, fromID, from)

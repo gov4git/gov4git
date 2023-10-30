@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"regexp"
+	"slices"
 	"strconv"
 	"time"
 
@@ -56,6 +57,7 @@ func LabelsToStrings(labels []*github.Label) []string {
 	for _, label := range labels {
 		labelStrings = append(labelStrings, label.GetName())
 	}
+	slices.Sort(labelStrings)
 	return labelStrings
 }
 

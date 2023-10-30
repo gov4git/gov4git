@@ -67,8 +67,8 @@ type Motion struct {
 	Scoring Scoring `json:"scoring"`
 	Score   float64 `json:"score"` // priority score for this motion, computed during sync after tallying
 	// network
-	RefBy []*Ref `json:"ref_by"`
-	RefTo []*Ref `json:"ref_to"`
+	RefBy Refs `json:"ref_by"`
+	RefTo Refs `json:"ref_to"`
 }
 
 func (m Motion) IsConcern() bool {
@@ -106,9 +106,36 @@ type Scoring struct {
 type RefType string
 
 type Ref struct {
+	Type RefType  `json:"type"`
 	From MotionID `json:"from"`
 	To   MotionID `json:"to"`
-	Type RefType  `json:"type"`
+}
+
+func RefLess(p, q Ref) bool {
+	if p.Type < q.Type {
+		return true
+	}
+	if p.From < q.From {
+		return true
+	}
+	if p.To < q.To {
+		return true
+	}
+	return false
+}
+
+type Refs []Ref
+
+func (x Refs) Len() int {
+	return len(x)
+}
+
+func (x Refs) Less(i, j int) bool {
+	return RefLess(x[i], x[j])
+}
+
+func (x Refs) Swap(i, j int) {
+	x[i], x[j] = x[j], x[i]
 }
 
 type Motions []Motion

@@ -22,7 +22,7 @@ func FetchRepoMaintainers(
 	m := []string{}
 	for _, u := range users {
 		if u.GetPermissions()["maintainer"] || u.GetPermissions()["admin"] {
-			m = append(m, u.GetLogin())
+			m = append(m, strings.ToLower(u.GetLogin()))
 		}
 	}
 	return m
@@ -104,7 +104,7 @@ func isJoinApprovalPresent(ctx context.Context, approvers []string, comments []*
 		if u == nil {
 			continue
 		}
-		if !util.IsIn(u.GetLogin(), approvers...) {
+		if !util.IsIn(strings.ToLower(u.GetLogin()), approvers...) {
 			continue
 		}
 		// trim empty lines and spaces

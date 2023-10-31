@@ -108,3 +108,7 @@ func (x *TestCommunity) InvalidMemberUser(i int) member.User {
 func (x *TestCommunity) InvalidMemberOwner(i int) id.OwnerAddress {
 	return x.silentMembers[i]
 }
+
+func (x *TestCommunity) NonExistentMemberUser() member.User {
+	return member.User("non_existent_member")
+}

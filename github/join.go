@@ -78,7 +78,7 @@ func ProcessJoinRequestIssues_StageOnly(
 			report.Joined = append(report.Joined, newMember)
 		} else {
 			if issue.User != nil {
-				report.NotJoined = append(report.NotJoined, issue.User.GetLogin())
+				report.NotJoined = append(report.NotJoined, strings.ToLower(issue.User.GetLogin()))
 			}
 		}
 	}
@@ -103,7 +103,7 @@ func processJoinRequestIssue_StageOnly(
 		replyAndCloseIssue(ctx, repo, ghc, issue, "GitHub identity of issue author is not available.")
 		return ""
 	}
-	login := u.GetLogin()
+	login := strings.ToLower(u.GetLogin())
 	if login == "" {
 		base.Infof("github user of issue author is not available: %v", form.SprintJSON(issue))
 		replyAndCloseIssue(ctx, repo, ghc, issue, "GitHub user of issue author is not available.")

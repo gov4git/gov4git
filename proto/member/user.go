@@ -30,6 +30,22 @@ func GetUser(ctx context.Context, addr gov.GovAddress, name User) Account {
 	return GetUser_Local(ctx, gov.Clone(ctx, addr).Tree(), name)
 }
 
+func IsUser_Local(ctx context.Context, t *git.Tree, name User) bool {
+	err := must.Try(
+		func() {
+			GetUser_Local(ctx, t, name)
+		},
+	)
+	if err == nil {
+		return true
+	}
+	if git.IsNotExist(err) {
+		return false
+	}
+	must.Panic(ctx, err)
+	return false
+}
+
 func GetUser_Local(ctx context.Context, t *git.Tree, name User) Account {
 	return usersKV.Get(ctx, usersNS, t, name)
 }
@@ -66,6 +82,7 @@ func RemoveUser(ctx context.Context, addr gov.GovAddress, name User) {
 }
 
 func RemoveUser_StageOnly(ctx context.Context, t *git.Tree, name User) git.ChangeNoResult {
+	must.Assertf(ctx, IsUser_Local(ctx, t, name), "%v is not a name", name)
 	// remove all group memberships of the user
 	for _, g := range ListUserGroups_Local(ctx, t, name) {
 		RemoveMember_StageOnly(ctx, t, name, g)
@@ -85,6 +102,7 @@ func SetUserProp[V form.Form](ctx context.Context, addr gov.GovAddress, user Use
 }
 
 func SetUserProp_StageOnly[V form.Form](ctx context.Context, t *git.Tree, user User, key string, value V) git.ChangeNoResult {
+	must.Assertf(ctx, IsUser_Local(ctx, t, user), "%v is not a user", user)
 	propKV := kv.KV[string, V]{}
 	return propKV.Set(ctx, usersKV.KeyNS(usersNS, user), t, key, value)
 }
@@ -92,24 +110,26 @@ func SetUserProp_StageOnly[V form.Form](ctx context.Context, t *git.Tree, user U
 // get prop
 
 func GetUserProp[V form.Form](ctx context.Context, addr gov.GovAddress, user User, key string) V {
-	return GetUserPropLocal[V](ctx, gov.Clone(ctx, addr).Tree(), user, key)
+	return GetUserProp_Local[V](ctx, gov.Clone(ctx, addr).Tree(), user, key)
 }
 
-func GetUserPropLocal[V form.Form](ctx context.Context, t *git.Tree, user User, key string) V {
+func GetUserProp_Local[V form.Form](ctx context.Context, t *git.Tree, user User, key string) V {
+	must.Assertf(ctx, IsUser_Local(ctx, t, user), "%v is not a user", user)
 	propKV := kv.KV[string, V]{}
 	return propKV.Get(ctx, usersKV.KeyNS(usersNS, user), t, key)
 }
 
 func GetUserPropOrDefault[V form.Form](ctx context.Context, addr gov.GovAddress, user User, key string, default_ V) V {
-	r := default_
-	r, _ = must.Try1(func() V { return GetUserProp[V](ctx, addr, user, key) })
-	return r
+	return GetUserPropOrDefault_Local[V](ctx, gov.Clone(ctx, addr).Tree(), user, key, default_)
 }
 
-func GetUserPropLocalOrDefault[V form.Form](ctx context.Context, t *git.Tree, user User, key string, default_ V) V {
-	r := default_
-	r, _ = must.Try1(func() V { return GetUserPropLocal[V](ctx, t, user, key) })
-	return r
+func GetUserPropOrDefault_Local[V form.Form](ctx context.Context, t *git.Tree, user User, key string, default_ V) V {
+	must.Assertf(ctx, IsUser_Local(ctx, t, user), "%v is not a user", user)
+	v, err := must.Try1(func() V { return GetUserProp_Local[V](ctx, t, user, key) })
+	if err != nil {
+		return default_
+	}
+	return v
 }
 
 // lookup

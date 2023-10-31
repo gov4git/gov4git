@@ -22,11 +22,11 @@ func Set_StageOnly(ctx context.Context, t *git.Tree, user member.User, key Balan
 }
 
 func Get(ctx context.Context, addr gov.GovAddress, user member.User, key Balance) float64 {
-	return member.GetUserPropOrDefault(ctx, addr, user, userPropKey(key), 0.0)
+	return member.GetUserPropOrDefault[float64](ctx, addr, user, userPropKey(key), 0.0)
 }
 
 func Get_Local(ctx context.Context, t *git.Tree, user member.User, key Balance) float64 {
-	return member.GetUserPropLocalOrDefault(ctx, t, user, userPropKey(key), 0.0)
+	return member.GetUserPropOrDefault_Local[float64](ctx, t, user, userPropKey(key), 0.0)
 }
 
 func TryTransfer_StageOnly(

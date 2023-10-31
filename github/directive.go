@@ -130,7 +130,7 @@ func processDirectiveIssue_StageOnly(
 		replyAndCloseIssue(ctx, repo, ghc, issue, "GitHub identity of issue author is not available.")
 		return DirectiveIssue{}, fmt.Errorf("identity of issue author is not available")
 	}
-	login := u.GetLogin()
+	login := strings.ToLower(u.GetLogin())
 	if login == "" {
 		base.Infof("github user of issue author is not available: %v", form.SprintJSON(issue))
 		replyAndCloseIssue(ctx, repo, ghc, issue, "GitHub user of issue author is not available.")
@@ -271,5 +271,5 @@ func parseUser(s string) (string, error) {
 	if s[0] != '@' {
 		return "", fmt.Errorf("user must start with @")
 	}
-	return s[1:], nil
+	return strings.ToLower(s[1:]), nil
 }

@@ -19,11 +19,17 @@ Verify `gov4git` is installed:
 gov4git version
 ```
 
-## Prepare a GitHub access token for automation
+## Prepare a GitHub user and access token for automation
 
-The governance system is deployed in the form of GitHub actions, installed in a newly created governance repo in the same GitHub organization as your project repo.
+The governance system is deployed in the form of a GitHub action, installed in a newly created governance repo in the same GitHub organization as your project repo.
 
-First, you must create a [GitHub access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) which will be used by the automation logic.
+The governance automation — invoked by the GitHub action — executes on behalf of a dedicated GitHub user, which represents the governance system itself. You must **create a new GitHub user, designated as the governance automation user** — and name it appropriately, as it will speak to the community users via GitHub comments.
+
+For instance, the _Plurality Book Project_ — *@pluralitybook* on GitHub — uses a dedicated user called _Plurality Book DAO_ — *@pluralitybook-dao* on GitHub — to operate the governance system.
+
+**Invite the automation user to your organization with Owner privileges.**
+
+**Create a [GitHub access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) for the automation user.**
 
 Your token must have permissions to:
 - create new repositories in your GitHub organization

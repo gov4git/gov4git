@@ -15,7 +15,7 @@ func TestBureau(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	usd := balance.Balance("usd")
+	usd := balance.Balance{"usd"}
 
 	// credit user 0 with some cash
 	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), usd, 3.0)

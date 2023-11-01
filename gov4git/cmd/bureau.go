@@ -40,9 +40,9 @@ var (
 				setup.Member,
 				setup.Gov,
 				member.User(bureauFromUser),
-				balance.Balance(bureauFromBalance),
+				balance.ParseBalance(bureauFromBalance),
 				member.User(bureauToUser),
-				balance.Balance(bureauToBalance),
+				balance.ParseBalance(bureauToBalance),
 				bureauAmount,
 			)
 		},

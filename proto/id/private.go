@@ -17,7 +17,7 @@ func GetOwnerCredentials(ctx context.Context, owner OwnerCloned) PrivateCredenti
 }
 
 func GetPrivateCredentials(ctx context.Context, privateTree *git.Tree) PrivateCredentials {
-	cred := form.FromFile[PrivateCredentials](ctx, privateTree.Filesystem, PrivateCredentialsNS.Path())
+	cred := form.FromFile[PrivateCredentials](ctx, privateTree.Filesystem, PrivateCredentialsNS)
 	must.Assertf(ctx, cred.IsValid(), "credentials are not valid")
 	return cred
 }

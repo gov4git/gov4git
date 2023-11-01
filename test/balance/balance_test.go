@@ -16,7 +16,7 @@ func TestBalance(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	bal := balance.Balance("test_balance")
+	bal := balance.Balance{"test_balance"}
 
 	// test set/get roundtrip
 	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), bal, 30.0)

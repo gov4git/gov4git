@@ -28,7 +28,7 @@ var (
 				ctx,
 				setup.Gov,
 				member.User(balanceUser),
-				balance.Balance(balanceKey),
+				balance.ParseBalance(balanceKey),
 				balanceValue,
 			)
 		},
@@ -44,7 +44,7 @@ var (
 				ctx,
 				setup.Gov,
 				member.User(balanceUser),
-				balance.Balance(balanceKey),
+				balance.ParseBalance(balanceKey),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(v))
 		},
@@ -60,7 +60,7 @@ var (
 				ctx,
 				setup.Gov,
 				member.User(balanceUser),
-				balance.Balance(balanceKey),
+				balance.ParseBalance(balanceKey),
 				balanceValue,
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(v))
@@ -77,7 +77,7 @@ var (
 				ctx,
 				setup.Gov,
 				member.User(balanceUser),
-				balance.Balance(balanceKey),
+				balance.ParseBalance(balanceKey),
 				balanceValue,
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(v))

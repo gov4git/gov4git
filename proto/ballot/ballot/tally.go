@@ -92,8 +92,8 @@ func tallyVotersCloned_StageOnly(
 		rejectFetchedVotes(fetchedVotes, currentTally.RejectedVotes)
 
 		// write updated tally
-		openTallyNS := common.BallotPath(ballotName).Sub(common.TallyFilebase)
-		git.ToFileStage(ctx, communityTree, openTallyNS.Path(), currentTally)
+		openTallyNS := common.BallotPath(ballotName).Append(common.TallyFilebase)
+		git.ToFileStage(ctx, communityTree, openTallyNS, currentTally)
 
 		return git.NewChange(
 			"Ballot is frozen, discarding pending votes",
@@ -107,8 +107,8 @@ func tallyVotersCloned_StageOnly(
 	updatedTally := strat.Tally(ctx, govOwner, &ad, &currentTally, fetchedVotesToElections(fetchedVotes)).Result
 
 	// write updated tally
-	openTallyNS := common.BallotPath(ballotName).Sub(common.TallyFilebase)
-	git.ToFileStage(ctx, communityTree, openTallyNS.Path(), updatedTally)
+	openTallyNS := common.BallotPath(ballotName).Append(common.TallyFilebase)
+	git.ToFileStage(ctx, communityTree, openTallyNS, updatedTally)
 
 	return git.NewChange(
 		fmt.Sprintf("Tally votes on ballot %v", ballotName),
@@ -131,6 +131,6 @@ func rejectFetchedVotes(fv FetchedVotes, rej map[member.User]common.RejectedElec
 }
 
 func LoadTally(ctx context.Context, communityTree *git.Tree, ballotName ns.NS) common.Tally {
-	tallyNS := common.BallotPath(ballotName).Sub(common.TallyFilebase)
-	return git.FromFile[common.Tally](ctx, communityTree, tallyNS.Path())
+	tallyNS := common.BallotPath(ballotName).Append(common.TallyFilebase)
+	return git.FromFile[common.Tally](ctx, communityTree, tallyNS)
 }

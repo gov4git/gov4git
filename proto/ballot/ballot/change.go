@@ -39,12 +39,12 @@ func Change_StageOnly(
 	description string,
 ) git.Change[form.Map, common.Advertisement] {
 
-	adNS := common.BallotPath(name).Sub(common.AdFilebase)
+	adNS := common.BallotPath(name).Append(common.AdFilebase)
 
 	ad, _ := load.LoadStrategy(ctx, govCloned.Public.Tree(), name)
 	ad.Title = title
 	ad.Description = description
-	git.ToFileStage(ctx, govCloned.Public.Tree(), adNS.Path(), ad)
+	git.ToFileStage(ctx, govCloned.Public.Tree(), adNS, ad)
 
 	return git.NewChange(
 		fmt.Sprintf("Change ballot %v info", name),

@@ -25,25 +25,25 @@ func SendMakeMsg_StageOnly[Msg form.Form](
 
 	// write receiver id + topic in send box file
 	infoValue := SendBoxInfo{ReceiverCred: receiverCred, Topic: topic}
-	infoNS := topicNS.Sub(BoxInfoFilebase)
-	git.ToFileStage(ctx, sender, infoNS.Path(), infoValue)
+	infoNS := topicNS.Append(BoxInfoFilebase)
+	git.ToFileStage(ctx, sender, infoNS, infoValue)
 
 	// read the next message number
 	// if file is missing, nextSeqNo = 0
-	nextNS := topicNS.Sub(NextFilebase)
-	nextSeqNo, _ := git.TryFromFile[SeqNo](ctx, sender, nextNS.Path())
+	nextNS := topicNS.Append(NextFilebase)
+	nextSeqNo, _ := git.TryFromFile[SeqNo](ctx, sender, nextNS)
 
 	// write message
-	msgNS := topicNS.Sub(strconv.Itoa(int(nextSeqNo)))
+	msgNS := topicNS.Append(strconv.Itoa(int(nextSeqNo)))
 	msg := mkMsg(ctx, nextSeqNo)
-	git.ToFileStage(ctx, sender, msgNS.Path(), msg)
+	git.ToFileStage(ctx, sender, msgNS, msg)
 
 	// write + stage next file
 	var newNextSeqNo SeqNo = nextSeqNo + 1
 	if newNextSeqNo < nextSeqNo {
 		must.Errorf(ctx, "mailbox size exceeded")
 	}
-	git.ToFileStage(ctx, sender, nextNS.Path(), newNextSeqNo)
+	git.ToFileStage(ctx, sender, nextNS, newNextSeqNo)
 
 	return git.NewChange(
 		fmt.Sprintf("Sent #%d", nextSeqNo),

@@ -1,7 +1,6 @@
 package mail
 
 import (
-	"path/filepath"
 	"sort"
 
 	"github.com/gov4git/gov4git/proto/id"
@@ -50,23 +49,19 @@ const (
 	NextFilebase    = "next.json"
 )
 
-var SendNS = id.PublicNS.Sub("mail/sent")
-var ReceiveNS = id.PublicNS.Sub("mail/received")
+var SendNS = id.PublicNS.Append("mail/sent")
+var ReceiveNS = id.PublicNS.Append("mail/received")
 
 func ReceiveTopicNS(senderID id.ID, topic string) ns.NS {
-	return ReceiveNS.Sub(
-		filepath.Join(
-			form.StringHashForFilename(string(senderID)),
-			form.StringHashForFilename(topic),
-		),
+	return ReceiveNS.Append(
+		form.StringHashForFilename(string(senderID)),
+		form.StringHashForFilename(topic),
 	)
 }
 
 func SendTopicNS(receiverID id.ID, topic string) ns.NS {
-	return SendNS.Sub(
-		filepath.Join(
-			form.StringHashForFilename(string(receiverID)),
-			form.StringHashForFilename(topic),
-		),
+	return SendNS.Append(
+		form.StringHashForFilename(string(receiverID)),
+		form.StringHashForFilename(topic),
 	)
 }

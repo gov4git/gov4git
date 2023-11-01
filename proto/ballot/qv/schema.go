@@ -5,8 +5,8 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 )
 
-const (
-	VotingCredits balance.Balance = "voting_credits"
+var (
+	VotingCredits = balance.Balance{"voting_credits"}
 )
 
 const (

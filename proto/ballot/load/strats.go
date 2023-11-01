@@ -13,14 +13,14 @@ import (
 func LoadStrategy(ctx context.Context, govTree *git.Tree, ballotName ns.NS) (common.Advertisement, common.Strategy) {
 
 	// read ad
-	adNS := common.BallotPath(ballotName).Sub(common.AdFilebase)
-	ad := git.FromFile[common.Advertisement](ctx, govTree, adNS.Path())
+	adNS := common.BallotPath(ballotName).Append(common.AdFilebase)
+	ad := git.FromFile[common.Advertisement](ctx, govTree, adNS)
 
 	// read strategy
-	strategyNS := common.BallotPath(ballotName).Sub(common.StrategyFilebase)
+	strategyNS := common.BallotPath(ballotName).Append(common.StrategyFilebase)
 	switch ad.Strategy {
 	case qv.QVStrategyName:
-		return ad, git.FromFile[qv.QV](ctx, govTree, strategyNS.Path())
+		return ad, git.FromFile[qv.QV](ctx, govTree, strategyNS)
 	default:
 		must.Errorf(ctx, "unkonwn ballot strategy %v", ad.Strategy)
 		panic("unreachable")

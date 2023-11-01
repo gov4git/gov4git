@@ -44,15 +44,15 @@ func Reopen_StageOnly(
 	chg := strat.Reopen(ctx, govCloned, &ad, &tally)
 
 	// remove prior outcome
-	openOutcomeNS := common.BallotPath(ballotName).Sub(common.OutcomeFilebase)
-	_, err := govTree.Remove(openOutcomeNS.Path())
+	openOutcomeNS := common.BallotPath(ballotName).Append(common.OutcomeFilebase)
+	_, err := git.TreeRemove(ctx, govTree, openOutcomeNS)
 	must.NoError(ctx, err)
 
 	// write state
 	ad.Closed = false
 	ad.Cancelled = false
-	openAdNS := common.BallotPath(ballotName).Sub(common.AdFilebase)
-	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
+	openAdNS := common.BallotPath(ballotName).Append(common.AdFilebase)
+	git.ToFileStage(ctx, govTree, openAdNS, ad)
 
 	return chg
 }

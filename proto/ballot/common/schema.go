@@ -1,7 +1,6 @@
 package common
 
 import (
-	"path/filepath"
 	"time"
 
 	"github.com/gov4git/gov4git/proto"
@@ -15,13 +14,13 @@ import (
 )
 
 var (
-	BallotNS         = proto.RootNS.Sub("ballot")
+	BallotNS         = proto.RootNS.Append("ballot")
 	AdFilebase       = "ballot_ad.json"
 	StrategyFilebase = "ballot_strategy.json"
 	TallyFilebase    = "ballot_tally.json"
 	OutcomeFilebase  = "ballot_outcome.json"
 
-	VoteLogNS = proto.RootNS.Sub("votes") // namespace in voter's repo for recording votes
+	VoteLogNS = proto.RootNS.Append("votes") // namespace in voter's repo for recording votes
 )
 
 // VoteLog records the votes of a user to a ballot within a given governance.
@@ -43,11 +42,9 @@ type VoterStatus struct {
 }
 
 func VoteLogPath(govID id.ID, ballotName ns.NS) ns.NS {
-	return VoteLogNS.Sub(
-		filepath.Join(
-			form.StringHashForFilename(string(govID)),
-			form.StringHashForFilename(BallotTopic(ballotName)),
-		),
+	return VoteLogNS.Append(
+		form.StringHashForFilename(string(govID)),
+		form.StringHashForFilename(BallotTopic(ballotName)),
 	)
 }
 

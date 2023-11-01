@@ -13,7 +13,7 @@ func FetchPublicCredentials(ctx context.Context, addr PublicAddress) PublicCrede
 }
 
 func GetPublicCredentials(ctx context.Context, t *git.Tree) PublicCredentials {
-	cred := form.FromFile[PublicCredentials](ctx, t.Filesystem, PublicCredentialsNS.Path())
+	cred := form.FromFile[PublicCredentials](ctx, t.Filesystem, PublicCredentialsNS)
 	must.Assertf(ctx, cred.IsValid(), "credentials are not valid")
 	return cred
 }

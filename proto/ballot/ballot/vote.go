@@ -59,7 +59,7 @@ func Vote_StageOnly(
 	govCred := id.GetPublicCredentials(ctx, govCloned.Tree())
 	voteLogNS := common.VoteLogPath(govCred.ID, ballotName)
 	// read current vote log
-	voteLog, err := git.TryFromFile[common.VoteLog](ctx, voterTree, voteLogNS.Path())
+	voteLog, err := git.TryFromFile[common.VoteLog](ctx, voterTree, voteLogNS)
 	if git.IsNotExist(err) {
 		voteLog = common.VoteLog{
 			GovID:         govCred.ID,
@@ -72,7 +72,7 @@ func Vote_StageOnly(
 	}
 	// append new vote
 	voteLog.VoteEnvelopes = append(voteLog.VoteEnvelopes, envelope)
-	git.ToFileStage(ctx, voterTree, voteLogNS.Path(), voteLog)
+	git.ToFileStage(ctx, voterTree, voteLogNS, voteLog)
 
 	// send vote to community by mail
 	sendChg := mail.Request_StageOnly(ctx, voterOwner, govCloned.Tree(), common.BallotTopic(ballotName), envelope)

@@ -44,8 +44,8 @@ func Freeze_StageOnly(
 	ad.Frozen = true
 
 	// write updated ad
-	adNS := common.BallotPath(ballotName).Sub(common.AdFilebase)
-	git.ToFileStage(ctx, govTree, adNS.Path(), ad)
+	adNS := common.BallotPath(ballotName).Append(common.AdFilebase)
+	git.ToFileStage(ctx, govTree, adNS, ad)
 
 	return git.NewChangeNoResult(fmt.Sprintf("Freeze ballot %v", ballotName), "ballot_freeze")
 }

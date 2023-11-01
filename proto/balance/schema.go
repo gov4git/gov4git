@@ -20,8 +20,4 @@ func userPropKey(balanceKey Balance) string {
 
 	balanceNS := ns.NS{"balance"}
 	return balanceNS.Join(balanceKey.NS()).GitPath()
-
-	// XXX: old version below; test for backwards compatibility
-	// key := strings.TrimLeft(filepath.ToSlash(string(balanceKey)), "/")
-	// return strings.Join([]string{"balance", key}, "/")
 }

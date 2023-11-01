@@ -45,7 +45,7 @@ func Track_StageOnly(
 	// read the voter's log
 	govCred := id.GetPublicCredentials(ctx, govCloned.Tree())
 	voteLogNS := common.VoteLogPath(govCred.ID, ballotName)
-	voteLog := git.FromFile[common.VoteLog](ctx, voterOwner.Public.Tree(), voteLogNS.Path())
+	voteLog := git.FromFile[common.VoteLog](ctx, voterOwner.Public.Tree(), voteLogNS)
 
 	// calculate pending votes
 	pendingVotes := map[id.ID]bool{}

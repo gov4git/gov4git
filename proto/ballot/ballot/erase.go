@@ -42,7 +42,7 @@ func Erase_StageOnly(
 
 	// write outcome
 	ballotNS := common.BallotPath(ballotName)
-	_, err := govTree.Remove(ballotNS.Path())
+	_, err := git.TreeRemove(ctx, govTree, ballotNS)
 	must.NoError(ctx, err)
 
 	return git.NewChange(

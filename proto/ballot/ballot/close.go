@@ -52,14 +52,14 @@ func Close_StageOnly(
 	}
 
 	// write outcome
-	openOutcomeNS := common.BallotPath(ballotName).Sub(common.OutcomeFilebase)
-	git.ToFileStage(ctx, govTree, openOutcomeNS.Path(), chg.Result)
+	openOutcomeNS := common.BallotPath(ballotName).Append(common.OutcomeFilebase)
+	git.ToFileStage(ctx, govTree, openOutcomeNS, chg.Result)
 
 	// write state
 	ad.Closed = true
 	ad.Cancelled = cancel
-	openAdNS := common.BallotPath(ballotName).Sub(common.AdFilebase)
-	git.ToFileStage(ctx, govTree, openAdNS.Path(), ad)
+	openAdNS := common.BallotPath(ballotName).Append(common.AdFilebase)
+	git.ToFileStage(ctx, govTree, openAdNS, ad)
 
 	return chg
 }

@@ -45,17 +45,17 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 	senderCred := id.GetPublicCredentials(ctx, sender)
 	senderTopicNS := SendTopicNS(receiverCred.ID, topic)
 	receiverTopicNS := ReceiveTopicNS(senderCred.ID, topic)
-	receiverNextNS := receiverTopicNS.Sub(NextFilebase)
-	senderNextNS := senderTopicNS.Sub(NextFilebase)
-	receiverInfoNS := receiverTopicNS.Sub(BoxInfoFilebase)
+	receiverNextNS := receiverTopicNS.Append(NextFilebase)
+	senderNextNS := senderTopicNS.Append(NextFilebase)
+	receiverInfoNS := receiverTopicNS.Append(BoxInfoFilebase)
 
 	// read receiver and sender next seq no
-	receiverNextSeqNo, _ := git.TryFromFile[SeqNo](ctx, receiver, receiverNextNS.Path())
-	senderNextSeqNo, _ := git.TryFromFile[SeqNo](ctx, sender, senderNextNS.Path())
+	receiverNextSeqNo, _ := git.TryFromFile[SeqNo](ctx, receiver, receiverNextNS)
+	senderNextSeqNo, _ := git.TryFromFile[SeqNo](ctx, sender, senderNextNS)
 
 	// write receive box info
 	info := ReceiveBoxInfo{SenderCred: senderCred, Topic: topic}
-	git.ToFileStage(ctx, receiver, receiverInfoNS.Path(), info)
+	git.ToFileStage(ctx, receiver, receiverInfoNS, info)
 
 	// read unread messages
 	receiverLatestNextSeqNo := receiverNextSeqNo
@@ -63,20 +63,20 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 	msgEffects := []MsgEffect[Msg, Effect]{}
 	for i := receiverNextSeqNo; i < senderNextSeqNo; i++ {
 		msgFilebase := strconv.Itoa(int(i))
-		msg := git.FromFile[Msg](ctx, sender, senderTopicNS.Sub(msgFilebase).Path())
+		msg := git.FromFile[Msg](ctx, sender, senderTopicNS.Append(msgFilebase))
 		effect, err := receive(ctx, i, msg)
 		if err != nil {
 			base.Infof("responding to message %d in sender repo (%v)", i, err)
 			continue
 		}
 		msgEffect := MsgEffect[Msg, Effect]{SeqNo: i, Msg: msg, Effect: effect}
-		git.ToFileStage(ctx, receiver, receiverTopicNS.Sub(msgFilebase).Path(), msgEffect)
+		git.ToFileStage(ctx, receiver, receiverTopicNS.Append(msgFilebase), msgEffect)
 		msgEffects = append(msgEffects, msgEffect)
 		receiverLatestNextSeqNo = i + 1
 	}
 
 	// write receiver-side next seq no
-	git.ToFileStage(ctx, receiver, receiverNextNS.Path(), receiverLatestNextSeqNo)
+	git.ToFileStage(ctx, receiver, receiverNextNS, receiverLatestNextSeqNo)
 
 	return git.NewChange(
 		fmt.Sprintf("Received %d messages", len(msgEffects)),

@@ -34,7 +34,7 @@ var (
 				ctx,
 				strat,
 				setup.Gov,
-				ns.ParseFromPath(ballotName),
+				ns.ParseFromGitPath(ballotName),
 				ballotTitle,
 				ballotDescription,
 				ballotChoices,
@@ -53,7 +53,7 @@ var (
 			chg := ballot.Freeze(
 				ctx,
 				setup.Organizer,
-				ns.ParseFromPath(ballotName),
+				ns.ParseFromGitPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -68,7 +68,7 @@ var (
 			chg := ballot.Unfreeze(
 				ctx,
 				setup.Organizer,
-				ns.ParseFromPath(ballotName),
+				ns.ParseFromGitPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -83,7 +83,7 @@ var (
 			chg := ballot.Close(
 				ctx,
 				setup.Organizer,
-				ns.ParseFromPath(ballotName),
+				ns.ParseFromGitPath(ballotName),
 				ballotCancel,
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -99,7 +99,7 @@ var (
 			r := ballot.Show(
 				ctx,
 				setup.Gov,
-				ns.ParseFromPath(ballotName),
+				ns.ParseFromGitPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(r))
 		},
@@ -138,7 +138,7 @@ var (
 			chg := ballot.Tally(
 				ctx,
 				setup.Organizer,
-				ns.ParseFromPath(ballotName),
+				ns.ParseFromGitPath(ballotName),
 				ballotFetchPar,
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -155,7 +155,7 @@ var (
 				ctx,
 				setup.Member,
 				setup.Gov,
-				ns.ParseFromPath(ballotName),
+				ns.ParseFromGitPath(ballotName),
 				parseElections(ctx, ballotElectionChoice, ballotElectionStrength),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -175,7 +175,7 @@ Pending votes have not yet been processed by the community's governance.`,
 				ctx,
 				setup.Member,
 				setup.Gov,
-				ns.ParseFromPath(ballotName),
+				ns.ParseFromGitPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(status))
 		},
@@ -190,7 +190,7 @@ Pending votes have not yet been processed by the community's governance.`,
 			chg := ballot.Erase(
 				ctx,
 				setup.Organizer,
-				ns.ParseFromPath(ballotName),
+				ns.ParseFromGitPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},

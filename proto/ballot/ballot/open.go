@@ -45,9 +45,9 @@ func Open_StageOnly(
 ) git.Change[form.Map, common.BallotAddress] {
 
 	// check no open ballots by the same name
-	openAdNS := common.BallotPath(name).Sub(common.AdFilebase)
-	if _, err := govCloned.Tree().Filesystem.Stat(openAdNS.Path()); err == nil {
-		must.Errorf(ctx, "ballot already exists: %v", openAdNS.Path())
+	openAdNS := common.BallotPath(name).Append(common.AdFilebase)
+	if _, err := git.TreeStat(ctx, govCloned.Tree(), openAdNS); err == nil {
+		must.Errorf(ctx, "ballot already exists: %v", openAdNS.GitPath())
 	}
 
 	// verify group exists
@@ -69,7 +69,7 @@ func Open_StageOnly(
 		Cancelled:    false,
 		ParentCommit: git.Head(ctx, govCloned.Repo()),
 	}
-	git.ToFileStage(ctx, govCloned.Tree(), openAdNS.Path(), ad)
+	git.ToFileStage(ctx, govCloned.Tree(), openAdNS, ad)
 
 	// write initial tally
 	tally := common.Tally{
@@ -80,12 +80,12 @@ func Open_StageOnly(
 		RejectedVotes: map[member.User]common.RejectedElections{},
 		Charges:       map[member.User]float64{},
 	}
-	openTallyNS := common.BallotPath(name).Sub(common.TallyFilebase)
-	git.ToFileStage(ctx, govCloned.Tree(), openTallyNS.Path(), tally)
+	openTallyNS := common.BallotPath(name).Append(common.TallyFilebase)
+	git.ToFileStage(ctx, govCloned.Tree(), openTallyNS, tally)
 
 	// write strategy
-	openStratNS := common.BallotPath(name).Sub(common.StrategyFilebase)
-	git.ToFileStage(ctx, govCloned.Tree(), openStratNS.Path(), strat)
+	openStratNS := common.BallotPath(name).Append(common.StrategyFilebase)
+	git.ToFileStage(ctx, govCloned.Tree(), openStratNS, strat)
 
 	return git.NewChange(
 		fmt.Sprintf("Create ballot of type %v", strat.Name()),

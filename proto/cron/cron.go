@@ -43,7 +43,7 @@ func Cron(
 	cronTree := cronCloned.Tree()
 
 	// read cron state
-	state, err := git.TryFromFile[CronState](ctx, cronTree, CronNS.Path())
+	state, err := git.TryFromFile[CronState](ctx, cronTree, CronNS)
 	must.Assertf(ctx, err == nil || err == os.ErrNotExist, "opening cron state (%v)", err)
 
 	now := time.Now()
@@ -98,7 +98,7 @@ func Cron(
 	}
 
 	// push cron state
-	git.ToFileStage(ctx, cronTree, CronNS.Path(), state)
+	git.ToFileStage(ctx, cronTree, CronNS, state)
 	proto.Commit(ctx, cronTree, cronChg)
 	cronCloned.Push(ctx)
 

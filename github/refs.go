@@ -40,8 +40,6 @@ func syncRefs(ctx context.Context, t *git.Tree, issues map[string]ImportedIssue,
 
 	// update edge differences; only update open motions
 
-	XXX
-
 	panic("XXX")
 	// XXX
 }

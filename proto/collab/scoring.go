@@ -67,7 +67,7 @@ func ScoreMotionByPoll_StageOnly(
 
 	motion := motionKV.Get(ctx, motionNS, govCloned.Tree(), id)
 
-	must.Assertf(ctx, motion.Scoring.Poll == nil, "motion %v is already associated with poll %v", id, motion.Scoring.Poll.Path())
+	must.Assertf(ctx, motion.Scoring.Poll == nil, "motion %v is already associated with poll %v", id, motion.Scoring.Poll.OSPath())
 
 	ballotName := MotionPollBallotName(id)
 	chg := ballot.Open_StageOnly(

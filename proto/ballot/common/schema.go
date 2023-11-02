@@ -60,8 +60,8 @@ func BallotPath(name BallotName) ns.NS {
 
 type BallotName ns.NS
 
-func (x BallotName) Path() string {
-	return ns.NS(x).Path()
+func (x BallotName) OSPath() string {
+	return ns.NS(x).OSPath()
 }
 
 func (x BallotName) GitPath() string {
@@ -73,7 +73,7 @@ func (x BallotName) NS() ns.NS {
 }
 
 func ParseBallotNameFromPath(p string) BallotName {
-	return BallotName(ns.ParseFromPath(p))
+	return BallotName(ns.ParseFromGitPath(p))
 }
 
 type Advertisement struct {

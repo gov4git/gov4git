@@ -1,0 +1,2 @@
+- [ ] initialize scoring method for opened motions (after syncing)
+- [ ] 

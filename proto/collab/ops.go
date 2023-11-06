@@ -2,6 +2,7 @@ package collab
 
 import (
 	"context"
+	"fmt"
 	"slices"
 	"time"
 
@@ -67,17 +68,23 @@ func OpenMotion_StageOnly(
 func CloseMotion(ctx context.Context, addr gov.GovAddress, id MotionID) git.ChangeNoResult {
 
 	cloned := gov.Clone(ctx, addr)
-	chg := CloseMotion_StageOnly(ctx, cloned.Tree(), id)
-	return proto.CommitIfChanged(ctx, cloned, chg)
+	CloseMotion_StageOnly(ctx, cloned.Tree(), id)
+	return proto.CommitIfChanged(ctx, cloned,
+		git.NewChangeNoResult(
+			fmt.Sprintf("Closed motion %v", id),
+			"collab_close_motion",
+		),
+	)
 }
 
-func CloseMotion_StageOnly(ctx context.Context, t *git.Tree, id MotionID) git.ChangeNoResult {
+func CloseMotion_StageOnly(ctx context.Context, t *git.Tree, id MotionID) Motion {
 
 	motion := motionKV.Get(ctx, motionNS, t, id)
 	must.Assert(ctx, !motion.Closed, ErrMotionAlreadyClosed)
 	motion.Closed = true
 	motion.ClosedAt = time.Now()
-	return motionKV.Set(ctx, motionNS, t, id, motion)
+	motionKV.Set(ctx, motionNS, t, id, motion)
+	return motion
 }
 
 func ReopenMotion_StageOnly(ctx context.Context, t *git.Tree, id MotionID) git.ChangeNoResult {

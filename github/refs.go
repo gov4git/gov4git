@@ -10,13 +10,14 @@ import (
 func syncRefs(
 	ctx context.Context,
 	t *git.Tree,
+	chg *SyncChanges,
 	issues map[string]ImportedIssue,
 	motions map[collab.MotionID]collab.Motion,
 ) {
 
-	motionRefs := map[collab.Ref]bool{} // index of current refs between motions
-	issueRefs := map[collab.Ref]bool{}  // index of current refs between issues, corresponding to existing motions
-	ids := map[collab.MotionID]bool{}   // index of existing motions
+	motionRefs := collab.RefSet{} // index of current refs between motions
+	issueRefs := collab.RefSet{}  // index of current refs between issues, corresponding to existing motions
+	ids := collab.MotionIDSet{}   // index of existing motions
 
 	// index motion refs (directed edges)
 	for id, motion := range motions {
@@ -49,6 +50,7 @@ func syncRefs(
 	for issueRef := range issueRefs {
 		if !motionRefs[issueRef] {
 			collab.LinkMotions_StageOnly(ctx, t, issueRef.From, issueRef.To, issueRef.Type)
+			chg.AddedRefs.Add(issueRef)
 		}
 	}
 
@@ -56,6 +58,7 @@ func syncRefs(
 	for motionRef := range motionRefs {
 		if !issueRefs[motionRef] {
 			collab.UnlinkMotions_StageOnly(ctx, t, motionRef.From, motionRef.To, motionRef.Type)
+			chg.RemovedRefs.Add(motionRef)
 		}
 	}
 

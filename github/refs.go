@@ -7,13 +7,18 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-func syncRefs(ctx context.Context, t *git.Tree, issues map[string]ImportedIssue, motions map[collab.MotionID]collab.Motion) {
+func syncRefs(
+	ctx context.Context,
+	t *git.Tree,
+	issues map[string]ImportedIssue,
+	motions map[collab.MotionID]collab.Motion,
+) {
 
 	motionRefs := map[collab.Ref]bool{} // index of current refs between motions
-	issueRefs := map[collab.Ref]bool{}  // index of current refs between issues
-	ids := map[collab.MotionID]bool{}
+	issueRefs := map[collab.Ref]bool{}  // index of current refs between issues, corresponding to existing motions
+	ids := map[collab.MotionID]bool{}   // index of existing motions
 
-	// index motion refs
+	// index motion refs (directed edges)
 	for id, motion := range motions {
 		for _, ref := range motion.RefTo {
 			motionRefs[ref] = true
@@ -21,7 +26,7 @@ func syncRefs(ctx context.Context, t *git.Tree, issues map[string]ImportedIssue,
 		ids[id] = true
 	}
 
-	// index issue refs
+	// index issue refs (directed edges)
 	for _, issue := range issues {
 		for _, importedRef := range issue.Refs {
 			from := IssueNumberToMotionID(issue.Number)
@@ -40,6 +45,18 @@ func syncRefs(ctx context.Context, t *git.Tree, issues map[string]ImportedIssue,
 
 	// update edge differences; only update open motions
 
-	panic("XXX")
-	// XXX
+	// add refs in issues, not in motions
+	for issueRef := range issueRefs {
+		if !motionRefs[issueRef] {
+			collab.LinkMotions_StageOnly(ctx, t, issueRef.From, issueRef.To, issueRef.Type)
+		}
+	}
+
+	// remove refs in motions, not in issues
+	for motionRef := range motionRefs {
+		if !issueRefs[motionRef] {
+			collab.UnlinkMotions_StageOnly(ctx, t, motionRef.From, motionRef.To, motionRef.Type)
+		}
+	}
+
 }

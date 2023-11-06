@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	motionNS = collabNS.Sub("motion")
+	motionNS = collabNS.Append("motion")
 	motionKV = kv.KV[MotionID, Motion]{}
 )
 
@@ -97,6 +97,25 @@ func (m Motion) ReferredBy(fromID MotionID, typ RefType) bool {
 	return false
 }
 
+func (m *Motion) AddRefTo(ref Ref) {
+	if !m.RefersTo(ref.To, ref.Type) {
+		m.RefTo = append(m.RefTo, ref)
+	}
+	m.RefTo.Sort()
+}
+
+func (m *Motion) AddRefBy(ref Ref) {
+	if !m.ReferredBy(ref.From, ref.Type) {
+		m.RefBy = append(m.RefBy, ref)
+	}
+	m.RefBy.Sort()
+}
+
+func (m *Motion) RemoveRef(unref Ref) {
+	m.RefTo = m.RefTo.Remove(unref)
+	m.RefBy = m.RefBy.Remove(unref)
+}
+
 // Scoring describes how a concern or a proposal is assigned a priority score.
 type Scoring struct {
 	Fixed *float64           `json:"fixed"`
@@ -109,6 +128,10 @@ type Ref struct {
 	Type RefType  `json:"type"`
 	From MotionID `json:"from"`
 	To   MotionID `json:"to"`
+}
+
+func RefEqual(x, y Ref) bool {
+	return x.Type == y.Type && x.From == y.From && x.To == y.To
 }
 
 func RefLess(p, q Ref) bool {
@@ -138,9 +161,25 @@ func (x Refs) Swap(i, j int) {
 	x[i], x[j] = x[j], x[i]
 }
 
+func (x Refs) Sort() { sort.Sort(x) }
+
+func (x Refs) Remove(unref Ref) Refs {
+	w := Refs{}
+	for _, ref := range x {
+		if !RefEqual(ref, unref) {
+			w = append(w, ref)
+		}
+	}
+	w.Sort()
+	return w
+}
+
 type Motions []Motion
 
-func (x Motions) Sort()              { sort.Sort(x) }
-func (x Motions) Len() int           { return len(x) }
+func (x Motions) Sort() { sort.Sort(x) }
+
+func (x Motions) Len() int { return len(x) }
+
 func (x Motions) Less(i, j int) bool { return x[i].Score < x[j].Score }
-func (x Motions) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
+
+func (x Motions) Swap(i, j int) { x[i], x[j] = x[j], x[i] }

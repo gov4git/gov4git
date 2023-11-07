@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/docket/docket"
+	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/lib4git/must"
 )
 
@@ -71,8 +71,8 @@ func (x ImportedIssue) Key() string {
 	return strconv.Itoa(int(x.Number))
 }
 
-func IssueNumberToMotionID(no int64) docket.MotionID {
-	return docket.MotionID(strconv.Itoa(int(no)))
+func IssueNumberToMotionID(no int64) schema.MotionID {
+	return schema.MotionID(strconv.Itoa(int(no)))
 }
 
 const (
@@ -89,11 +89,11 @@ func (x ImportedIssue) BallotName() common.BallotName {
 	}
 }
 
-func (x ImportedIssue) MotionType() docket.MotionType {
+func (x ImportedIssue) MotionType() schema.MotionType {
 	if x.IsPullRequest {
-		return docket.MotionProposalType
+		return schema.MotionProposalType
 	} else {
-		return docket.MotionConcernType
+		return schema.MotionConcernType
 	}
 }
 

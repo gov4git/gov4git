@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto"
-	"github.com/gov4git/gov4git/proto/docket"
+	"github.com/gov4git/gov4git/proto/docket/docket"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/form"
@@ -22,7 +22,7 @@ func SyncManagedIssues(
 ) git.Change[form.Map, SyncChanges] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	syncChanges := SyncGovernedIssues_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
+	syncChanges := SyncManagedIssues_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
 	chg := git.NewChange[form.Map, SyncChanges](
 		fmt.Sprintf("Sync %d GitHub issues participating in governance", len(syncChanges.IssuesCausingChange)),
 		"github_sync",
@@ -44,7 +44,7 @@ type SyncChanges struct {
 	RemovedRefs         docket.RefSet      `json:"removed_refs"`
 }
 
-func SyncGovernedIssues_StageOnly(
+func SyncManagedIssues_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client,

@@ -5,8 +5,8 @@ import (
 )
 
 var (
-	collabCmd = &cobra.Command{
-		Use:   "collab",
+	docketCmd = &cobra.Command{
+		Use:   "docket",
 		Short: "Collaboration tools",
 		Long:  ``,
 		Run:   func(cmd *cobra.Command, args []string) {},
@@ -14,5 +14,5 @@ var (
 )
 
 func init() {
-	collabCmd.AddCommand(motionCmd)
+	docketCmd.AddCommand(motionCmd)
 }

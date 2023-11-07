@@ -1,4 +1,4 @@
-package collab
+package docket
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-func UnlinkMotions(
+func LinkMotions(
 	ctx context.Context,
 	addr gov.GovAddress,
 	fromID MotionID,
@@ -19,11 +19,11 @@ func UnlinkMotions(
 ) git.Change[form.Map, Ref] {
 
 	cloned := gov.Clone(ctx, addr)
-	chg := UnlinkMotions_StageOnly(ctx, cloned.Tree(), fromID, toID, typ)
+	chg := LinkMotions_StageOnly(ctx, cloned.Tree(), fromID, toID, typ)
 	return proto.CommitIfChanged(ctx, cloned, chg)
 }
 
-func UnlinkMotions_StageOnly(
+func LinkMotions_StageOnly(
 	ctx context.Context,
 	t *git.Tree,
 	fromID MotionID,
@@ -35,21 +35,21 @@ func UnlinkMotions_StageOnly(
 	from := motionKV.Get(ctx, motionNS, t, fromID)
 	to := motionKV.Get(ctx, motionNS, t, toID)
 
-	unref := Ref{From: fromID, To: toID, Type: typ}
+	ref := Ref{From: fromID, To: toID, Type: typ}
 
 	// update
-	from.RemoveRef(unref)
-	to.RemoveRef(unref)
+	from.AddRefTo(ref)
+	to.AddRefBy(ref)
 
 	// write state
 	motionKV.Set(ctx, motionNS, t, fromID, from)
 	motionKV.Set(ctx, motionNS, t, toID, to)
 
 	return git.NewChange(
-		fmt.Sprintf("Remove reference from motion %v to motion %v of type %v", fromID, toID, typ),
-		"collab_unlink_motions",
+		fmt.Sprintf("Add reference from motion %v to motion %v of type %v", fromID, toID, typ),
+		"collab_link_motions",
 		form.Map{"from": fromID, "to": toID, "type": typ},
-		unref,
+		ref,
 		nil,
 	)
 }

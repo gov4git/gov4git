@@ -5,7 +5,7 @@
 - [x] score concerns and proposals
   - [ ] include scoring tally in the concern/proposal
 
-- [x] cli collab
+- [x] cli docket
   - [x] cli concerns
   - [ ] cli proposals
   - [ ] ???

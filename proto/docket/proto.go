@@ -1,4 +1,4 @@
-package collab
+package docket
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	motionNS = collabNS.Append("motion")
+	motionNS = docketNS.Append("motion")
 	motionKV = kv.KV[MotionID, Motion]{}
 )
 
@@ -21,7 +21,7 @@ var (
 )
 
 func MotionPollBallotName(id MotionID) common.BallotName {
-	return common.BallotName{"collab", "motion", "poll", id.String()}
+	return common.BallotName{"docket", "motion", "poll", id.String()}
 }
 
 type MotionID string

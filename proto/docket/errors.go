@@ -1,4 +1,4 @@
-package collab
+package docket
 
 import "errors"
 

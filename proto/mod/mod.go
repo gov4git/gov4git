@@ -7,7 +7,13 @@ type ModuleRegistry[M any] struct {
 	mods map[string]M
 }
 
-func (r *ModuleRegistry[M]) Add(key string, module M) {
+func NewModuleRegistry[M any]() *ModuleRegistry[M] {
+	return &ModuleRegistry[M]{
+		mods: map[string]M{},
+	}
+}
+
+func (r *ModuleRegistry[M]) Set(key string, module M) {
 	r.lk.Lock()
 	defer r.lk.Unlock()
 	r.mods[key] = module

@@ -3,7 +3,7 @@ package github
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/proto/docket"
+	"github.com/gov4git/gov4git/proto/docket/docket"
 	"github.com/gov4git/lib4git/git"
 )
 

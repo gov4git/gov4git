@@ -1,10 +1,11 @@
-package docket
+package ops
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -13,10 +14,10 @@ import (
 func UnlinkMotions(
 	ctx context.Context,
 	addr gov.GovAddress,
-	fromID MotionID,
-	toID MotionID,
-	typ RefType,
-) git.Change[form.Map, Ref] {
+	fromID schema.MotionID,
+	toID schema.MotionID,
+	typ schema.RefType,
+) git.Change[form.Map, schema.Ref] {
 
 	cloned := gov.Clone(ctx, addr)
 	chg := UnlinkMotions_StageOnly(ctx, cloned.Tree(), fromID, toID, typ)
@@ -26,24 +27,24 @@ func UnlinkMotions(
 func UnlinkMotions_StageOnly(
 	ctx context.Context,
 	t *git.Tree,
-	fromID MotionID,
-	toID MotionID,
-	typ RefType,
-) git.Change[form.Map, Ref] {
+	fromID schema.MotionID,
+	toID schema.MotionID,
+	typ schema.RefType,
+) git.Change[form.Map, schema.Ref] {
 
 	// read state
-	from := motionKV.Get(ctx, motionNS, t, fromID)
-	to := motionKV.Get(ctx, motionNS, t, toID)
+	from := schema.MotionKV.Get(ctx, schema.MotionNS, t, fromID)
+	to := schema.MotionKV.Get(ctx, schema.MotionNS, t, toID)
 
-	unref := Ref{From: fromID, To: toID, Type: typ}
+	unref := schema.Ref{From: fromID, To: toID, Type: typ}
 
 	// update
 	from.RemoveRef(unref)
 	to.RemoveRef(unref)
 
 	// write state
-	motionKV.Set(ctx, motionNS, t, fromID, from)
-	motionKV.Set(ctx, motionNS, t, toID, to)
+	schema.MotionKV.Set(ctx, schema.MotionNS, t, fromID, from)
+	schema.MotionKV.Set(ctx, schema.MotionNS, t, toID, to)
 
 	return git.NewChange(
 		fmt.Sprintf("Remove reference from motion %v to motion %v of type %v", fromID, toID, typ),

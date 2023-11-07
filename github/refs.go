@@ -3,7 +3,8 @@ package github
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/proto/docket/docket"
+	"github.com/gov4git/gov4git/proto/docket/ops"
+	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/lib4git/git"
 )
 
@@ -12,12 +13,12 @@ func syncRefs(
 	t *git.Tree,
 	chg *SyncChanges,
 	issues map[string]ImportedIssue,
-	motions map[docket.MotionID]docket.Motion,
+	motions map[schema.MotionID]schema.Motion,
 ) {
 
-	motionRefs := docket.RefSet{} // index of current refs between motions
-	issueRefs := docket.RefSet{}  // index of current refs between issues, corresponding to existing motions
-	ids := docket.MotionIDSet{}   // index of existing motions
+	motionRefs := schema.RefSet{} // index of current refs between motions
+	issueRefs := schema.RefSet{}  // index of current refs between issues, corresponding to existing motions
+	ids := schema.MotionIDSet{}   // index of existing motions
 
 	// index motion refs (directed edges)
 	for id, motion := range motions {
@@ -34,10 +35,10 @@ func syncRefs(
 			to := IssueNumberToMotionID(importedRef.To)
 			// only include issue refs between existing motions
 			if ids[from] && ids[to] {
-				ref := docket.Ref{
+				ref := schema.Ref{
 					From: from,
 					To:   to,
-					Type: docket.RefType(importedRef.Type),
+					Type: schema.RefType(importedRef.Type),
 				}
 				issueRefs[ref] = true
 			}
@@ -49,7 +50,7 @@ func syncRefs(
 	// add refs in issues, not in motions
 	for issueRef := range issueRefs {
 		if !motionRefs[issueRef] {
-			docket.LinkMotions_StageOnly(ctx, t, issueRef.From, issueRef.To, issueRef.Type)
+			ops.LinkMotions_StageOnly(ctx, t, issueRef.From, issueRef.To, issueRef.Type)
 			chg.AddedRefs.Add(issueRef)
 		}
 	}
@@ -57,7 +58,7 @@ func syncRefs(
 	// remove refs in motions, not in issues
 	for motionRef := range motionRefs {
 		if !issueRefs[motionRef] {
-			docket.UnlinkMotions_StageOnly(ctx, t, motionRef.From, motionRef.To, motionRef.Type)
+			ops.UnlinkMotions_StageOnly(ctx, t, motionRef.From, motionRef.To, motionRef.Type)
 			chg.RemovedRefs.Add(motionRef)
 		}
 	}

@@ -1,4 +1,4 @@
-package docket
+package ops
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
@@ -17,9 +18,9 @@ import (
 func FixMotionScore(
 	ctx context.Context,
 	addr gov.GovAddress,
-	id MotionID,
+	id schema.MotionID,
 	score float64,
-) git.Change[form.Map, Motion] {
+) git.Change[form.Map, schema.Motion] {
 
 	cloned := gov.Clone(ctx, addr)
 	chg := FixMotionScore_StageOnly(ctx, addr, cloned, id, score)
@@ -30,13 +31,13 @@ func FixMotionScore_StageOnly(
 	ctx context.Context,
 	govAddr gov.GovAddress,
 	govCloned git.Cloned,
-	id MotionID,
+	id schema.MotionID,
 	score float64,
-) git.Change[form.Map, Motion] {
+) git.Change[form.Map, schema.Motion] {
 
-	motion := motionKV.Get(ctx, motionNS, govCloned.Tree(), id)
+	motion := schema.MotionKV.Get(ctx, schema.MotionNS, govCloned.Tree(), id)
 	motion.Scoring.Fixed = form.Float64(score)
-	motionKV.Set(ctx, motionNS, govCloned.Tree(), id, motion)
+	schema.MotionKV.Set(ctx, schema.MotionNS, govCloned.Tree(), id, motion)
 
 	return git.NewChange(
 		fmt.Sprintf("Fix motion %v score to %v", id, score),
@@ -50,8 +51,8 @@ func FixMotionScore_StageOnly(
 func ScoreMotionByPoll(
 	ctx context.Context,
 	addr gov.GovAddress,
-	id MotionID,
-) git.Change[form.Map, Motion] {
+	id schema.MotionID,
+) git.Change[form.Map, schema.Motion] {
 
 	cloned := gov.Clone(ctx, addr)
 	chg := ScoreMotionByPoll_StageOnly(ctx, addr, cloned, id)
@@ -62,14 +63,14 @@ func ScoreMotionByPoll_StageOnly(
 	ctx context.Context,
 	govAddr gov.GovAddress,
 	govCloned git.Cloned,
-	id MotionID,
-) git.Change[form.Map, Motion] {
+	id schema.MotionID,
+) git.Change[form.Map, schema.Motion] {
 
-	motion := motionKV.Get(ctx, motionNS, govCloned.Tree(), id)
+	motion := schema.MotionKV.Get(ctx, schema.MotionNS, govCloned.Tree(), id)
 
 	must.Assertf(ctx, motion.Scoring.Poll == nil, "motion %v is already associated with poll %v", id, motion.Scoring.Poll.OSPath())
 
-	ballotName := MotionPollBallotName(id)
+	ballotName := schema.MotionPollBallotName(id)
 	chg := ballot.Open_StageOnly(
 		ctx,
 		qv.QV{},
@@ -78,12 +79,12 @@ func ScoreMotionByPoll_StageOnly(
 		ballotName,
 		fmt.Sprintf("Priority poll for motion %v", id),            // title
 		fmt.Sprintf("Up/down vote the priority of motion %v", id), // description
-		[]string{MotionPollBallotChoice},                          // choices
+		[]string{schema.MotionPollBallotChoice},                   // choices
 		member.Everybody,
 	)
 	motion.Scoring.Poll = &ballotName
 
-	motionKV.Set(ctx, motionNS, govCloned.Tree(), id, motion)
+	schema.MotionKV.Set(ctx, schema.MotionNS, govCloned.Tree(), id, motion)
 
 	return git.NewChange(
 		fmt.Sprintf("Prioritize motion %v by ballot %v", id, ballotName),

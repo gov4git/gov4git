@@ -1,4 +1,4 @@
-package docket
+package schema
 
 import "errors"
 

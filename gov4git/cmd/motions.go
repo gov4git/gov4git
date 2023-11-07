@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gov4git/gov4git/proto/docket/docket"
+	"github.com/gov4git/gov4git/proto/docket/ops"
+	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )
@@ -23,13 +24,13 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			docket.OpenMotion(
+			ops.OpenMotion(
 				ctx,
 				setup.Gov,
-				docket.MotionID(motionName),
+				schema.MotionID(motionName),
 				motionTitle,
 				motionDesc,
-				docket.ParseMotionType(ctx, motionType),
+				schema.ParseMotionType(ctx, motionType),
 				motionTrackerURL,
 				nil,
 			)
@@ -43,10 +44,10 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			docket.CloseMotion(
+			ops.CloseMotion(
 				ctx,
 				setup.Gov,
-				docket.MotionID(motionName),
+				schema.MotionID(motionName),
 			)
 			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -58,7 +59,7 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			l := docket.ListMotions(ctx, setup.Gov)
+			l := ops.ListMotions(ctx, setup.Gov)
 			fmt.Fprint(os.Stdout, form.SprintJSON(l))
 		},
 	}

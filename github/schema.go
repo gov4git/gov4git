@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/docket"
+	"github.com/gov4git/gov4git/proto/docket/docket"
 	"github.com/gov4git/lib4git/must"
 )
 

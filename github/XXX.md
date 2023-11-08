@@ -1,4 +1,4 @@
 - [x] prohibit reopening
-- [ ] integration test github sync
+- [x] integration test github sync
 - [ ] unit tests for docket
 - [ ] initialize scoring method for opened motions (after syncing)

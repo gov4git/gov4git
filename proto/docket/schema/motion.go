@@ -109,3 +109,13 @@ func (x Motions) Len() int { return len(x) }
 func (x Motions) Less(i, j int) bool { return x[i].Score < x[j].Score }
 
 func (x Motions) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
+
+type MotionsByID []Motion
+
+func (x MotionsByID) Sort() { sort.Sort(x) }
+
+func (x MotionsByID) Len() int { return len(x) }
+
+func (x MotionsByID) Less(i, j int) bool { return x[i].ID < x[j].ID }
+
+func (x MotionsByID) Swap(i, j int) { x[i], x[j] = x[j], x[i] }

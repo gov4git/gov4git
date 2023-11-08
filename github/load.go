@@ -65,13 +65,13 @@ func IsIssueForPrioritization(issue *github.Issue) bool {
 	return util.IsIn(PrioritizeIssueByGovernanceLabel, LabelsToStrings(issue.Labels)...)
 }
 
-func IsIssueGoverned(issue *github.Issue) bool {
-	return util.IsIn(IssueIsGovernedLabel, LabelsToStrings(issue.Labels)...)
+func IsIssueManaged(issue *github.Issue) bool {
+	return util.IsIn(IssueIsManagedLabel, LabelsToStrings(issue.Labels)...)
 }
 
 func TransformIssue(ctx context.Context, repo Repo, issue *github.Issue) ImportedIssue {
 	return ImportedIssue{
-		IsGoverned:        IsIssueGoverned(issue),
+		IsManaged:         IsIssueManaged(issue),
 		ForPrioritization: IsIssueForPrioritization(issue),
 		URL:               issue.GetURL(),
 		Number:            int64(issue.GetNumber()),

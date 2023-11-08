@@ -1,6 +1,9 @@
 package schema
 
-import "sort"
+import (
+	"encoding/json"
+	"sort"
+)
 
 type RefType string
 
@@ -71,4 +74,21 @@ func (x RefSet) Refs() Refs {
 	}
 	s.Sort()
 	return s
+}
+
+func (x RefSet) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.Refs())
+}
+
+func (x *RefSet) UnmarshalJSON(b []byte) error {
+	var refs Refs
+	err := json.Unmarshal(b, &refs)
+	if err != nil {
+		return err
+	}
+	(*x) = RefSet{}
+	for _, ref := range refs {
+		(*x)[ref] = true
+	}
+	return nil
 }

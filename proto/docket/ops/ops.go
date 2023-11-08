@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/lib4git/git"
@@ -26,6 +27,7 @@ func OpenMotion(
 	ctx context.Context,
 	addr gov.GovAddress,
 	id schema.MotionID,
+	policy schema.PolicyName,
 	title string,
 	desc string,
 	typ schema.MotionType,
@@ -34,7 +36,7 @@ func OpenMotion(
 ) git.ChangeNoResult {
 
 	cloned := gov.Clone(ctx, addr)
-	chg := OpenMotion_StageOnly(ctx, cloned.Tree(), id, title, desc, typ, trackerURL, labels)
+	chg := OpenMotion_StageOnly(ctx, cloned.Tree(), id, policy, title, desc, typ, trackerURL, labels)
 	return proto.CommitIfChanged(ctx, cloned, chg)
 }
 
@@ -42,6 +44,7 @@ func OpenMotion_StageOnly(
 	ctx context.Context,
 	t *git.Tree,
 	id schema.MotionID,
+	policyName schema.PolicyName,
 	title string,
 	desc string,
 	typ schema.MotionType,
@@ -56,36 +59,42 @@ func OpenMotion_StageOnly(
 	state := schema.Motion{
 		OpenedAt:   time.Now(),
 		ID:         id,
+		Type:       typ,
+		Policy:     policyName,
+		TrackerURL: trackerURL,
 		Title:      title,
 		Body:       desc,
-		Type:       typ,
-		TrackerURL: trackerURL,
 		Labels:     labels,
 		Closed:     false,
 	}
-	return schema.MotionKV.Set(ctx, schema.MotionNS, t, id, state)
+	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, state)
+
+	// apply policy
+	pcy := policy.Get(ctx, policyName.String())
+	pcy.Open(ctx, schema.MotionKV.KeyNS(schema.MotionNS, id).Append("policy"), state)
+
+	return git.NewChangeNoResult(fmt.Sprintf("Open motion %v", id), "docket_open_motion")
 }
 
 func CloseMotion(ctx context.Context, addr gov.GovAddress, id schema.MotionID) git.ChangeNoResult {
 
 	cloned := gov.Clone(ctx, addr)
-	CloseMotion_StageOnly(ctx, cloned.Tree(), id)
-	return proto.CommitIfChanged(ctx, cloned,
-		git.NewChangeNoResult(
-			fmt.Sprintf("Closed motion %v", id),
-			"collab_close_motion",
-		),
-	)
+	return CloseMotion_StageOnly(ctx, cloned.Tree(), id)
 }
 
-func CloseMotion_StageOnly(ctx context.Context, t *git.Tree, id schema.MotionID) schema.Motion {
+func CloseMotion_StageOnly(ctx context.Context, t *git.Tree, id schema.MotionID) git.ChangeNoResult {
 
 	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
 	must.Assert(ctx, !motion.Closed, schema.ErrMotionAlreadyClosed)
 	motion.Closed = true
 	motion.ClosedAt = time.Now()
 	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
-	return motion
+
+	// apply policy
+	pcy := policy.Get(ctx, motion.Policy.String())
+	pcy.Close(ctx, schema.MotionKV.KeyNS(schema.MotionNS, id).Append("policy"), motion)
+
+	return git.NewChangeNoResult(fmt.Sprintf("Close motion %v", id), "docket_close_motion")
 }
 
 func ReopenMotion_StageOnly(ctx context.Context, t *git.Tree, id schema.MotionID) git.ChangeNoResult {

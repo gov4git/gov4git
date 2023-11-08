@@ -3,8 +3,10 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/gov4git/gov4git/proto/docket/ops"
+	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
@@ -28,6 +30,7 @@ var (
 				ctx,
 				setup.Gov,
 				schema.MotionID(motionName),
+				schema.PolicyName(motionPolicy),
 				motionTitle,
 				motionDesc,
 				schema.ParseMotionType(ctx, motionType),
@@ -67,6 +70,7 @@ var (
 
 var (
 	motionName       string
+	motionPolicy     string
 	motionTitle      string
 	motionDesc       string
 	motionType       string
@@ -77,6 +81,8 @@ func init() {
 	motionCmd.AddCommand(motionOpenCmd)
 	motionOpenCmd.Flags().StringVar(&motionName, "name", "", "unique name for motion")
 	motionOpenCmd.MarkFlagRequired("name")
+	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(policy.Policies(), ", ")+")")
+	motionOpenCmd.MarkFlagRequired("policy")
 	motionOpenCmd.Flags().StringVar(&motionTitle, "title", "", "title for motion")
 	motionOpenCmd.Flags().StringVar(&motionDesc, "desc", "", "description for motion")
 	motionOpenCmd.Flags().StringVar(&motionType, "type", "concern", "type of motion (concern, proposal)")

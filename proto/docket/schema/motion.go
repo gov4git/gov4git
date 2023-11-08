@@ -34,22 +34,23 @@ func ParseMotionType(ctx context.Context, s string) MotionType {
 type Motion struct {
 	OpenedAt time.Time `json:"opened_at"`
 	ClosedAt time.Time `json:"closed_at"`
-	//
-	ID   MotionID   `json:"id"`
-	Type MotionType `json:"type"`
-	// meta
+	// instance, immutable
+	ID     MotionID   `json:"id"`
+	Type   MotionType `json:"type"`
+	Policy PolicyName `json:"policy"`
+	// meta, mutable
 	TrackerURL string   `json:"tracker_url"` // link to concern on an external concern tracker, such as a GitHub issue
 	Title      string   `json:"title"`
 	Body       string   `json:"description"`
 	Labels     []string `json:"labels"`
-	// state
+	// state, mutable
 	Frozen    bool `json:"frozen"`
 	Closed    bool `json:"closed"`
 	Cancelled bool `json:"cancelled"`
-	// attention ranking
+	// attention ranking, mutable
 	Scoring Scoring `json:"scoring"`
 	Score   float64 `json:"score"` // priority score for this motion, computed during sync after tallying
-	// network
+	// network, mutable
 	RefBy Refs `json:"ref_by"`
 	RefTo Refs `json:"ref_to"`
 }

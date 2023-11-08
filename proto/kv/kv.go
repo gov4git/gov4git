@@ -25,7 +25,7 @@ type Value = form.Form
 type KV[K Key, V Value] struct{}
 
 func (KV[K, V]) KeyNS(ns ns.NS, key K) ns.NS {
-	return ns.Sub(form.StringHashForFilename(string(key)))
+	return ns.Append(form.StringHashForFilename(string(key)))
 }
 
 func (x KV[K, V]) Set(ctx context.Context, ns ns.NS, t *git.Tree, key K, value V) git.ChangeNoResult {

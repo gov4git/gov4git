@@ -22,12 +22,12 @@ func SyncManagedIssues(
 	repo Repo,
 	githubClient *github.Client,
 	govAddr gov.OrganizerAddress,
-) git.Change[form.Map, SyncChanges] {
+) git.Change[form.Map, SyncManagedChanges] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	syncChanges := SyncManagedIssues_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
-	chg := git.NewChange[form.Map, SyncChanges](
-		fmt.Sprintf("Sync %d GitHub issues participating in governance", len(syncChanges.IssuesCausingChange)),
+	chg := git.NewChange[form.Map, SyncManagedChanges](
+		fmt.Sprintf("Sync %d managed GitHub issues", len(syncChanges.IssuesCausingChange)),
 		"github_sync",
 		form.Map{},
 		syncChanges,
@@ -36,7 +36,7 @@ func SyncManagedIssues(
 	return proto.CommitIfChanged(ctx, govCloned.Public, chg)
 }
 
-type SyncChanges struct {
+type SyncManagedChanges struct {
 	IssuesCausingChange ImportedIssues     `json:"issues_causing_change"`
 	Updated             schema.MotionIDSet `json:"updated_motions"`
 	Opened              schema.MotionIDSet `json:"opened_motions"`
@@ -53,7 +53,7 @@ func SyncManagedIssues_StageOnly(
 	githubClient *github.Client,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-) (syncChanges SyncChanges) {
+) (syncChanges SyncManagedChanges) {
 
 	syncChanges.AddedRefs = schema.RefSet{}
 	syncChanges.RemovedRefs = schema.RefSet{}
@@ -119,7 +119,7 @@ func SyncManagedIssues_StageOnly(
 func syncMeta(
 	ctx context.Context,
 	t *git.Tree,
-	chg *SyncChanges,
+	chg *SyncManagedChanges,
 	issue ImportedIssue,
 	motion schema.Motion,
 ) bool {
@@ -145,7 +145,7 @@ func syncMeta(
 func syncFrozen(
 	ctx context.Context,
 	t *git.Tree,
-	chg *SyncChanges,
+	chg *SyncManagedChanges,
 	ghIssue ImportedIssue,
 	govMotion schema.Motion,
 ) bool {
@@ -181,7 +181,7 @@ func motionPolicyForIssue(issue ImportedIssue) schema.PolicyName {
 func syncCreateMotionForIssue(
 	ctx context.Context,
 	t *git.Tree,
-	chg *SyncChanges,
+	chg *SyncManagedChanges,
 	issue ImportedIssue,
 	id schema.MotionID,
 ) {

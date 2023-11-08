@@ -11,7 +11,7 @@ import (
 func syncRefs(
 	ctx context.Context,
 	t *git.Tree,
-	chg *SyncChanges,
+	chg *SyncManagedChanges,
 	issues map[string]ImportedIssue,
 	motions map[schema.MotionID]schema.Motion,
 ) {

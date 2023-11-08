@@ -60,7 +60,10 @@ func Cron(
 		base.Infof("maintainers for %v are %v", repo, form.SprintJSON(maintainers))
 
 		// process issues and pull requests
-		report["processed_issues"] = govgh.ImportIssuesForPrioritization_StageOnly(ctx, repo, ghc, govAddr, govCloned)
+		report["processed_prioritization_issues"] = govgh.ImportIssuesForPrioritization_StageOnly(ctx, repo, ghc, govAddr, govCloned)
+
+		// process managed issues and pull requests
+		report["processed_managed_issues"] = govgh.SyncManagedIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned)
 
 		// process joins
 		report["processed_joins"] = govgh.ProcessJoinRequestIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned, maintainers)

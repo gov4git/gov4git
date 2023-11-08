@@ -14,5 +14,6 @@ func ListMotions(ctx context.Context, addr gov.GovAddress) schema.Motions {
 
 func ListMotions_Local(ctx context.Context, t *git.Tree) schema.Motions {
 	_, motions := schema.MotionKV.ListKeyValues(ctx, schema.MotionNS, t)
+	schema.MotionsByID(motions).Sort()
 	return motions
 }

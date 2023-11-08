@@ -22,11 +22,11 @@ func SyncManagedIssues(
 	repo Repo,
 	githubClient *github.Client,
 	govAddr gov.OrganizerAddress,
-) git.Change[form.Map, SyncManagedChanges] {
+) git.Change[form.Map, *SyncManagedChanges] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
 	syncChanges := SyncManagedIssues_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
-	chg := git.NewChange[form.Map, SyncManagedChanges](
+	chg := git.NewChange[form.Map, *SyncManagedChanges](
 		fmt.Sprintf("Sync %d managed GitHub issues", len(syncChanges.IssuesCausingChange)),
 		"github_sync",
 		form.Map{},
@@ -47,16 +47,28 @@ type SyncManagedChanges struct {
 	RemovedRefs         schema.RefSet      `json:"removed_refs"`
 }
 
+func newSyncManagedChanges() *SyncManagedChanges {
+	return &SyncManagedChanges{
+		IssuesCausingChange: nil,
+		Updated:             schema.MotionIDSet{},
+		Opened:              schema.MotionIDSet{},
+		Closed:              schema.MotionIDSet{},
+		Froze:               schema.MotionIDSet{},
+		Unfroze:             schema.MotionIDSet{},
+		AddedRefs:           schema.RefSet{},
+		RemovedRefs:         schema.RefSet{},
+	}
+}
+
 func SyncManagedIssues_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client,
 	govAddr gov.OrganizerAddress,
 	govCloned id.OwnerCloned,
-) (syncChanges SyncManagedChanges) {
+) (syncChanges *SyncManagedChanges) {
 
-	syncChanges.AddedRefs = schema.RefSet{}
-	syncChanges.RemovedRefs = schema.RefSet{}
+	syncChanges = newSyncManagedChanges()
 
 	t := govCloned.Public.Tree()
 
@@ -68,29 +80,29 @@ func SyncManagedIssues_StageOnly(
 	// ensure every issue has a corresponding up-to-date motion
 	for key, issue := range issues {
 		id := schema.MotionID(key)
-		if issue.IsGoverned {
+		if issue.IsManaged {
 			if motion, ok := motions[id]; ok { // if motion for issue already exists, update it
-				changed := syncMeta(ctx, t, &syncChanges, issue, motion)
+				changed := syncMeta(ctx, t, syncChanges, issue, motion)
 				switch {
 				case issue.Closed && motion.Closed:
 				case issue.Closed && !motion.Closed:
-					syncFrozen(ctx, t, &syncChanges, issue, motion)
+					syncFrozen(ctx, t, syncChanges, issue, motion)
 					ops.CloseMotion_StageOnly(ctx, t, id)
 					syncChanges.Closed.Add(id)
 					changed = true
 				case !issue.Closed && motion.Closed:
 					//XXX: reopening is prohibited
 					ops.ReopenMotion_StageOnly(ctx, t, id)
-					syncFrozen(ctx, t, &syncChanges, issue, motion)
+					syncFrozen(ctx, t, syncChanges, issue, motion)
 					changed = true
 				case !issue.Closed && !motion.Closed:
-					changed = changed || syncFrozen(ctx, t, &syncChanges, issue, motion)
+					changed = changed || syncFrozen(ctx, t, syncChanges, issue, motion)
 				}
 				if changed {
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
 			} else { // otherwise, no motion for this issue exists, so create one
-				syncCreateMotionForIssue(ctx, t, &syncChanges, issue, id)
+				syncCreateMotionForIssue(ctx, t, syncChanges, issue, id)
 				syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 			}
 		} else { // issue is not governed, freeze motion if it exists and is open
@@ -110,7 +122,7 @@ func SyncManagedIssues_StageOnly(
 	// don't touch motions that have no corresponding issue
 
 	matchingMotions := indexMotions(ops.ListMotions_Local(ctx, t))
-	syncRefs(ctx, t, &syncChanges, issues, matchingMotions)
+	syncRefs(ctx, t, syncChanges, issues, matchingMotions)
 
 	syncChanges.IssuesCausingChange.Sort()
 	return

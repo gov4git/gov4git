@@ -13,6 +13,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 )
@@ -91,10 +92,7 @@ func SyncManagedIssues_StageOnly(
 					syncChanges.Closed.Add(id)
 					changed = true
 				case !issue.Closed && motion.Closed:
-					//XXX: reopening is prohibited
-					ops.ReopenMotion_StageOnly(ctx, t, id)
-					syncFrozen(ctx, t, syncChanges, issue, motion)
-					changed = true
+					base.Infof("GitHub issue %v has been re-opened; corresonding motion remains closed", issue.Number)
 				case !issue.Closed && !motion.Closed:
 					changed = changed || syncFrozen(ctx, t, syncChanges, issue, motion)
 				}

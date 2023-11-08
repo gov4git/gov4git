@@ -8,6 +8,8 @@ import (
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/docket/ops"
+	"github.com/gov4git/gov4git/proto/docket/policies/concern"
+	"github.com/gov4git/gov4git/proto/docket/policies/proposal"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
@@ -164,6 +166,18 @@ func syncFrozen(
 	panic("unreachable")
 }
 
+const (
+	MotionPolicyForIssue = concern.ConcernPolicyName
+	MotionPolicyForPR    = proposal.ProposalPolicyName
+)
+
+func motionPolicyForIssue(issue ImportedIssue) schema.PolicyName {
+	if issue.IsPullRequest {
+		return MotionPolicyForPR
+	}
+	return MotionPolicyForIssue
+}
+
 func syncCreateMotionForIssue(
 	ctx context.Context,
 	t *git.Tree,
@@ -175,6 +189,7 @@ func syncCreateMotionForIssue(
 		ctx,
 		t,
 		id,
+		motionPolicyForIssue(issue),
 		issue.Title,
 		issue.Body,
 		issue.MotionType(),

@@ -1,2 +1,3 @@
+- [ ] prohibit reopening
+- [ ] test github sync
 - [ ] initialize scoring method for opened motions (after syncing)
-- [ ] 

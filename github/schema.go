@@ -40,7 +40,7 @@ const (
 	DirectiveLabel = "gov4git:directive"
 
 	// labels for issues that are managed
-	IssueIsGovernedLabel = "gov4git:governed"
+	IssueIsManagedLabel = "gov4git:managed"
 
 	// Github deploy environment
 	DeployEnvName = "gov4git:governance"
@@ -63,7 +63,7 @@ type ImportedIssue struct {
 	Locked            bool `json:"locked"`
 	Closed            bool `json:"closed"`
 	IsPullRequest     bool `json:"is_pull_request"`
-	IsGoverned        bool `json:"is_governed"`
+	IsManaged         bool `json:"is_governed"`
 	ForPrioritization bool `json:"for_prioritization"`
 }
 

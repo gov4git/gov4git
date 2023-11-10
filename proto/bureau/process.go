@@ -7,7 +7,6 @@ import (
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/mail"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
@@ -24,8 +23,8 @@ func Process(
 
 	base.Infof("fetching service requests from the community ...")
 
-	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg, changed := Process_StageOnly(ctx, govAddr, govOwner, group)
+	govOwner := gov.CloneOwner(ctx, govAddr)
+	chg, changed := Process_StageOnly(ctx, govOwner, group)
 	if changed {
 		proto.Commit(ctx, govOwner.Public.Tree(), chg)
 		govOwner.Public.Push(ctx)
@@ -35,8 +34,7 @@ func Process(
 
 func Process_StageOnly(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	govOwner id.OwnerCloned,
+	govOwner gov.OwnerCloned,
 	group member.Group,
 ) (change git.ChangeNoResult, changed bool) {
 
@@ -54,7 +52,7 @@ func Process_StageOnly(
 	// fetch user requests
 	var fetchedReqs FetchedRequests
 	for i, account := range accounts {
-		if fetched, err := fetchUserRequests(ctx, govAddr, govOwner, users[i], account); err != nil {
+		if fetched, err := fetchUserRequests(ctx, govOwner, users[i], account); err != nil {
 			base.Infof("fetching bureau requests for user %v (%v)", users[i], err)
 		} else {
 			fetchedReqs = append(fetchedReqs, fetched.Result...)
@@ -63,7 +61,7 @@ func Process_StageOnly(
 
 	// process requests
 	for _, fetched := range fetchedReqs {
-		nOK, nErr := processRequest_StageOnly(ctx, govAddr, govOwner, fetched)
+		nOK, nErr := processRequest_StageOnly(ctx, govOwner, fetched)
 		if nOK+nErr > 0 {
 			changed = true
 		}
@@ -77,8 +75,7 @@ func Process_StageOnly(
 
 func processRequest_StageOnly(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	govOwner id.OwnerCloned,
+	govOwner gov.OwnerCloned,
 	fetched FetchedRequest,
 ) (numOK int, numErr int) {
 	for _, req := range fetched.Requests {
@@ -117,8 +114,7 @@ func processRequest_StageOnly(
 
 func fetchUserRequests(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	govOwner id.OwnerCloned,
+	govOwner gov.OwnerCloned,
 	user member.User,
 	account member.Account,
 ) (git.Change[form.Map, FetchedRequests], error) {
@@ -145,7 +141,7 @@ func fetchUserRequests(
 
 	recvOnly := mail.Respond_StageOnly[Request, Request](
 		ctx,
-		govOwner,
+		govOwner.IDOwnerCloned(),
 		account.PublicAddress,
 		userPublic.Tree(),
 		BureauTopic,

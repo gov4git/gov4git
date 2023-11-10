@@ -16,7 +16,7 @@ import (
 
 func OpenMotion(
 	ctx context.Context,
-	addr gov.GovOwnerAddress,
+	addr gov.OwnerAddress,
 	id schema.MotionID,
 	policy schema.PolicyName,
 	title string,
@@ -34,8 +34,8 @@ func OpenMotion(
 
 func OpenMotion_StageOnly(
 	ctx context.Context,
-	addr gov.GovOwnerAddress,
-	cloned gov.GovOwnerCloned,
+	addr gov.OwnerAddress,
+	cloned gov.OwnerCloned,
 	id schema.MotionID,
 	policyName schema.PolicyName,
 	title string,

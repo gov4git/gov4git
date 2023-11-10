@@ -11,7 +11,7 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func SetGroup(ctx context.Context, addr gov.GovAddress, name Group) {
+func SetGroup(ctx context.Context, addr gov.Address, name Group) {
 	cloned := gov.Clone(ctx, addr)
 	chg := SetGroup_StageOnly(ctx, cloned.Tree(), name)
 	proto.Commit(ctx, cloned.Tree(), chg)
@@ -22,7 +22,7 @@ func SetGroup_StageOnly(ctx context.Context, t *git.Tree, name Group) git.Change
 	return groupsKV.Set(ctx, groupsNS, t, name, form.None{})
 }
 
-func IsGroup(ctx context.Context, addr gov.GovAddress, name Group) bool {
+func IsGroup(ctx context.Context, addr gov.Address, name Group) bool {
 	return IsGroup_Local(ctx, gov.Clone(ctx, addr).Tree(), name)
 }
 
@@ -31,7 +31,7 @@ func IsGroup_Local(ctx context.Context, t *git.Tree, name Group) bool {
 	return err == nil
 }
 
-func AddGroup(ctx context.Context, addr gov.GovAddress, name Group) {
+func AddGroup(ctx context.Context, addr gov.Address, name Group) {
 	cloned := gov.Clone(ctx, addr)
 	chg := AddGroup_StageOnly(ctx, cloned.Tree(), name)
 	proto.Commit(ctx, cloned.Tree(), chg)
@@ -45,7 +45,7 @@ func AddGroup_StageOnly(ctx context.Context, t *git.Tree, name Group) git.Change
 	return SetGroup_StageOnly(ctx, t, name)
 }
 
-func RemoveGroup(ctx context.Context, addr gov.GovAddress, name Group) {
+func RemoveGroup(ctx context.Context, addr gov.Address, name Group) {
 	cloned := gov.Clone(ctx, addr)
 	chg := RemoveGroup_StageOnly(ctx, cloned.Tree(), name)
 	proto.Commit(ctx, cloned.Tree(), chg)

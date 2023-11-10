@@ -16,7 +16,7 @@ import (
 
 func Erase(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 	ballotName common.BallotName,
 ) git.Change[form.Map, bool] {
 
@@ -29,7 +29,7 @@ func Erase(
 
 func Erase_StageOnly(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 	govCloned id.OwnerCloned,
 	ballotName common.BallotName,
 ) git.Change[form.Map, bool] {

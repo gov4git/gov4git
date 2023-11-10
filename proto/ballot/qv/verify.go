@@ -14,7 +14,7 @@ import (
 func (qv QV) VerifyElections(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.GovAddress,
+	govAddr gov.Address,
 	voterCloned id.OwnerCloned,
 	govCloned git.Cloned,
 	ad *common.Advertisement,

@@ -20,7 +20,7 @@ func ProcessJoinRequestIssuesApprovedByMaintainer(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 ) git.Change[form.Map, ProcessJoinRequestIssuesReport] {
 
 	maintainers := FetchRepoMaintainers(ctx, repo, ghc)
@@ -32,7 +32,7 @@ func ProcessJoinRequestIssues(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 	approverGitHubUsers []string,
 ) git.Change[form.Map, ProcessJoinRequestIssuesReport] {
 
@@ -63,8 +63,8 @@ func ProcessJoinRequestIssues_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	approvers []string,
 ) ProcessJoinRequestIssuesReport { // return list of new member usernames
 
@@ -89,8 +89,8 @@ func processJoinRequestIssue_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	approverGitHubUsers []string,
 	issue *github.Issue,
 ) string { // return new member username, if joined

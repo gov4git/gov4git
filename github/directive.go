@@ -47,7 +47,7 @@ func ProcessDirectiveIssuesByMaintainer(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 ) git.Change[form.Map, ProcessDirectiveIssueReports] {
 
 	maintainers := FetchRepoMaintainers(ctx, repo, ghc)
@@ -59,7 +59,7 @@ func ProcessDirectiveIssues(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 	approverGitHubUsers []string,
 ) git.Change[form.Map, ProcessDirectiveIssueReports] {
 
@@ -85,8 +85,8 @@ func ProcessDirectiveIssues_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	maintainers []string,
 ) ProcessDirectiveIssueReports { // return list of processed directives
 
@@ -115,8 +115,8 @@ func processDirectiveIssue_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	maintainers []string,
 	issue *github.Issue,
 ) (DirectiveIssue, error) {

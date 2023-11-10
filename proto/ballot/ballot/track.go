@@ -14,7 +14,7 @@ import (
 func Track(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.GovAddress,
+	govAddr gov.Address,
 	ballotName common.BallotName,
 ) common.VoterStatus {
 
@@ -26,7 +26,7 @@ func Track(
 func Track_StageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.GovAddress,
+	govAddr gov.Address,
 	voterOwner id.OwnerCloned,
 	govCloned git.Cloned,
 	ballotName common.BallotName,

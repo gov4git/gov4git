@@ -32,7 +32,7 @@ var (
 			chg := ballot.Open(
 				ctx,
 				strat,
-				setup.Gov,
+				setup.Organizer,
 				common.ParseBallotNameFromPath(ballotName),
 				ballotTitle,
 				ballotDescription,

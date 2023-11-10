@@ -29,7 +29,7 @@ func TestVoteFreezeVote(t *testing.T) {
 	openChg := ballot.Open(
 		ctx,
 		strat,
-		cty.Gov(),
+		cty.Organizer(),
 		ballotName,
 		"ballot title",
 		"ballot description",
@@ -87,7 +87,7 @@ func TestVoteFreezeTally(t *testing.T) {
 
 	// open
 	strat := qv.QV{}
-	openChg := ballot.Open(ctx, strat, cty.Gov(), ballotName, "ballot title", "ballot description", choices, member.Everybody)
+	openChg := ballot.Open(ctx, strat, cty.Organizer(), ballotName, "ballot title", "ballot description", choices, member.Everybody)
 	fmt.Println("open: ", form.SprintJSON(openChg))
 
 	// give voter credits

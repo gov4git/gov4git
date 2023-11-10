@@ -30,7 +30,7 @@ func (x Cloned) Address() PublicAddress {
 	return x.address
 }
 
-func Clone(ctx context.Context, addr PublicAddress) git.Cloned {
+func Clone(ctx context.Context, addr PublicAddress) Cloned {
 	return Cloned{
 		address: addr,
 		Cloned:  git.CloneOne(ctx, git.Address(addr)),
@@ -41,6 +41,13 @@ type OwnerCloned struct {
 	address OwnerAddress
 	Public  git.Cloned
 	Private git.Cloned
+}
+
+func (x OwnerCloned) PublicClone() Cloned {
+	return Cloned{
+		address: x.address.Public,
+		Cloned:  x.Public,
+	}
 }
 
 func (x OwnerCloned) Address() OwnerAddress {

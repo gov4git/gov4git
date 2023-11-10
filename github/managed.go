@@ -87,7 +87,7 @@ func SyncManagedIssues_StageOnly(
 				case issue.Closed && motion.Closed:
 				case issue.Closed && !motion.Closed:
 					syncFrozen(ctx, t, syncChanges, issue, motion)
-					ops.CloseMotion_StageOnly(ctx, govAddr, govCloned, id)
+					ops.CloseMotion_StageOnly(ctx, govCloned, id)
 					syncChanges.Closed.Add(id)
 					changed = true
 				case !issue.Closed && motion.Closed:
@@ -198,7 +198,6 @@ func syncCreateMotionForIssue(
 	t := cloned.Public.Tree()
 	ops.OpenMotion_StageOnly(
 		ctx,
-		addr,
 		cloned,
 		id,
 		motionPolicyForIssue(issue),
@@ -214,7 +213,7 @@ func syncCreateMotionForIssue(
 		chg.Froze.Add(id)
 	}
 	if issue.Closed {
-		ops.CloseMotion_StageOnly(ctx, addr, cloned, id)
+		ops.CloseMotion_StageOnly(ctx, cloned, id)
 		chg.Closed.Add(id)
 	}
 }

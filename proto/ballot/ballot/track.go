@@ -18,17 +18,16 @@ func Track(
 	ballotName common.BallotName,
 ) common.VoterStatus {
 
-	govCloned := git.CloneOne(ctx, git.Address(govAddr))
+	govCloned := gov.Clone(ctx, govAddr)
 	voterOwner := id.CloneOwner(ctx, voterAddr)
-	return Track_StageOnly(ctx, voterAddr, govAddr, voterOwner, govCloned, ballotName)
+	return Track_StageOnly(ctx, voterAddr, voterOwner, govCloned, ballotName)
 }
 
 func Track_StageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.Address,
 	voterOwner id.OwnerCloned,
-	govCloned git.Cloned,
+	govCloned gov.Cloned,
 	ballotName common.BallotName,
 ) common.VoterStatus {
 

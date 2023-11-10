@@ -14,7 +14,7 @@ import (
 
 func ScoreMotions(
 	ctx context.Context,
-	addr gov.GovOwnerAddress,
+	addr gov.OwnerAddress,
 
 ) git.Change[form.Map, schema.Motions] {
 
@@ -25,8 +25,8 @@ func ScoreMotions(
 
 func ScoreMotions_StageOnly(
 	ctx context.Context,
-	addr gov.GovOwnerAddress,
-	cloned gov.GovOwnerCloned,
+	addr gov.OwnerAddress,
+	cloned gov.OwnerCloned,
 
 ) git.Change[form.Map, schema.Motions] {
 

@@ -24,7 +24,7 @@ func Cron(
 	ctx context.Context,
 	repo govgh.Repo,
 	ghc *github.Client,
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 	//
 	githubFreq time.Duration, // frequency of importing from github
 	communityFreq time.Duration, // frequency of fetching community votes and service requests

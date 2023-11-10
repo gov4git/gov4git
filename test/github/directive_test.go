@@ -90,11 +90,11 @@ func TestDirective(t *testing.T) {
 	}
 	fmt.Println(form.SprintJSON(chg.Result))
 
-	b1 := balance.Get(ctx, gov.GovAddress(cty.Organizer().Public), cty.MemberUser(0), qv.VotingCredits)
+	b1 := balance.Get(ctx, gov.Address(cty.Organizer().Public), cty.MemberUser(0), qv.VotingCredits)
 	if b1 != 10.0 {
 		t.Errorf("expecting %v, got %v", 10.0, b1)
 	}
-	b2 := balance.Get(ctx, gov.GovAddress(cty.Organizer().Public), cty.MemberUser(1), qv.VotingCredits)
+	b2 := balance.Get(ctx, gov.Address(cty.Organizer().Public), cty.MemberUser(1), qv.VotingCredits)
 	if b2 != 10.0 {
 		t.Errorf("expecting %v, got %v", 10.0, b2)
 	}

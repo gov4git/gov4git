@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-func ListMotions(ctx context.Context, addr gov.GovAddress) schema.Motions {
+func ListMotions(ctx context.Context, addr gov.Address) schema.Motions {
 	return ListMotions_Local(ctx, gov.Clone(ctx, addr).Tree())
 }
 

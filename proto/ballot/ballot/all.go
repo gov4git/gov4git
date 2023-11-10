@@ -17,7 +17,7 @@ import (
 
 func TallyAll(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 	maxPar int,
 ) git.Change[form.Map, []common.Tally] {
 
@@ -35,8 +35,8 @@ func TallyAll(
 
 func TallyAll_StageOnly(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
-	govOwner gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govOwner gov.OwnerCloned,
 	maxPar int,
 ) git.Change[form.Map, []common.Tally] {
 

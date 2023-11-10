@@ -17,7 +17,7 @@ import (
 func Vote(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.GovAddress,
+	govAddr gov.Address,
 	ballotName common.BallotName,
 	elections common.Elections,
 ) git.Change[form.Map, mail.RequestEnvelope[common.VoteEnvelope]] {
@@ -34,7 +34,7 @@ func Vote(
 func Vote_StageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.GovAddress,
+	govAddr gov.Address,
 	voterOwner id.OwnerCloned,
 	govCloned git.Cloned,
 	ballotName common.BallotName,
@@ -88,7 +88,7 @@ func verifyElections(
 	ctx context.Context,
 	strat common.Strategy,
 	voterAddr id.OwnerAddress,
-	govAddr gov.GovAddress,
+	govAddr gov.Address,
 	voterOwner id.OwnerCloned,
 	govCloned git.Cloned,
 	ad common.Advertisement,

@@ -25,16 +25,16 @@ var (
 
 // VoteLog records the votes of a user to a ballot within a given governance.
 type VoteLog struct {
-	GovID         id.ID          `json:"governance_id"`
-	GovAddress    gov.GovAddress `json:"governance_address"`
-	Ballot        BallotName     `json:"ballot_name"`
-	VoteEnvelopes VoteEnvelopes  `json:"vote_envelopes"` // in the order in which they were sent
+	GovID         id.ID         `json:"governance_id"`
+	GovAddress    gov.Address   `json:"governance_address"`
+	Ballot        BallotName    `json:"ballot_name"`
+	VoteEnvelopes VoteEnvelopes `json:"vote_envelopes"` // in the order in which they were sent
 }
 
 // VoterStatus reflects the state of an individual user's votes within a ballot.
 type VoterStatus struct {
 	GovID         id.ID             `json:"governance_id"`
-	GovAddress    gov.GovAddress    `json:"governance_address"`
+	GovAddress    gov.Address       `json:"governance_address"`
 	BallotName    BallotName        `json:"ballot_name"`
 	AcceptedVotes AcceptedElections `json:"accepted_votes"`
 	RejectedVotes RejectedElections `json:"rejected_votes"`
@@ -77,7 +77,7 @@ func ParseBallotNameFromPath(p string) BallotName {
 }
 
 type Advertisement struct {
-	Gov          gov.GovAddress `json:"community"`
+	Gov          gov.Address    `json:"community"`
 	Name         BallotName     `json:"name"`
 	Title        string         `json:"title"`
 	Description  string         `json:"description"`
@@ -91,7 +91,7 @@ type Advertisement struct {
 }
 
 type BallotAddress struct {
-	Gov  gov.GovAddress
+	Gov  gov.Address
 	Name BallotName
 }
 

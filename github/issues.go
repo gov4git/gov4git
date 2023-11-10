@@ -23,7 +23,7 @@ func ImportIssuesForPrioritization(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 ) git.Change[form.Map, ImportedIssues] {
 
 	base.Infof("importing issues for prioritization ...")
@@ -43,8 +43,8 @@ func ImportIssuesForPrioritization_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 ) ImportedIssues {
 
 	// load github issues and governance ballots, and
@@ -86,7 +86,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				ballot.Open_StageOnly(
 					ctx,
 					qv.QV{},
-					gov.GovAddress(govAddr.Public),
+					gov.Address(govAddr.Public),
 					govCloned.Public,
 					ghIssue.BallotName(),
 					ghIssue.Title,
@@ -137,8 +137,8 @@ func filterIssuesForPrioritization(ads []common.Advertisement) map[string]common
 func UpdateMeta_StageOnly(
 	ctx context.Context,
 	repo Repo,
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	ghIssue ImportedIssue,
 	govBallot common.Advertisement,
 ) (changed bool) {
@@ -152,8 +152,8 @@ func UpdateMeta_StageOnly(
 func UpdateFrozen_StageOnly(
 	ctx context.Context,
 	repo Repo,
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	ghIssue ImportedIssue,
 	govBallot common.Advertisement,
 ) (changed bool) {

@@ -2,9 +2,15 @@ package concern
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/gov4git/gov4git/proto/ballot/ballot"
+	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
+	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -20,10 +26,62 @@ func (x concernPolicy) Name() string {
 	return ConcernPolicyName.String()
 }
 
-func (x concernPolicy) Open(ctx context.Context, instancePolicyNS ns.NS, motion schema.Motion) {
+func (x concernPolicy) Open(
+	ctx context.Context,
+	govAddr gov.GovPrivateAddress,
+	govCloned id.OwnerCloned,
+	motion schema.Motion,
+	instancePolicyNS ns.NS,
+
+) {
+
+	// open a poll for the motion
+	ballotName := schema.MotionPollBallotName(motion.ID)
+	ballot.Open_StageOnly(
+		ctx,
+		qv.QV{},
+		gov.GovPublicAddress(govAddr.Public),
+		govCloned.Public,
+		ballotName,
+		fmt.Sprintf("Priority poll for motion %v", motion.ID),
+		fmt.Sprintf("Up/down vote the priority of motion %v", motion.ID),
+		[]string{schema.MotionPollBallotChoice},
+		member.Everybody,
+	)
 
 }
 
-func (x concernPolicy) Close(ctx context.Context, instancePolicyNS ns.NS, motion schema.Motion) {
+func (x concernPolicy) Score(
+	ctx context.Context,
+	govAddr gov.GovPrivateAddress,
+	govCloned id.OwnerCloned,
+	motion schema.Motion,
+	instancePolicyNS ns.NS,
+
+) schema.Score {
+
+	return schema.Score{}
+}
+
+// XXX: Open and Close use different addr/clone types
+
+func (x concernPolicy) Close(
+	ctx context.Context,
+	govAddr gov.GovPrivateAddress,
+	govCloned id.OwnerCloned,
+	motion schema.Motion,
+	instancePolicyNS ns.NS,
+
+) {
+
+	// close the poll for the motion
+	ballotName := schema.MotionPollBallotName(motion.ID)
+	ballot.Close_StageOnly(
+		ctx,
+		govAddr,
+		govCloned,
+		ballotName,
+		false,
+	)
 
 }

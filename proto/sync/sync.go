@@ -13,7 +13,7 @@ import (
 
 func Sync(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	maxPar int,
 ) git.Change[form.Map, form.Map] {
 

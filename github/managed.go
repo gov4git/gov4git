@@ -22,7 +22,7 @@ func SyncManagedIssues(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 ) git.Change[form.Map, *SyncManagedChanges] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
@@ -65,7 +65,7 @@ func SyncManagedIssues_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	govCloned id.OwnerCloned,
 ) (syncChanges *SyncManagedChanges) {
 
@@ -88,7 +88,7 @@ func SyncManagedIssues_StageOnly(
 				case issue.Closed && motion.Closed:
 				case issue.Closed && !motion.Closed:
 					syncFrozen(ctx, t, syncChanges, issue, motion)
-					ops.CloseMotion_StageOnly(ctx, t, id)
+					ops.CloseMotion_StageOnly(ctx, govAddr, govCloned, id)
 					syncChanges.Closed.Add(id)
 					changed = true
 				case !issue.Closed && motion.Closed:
@@ -100,7 +100,7 @@ func SyncManagedIssues_StageOnly(
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
 			} else { // otherwise, no motion for this issue exists, so create one
-				syncCreateMotionForIssue(ctx, t, syncChanges, issue, id)
+				syncCreateMotionForIssue(ctx, govAddr, govCloned, syncChanges, issue, id)
 				syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 			}
 		} else { // issue is not governed, freeze motion if it exists and is open
@@ -190,14 +190,17 @@ func motionPolicyForIssue(issue ImportedIssue) schema.PolicyName {
 
 func syncCreateMotionForIssue(
 	ctx context.Context,
-	t *git.Tree,
+	addr gov.GovPrivateAddress,
+	cloned id.OwnerCloned,
 	chg *SyncManagedChanges,
 	issue ImportedIssue,
 	id schema.MotionID,
 ) {
+	t := cloned.Public.Tree()
 	ops.OpenMotion_StageOnly(
 		ctx,
-		t,
+		addr,
+		cloned,
 		id,
 		motionPolicyForIssue(issue),
 		issue.Title,
@@ -212,7 +215,7 @@ func syncCreateMotionForIssue(
 		chg.Froze.Add(id)
 	}
 	if issue.Closed {
-		ops.CloseMotion_StageOnly(ctx, t, id)
+		ops.CloseMotion_StageOnly(ctx, addr, cloned, id)
 		chg.Closed.Add(id)
 	}
 }

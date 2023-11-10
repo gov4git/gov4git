@@ -35,7 +35,7 @@ func fetchedVotesToElections(fv FetchedVotes) map[member.User]common.Elections {
 
 func fetchVotes(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	govOwner id.OwnerCloned,
 	ballotName common.BallotName,
 	user member.User,
@@ -47,7 +47,7 @@ func fetchVotes(
 
 func fetchVotesCloned(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	govOwner id.OwnerCloned,
 	ballotName common.BallotName,
 	user member.User,

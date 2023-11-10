@@ -15,7 +15,7 @@ import (
 
 func Reopen(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	ballotName common.BallotName,
 ) git.Change[form.Map, form.None] {
 
@@ -28,7 +28,7 @@ func Reopen(
 
 func Reopen_StageOnly(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	govCloned id.OwnerCloned,
 	ballotName common.BallotName,
 ) git.Change[form.Map, form.None] {

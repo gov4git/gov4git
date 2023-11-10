@@ -25,20 +25,20 @@ var (
 
 // VoteLog records the votes of a user to a ballot within a given governance.
 type VoteLog struct {
-	GovID         id.ID          `json:"governance_id"`
-	GovAddress    gov.GovAddress `json:"governance_address"`
-	Ballot        BallotName     `json:"ballot_name"`
-	VoteEnvelopes VoteEnvelopes  `json:"vote_envelopes"` // in the order in which they were sent
+	GovID         id.ID                `json:"governance_id"`
+	GovAddress    gov.GovPublicAddress `json:"governance_address"`
+	Ballot        BallotName           `json:"ballot_name"`
+	VoteEnvelopes VoteEnvelopes        `json:"vote_envelopes"` // in the order in which they were sent
 }
 
 // VoterStatus reflects the state of an individual user's votes within a ballot.
 type VoterStatus struct {
-	GovID         id.ID             `json:"governance_id"`
-	GovAddress    gov.GovAddress    `json:"governance_address"`
-	BallotName    BallotName        `json:"ballot_name"`
-	AcceptedVotes AcceptedElections `json:"accepted_votes"`
-	RejectedVotes RejectedElections `json:"rejected_votes"`
-	PendingVotes  Elections         `json:"pending_votes"`
+	GovID         id.ID                `json:"governance_id"`
+	GovAddress    gov.GovPublicAddress `json:"governance_address"`
+	BallotName    BallotName           `json:"ballot_name"`
+	AcceptedVotes AcceptedElections    `json:"accepted_votes"`
+	RejectedVotes RejectedElections    `json:"rejected_votes"`
+	PendingVotes  Elections            `json:"pending_votes"`
 }
 
 func VoteLogPath(govID id.ID, ballotName BallotName) ns.NS {
@@ -77,21 +77,21 @@ func ParseBallotNameFromPath(p string) BallotName {
 }
 
 type Advertisement struct {
-	Gov          gov.GovAddress `json:"community"`
-	Name         BallotName     `json:"name"`
-	Title        string         `json:"title"`
-	Description  string         `json:"description"`
-	Choices      []string       `json:"choices"`
-	Strategy     string         `json:"strategy"`
-	Participants member.Group   `json:"participants_group"`
-	Frozen       bool           `json:"frozen"` // if frozen, the ballot is not accepting votes
-	Closed       bool           `json:"closed"` // closed ballots cannot be re-opened
-	Cancelled    bool           `json:"cancelled"`
-	ParentCommit git.CommitHash `json:"parent_commit"`
+	Gov          gov.GovPublicAddress `json:"community"`
+	Name         BallotName           `json:"name"`
+	Title        string               `json:"title"`
+	Description  string               `json:"description"`
+	Choices      []string             `json:"choices"`
+	Strategy     string               `json:"strategy"`
+	Participants member.Group         `json:"participants_group"`
+	Frozen       bool                 `json:"frozen"` // if frozen, the ballot is not accepting votes
+	Closed       bool                 `json:"closed"` // closed ballots cannot be re-opened
+	Cancelled    bool                 `json:"cancelled"`
+	ParentCommit git.CommitHash       `json:"parent_commit"`
 }
 
 type BallotAddress struct {
-	Gov  gov.GovAddress
+	Gov  gov.GovPublicAddress
 	Name BallotName
 }
 

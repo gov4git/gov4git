@@ -28,7 +28,7 @@ var (
 			LoadConfig()
 			ops.OpenMotion(
 				ctx,
-				setup.Gov,
+				setup.Organizer,
 				schema.MotionID(motionName),
 				schema.PolicyName(motionPolicy),
 				motionTitle,
@@ -49,7 +49,7 @@ var (
 			LoadConfig()
 			ops.CloseMotion(
 				ctx,
-				setup.Gov,
+				setup.Organizer,
 				schema.MotionID(motionName),
 			)
 			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -81,7 +81,7 @@ func init() {
 	motionCmd.AddCommand(motionOpenCmd)
 	motionOpenCmd.Flags().StringVar(&motionName, "name", "", "unique name for motion")
 	motionOpenCmd.MarkFlagRequired("name")
-	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(policy.Policies(), ", ")+")")
+	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(policy.InstalledPolicies(), ", ")+")")
 	motionOpenCmd.MarkFlagRequired("policy")
 	motionOpenCmd.Flags().StringVar(&motionTitle, "title", "", "title for motion")
 	motionOpenCmd.Flags().StringVar(&motionDesc, "desc", "", "description for motion")

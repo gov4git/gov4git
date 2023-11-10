@@ -48,8 +48,7 @@ type Motion struct {
 	Closed    bool `json:"closed"`
 	Cancelled bool `json:"cancelled"`
 	// attention ranking, mutable
-	Scoring Scoring `json:"scoring"`
-	Score   float64 `json:"score"` // priority score for this motion, computed during sync after tallying
+	Score Score `json:"score"`
 	// network, mutable
 	RefBy Refs `json:"ref_by"`
 	RefTo Refs `json:"ref_to"`
@@ -106,7 +105,7 @@ func (x Motions) Sort() { sort.Sort(x) }
 
 func (x Motions) Len() int { return len(x) }
 
-func (x Motions) Less(i, j int) bool { return x[i].Score < x[j].Score }
+func (x Motions) Less(i, j int) bool { return x[i].Score.Attention < x[j].Score.Attention }
 
 func (x Motions) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
 

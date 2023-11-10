@@ -13,7 +13,7 @@ import (
 
 func LinkMotions(
 	ctx context.Context,
-	addr gov.GovAddress,
+	addr gov.GovPublicAddress,
 	fromID schema.MotionID,
 	toID schema.MotionID,
 	typ schema.RefType,

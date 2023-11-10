@@ -28,7 +28,7 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := boot.Boot(ctx, id.OwnerAddress(setup.Organizer))
+			chg := boot.Boot(ctx, setup.Organizer)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}

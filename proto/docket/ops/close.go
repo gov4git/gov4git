@@ -8,26 +8,25 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
 
 func CloseMotion(
 	ctx context.Context,
-	addr gov.GovPrivateAddress,
+	addr gov.GovOwnerAddress,
 	id schema.MotionID,
 
 ) git.ChangeNoResult {
 
-	cloned := gov.CloneOrganizer(ctx, addr)
+	cloned := gov.CloneOwner(ctx, addr)
 	return CloseMotion_StageOnly(ctx, addr, cloned, id)
 }
 
 func CloseMotion_StageOnly(
 	ctx context.Context,
-	addr gov.GovPrivateAddress,
-	cloned id.OwnerCloned,
+	addr gov.GovOwnerAddress,
+	cloned gov.GovOwnerCloned,
 	id schema.MotionID,
 
 ) git.ChangeNoResult {

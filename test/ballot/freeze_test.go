@@ -105,7 +105,7 @@ func TestVoteFreezeTally(t *testing.T) {
 	fmt.Println("freeze: ", form.SprintJSON(freezeChg))
 
 	// verify state changed
-	ast := ballot.Show(ctx, gov.GovPublicAddress(cty.Organizer().Public), ballotName)
+	ast := ballot.Show(ctx, gov.GovAddress(cty.Organizer().Public), ballotName)
 	if !ast.Ad.Frozen {
 		t.Errorf("expecting frozen")
 	}

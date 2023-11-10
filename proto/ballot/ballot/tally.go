@@ -9,7 +9,6 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -18,12 +17,12 @@ import (
 
 func Tally(
 	ctx context.Context,
-	govAddr gov.GovPrivateAddress,
+	govAddr gov.GovOwnerAddress,
 	ballotName common.BallotName,
 	maxPar int,
 ) git.Change[form.Map, common.Tally] {
 
-	govOwner := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
+	govOwner := gov.CloneOwner(ctx, govAddr)
 	chg, changed := Tally_StageOnly(ctx, govAddr, govOwner, ballotName, maxPar)
 	if !changed {
 		return chg
@@ -35,8 +34,8 @@ func Tally(
 
 func Tally_StageOnly(
 	ctx context.Context,
-	govAddr gov.GovPrivateAddress,
-	govOwner id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govOwner gov.GovOwnerCloned,
 	ballotName common.BallotName,
 	maxPar int,
 ) (git.Change[form.Map, common.Tally], bool) {
@@ -53,8 +52,8 @@ func Tally_StageOnly(
 
 func tallyVotersCloned_StageOnly(
 	ctx context.Context,
-	govAddr gov.GovPrivateAddress,
-	govOwner id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govOwner gov.GovOwnerCloned,
 	ballotName common.BallotName,
 	voterAccounts map[member.User]member.Account,
 	votersCloned map[member.User]git.Cloned,

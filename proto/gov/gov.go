@@ -7,14 +7,20 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-type GovPublicAddress id.PublicAddress
+type GovAddress id.PublicAddress
 
-func Clone(ctx context.Context, addr GovPublicAddress) git.Cloned {
+func Clone(ctx context.Context, addr GovAddress) git.Cloned {
 	return git.CloneOne(ctx, git.Address(addr))
 }
 
-type GovPrivateAddress id.OwnerAddress
+type GovOwnerAddress id.OwnerAddress
 
-func CloneOrganizer(ctx context.Context, addr GovPrivateAddress) id.OwnerCloned {
-	return id.CloneOwner(ctx, id.OwnerAddress(addr))
+func CloneOwner(ctx context.Context, addr GovOwnerAddress) GovOwnerCloned {
+	return GovOwnerCloned(id.CloneOwner(ctx, id.OwnerAddress(addr)))
+}
+
+type GovOwnerCloned id.OwnerCloned
+
+func (x GovOwnerCloned) IDOwnerCloned() id.OwnerCloned {
+	return id.OwnerCloned(x)
 }

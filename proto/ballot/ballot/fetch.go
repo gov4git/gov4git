@@ -35,8 +35,8 @@ func fetchedVotesToElections(fv FetchedVotes) map[member.User]common.Elections {
 
 func fetchVotes(
 	ctx context.Context,
-	govAddr gov.GovPrivateAddress,
-	govOwner id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govOwner gov.GovOwnerCloned,
 	ballotName common.BallotName,
 	user member.User,
 	account member.Account,
@@ -47,8 +47,8 @@ func fetchVotes(
 
 func fetchVotesCloned(
 	ctx context.Context,
-	govAddr gov.GovPrivateAddress,
-	govOwner id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govOwner gov.GovOwnerCloned,
 	ballotName common.BallotName,
 	user member.User,
 	account member.Account,
@@ -77,7 +77,7 @@ func fetchVotesCloned(
 	voterPublicTree := userCloned.Tree()
 	mail.Respond_StageOnly[common.VoteEnvelope, common.VoteEnvelope](
 		ctx,
-		govOwner,
+		govOwner.IDOwnerCloned(),
 		account.PublicAddress,
 		voterPublicTree,
 		common.BallotTopic(ballotName),

@@ -13,7 +13,7 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func SetUser(ctx context.Context, addr gov.GovPublicAddress, name User, acct Account) {
+func SetUser(ctx context.Context, addr gov.GovAddress, name User, acct Account) {
 	cloned := gov.Clone(ctx, addr)
 	chg := SetUser_StageOnly(ctx, cloned.Tree(), name, acct)
 	proto.Commit(ctx, cloned.Tree(), chg)
@@ -26,7 +26,7 @@ func SetUser_StageOnly(ctx context.Context, t *git.Tree, name User, user Account
 	return usersKV.Set(ctx, usersNS, t, name, user) // create the user record
 }
 
-func GetUser(ctx context.Context, addr gov.GovPublicAddress, name User) Account {
+func GetUser(ctx context.Context, addr gov.GovAddress, name User) Account {
 	return GetUser_Local(ctx, gov.Clone(ctx, addr).Tree(), name)
 }
 
@@ -50,7 +50,7 @@ func GetUser_Local(ctx context.Context, t *git.Tree, name User) Account {
 	return usersKV.Get(ctx, usersNS, t, name)
 }
 
-func AddUserByPublicAddress(ctx context.Context, govAddr gov.GovPublicAddress, name User, userAddr id.PublicAddress) {
+func AddUserByPublicAddress(ctx context.Context, govAddr gov.GovAddress, name User, userAddr id.PublicAddress) {
 	cred := id.FetchPublicCredentials(ctx, userAddr)
 	AddUser(ctx, govAddr, name, Account{ID: cred.ID, PublicAddress: userAddr})
 }
@@ -60,7 +60,7 @@ func AddUserByPublicAddress_StageOnly(ctx context.Context, t *git.Tree, name Use
 	AddUser_StageOnly(ctx, t, name, Account{ID: cred.ID, PublicAddress: userAddr})
 }
 
-func AddUser(ctx context.Context, addr gov.GovPublicAddress, name User, acct Account) {
+func AddUser(ctx context.Context, addr gov.GovAddress, name User, acct Account) {
 	cloned := gov.Clone(ctx, addr)
 	chg := AddUser_StageOnly(ctx, cloned.Tree(), name, acct)
 	proto.Commit(ctx, cloned.Tree(), chg)
@@ -74,7 +74,7 @@ func AddUser_StageOnly(ctx context.Context, t *git.Tree, name User, user Account
 	return SetUser_StageOnly(ctx, t, name, user)
 }
 
-func RemoveUser(ctx context.Context, addr gov.GovPublicAddress, name User) {
+func RemoveUser(ctx context.Context, addr gov.GovAddress, name User) {
 	cloned := gov.Clone(ctx, addr)
 	chg := RemoveUser_StageOnly(ctx, cloned.Tree(), name)
 	proto.Commit(ctx, cloned.Tree(), chg)
@@ -94,7 +94,7 @@ func RemoveUser_StageOnly(ctx context.Context, t *git.Tree, name User) git.Chang
 
 // set prop
 
-func SetUserProp[V form.Form](ctx context.Context, addr gov.GovPublicAddress, user User, key string, value V) {
+func SetUserProp[V form.Form](ctx context.Context, addr gov.GovAddress, user User, key string, value V) {
 	cloned := gov.Clone(ctx, addr)
 	chg := SetUserProp_StageOnly(ctx, cloned.Tree(), user, key, value)
 	proto.Commit(ctx, cloned.Tree(), chg)
@@ -109,7 +109,7 @@ func SetUserProp_StageOnly[V form.Form](ctx context.Context, t *git.Tree, user U
 
 // get prop
 
-func GetUserProp[V form.Form](ctx context.Context, addr gov.GovPublicAddress, user User, key string) V {
+func GetUserProp[V form.Form](ctx context.Context, addr gov.GovAddress, user User, key string) V {
 	return GetUserProp_Local[V](ctx, gov.Clone(ctx, addr).Tree(), user, key)
 }
 
@@ -119,7 +119,7 @@ func GetUserProp_Local[V form.Form](ctx context.Context, t *git.Tree, user User,
 	return propKV.Get(ctx, usersKV.KeyNS(usersNS, user), t, key)
 }
 
-func GetUserPropOrDefault[V form.Form](ctx context.Context, addr gov.GovPublicAddress, user User, key string, default_ V) V {
+func GetUserPropOrDefault[V form.Form](ctx context.Context, addr gov.GovAddress, user User, key string, default_ V) V {
 	return GetUserPropOrDefault_Local[V](ctx, gov.Clone(ctx, addr).Tree(), user, key, default_)
 }
 
@@ -134,7 +134,7 @@ func GetUserPropOrDefault_Local[V form.Form](ctx context.Context, t *git.Tree, u
 
 // lookup
 
-func LookupUserByAddress(ctx context.Context, govAddr gov.GovPublicAddress, userAddr id.PublicAddress) []User {
+func LookupUserByAddress(ctx context.Context, govAddr gov.GovAddress, userAddr id.PublicAddress) []User {
 	return LookupUserByAddress_Local(ctx, gov.Clone(ctx, govAddr).Tree(), userAddr)
 }
 
@@ -150,7 +150,7 @@ func LookupUserByAddress_Local(ctx context.Context, t *git.Tree, userAddr id.Pub
 	return r
 }
 
-func LookupUserByID(ctx context.Context, govAddr gov.GovPublicAddress, userID id.ID) []User {
+func LookupUserByID(ctx context.Context, govAddr gov.GovAddress, userID id.ID) []User {
 	return LookupUserByID_Local(ctx, gov.Clone(ctx, govAddr).Tree(), userID)
 }
 

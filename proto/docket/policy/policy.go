@@ -5,7 +5,6 @@ import (
 
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/mod"
 	"github.com/gov4git/lib4git/ns"
 )
@@ -15,24 +14,24 @@ type Policy interface {
 
 	Open(
 		ctx context.Context,
-		govAddr gov.GovPrivateAddress,
-		govCloned id.OwnerCloned,
+		govAddr gov.GovOwnerAddress,
+		govCloned gov.GovOwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 	)
 
 	Score(
 		ctx context.Context,
-		govAddr gov.GovPrivateAddress,
-		govCloned id.OwnerCloned,
+		govAddr gov.GovOwnerAddress,
+		govCloned gov.GovOwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 	) schema.Score
 
 	Close(
 		ctx context.Context,
-		govAddr gov.GovPrivateAddress,
-		govCloned id.OwnerCloned,
+		govAddr gov.GovOwnerAddress,
+		govCloned gov.GovOwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 	)

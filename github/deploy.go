@@ -12,6 +12,7 @@ import (
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/gov4git/api"
 	"github.com/gov4git/gov4git/proto/boot"
+	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
@@ -50,7 +51,7 @@ func Deploy(
 	govPrivateURLs, err := v.CreateRepo(ctx, govPrivate.Name, govPrivate.Owner, true)
 	must.NoError(ctx, err)
 
-	govOwnerAddr := id.OwnerAddress{
+	govOwnerAddr := gov.OwnerAddress{
 		Public: id.PublicAddress{
 			Repo:   git.URL(govPublicURLs.HTTPSURL),
 			Branch: git.MainBranch,
@@ -113,7 +114,7 @@ var (
 
 func installGithubActions(
 	ctx context.Context,
-	govOwnerAddr id.OwnerAddress,
+	govOwnerAddr gov.OwnerAddress,
 ) {
 
 	govCloned := git.CloneOne(ctx, git.Address(govOwnerAddr.Public))

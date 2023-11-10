@@ -11,7 +11,6 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
@@ -24,11 +23,11 @@ func ImportIssuesForPrioritization(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.GovPrivateAddress,
+	govAddr gov.GovOwnerAddress,
 ) git.Change[form.Map, ImportedIssues] {
 
 	base.Infof("importing issues for prioritization ...")
-	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
+	govCloned := gov.CloneOwner(ctx, govAddr)
 	issuesCausingChange := ImportIssuesForPrioritization_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
 	chg := git.NewChange[form.Map, ImportedIssues](
 		fmt.Sprintf("Import %d GitHub issues", len(issuesCausingChange)),
@@ -44,8 +43,8 @@ func ImportIssuesForPrioritization_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.GovPrivateAddress,
-	govCloned id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govCloned gov.GovOwnerCloned,
 ) ImportedIssues {
 
 	// load github issues and governance ballots, and
@@ -87,7 +86,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				ballot.Open_StageOnly(
 					ctx,
 					qv.QV{},
-					gov.GovPublicAddress(govAddr.Public),
+					gov.GovAddress(govAddr.Public),
 					govCloned.Public,
 					ghIssue.BallotName(),
 					ghIssue.Title,
@@ -138,8 +137,8 @@ func filterIssuesForPrioritization(ads []common.Advertisement) map[string]common
 func UpdateMeta_StageOnly(
 	ctx context.Context,
 	repo Repo,
-	govAddr gov.GovPrivateAddress,
-	govCloned id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govCloned gov.GovOwnerCloned,
 	ghIssue ImportedIssue,
 	govBallot common.Advertisement,
 ) (changed bool) {
@@ -153,8 +152,8 @@ func UpdateMeta_StageOnly(
 func UpdateFrozen_StageOnly(
 	ctx context.Context,
 	repo Repo,
-	govAddr gov.GovPrivateAddress,
-	govCloned id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govCloned gov.GovOwnerCloned,
 	ghIssue ImportedIssue,
 	govBallot common.Advertisement,
 ) (changed bool) {

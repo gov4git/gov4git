@@ -8,26 +8,25 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 )
 
 func ScoreMotions(
 	ctx context.Context,
-	addr gov.GovPrivateAddress,
+	addr gov.GovOwnerAddress,
 
 ) git.Change[form.Map, schema.Motions] {
 
-	cloned := gov.CloneOrganizer(ctx, addr)
+	cloned := gov.CloneOwner(ctx, addr)
 	chg := ScoreMotions_StageOnly(ctx, addr, cloned)
 	return proto.CommitIfChanged(ctx, cloned.Public, chg)
 }
 
 func ScoreMotions_StageOnly(
 	ctx context.Context,
-	addr gov.GovPrivateAddress,
-	cloned id.OwnerCloned,
+	addr gov.GovOwnerAddress,
+	cloned gov.GovOwnerCloned,
 
 ) git.Change[form.Map, schema.Motions] {
 

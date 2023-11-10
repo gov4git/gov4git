@@ -12,7 +12,7 @@ import (
 
 func List(
 	ctx context.Context,
-	govAddr gov.GovPublicAddress,
+	govAddr gov.GovAddress,
 ) []common.Advertisement {
 
 	return List_Local(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree())
@@ -50,7 +50,7 @@ func List_Local(
 
 func ListFilter(
 	ctx context.Context,
-	govAddr gov.GovPublicAddress,
+	govAddr gov.GovAddress,
 	onlyOpen bool,
 	onlyClosed bool,
 	onlyFrozen bool,

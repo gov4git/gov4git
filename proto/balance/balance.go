@@ -13,7 +13,7 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func Set(ctx context.Context, addr gov.GovPublicAddress, user member.User, key Balance, value float64) {
+func Set(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) {
 	member.SetUserProp(ctx, addr, user, userPropKey(key), value)
 }
 
@@ -21,7 +21,7 @@ func Set_StageOnly(ctx context.Context, t *git.Tree, user member.User, key Balan
 	member.SetUserProp_StageOnly(ctx, t, user, userPropKey(key), value)
 }
 
-func Get(ctx context.Context, addr gov.GovPublicAddress, user member.User, key Balance) float64 {
+func Get(ctx context.Context, addr gov.GovAddress, user member.User, key Balance) float64 {
 	return member.GetUserPropOrDefault[float64](ctx, addr, user, userPropKey(key), 0.0)
 }
 
@@ -81,7 +81,7 @@ func Charge_StageOnly(
 	Add_StageOnly(ctx, t, user, bal, -amount)
 }
 
-func Add(ctx context.Context, addr gov.GovPublicAddress, user member.User, key Balance, value float64) float64 {
+func Add(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) float64 {
 	cloned := gov.Clone(ctx, addr)
 	prior := Add_StageOnly(ctx, cloned.Tree(), user, key, value)
 	chg := git.NewChange[form.Map, float64](
@@ -102,7 +102,7 @@ func Add_StageOnly(ctx context.Context, t *git.Tree, user member.User, key Balan
 	return prior
 }
 
-func Mul(ctx context.Context, addr gov.GovPublicAddress, user member.User, key Balance, value float64) float64 {
+func Mul(ctx context.Context, addr gov.GovAddress, user member.User, key Balance, value float64) float64 {
 	cloned := gov.Clone(ctx, addr)
 	prior := Mul_StageOnly(ctx, cloned.Tree(), user, key, value)
 	chg := git.NewChange[form.Map, float64](

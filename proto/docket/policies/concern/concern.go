@@ -9,7 +9,6 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/ns"
 )
@@ -28,8 +27,8 @@ func (x concernPolicy) Name() string {
 
 func (x concernPolicy) Open(
 	ctx context.Context,
-	govAddr gov.GovPrivateAddress,
-	govCloned id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govCloned gov.GovOwnerCloned,
 	motion schema.Motion,
 	instancePolicyNS ns.NS,
 
@@ -40,7 +39,7 @@ func (x concernPolicy) Open(
 	ballot.Open_StageOnly(
 		ctx,
 		qv.QV{},
-		gov.GovPublicAddress(govAddr.Public),
+		gov.GovAddress(govAddr.Public),
 		govCloned.Public,
 		ballotName,
 		fmt.Sprintf("Priority poll for motion %v", motion.ID),
@@ -53,8 +52,8 @@ func (x concernPolicy) Open(
 
 func (x concernPolicy) Score(
 	ctx context.Context,
-	govAddr gov.GovPrivateAddress,
-	govCloned id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govCloned gov.GovOwnerCloned,
 	motion schema.Motion,
 	instancePolicyNS ns.NS,
 
@@ -63,12 +62,10 @@ func (x concernPolicy) Score(
 	return schema.Score{}
 }
 
-// XXX: Open and Close use different addr/clone types
-
 func (x concernPolicy) Close(
 	ctx context.Context,
-	govAddr gov.GovPrivateAddress,
-	govCloned id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govCloned gov.GovOwnerCloned,
 	motion schema.Motion,
 	instancePolicyNS ns.NS,
 

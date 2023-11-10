@@ -20,7 +20,7 @@ type Strategy interface {
 	VerifyElections(
 		ctx context.Context,
 		voterAddr id.OwnerAddress,
-		govAddr gov.GovPublicAddress,
+		govAddr gov.GovAddress,
 		voterCloned id.OwnerCloned,
 		govCloned git.Cloned,
 		ad *Advertisement,
@@ -30,7 +30,7 @@ type Strategy interface {
 
 	Tally(
 		ctx context.Context,
-		gov id.OwnerCloned,
+		gov gov.GovOwnerCloned,
 		ad *Advertisement,
 		current *Tally,
 		fetched map[member.User]Elections,
@@ -38,21 +38,21 @@ type Strategy interface {
 
 	Close(
 		ctx context.Context,
-		gov id.OwnerCloned,
+		gov gov.GovOwnerCloned,
 		ad *Advertisement,
 		tally *Tally,
 	) git.Change[form.Map, Outcome]
 
 	Cancel(
 		ctx context.Context,
-		gov id.OwnerCloned,
+		gov gov.GovOwnerCloned,
 		ad *Advertisement,
 		tally *Tally,
 	) git.Change[form.Map, Outcome]
 
 	Reopen(
 		ctx context.Context,
-		gov id.OwnerCloned,
+		gov gov.GovOwnerCloned,
 		ad *Advertisement,
 		tally *Tally,
 	) git.Change[form.Map, form.None]

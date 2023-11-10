@@ -18,7 +18,7 @@ import (
 
 func Tally(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	ballotName common.BallotName,
 	maxPar int,
 ) git.Change[form.Map, common.Tally] {
@@ -35,7 +35,7 @@ func Tally(
 
 func Tally_StageOnly(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	govOwner id.OwnerCloned,
 	ballotName common.BallotName,
 	maxPar int,
@@ -53,7 +53,7 @@ func Tally_StageOnly(
 
 func tallyVotersCloned_StageOnly(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	govOwner id.OwnerCloned,
 	ballotName common.BallotName,
 	voterAccounts map[member.User]member.Account,

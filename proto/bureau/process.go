@@ -18,7 +18,7 @@ import (
 
 func Process(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	group member.Group,
 ) git.ChangeNoResult {
 
@@ -35,7 +35,7 @@ func Process(
 
 func Process_StageOnly(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	govOwner id.OwnerCloned,
 	group member.Group,
 ) (change git.ChangeNoResult, changed bool) {
@@ -77,7 +77,7 @@ func Process_StageOnly(
 
 func processRequest_StageOnly(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	govOwner id.OwnerCloned,
 	fetched FetchedRequest,
 ) (numOK int, numErr int) {
@@ -117,7 +117,7 @@ func processRequest_StageOnly(
 
 func fetchUserRequests(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	govOwner id.OwnerCloned,
 	user member.User,
 	account member.Account,

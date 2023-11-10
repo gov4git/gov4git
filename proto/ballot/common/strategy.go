@@ -20,7 +20,7 @@ type Strategy interface {
 	VerifyElections(
 		ctx context.Context,
 		voterAddr id.OwnerAddress,
-		govAddr gov.GovAddress,
+		govAddr gov.GovPublicAddress,
 		voterCloned id.OwnerCloned,
 		govCloned git.Cloned,
 		ad *Advertisement,

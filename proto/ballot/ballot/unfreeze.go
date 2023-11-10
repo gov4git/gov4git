@@ -15,7 +15,7 @@ import (
 
 func Unfreeze(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	ballotName common.BallotName,
 ) git.ChangeNoResult {
 
@@ -28,7 +28,7 @@ func Unfreeze(
 
 func Unfreeze_StageOnly(
 	ctx context.Context,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 	govCloned id.OwnerCloned,
 	ballotName common.BallotName,
 ) git.ChangeNoResult {

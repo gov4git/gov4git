@@ -16,8 +16,8 @@ import (
 )
 
 type TestCommunity struct {
-	gov           gov.GovPublicAddress
-	organizer     gov.GovPrivateAddress
+	gov           gov.GovAddress
+	organizer     gov.GovOwnerAddress
 	members       []id.OwnerAddress
 	silentMembers []id.OwnerAddress
 }
@@ -52,8 +52,8 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 	}
 
 	comty := &TestCommunity{
-		gov:           gov.GovPublicAddress(organizerID.PublicAddress()),
-		organizer:     gov.GovPrivateAddress(organizerID.OwnerAddress()),
+		gov:           gov.GovAddress(organizerID.PublicAddress()),
+		organizer:     gov.GovOwnerAddress(organizerID.OwnerAddress()),
 		members:       members,
 		silentMembers: silentMembers,
 	}
@@ -85,11 +85,11 @@ func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 	govCloned.Push(ctx)
 }
 
-func (x *TestCommunity) Gov() gov.GovPublicAddress {
+func (x *TestCommunity) Gov() gov.GovAddress {
 	return x.gov
 }
 
-func (x *TestCommunity) Organizer() gov.GovPrivateAddress {
+func (x *TestCommunity) Organizer() gov.GovOwnerAddress {
 	return x.organizer
 }
 

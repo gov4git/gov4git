@@ -11,7 +11,6 @@ import (
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
@@ -48,7 +47,7 @@ func ProcessDirectiveIssuesByMaintainer(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	govAddr gov.GovPrivateAddress,
+	govAddr gov.GovOwnerAddress,
 ) git.Change[form.Map, ProcessDirectiveIssueReports] {
 
 	maintainers := FetchRepoMaintainers(ctx, repo, ghc)
@@ -60,11 +59,11 @@ func ProcessDirectiveIssues(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	govAddr gov.GovPrivateAddress,
+	govAddr gov.GovOwnerAddress,
 	approverGitHubUsers []string,
 ) git.Change[form.Map, ProcessDirectiveIssueReports] {
 
-	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
+	govCloned := gov.CloneOwner(ctx, govAddr)
 	report := ProcessDirectiveIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned, approverGitHubUsers)
 	chg := git.NewChange[form.Map, ProcessDirectiveIssueReports](
 		fmt.Sprintf("Process %d organizer directives", len(report)),
@@ -86,8 +85,8 @@ func ProcessDirectiveIssues_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.GovPrivateAddress,
-	govCloned id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govCloned gov.GovOwnerCloned,
 	maintainers []string,
 ) ProcessDirectiveIssueReports { // return list of processed directives
 
@@ -116,8 +115,8 @@ func processDirectiveIssue_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	govAddr gov.GovPrivateAddress,
-	govCloned id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govCloned gov.GovOwnerCloned,
 	maintainers []string,
 	issue *github.Issue,
 ) (DirectiveIssue, error) {

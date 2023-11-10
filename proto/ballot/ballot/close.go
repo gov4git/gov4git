@@ -7,7 +7,6 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -15,12 +14,12 @@ import (
 
 func Close(
 	ctx context.Context,
-	govAddr gov.GovPrivateAddress,
+	govAddr gov.GovOwnerAddress,
 	ballotName common.BallotName,
 	cancel bool,
 ) git.Change[form.Map, common.Outcome] {
 
-	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
+	govCloned := gov.CloneOwner(ctx, govAddr)
 	chg := Close_StageOnly(ctx, govAddr, govCloned, ballotName, cancel)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
@@ -29,8 +28,8 @@ func Close(
 
 func Close_StageOnly(
 	ctx context.Context,
-	govAddr gov.GovPrivateAddress,
-	govCloned id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govCloned gov.GovOwnerCloned,
 	ballotName common.BallotName,
 	cancel bool,
 ) git.Change[form.Map, common.Outcome] {

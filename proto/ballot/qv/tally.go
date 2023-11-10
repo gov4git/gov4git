@@ -6,7 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -15,7 +15,7 @@ import (
 
 func (qv QV) Tally(
 	ctx context.Context,
-	owner id.OwnerCloned,
+	owner gov.GovOwnerCloned,
 	ad *common.Advertisement,
 	prior *common.Tally,
 	fetched map[member.User]common.Elections, // newly fetched votes from participating users

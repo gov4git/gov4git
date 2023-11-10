@@ -5,14 +5,14 @@ import (
 	"fmt"
 
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 )
 
 func (qv QV) Reopen(
 	ctx context.Context,
-	govOwner id.OwnerCloned,
+	govOwner gov.GovOwnerCloned,
 	ad *common.Advertisement,
 	tally *common.Tally,
 ) git.Change[form.Map, form.None] {

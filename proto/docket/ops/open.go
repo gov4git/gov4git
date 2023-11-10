@@ -10,14 +10,13 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
 
 func OpenMotion(
 	ctx context.Context,
-	addr gov.GovPrivateAddress,
+	addr gov.GovOwnerAddress,
 	id schema.MotionID,
 	policy schema.PolicyName,
 	title string,
@@ -28,15 +27,15 @@ func OpenMotion(
 
 ) git.ChangeNoResult {
 
-	cloned := gov.CloneOrganizer(ctx, addr)
+	cloned := gov.CloneOwner(ctx, addr)
 	chg := OpenMotion_StageOnly(ctx, addr, cloned, id, policy, title, desc, typ, trackerURL, labels)
 	return proto.CommitIfChanged(ctx, cloned.Public, chg)
 }
 
 func OpenMotion_StageOnly(
 	ctx context.Context,
-	addr gov.GovPrivateAddress,
-	cloned id.OwnerCloned,
+	addr gov.GovOwnerAddress,
+	cloned gov.GovOwnerCloned,
 	id schema.MotionID,
 	policyName schema.PolicyName,
 	title string,

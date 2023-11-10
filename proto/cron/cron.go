@@ -11,7 +11,6 @@ import (
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -25,7 +24,7 @@ func Cron(
 	ctx context.Context,
 	repo govgh.Repo,
 	ghc *github.Client,
-	govAddr gov.GovPrivateAddress,
+	govAddr gov.GovOwnerAddress,
 	//
 	githubFreq time.Duration, // frequency of importing from github
 	communityFreq time.Duration, // frequency of fetching community votes and service requests
@@ -33,7 +32,7 @@ func Cron(
 	maxPar int, // parallelism for fetching community votes
 ) form.Map {
 
-	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
+	govCloned := gov.CloneOwner(ctx, govAddr)
 	govTree := govCloned.Public.Tree()
 
 	// use a separate branch for cron logs

@@ -12,7 +12,6 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policies/proposal"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -22,10 +21,10 @@ func SyncManagedIssues(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client,
-	govAddr gov.GovPrivateAddress,
+	govAddr gov.GovOwnerAddress,
 ) git.Change[form.Map, *SyncManagedChanges] {
 
-	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
+	govCloned := gov.CloneOwner(ctx, govAddr)
 	syncChanges := SyncManagedIssues_StageOnly(ctx, repo, githubClient, govAddr, govCloned)
 	chg := git.NewChange[form.Map, *SyncManagedChanges](
 		fmt.Sprintf("Sync %d managed GitHub issues", len(syncChanges.IssuesCausingChange)),
@@ -65,8 +64,8 @@ func SyncManagedIssues_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client,
-	govAddr gov.GovPrivateAddress,
-	govCloned id.OwnerCloned,
+	govAddr gov.GovOwnerAddress,
+	govCloned gov.GovOwnerCloned,
 ) (syncChanges *SyncManagedChanges) {
 
 	syncChanges = newSyncManagedChanges()
@@ -190,8 +189,8 @@ func motionPolicyForIssue(issue ImportedIssue) schema.PolicyName {
 
 func syncCreateMotionForIssue(
 	ctx context.Context,
-	addr gov.GovPrivateAddress,
-	cloned id.OwnerCloned,
+	addr gov.GovOwnerAddress,
+	cloned gov.GovOwnerCloned,
 	chg *SyncManagedChanges,
 	issue ImportedIssue,
 	id schema.MotionID,

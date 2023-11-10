@@ -25,10 +25,9 @@ func Transfer(
 	amount float64,
 ) git.Change[form.Map, mail.RequestEnvelope[Request]] {
 
-	govCloned := git.CloneOne(ctx, git.Address(govAddr))
-	// userRepo, userTree := id.CloneOwner(ctx, userAddr)
+	govCloned := gov.Clone(ctx, govAddr)
 	userOwner := id.CloneOwner(ctx, userAddr)
-	chg := Transfer_StageOnly(ctx, userAddr, govAddr, userOwner, govCloned, fromUserOpt, fromBalance, toUser, toBalance, amount)
+	chg := Transfer_StageOnly(ctx, userAddr, userOwner, govCloned, fromUserOpt, fromBalance, toUser, toBalance, amount)
 	proto.Commit(ctx, userOwner.Public.Tree(), chg)
 	userOwner.Public.Push(ctx)
 	return chg
@@ -37,9 +36,8 @@ func Transfer(
 func Transfer_StageOnly(
 	ctx context.Context,
 	userAddr id.OwnerAddress,
-	govAddr gov.Address,
 	userOwner id.OwnerCloned,
-	govCloned git.Cloned,
+	govCloned gov.Cloned,
 	fromUserOpt member.User,
 	fromBalance balance.Balance,
 	toUser member.User,
@@ -54,11 +52,11 @@ func Transfer_StageOnly(
 		us := member.LookupUserByID_Local(ctx, govCloned.Tree(), userCred.ID)
 		switch len(us) {
 		case 0:
-			must.Errorf(ctx, "%s not found in community %v", userAddr.Public, govAddr)
+			must.Errorf(ctx, "%s not found in community %v", userAddr.Public, govCloned.Address())
 		case 1:
 			fromUserOpt = us[0]
 		default:
-			must.Errorf(ctx, "community %v has more than one user at address %v", govAddr, userAddr.Public)
+			must.Errorf(ctx, "community %v has more than one user at address %v", govCloned.Address(), userAddr.Public)
 		}
 	}
 

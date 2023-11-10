@@ -21,7 +21,7 @@ func Erase(
 ) git.Change[form.Map, bool] {
 
 	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg := Erase_StageOnly(ctx, govAddr, govCloned, ballotName)
+	chg := Erase_StageOnly(ctx, govCloned, ballotName)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
@@ -29,7 +29,6 @@ func Erase(
 
 func Erase_StageOnly(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
 	govCloned id.OwnerCloned,
 	ballotName common.BallotName,
 ) git.Change[form.Map, bool] {

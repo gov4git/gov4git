@@ -47,12 +47,11 @@ func Tally_StageOnly(
 	votersCloned := clonePar(ctx, pv.VoterAccounts, maxPar)
 	pv.attachVoterClones(ctx, votersCloned)
 
-	return tallyVotersCloned_StageOnly(ctx, govAddr, govOwner, ballotName, pv.VoterAccounts, pv.VoterClones)
+	return tallyVotersCloned_StageOnly(ctx, govOwner, ballotName, pv.VoterAccounts, pv.VoterClones)
 }
 
 func tallyVotersCloned_StageOnly(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
 	govOwner gov.OwnerCloned,
 	ballotName common.BallotName,
 	voterAccounts map[member.User]member.Account,
@@ -69,7 +68,7 @@ func tallyVotersCloned_StageOnly(
 	var fetchedVotes FetchedVotes
 	var fetchVoteChanges []git.Change[form.Map, FetchedVotes]
 	for user, account := range voterAccounts {
-		chg := fetchVotesCloned(ctx, govAddr, govOwner, ballotName, user, account, votersCloned[user])
+		chg := fetchVotesCloned(ctx, govOwner, ballotName, user, account, votersCloned[user])
 		fetchVoteChanges = append(fetchVoteChanges, chg)
 		fetchedVotes = append(fetchedVotes, chg.Result...)
 	}

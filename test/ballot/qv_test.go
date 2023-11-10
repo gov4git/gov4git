@@ -31,7 +31,7 @@ func TestQV(t *testing.T) {
 	openChg := ballot.Open(
 		ctx,
 		strat,
-		cty.Gov(),
+		cty.Organizer(),
 		ballotName,
 		"ballot_name",
 		"ballot description",

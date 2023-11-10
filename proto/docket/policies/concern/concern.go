@@ -27,8 +27,7 @@ func (x concernPolicy) Name() string {
 
 func (x concernPolicy) Open(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	govCloned gov.OwnerCloned,
+	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	instancePolicyNS ns.NS,
 
@@ -39,8 +38,7 @@ func (x concernPolicy) Open(
 	ballot.Open_StageOnly(
 		ctx,
 		qv.QV{},
-		gov.Address(govAddr.Public),
-		govCloned.Public,
+		cloned,
 		ballotName,
 		fmt.Sprintf("Priority poll for motion %v", motion.ID),
 		fmt.Sprintf("Up/down vote the priority of motion %v", motion.ID),
@@ -52,8 +50,7 @@ func (x concernPolicy) Open(
 
 func (x concernPolicy) Score(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	govCloned gov.OwnerCloned,
+	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	instancePolicyNS ns.NS,
 
@@ -64,8 +61,7 @@ func (x concernPolicy) Score(
 
 func (x concernPolicy) Close(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	govCloned gov.OwnerCloned,
+	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	instancePolicyNS ns.NS,
 
@@ -75,8 +71,7 @@ func (x concernPolicy) Close(
 	ballotName := schema.MotionPollBallotName(motion.ID)
 	ballot.Close_StageOnly(
 		ctx,
-		govAddr,
-		govCloned,
+		cloned,
 		ballotName,
 		false,
 	)

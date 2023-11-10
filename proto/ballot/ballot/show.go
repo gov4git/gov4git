@@ -10,14 +10,14 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func Show(ctx context.Context, govAddr gov.GovAddress, ballotName common.BallotName) common.AdStrategyTally {
+func Show(ctx context.Context, govAddr gov.Address, ballotName common.BallotName) common.AdStrategyTally {
 
 	return Show_Local(ctx, govAddr, git.CloneOne(ctx, git.Address(govAddr)).Tree(), ballotName)
 }
 
 func Show_Local(
 	ctx context.Context,
-	govAddr gov.GovAddress,
+	govAddr gov.Address,
 	govTree *git.Tree,
 	ballotName common.BallotName,
 ) common.AdStrategyTally {

@@ -12,7 +12,7 @@ import (
 
 func (qv QV) Close(
 	ctx context.Context,
-	govOwner gov.GovOwnerCloned,
+	govOwner gov.OwnerCloned,
 	ad *common.Advertisement,
 	tally *common.Tally,
 ) git.Change[form.Map, common.Outcome] {

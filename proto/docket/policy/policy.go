@@ -14,24 +14,24 @@ type Policy interface {
 
 	Open(
 		ctx context.Context,
-		govAddr gov.GovOwnerAddress,
-		govCloned gov.GovOwnerCloned,
+		govAddr gov.OwnerAddress,
+		govCloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 	)
 
 	Score(
 		ctx context.Context,
-		govAddr gov.GovOwnerAddress,
-		govCloned gov.GovOwnerCloned,
+		govAddr gov.OwnerAddress,
+		govCloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 	) schema.Score
 
 	Close(
 		ctx context.Context,
-		govAddr gov.GovOwnerAddress,
-		govCloned gov.GovOwnerCloned,
+		govAddr gov.OwnerAddress,
+		govCloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 	)

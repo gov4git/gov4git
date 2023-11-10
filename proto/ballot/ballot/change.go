@@ -14,7 +14,7 @@ import (
 
 func Change(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 	name common.BallotName,
 	title string,
 	description string,
@@ -30,8 +30,8 @@ func Change(
 
 func Change_StageOnly(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	name common.BallotName,
 	title string,
 	description string,

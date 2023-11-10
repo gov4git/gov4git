@@ -15,7 +15,7 @@ import (
 
 func (qv QV) Tally(
 	ctx context.Context,
-	owner gov.GovOwnerCloned,
+	owner gov.OwnerCloned,
 	ad *common.Advertisement,
 	prior *common.Tally,
 	fetched map[member.User]common.Elections, // newly fetched votes from participating users

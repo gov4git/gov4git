@@ -14,7 +14,7 @@ import (
 
 func Close(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 	ballotName common.BallotName,
 	cancel bool,
 ) git.Change[form.Map, common.Outcome] {
@@ -28,8 +28,8 @@ func Close(
 
 func Close_StageOnly(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	ballotName common.BallotName,
 	cancel bool,
 ) git.Change[form.Map, common.Outcome] {

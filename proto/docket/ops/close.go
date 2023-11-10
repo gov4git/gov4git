@@ -14,7 +14,7 @@ import (
 
 func CloseMotion(
 	ctx context.Context,
-	addr gov.GovOwnerAddress,
+	addr gov.OwnerAddress,
 	id schema.MotionID,
 
 ) git.ChangeNoResult {
@@ -25,8 +25,8 @@ func CloseMotion(
 
 func CloseMotion_StageOnly(
 	ctx context.Context,
-	addr gov.GovOwnerAddress,
-	cloned gov.GovOwnerCloned,
+	addr gov.OwnerAddress,
+	cloned gov.OwnerCloned,
 	id schema.MotionID,
 
 ) git.ChangeNoResult {

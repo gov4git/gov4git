@@ -47,7 +47,7 @@ func TestReopen(t *testing.T) {
 	ballot.Close(ctx, cty.Organizer(), ballotName, false)
 
 	// verify state changed
-	ast := ballot.Show(ctx, gov.GovAddress(cty.Organizer().Public), ballotName)
+	ast := ballot.Show(ctx, gov.Address(cty.Organizer().Public), ballotName)
 	if !ast.Ad.Closed {
 		t.Errorf("expecting closed flag")
 	}
@@ -56,7 +56,7 @@ func TestReopen(t *testing.T) {
 	ballot.Reopen(ctx, cty.Organizer(), ballotName)
 
 	// verify state changed
-	ast = ballot.Show(ctx, gov.GovAddress(cty.Organizer().Public), ballotName)
+	ast = ballot.Show(ctx, gov.Address(cty.Organizer().Public), ballotName)
 	if ast.Ad.Closed || ast.Ad.Cancelled {
 		t.Errorf("expecting not closed and not cancelled")
 	}

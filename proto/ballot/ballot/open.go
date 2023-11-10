@@ -16,7 +16,7 @@ import (
 func Open(
 	ctx context.Context,
 	strat common.Strategy,
-	govAddr gov.GovAddress,
+	govAddr gov.Address,
 	name common.BallotName,
 	title string,
 	description string,
@@ -34,7 +34,7 @@ func Open(
 func Open_StageOnly(
 	ctx context.Context,
 	strat common.Strategy,
-	govAddr gov.GovAddress,
+	govAddr gov.Address,
 	govCloned git.Cloned,
 	name common.BallotName,
 	title string,

@@ -23,8 +23,8 @@ func (x proposalPolicy) Name() string {
 
 func (x proposalPolicy) Open(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	motion schema.Motion,
 	instancePolicyNS ns.NS,
 
@@ -34,8 +34,8 @@ func (x proposalPolicy) Open(
 
 func (x proposalPolicy) Score(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	motion schema.Motion,
 	instancePolicyNS ns.NS,
 
@@ -46,8 +46,8 @@ func (x proposalPolicy) Score(
 
 func (x proposalPolicy) Close(
 	ctx context.Context,
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 	motion schema.Motion,
 	instancePolicyNS ns.NS,
 

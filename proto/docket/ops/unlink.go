@@ -13,7 +13,7 @@ import (
 
 func UnlinkMotions(
 	ctx context.Context,
-	addr gov.GovAddress,
+	addr gov.Address,
 	fromID schema.MotionID,
 	toID schema.MotionID,
 	typ schema.RefType,

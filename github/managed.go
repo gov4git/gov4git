@@ -21,7 +21,7 @@ func SyncManagedIssues(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client,
-	govAddr gov.GovOwnerAddress,
+	govAddr gov.OwnerAddress,
 ) git.Change[form.Map, *SyncManagedChanges] {
 
 	govCloned := gov.CloneOwner(ctx, govAddr)
@@ -64,8 +64,8 @@ func SyncManagedIssues_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client,
-	govAddr gov.GovOwnerAddress,
-	govCloned gov.GovOwnerCloned,
+	govAddr gov.OwnerAddress,
+	govCloned gov.OwnerCloned,
 ) (syncChanges *SyncManagedChanges) {
 
 	syncChanges = newSyncManagedChanges()
@@ -189,8 +189,8 @@ func motionPolicyForIssue(issue ImportedIssue) schema.PolicyName {
 
 func syncCreateMotionForIssue(
 	ctx context.Context,
-	addr gov.GovOwnerAddress,
-	cloned gov.GovOwnerCloned,
+	addr gov.OwnerAddress,
+	cloned gov.OwnerCloned,
 	chg *SyncManagedChanges,
 	issue ImportedIssue,
 	id schema.MotionID,

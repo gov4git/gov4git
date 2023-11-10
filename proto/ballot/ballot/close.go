@@ -20,7 +20,7 @@ func Close(
 ) git.Change[form.Map, common.Outcome] {
 
 	govCloned := gov.CloneOwner(ctx, govAddr)
-	chg := Close_StageOnly(ctx, govAddr, govCloned, ballotName, cancel)
+	chg := Close_StageOnly(ctx, govCloned, ballotName, cancel)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
@@ -28,7 +28,6 @@ func Close(
 
 func Close_StageOnly(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
 	govCloned gov.OwnerCloned,
 	ballotName common.BallotName,
 	cancel bool,

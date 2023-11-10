@@ -28,7 +28,7 @@ func TestInsufficientCredits(t *testing.T) {
 	openChg := ballot.Open(
 		ctx,
 		strat,
-		cty.Gov(),
+		cty.Organizer(),
 		ballotName,
 		"ballot title",
 		"ballot description",

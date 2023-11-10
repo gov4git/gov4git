@@ -20,12 +20,11 @@ func CloseMotion(
 ) git.ChangeNoResult {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	return CloseMotion_StageOnly(ctx, addr, cloned, id)
+	return CloseMotion_StageOnly(ctx, cloned, id)
 }
 
 func CloseMotion_StageOnly(
 	ctx context.Context,
-	addr gov.OwnerAddress,
 	cloned gov.OwnerCloned,
 	id schema.MotionID,
 
@@ -42,7 +41,6 @@ func CloseMotion_StageOnly(
 	pcy := policy.Get(ctx, motion.Policy.String())
 	pcy.Close(
 		ctx,
-		addr,
 		cloned,
 		motion,
 		policy.MotionPolicyNS(id),

@@ -35,19 +35,17 @@ func fetchedVotesToElections(fv FetchedVotes) map[member.User]common.Elections {
 
 func fetchVotes(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
 	govOwner gov.OwnerCloned,
 	ballotName common.BallotName,
 	user member.User,
 	account member.Account,
 ) git.Change[form.Map, FetchedVotes] {
 	userCloned := git.CloneOne(ctx, git.Address(account.PublicAddress))
-	return fetchVotesCloned(ctx, govAddr, govOwner, ballotName, user, account, userCloned)
+	return fetchVotesCloned(ctx, govOwner, ballotName, user, account, userCloned)
 }
 
 func fetchVotesCloned(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
 	govOwner gov.OwnerCloned,
 	ballotName common.BallotName,
 	user member.User,

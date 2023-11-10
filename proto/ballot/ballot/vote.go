@@ -22,9 +22,9 @@ func Vote(
 	elections common.Elections,
 ) git.Change[form.Map, mail.RequestEnvelope[common.VoteEnvelope]] {
 
-	govCloned := git.CloneOne(ctx, git.Address(govAddr))
+	govCloned := gov.Clone(ctx, govAddr)
 	voterOwner := id.CloneOwner(ctx, voterAddr)
-	chg := Vote_StageOnly(ctx, voterAddr, govAddr, voterOwner, govCloned, ballotName, elections)
+	chg := Vote_StageOnly(ctx, voterAddr, voterOwner, govCloned, ballotName, elections)
 	proto.Commit(ctx, voterOwner.Public.Tree(), chg)
 	voterOwner.Public.Push(ctx)
 
@@ -34,9 +34,8 @@ func Vote(
 func Vote_StageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.Address,
 	voterOwner id.OwnerCloned,
-	govCloned git.Cloned,
+	govCloned gov.Cloned,
 	ballotName common.BallotName,
 	elections common.Elections,
 ) git.Change[form.Map, mail.RequestEnvelope[common.VoteEnvelope]] {
@@ -46,7 +45,7 @@ func Vote_StageOnly(
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 	must.Assertf(ctx, !ad.Frozen, "ballot is frozen")
 
-	verifyElections(ctx, strat, voterAddr, govAddr, voterOwner, govCloned, ad, elections)
+	verifyElections(ctx, strat, voterAddr, govCloned.Address(), voterOwner, govCloned, ad, elections)
 	envelope := common.VoteEnvelope{
 		AdCommit:  git.Head(ctx, govCloned.Repo()),
 		Ad:        ad,
@@ -62,7 +61,7 @@ func Vote_StageOnly(
 	if git.IsNotExist(err) {
 		voteLog = common.VoteLog{
 			GovID:         govCred.ID,
-			GovAddress:    govAddr,
+			GovAddress:    govCloned.Address(),
 			Ballot:        ballotName,
 			VoteEnvelopes: nil,
 		}

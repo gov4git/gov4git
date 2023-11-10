@@ -57,7 +57,7 @@ func ListFilter(
 	withParticipant member.User,
 ) []common.Advertisement {
 
-	return ListFilter_Local(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree(), onlyOpen, onlyClosed, onlyFrozen, withParticipant)
+	return ListFilter_Local(ctx, gov.Clone(ctx, govAddr).Tree(), onlyOpen, onlyClosed, onlyFrozen, withParticipant)
 }
 
 func ListFilter_Local(

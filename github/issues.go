@@ -67,11 +67,11 @@ func ImportIssuesForPrioritization_StageOnly(
 				case ghIssue.Closed && !govBallot.Closed:
 					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
 					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-					ballot.Close_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
+					ballot.Close_StageOnly(ctx, govCloned, ghIssue.BallotName(), false)
 					causedChange = append(causedChange, ghIssue)
 				case !ghIssue.Closed && govBallot.Closed:
 					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-					ballot.Reopen_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+					ballot.Reopen_StageOnly(ctx, govCloned, ghIssue.BallotName())
 					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
 					causedChange = append(causedChange, ghIssue)
 				case !ghIssue.Closed && !govBallot.Closed:
@@ -86,8 +86,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				ballot.Open_StageOnly(
 					ctx,
 					qv.QV{},
-					gov.Address(govAddr.Public),
-					govCloned.Public,
+					govCloned,
 					ghIssue.BallotName(),
 					ghIssue.Title,
 					ghIssue.Body,
@@ -95,10 +94,10 @@ func ImportIssuesForPrioritization_StageOnly(
 					member.Everybody,
 				)
 				if ghIssue.Locked {
-					ballot.Freeze_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+					ballot.Freeze_StageOnly(ctx, govCloned, ghIssue.BallotName())
 				}
 				if ghIssue.Closed {
-					ballot.Close_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), false)
+					ballot.Close_StageOnly(ctx, govCloned, ghIssue.BallotName(), false)
 				}
 				causedChange = append(causedChange, ghIssue)
 			}
@@ -108,7 +107,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				// if ballot frozen, do nothing
 				// otherwise, freeze ballot
 				if !govBallot.Closed && !govBallot.Frozen {
-					ballot.Freeze_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+					ballot.Freeze_StageOnly(ctx, govCloned, ghIssue.BallotName())
 					causedChange = append(causedChange, ghIssue)
 				}
 			}
@@ -145,7 +144,7 @@ func UpdateMeta_StageOnly(
 	if ghIssue.Title == govBallot.Title && ghIssue.Body == govBallot.Description {
 		return false
 	}
-	ballot.Change_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName(), ghIssue.Title, ghIssue.Body)
+	ballot.Change_StageOnly(ctx, govCloned, ghIssue.BallotName(), ghIssue.Title, ghIssue.Body)
 	return true
 }
 
@@ -161,10 +160,10 @@ func UpdateFrozen_StageOnly(
 	case ghIssue.Locked && govBallot.Frozen:
 		return false
 	case ghIssue.Locked && !govBallot.Frozen:
-		ballot.Freeze_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+		ballot.Freeze_StageOnly(ctx, govCloned, ghIssue.BallotName())
 		return true
 	case !ghIssue.Locked && govBallot.Frozen:
-		ballot.Unfreeze_StageOnly(ctx, govAddr, govCloned, ghIssue.BallotName())
+		ballot.Unfreeze_StageOnly(ctx, govCloned, ghIssue.BallotName())
 		return true
 	case !ghIssue.Locked && !govBallot.Frozen:
 		return false

@@ -26,7 +26,7 @@ func TestReopen(t *testing.T) {
 
 	// open
 	strat := qv.QV{}
-	ballot.Open(ctx, strat, cty.Gov(), ballotName, "ballot_name", "ballot description", choices, member.Everybody)
+	ballot.Open(ctx, strat, cty.Organizer(), ballotName, "ballot_name", "ballot description", choices, member.Everybody)
 
 	// give credits to user
 	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 4.0)

@@ -19,15 +19,16 @@ func Reopen(
 ) git.Change[form.Map, form.None] {
 
 	govCloned := gov.CloneOwner(ctx, govAddr)
-	chg := Reopen_StageOnly(ctx, govAddr, govCloned, ballotName)
+	chg := Reopen_StageOnly(ctx, govCloned, ballotName)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
 }
 
+// XXX: can reopen only if not cancelled
+
 func Reopen_StageOnly(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
 	govCloned gov.OwnerCloned,
 	ballotName common.BallotName,
 ) git.Change[form.Map, form.None] {

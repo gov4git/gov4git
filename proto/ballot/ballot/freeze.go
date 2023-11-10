@@ -19,7 +19,7 @@ func Freeze(
 ) git.ChangeNoResult {
 
 	govCloned := gov.CloneOwner(ctx, govAddr)
-	chg := Freeze_StageOnly(ctx, govAddr, govCloned, ballotName)
+	chg := Freeze_StageOnly(ctx, govCloned, ballotName)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
@@ -27,7 +27,6 @@ func Freeze(
 
 func Freeze_StageOnly(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
 	govCloned gov.OwnerCloned,
 	ballotName common.BallotName,
 ) git.ChangeNoResult {

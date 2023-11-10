@@ -26,7 +26,7 @@ func TestTrack(t *testing.T) {
 	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 6.0)
 
 	// open ballot
-	ballot.Open(ctx, qv.QV{}, cty.Gov(), ballotName, "ballot title", "ballot description", choices, member.Everybody)
+	ballot.Open(ctx, qv.QV{}, cty.Organizer(), ballotName, "ballot title", "ballot description", choices, member.Everybody)
 
 	// vote 1: accepted vote
 	elections1 := common.Elections{common.NewElection(choices[0], 1.0)}

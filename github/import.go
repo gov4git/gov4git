@@ -13,7 +13,7 @@ func Import(
 	ctx context.Context,
 	repo Repo,
 	githubClient *github.Client,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 ) form.Map {
 
 	chg1 := ImportIssuesForPrioritization(ctx, repo, githubClient, govAddr)
@@ -29,7 +29,7 @@ func ImportJoinsAndDirectives(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	govAddr gov.OrganizerAddress,
+	govAddr gov.GovPrivateAddress,
 ) form.Map {
 
 	base.Infof("importing join requests and organizer directives ...")

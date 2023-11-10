@@ -17,7 +17,7 @@ import (
 func Transfer(
 	ctx context.Context,
 	userAddr id.OwnerAddress,
-	govAddr gov.GovAddress,
+	govAddr gov.GovPublicAddress,
 	fromUserOpt member.User, // optional, if empty string, a lookup forthe user is performed
 	fromBalance balance.Balance,
 	toUser member.User,
@@ -37,7 +37,7 @@ func Transfer(
 func Transfer_StageOnly(
 	ctx context.Context,
 	userAddr id.OwnerAddress,
-	govAddr gov.GovAddress,
+	govAddr gov.GovPublicAddress,
 	userOwner id.OwnerCloned,
 	govCloned git.Cloned,
 	fromUserOpt member.User,

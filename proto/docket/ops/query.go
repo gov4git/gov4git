@@ -9,7 +9,7 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func IsMotion(ctx context.Context, addr gov.GovAddress, id schema.MotionID) bool {
+func IsMotion(ctx context.Context, addr gov.GovPublicAddress, id schema.MotionID) bool {
 	return IsMotion_Local(ctx, gov.Clone(ctx, addr).Tree(), id)
 }
 

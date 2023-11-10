@@ -17,8 +17,8 @@ const (
 type Setup struct {
 	CacheDir  string
 	CacheTTL  time.Duration
-	Gov       gov.GovAddress
-	Organizer gov.OrganizerAddress
+	Gov       gov.GovPublicAddress
+	Organizer gov.GovPrivateAddress
 	Member    id.OwnerAddress
 }
 
@@ -69,8 +69,8 @@ func (cfg Config) Setup(ctx context.Context) Setup {
 	s := Setup{
 		CacheDir: cfg.CacheDir,
 		CacheTTL: time.Second * time.Duration(cfg.CacheTTLSeconds),
-		Gov:      gov.GovAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
-		Organizer: gov.OrganizerAddress{
+		Gov:      gov.GovPublicAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
+		Organizer: gov.GovPrivateAddress{
 			Public:  id.PublicAddress{Repo: cfg.GovPublicURL, Branch: cfg.GovPublicBranch},
 			Private: id.PrivateAddress{Repo: cfg.GovPrivateURL, Branch: cfg.GovPrivateBranch},
 		},

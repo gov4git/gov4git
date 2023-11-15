@@ -65,7 +65,7 @@ func (x proposalPolicy) Cancel(
 
 func (x proposalPolicy) Show(
 	ctx context.Context,
-	cloned gov.OwnerCloned,
+	cloned gov.Cloned,
 	motion schema.Motion,
 	instancePolicyNS ns.NS,
 

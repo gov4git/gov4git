@@ -43,7 +43,7 @@ type Policy interface {
 
 	Show(
 		ctx context.Context,
-		cloned gov.OwnerCloned,
+		cloned gov.Cloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 	) form.Map

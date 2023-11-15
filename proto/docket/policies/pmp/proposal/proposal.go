@@ -14,7 +14,7 @@ func init() {
 	policy.Install(context.Background(), proposalPolicy{})
 }
 
-const ProposalPolicyName = schema.PolicyName("proposal-policy")
+const ProposalPolicyName = schema.PolicyName("pmp-proposal-policy")
 
 type proposalPolicy struct{}
 

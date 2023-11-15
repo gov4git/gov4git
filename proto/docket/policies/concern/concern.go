@@ -79,6 +79,16 @@ func (x concernPolicy) Close(
 
 }
 
+func (x concernPolicy) Cancel(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion schema.Motion,
+	instancePolicyNS ns.NS,
+
+) {
+
+}
+
 func (x concernPolicy) Show(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

@@ -34,6 +34,13 @@ type Policy interface {
 		instancePolicyNS ns.NS,
 	)
 
+	Cancel(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		motion schema.Motion,
+		instancePolicyNS ns.NS,
+	)
+
 	Show(
 		ctx context.Context,
 		cloned gov.OwnerCloned,

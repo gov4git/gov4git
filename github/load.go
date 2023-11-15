@@ -70,10 +70,12 @@ func IsIssueManaged(issue *github.Issue) bool {
 }
 
 func TransformIssue(ctx context.Context, repo Repo, issue *github.Issue) ImportedIssue {
+	author, _ := getIssueAuthorLogin(issue)
 	return ImportedIssue{
 		IsManaged:         IsIssueManaged(issue),
 		ForPrioritization: IsIssueForPrioritization(issue),
 		URL:               issue.GetURL(),
+		Author:            author,
 		Number:            int64(issue.GetNumber()),
 		Title:             issue.GetTitle(),
 		Body:              issue.GetBody(),

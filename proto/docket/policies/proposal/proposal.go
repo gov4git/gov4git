@@ -6,6 +6,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -50,4 +51,15 @@ func (x proposalPolicy) Close(
 
 ) {
 
+}
+
+func (x proposalPolicy) Show(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion schema.Motion,
+	instancePolicyNS ns.NS,
+
+) form.Map {
+
+	return nil
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/mod"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -32,6 +33,13 @@ type Policy interface {
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 	)
+
+	Show(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		motion schema.Motion,
+		instancePolicyNS ns.NS,
+	) form.Map
 }
 
 var policyRegistry = mod.NewModuleRegistry[Policy]()

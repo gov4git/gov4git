@@ -10,6 +10,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
@@ -19,6 +20,7 @@ func OpenMotion(
 	addr gov.OwnerAddress,
 	id schema.MotionID,
 	policy schema.PolicyName,
+	author member.User,
 	title string,
 	desc string,
 	typ schema.MotionType,
@@ -28,7 +30,7 @@ func OpenMotion(
 ) git.ChangeNoResult {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	chg := OpenMotion_StageOnly(ctx, cloned, id, policy, title, desc, typ, trackerURL, labels)
+	chg := OpenMotion_StageOnly(ctx, cloned, id, policy, author, title, desc, typ, trackerURL, labels)
 	return proto.CommitIfChanged(ctx, cloned.Public, chg)
 }
 
@@ -37,6 +39,7 @@ func OpenMotion_StageOnly(
 	cloned gov.OwnerCloned,
 	id schema.MotionID,
 	policyName schema.PolicyName,
+	author member.User,
 	title string,
 	desc string,
 	typ schema.MotionType,
@@ -49,12 +52,16 @@ func OpenMotion_StageOnly(
 	labels = slices.Clone(labels)
 	slices.Sort(labels)
 
+	// verify author is a user, or empty string
+	must.Assertf(ctx, author == "" || member.IsUser_Local(ctx, t, author), "motion author %v is not in the community", author)
+
 	must.Assert(ctx, !IsMotion_Local(ctx, t, id), schema.ErrMotionAlreadyExists)
 	motion := schema.Motion{
 		OpenedAt:   time.Now(),
 		ID:         id,
 		Type:       typ,
 		Policy:     policyName,
+		Author:     author,
 		TrackerURL: trackerURL,
 		Title:      title,
 		Body:       desc,

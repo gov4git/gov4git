@@ -12,6 +12,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp/proposal"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -195,12 +196,22 @@ func syncCreateMotionForIssue(
 	issue ImportedIssue,
 	id schema.MotionID,
 ) {
+
 	t := cloned.Public.Tree()
+
+	// if the user is a community member, find their username
+	var author member.User
+	query := member.User(issue.Author)
+	if member.IsUser_Local(ctx, t, query) {
+		author = query
+	}
+
 	ops.OpenMotion_StageOnly(
 		ctx,
 		cloned,
 		id,
 		motionPolicyForIssue(issue),
+		author,
 		issue.Title,
 		issue.Body,
 		issue.MotionType(),

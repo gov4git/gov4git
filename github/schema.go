@@ -47,7 +47,8 @@ const (
 )
 
 type ImportedIssue struct {
-	Number int64 `json:"number"`
+	Author string `json:"author"` // XXX: GitHub username of author
+	Number int64  `json:"number"`
 	// meta
 	URL    string   `json:"url"`
 	Title  string   `json:"title"`

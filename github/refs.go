@@ -5,12 +5,12 @@ import (
 
 	"github.com/gov4git/gov4git/proto/docket/ops"
 	"github.com/gov4git/gov4git/proto/docket/schema"
-	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/gov4git/proto/gov"
 )
 
 func syncRefs(
 	ctx context.Context,
-	t *git.Tree,
+	cloned gov.OwnerCloned,
 	chg *SyncManagedChanges,
 	issues map[string]ImportedIssue,
 	motions map[schema.MotionID]schema.Motion,
@@ -50,7 +50,7 @@ func syncRefs(
 	// add refs in issues, not in motions
 	for issueRef := range issueRefs {
 		if !motionRefs[issueRef] {
-			ops.LinkMotions_StageOnly(ctx, t, issueRef.From, issueRef.To, issueRef.Type)
+			ops.LinkMotions_StageOnly(ctx, cloned, issueRef.From, issueRef.To, issueRef.Type)
 			chg.AddedRefs.Add(issueRef)
 		}
 	}
@@ -58,7 +58,7 @@ func syncRefs(
 	// remove refs in motions, not in issues
 	for motionRef := range motionRefs {
 		if !issueRefs[motionRef] {
-			ops.UnlinkMotions_StageOnly(ctx, t, motionRef.From, motionRef.To, motionRef.Type)
+			ops.UnlinkMotions_StageOnly(ctx, cloned, motionRef.From, motionRef.To, motionRef.Type)
 			chg.RemovedRefs.Add(motionRef)
 		}
 	}

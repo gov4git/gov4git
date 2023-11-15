@@ -47,6 +47,46 @@ type Policy interface {
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 	) form.Map
+
+	AddRefTo(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		refType schema.RefType,
+		from schema.Motion,
+		to schema.Motion,
+		fromPolicyNS ns.NS,
+		toPolicyNS ns.NS,
+	)
+
+	AddRefFrom(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		refType schema.RefType,
+		from schema.Motion,
+		to schema.Motion,
+		fromPolicyNS ns.NS,
+		toPolicyNS ns.NS,
+	)
+
+	RemoveRefTo(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		refType schema.RefType,
+		from schema.Motion,
+		to schema.Motion,
+		fromPolicyNS ns.NS,
+		toPolicyNS ns.NS,
+	)
+
+	RemoveRefFrom(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		refType schema.RefType,
+		from schema.Motion,
+		to schema.Motion,
+		fromPolicyNS ns.NS,
+		toPolicyNS ns.NS,
+	)
 }
 
 var policyRegistry = mod.NewModuleRegistry[Policy]()

@@ -99,3 +99,51 @@ func (x concernPolicy) Show(
 
 	return nil
 }
+
+func (x concernPolicy) AddRefTo(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	refType schema.RefType,
+	from schema.Motion,
+	to schema.Motion,
+	fromPolicyNS ns.NS,
+	toPolicyNS ns.NS,
+) {
+
+}
+
+func (x concernPolicy) AddRefFrom(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	refType schema.RefType,
+	from schema.Motion,
+	to schema.Motion,
+	fromPolicyNS ns.NS,
+	toPolicyNS ns.NS,
+) {
+
+}
+
+func (x concernPolicy) RemoveRefTo(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	refType schema.RefType,
+	from schema.Motion,
+	to schema.Motion,
+	fromPolicyNS ns.NS,
+	toPolicyNS ns.NS,
+) {
+
+}
+
+func (x concernPolicy) RemoveRefFrom(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	refType schema.RefType,
+	from schema.Motion,
+	to schema.Motion,
+	fromPolicyNS ns.NS,
+	toPolicyNS ns.NS,
+) {
+
+}

@@ -119,7 +119,7 @@ func SyncManagedIssues_StageOnly(
 	// don't touch motions that have no corresponding issue
 
 	matchingMotions := indexMotions(ops.ListMotions_Local(ctx, t))
-	syncRefs(ctx, t, syncChanges, issues, matchingMotions)
+	syncRefs(ctx, govCloned, syncChanges, issues, matchingMotions)
 
 	syncChanges.IssuesCausingChange.Sort()
 	return

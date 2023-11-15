@@ -64,8 +64,19 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			l := ops.ListMotions(ctx, setup.Gov)
+			l := ops.ListMotionViews(ctx, setup.Gov)
 			fmt.Fprint(os.Stdout, form.SprintJSON(l))
+		},
+	}
+
+	motionShowCmd = &cobra.Command{
+		Use:   "show",
+		Short: "Show motion state",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
+			s := ops.ShowMotion(ctx, setup.Gov, schema.MotionID(motionName))
+			fmt.Fprint(os.Stdout, form.SprintJSON(s))
 		},
 	}
 )
@@ -101,4 +112,8 @@ func init() {
 	motionCmd.AddCommand(motionListCmd)
 	motionListCmd.Flags().StringVar(&motionName, "name", "", "name of motion")
 	motionListCmd.MarkFlagRequired("name")
+
+	motionCmd.AddCommand(motionShowCmd)
+	motionShowCmd.Flags().StringVar(&motionName, "name", "", "name of motion")
+	motionShowCmd.MarkFlagRequired("name")
 }

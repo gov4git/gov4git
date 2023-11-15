@@ -73,3 +73,51 @@ func (x proposalPolicy) Show(
 
 	return nil
 }
+
+func (x proposalPolicy) AddRefTo(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	refType schema.RefType,
+	from schema.Motion,
+	to schema.Motion,
+	fromPolicyNS ns.NS,
+	toPolicyNS ns.NS,
+) {
+
+}
+
+func (x proposalPolicy) AddRefFrom(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	refType schema.RefType,
+	from schema.Motion,
+	to schema.Motion,
+	fromPolicyNS ns.NS,
+	toPolicyNS ns.NS,
+) {
+
+}
+
+func (x proposalPolicy) RemoveRefTo(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	refType schema.RefType,
+	from schema.Motion,
+	to schema.Motion,
+	fromPolicyNS ns.NS,
+	toPolicyNS ns.NS,
+) {
+
+}
+
+func (x proposalPolicy) RemoveRefFrom(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	refType schema.RefType,
+	from schema.Motion,
+	to schema.Motion,
+	fromPolicyNS ns.NS,
+	toPolicyNS ns.NS,
+) {
+
+}

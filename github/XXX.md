@@ -3,6 +3,6 @@
 
 - [ ] initialize scoring method for opened motions (after syncing)
 - [ ] re-score managed issues after tally in cron
-- [ ] list motions with corresponding ballots?
+- [ ] list all motions with corresponding ballots? (policy info)
 
 - [ ] unit tests for docket

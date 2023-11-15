@@ -18,7 +18,7 @@ func init() {
 	policy.Install(context.Background(), concernPolicy{})
 }
 
-const ConcernPolicyName = schema.PolicyName("concern-policy")
+const ConcernPolicyName = schema.PolicyName("pmp-concern-policy")
 
 type concernPolicy struct{}
 

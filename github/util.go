@@ -2,6 +2,7 @@ package github
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/google/go-github/v55/github"
@@ -115,4 +116,16 @@ func isJoinApprovalPresent(ctx context.Context, approvers []string, comments []*
 		return true
 	}
 	return false
+}
+
+func getIssueAuthorLogin(issue *github.Issue) (string, error) {
+	u := issue.GetUser()
+	if u == nil {
+		return "", fmt.Errorf("github issue without author")
+	}
+	login := strings.ToLower(u.GetLogin())
+	if login == "" {
+		return "", fmt.Errorf("github issue author has no login")
+	}
+	return login, nil
 }

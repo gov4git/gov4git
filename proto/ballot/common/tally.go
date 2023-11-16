@@ -1,6 +1,7 @@
 package common
 
 import (
+	"math"
 	"time"
 
 	"github.com/gov4git/gov4git/proto/member"
@@ -21,6 +22,16 @@ func (x Tally) Capitalization() float64 {
 		cap += spent
 	}
 	return cap
+}
+
+func (x Tally) Attention() float64 {
+	score := 0.0
+	for _, choices := range x.VotesByUser {
+		for _, ss := range choices {
+			score += math.Abs(ss.Score)
+		}
+	}
+	return score
 }
 
 type StrengthAndScore struct {

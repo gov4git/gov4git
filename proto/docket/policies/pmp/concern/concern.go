@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
@@ -35,7 +36,7 @@ func (x concernPolicy) Open(
 ) {
 
 	// open a poll for the motion
-	ballotName := schema.MotionPollBallotName(motion.ID)
+	ballotName := pmp.MotionPollBallotName(motion.ID)
 	ballot.Open_StageOnly(
 		ctx,
 		qv.QV{},
@@ -69,7 +70,7 @@ func (x concernPolicy) Close(
 ) {
 
 	// close the poll for the motion
-	ballotName := schema.MotionPollBallotName(motion.ID)
+	ballotName := pmp.MotionPollBallotName(motion.ID)
 	ballot.Close_StageOnly(
 		ctx,
 		cloned,

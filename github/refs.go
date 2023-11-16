@@ -45,7 +45,7 @@ func syncRefs(
 		}
 	}
 
-	// update edge differences; only update open motions
+	// update edge differences
 
 	// add refs in issues, not in motions
 	for issueRef := range issueRefs {

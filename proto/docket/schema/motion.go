@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	MotionPollBallotChoice = "prioritize"
+	MotionPollBallotChoice = "priority"
 )
 
 type MotionType string
@@ -120,3 +120,13 @@ func (x MotionsByID) Len() int { return len(x) }
 func (x MotionsByID) Less(i, j int) bool { return x[i].ID < x[j].ID }
 
 func (x MotionsByID) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
+
+func FilterClosedMotions(ms Motions) Motions {
+	r := Motions{}
+	for _, m := range ms {
+		if !m.Closed {
+			r = append(r, m)
+		}
+	}
+	return r
+}

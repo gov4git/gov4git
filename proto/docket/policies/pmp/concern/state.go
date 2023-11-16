@@ -14,6 +14,6 @@ type ConcernState struct {
 
 func NewConcernState(id schema.MotionID) *ConcernState {
 	return &ConcernState{
-		PriorityPoll: pmp.MotionPollBallotName(id),
+		PriorityPoll: pmp.ConcernPollBallotName(id),
 	}
 }

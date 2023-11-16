@@ -46,11 +46,10 @@ func (x concernPolicy) Open(
 		cloned,
 		state.PriorityPoll,
 		fmt.Sprintf("Prioritization poll for motion %v", motion.ID),
-		fmt.Sprintf("Up/down vote the priority of motion %v", motion.ID),
+		fmt.Sprintf("Up/down vote the priority for concern (issue) %v", motion.ID),
 		[]string{schema.MotionPollBallotChoice},
 		member.Everybody,
 	)
-
 }
 
 func (x concernPolicy) Score(
@@ -81,7 +80,7 @@ func (x concernPolicy) Close(
 ) {
 
 	// close the poll for the motion
-	priorityPollName := pmp.MotionPollBallotName(motion.ID)
+	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
 	ballot.Close_StageOnly(
 		ctx,
 		cloned,
@@ -100,7 +99,7 @@ func (x concernPolicy) Cancel(
 ) {
 
 	// cancel the poll for the motion (and return credits to users)
-	priorityPollName := pmp.MotionPollBallotName(motion.ID)
+	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
 	ballot.Close_StageOnly(
 		ctx,
 		cloned,
@@ -122,12 +121,12 @@ func (x concernPolicy) Show(
 	policyState := LoadState_Local(ctx, cloned.Tree(), policyNS)
 
 	// retrieve poll state
-	priorityPollName := pmp.MotionPollBallotName(motion.ID)
+	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
 	pollState := ballot.Show_Local(ctx, cloned.Tree(), priorityPollName)
 
 	return form.Map{
-		"pmp_policy_state":  policyState,
-		"pmp_priority_poll": pollState,
+		"pmp_concern_policy_state":        policyState,
+		"pmp_concern_priority_poll_state": pollState,
 	}
 }
 

@@ -31,18 +31,21 @@ func (x concernPolicy) Open(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
-	instancePolicyNS ns.NS,
+	policyNS ns.NS,
 
 ) {
 
+	// initialize state
+	state := NewConcernState(motion.ID)
+	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+
 	// open a poll for the motion
-	ballotName := pmp.MotionPollBallotName(motion.ID)
 	ballot.Open_StageOnly(
 		ctx,
 		qv.QV{},
 		cloned,
-		ballotName,
-		fmt.Sprintf("Priority poll for motion %v", motion.ID),
+		state.PriorityPoll,
+		fmt.Sprintf("Prioritization poll for motion %v", motion.ID),
 		fmt.Sprintf("Up/down vote the priority of motion %v", motion.ID),
 		[]string{schema.MotionPollBallotChoice},
 		member.Everybody,
@@ -54,27 +57,35 @@ func (x concernPolicy) Score(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
-	instancePolicyNS ns.NS,
+	policyNS ns.NS,
 
 ) schema.Score {
 
-	return schema.Score{}
+	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+
+	// compute score
+	ads := ballot.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
+	attention := ads.Tally.Attention()
+
+	return schema.Score{
+		Attention: attention,
+	}
 }
 
 func (x concernPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
-	instancePolicyNS ns.NS,
+	policyNS ns.NS,
 
 ) {
 
 	// close the poll for the motion
-	ballotName := pmp.MotionPollBallotName(motion.ID)
+	priorityPollName := pmp.MotionPollBallotName(motion.ID)
 	ballot.Close_StageOnly(
 		ctx,
 		cloned,
-		ballotName,
+		priorityPollName,
 		false,
 	)
 
@@ -84,9 +95,18 @@ func (x concernPolicy) Cancel(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
-	instancePolicyNS ns.NS,
+	policyNS ns.NS,
 
 ) {
+
+	// cancel the poll for the motion (and return credits to users)
+	priorityPollName := pmp.MotionPollBallotName(motion.ID)
+	ballot.Close_StageOnly(
+		ctx,
+		cloned,
+		priorityPollName,
+		true,
+	)
 
 }
 
@@ -94,11 +114,21 @@ func (x concernPolicy) Show(
 	ctx context.Context,
 	cloned gov.Cloned,
 	motion schema.Motion,
-	instancePolicyNS ns.NS,
+	policyNS ns.NS,
 
 ) form.Map {
 
-	return nil
+	// retrieve policy state
+	policyState := LoadState_Local(ctx, cloned.Tree(), policyNS)
+
+	// retrieve poll state
+	priorityPollName := pmp.MotionPollBallotName(motion.ID)
+	pollState := ballot.Show_Local(ctx, cloned.Tree(), priorityPollName)
+
+	return form.Map{
+		"pmp_policy_state":  policyState,
+		"pmp_priority_poll": pollState,
+	}
 }
 
 func (x concernPolicy) AddRefTo(
@@ -109,8 +139,8 @@ func (x concernPolicy) AddRefTo(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
-) {
 
+) {
 }
 
 func (x concernPolicy) AddRefFrom(
@@ -121,8 +151,8 @@ func (x concernPolicy) AddRefFrom(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
-) {
 
+) {
 }
 
 func (x concernPolicy) RemoveRefTo(
@@ -134,7 +164,6 @@ func (x concernPolicy) RemoveRefTo(
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
 ) {
-
 }
 
 func (x concernPolicy) RemoveRefFrom(
@@ -146,5 +175,4 @@ func (x concernPolicy) RemoveRefFrom(
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
 ) {
-
 }

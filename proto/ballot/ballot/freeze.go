@@ -16,6 +16,7 @@ func Freeze(
 	ctx context.Context,
 	govAddr gov.OwnerAddress,
 	ballotName common.BallotName,
+
 ) git.ChangeNoResult {
 
 	govCloned := gov.CloneOwner(ctx, govAddr)
@@ -29,6 +30,7 @@ func Freeze_StageOnly(
 	ctx context.Context,
 	govCloned gov.OwnerCloned,
 	ballotName common.BallotName,
+
 ) git.ChangeNoResult {
 
 	govTree := govCloned.Public.Tree()
@@ -45,4 +47,15 @@ func Freeze_StageOnly(
 	git.ToFileStage(ctx, govTree, adNS, ad)
 
 	return git.NewChangeNoResult(fmt.Sprintf("Freeze ballot %v", ballotName), "ballot_freeze")
+}
+
+func IsFrozen_Local(
+	ctx context.Context,
+	cloned gov.Cloned,
+	ballotName common.BallotName,
+
+) bool {
+
+	ad, _ := load.LoadStrategy(ctx, cloned.Tree(), ballotName)
+	return ad.Frozen
 }

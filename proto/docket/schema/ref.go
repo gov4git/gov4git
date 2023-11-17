@@ -32,6 +32,15 @@ func RefLess(p, q Ref) bool {
 
 type Refs []Ref
 
+func (x Refs) Contains(y Ref) bool {
+	for _, x := range x {
+		if RefEqual(x, y) {
+			return true
+		}
+	}
+	return false
+}
+
 func (x Refs) Len() int {
 	return len(x)
 }

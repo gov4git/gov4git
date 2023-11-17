@@ -62,7 +62,7 @@ func (x concernPolicy) Score(
 
 	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
 
-	// compute score
+	// compute motion score from the priority poll ballot
 	ads := ballot.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
 	attention := ads.Tally.Attention()
 
@@ -98,7 +98,7 @@ func (x concernPolicy) Cancel(
 
 ) {
 
-	// cancel the poll for the motion (and return credits to users)
+	// cancel the poll for the motion (returning credits to users)
 	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
 	ballot.Close_StageOnly(
 		ctx,
@@ -152,6 +152,33 @@ func (x concernPolicy) AddRefFrom(
 	toPolicyNS ns.NS,
 
 ) {
+
+	// freeze poll if from-motion is a highly-ranked pr
+	if !from.IsProposal() {
+		return
+	}
+	if from.Score.Attention <= 0.0 { // XXX: add a global threshold for considering proposals as eligible solutions
+		return
+	}
+
+	toState := LoadState_Local(ctx, cloned.Public.Tree(), toPolicyNS)
+	ref := schema.Ref{Type: refType, From: from.ID, To: to.ID}
+
+	// check if reference has already triggered a freeze
+	if toState.EligibleProposals.Contains(ref) {
+		return
+	}
+
+	// if not, record the reference as a trigger
+	toState.EligibleProposals = append(toState.EligibleProposals, ref)
+	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
+
+	// freeze priority poll, if not already frozen
+	priorityPoll := pmp.ConcernPollBallotName(to.ID)
+	if ballot.IsFrozen_Local(ctx, cloned.PublicClone(), priorityPoll) {
+		return
+	}
+	ballot.Freeze_StageOnly(ctx, cloned, priorityPoll)
 }
 
 func (x concernPolicy) RemoveRefTo(
@@ -173,5 +200,33 @@ func (x concernPolicy) RemoveRefFrom(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+
 ) {
+
+	// unfreeze poll if from-motion had triggered a freeze, and there are no other triggers remaining
+
+	toState := LoadState_Local(ctx, cloned.Public.Tree(), toPolicyNS)
+	ref := schema.Ref{Type: refType, From: from.ID, To: to.ID}
+
+	// check if reference is the only remaining trigger
+	if toState.EligibleProposals.Len() != 1 || !schema.RefEqual(ref, toState.EligibleProposals[0]) {
+
+		// remove it as the last remaining trigger
+		toState.EligibleProposals = nil
+		SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
+
+		// unfreeze the priority poll ballot, if frozen
+		priorityPoll := pmp.ConcernPollBallotName(to.ID)
+		if !ballot.IsFrozen_Local(ctx, cloned.PublicClone(), priorityPoll) {
+			return
+		}
+		ballot.Unfreeze_StageOnly(ctx, cloned, priorityPoll)
+
+	} else if toState.EligibleProposals.Contains(ref) {
+
+		// remove it from the list of triggers
+		toState.EligibleProposals = toState.EligibleProposals.Remove(ref)
+		SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
+	}
+
 }

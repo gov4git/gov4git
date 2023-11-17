@@ -2,29 +2,55 @@ package ops
 
 import (
 	"context"
-	"slices"
+	"fmt"
 
-	"github.com/gov4git/gov4git/proto/docket/schema"
+	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/docket/policy"
+	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 )
 
-func UpdateMotionMeta_StageOnly(
+func UpdateMotions(
 	ctx context.Context,
-	t *git.Tree,
-	id schema.MotionID,
-	trackerURL string,
-	title string,
-	desc string,
-	labels []string,
-) git.ChangeNoResult {
+	addr gov.OwnerAddress,
 
-	labels = slices.Clone(labels)
-	slices.Sort(labels)
+) git.Change[form.Map, form.None] {
 
-	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
-	motion.TrackerURL = trackerURL
-	motion.Title = title
-	motion.Body = desc
-	motion.Labels = labels
-	return schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
+	cloned := gov.CloneOwner(ctx, addr)
+	chg := UpdateMotions_StageOnly(ctx, cloned)
+	return proto.CommitIfChanged(ctx, cloned.Public, chg)
+}
+
+func UpdateMotions_StageOnly(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+
+) git.Change[form.Map, form.None] {
+
+	t := cloned.Public.Tree()
+	motions := ListMotions_Local(ctx, t)
+	for i, motion := range motions {
+		// only update open motions
+		if motion.Closed {
+			continue
+		}
+		p := policy.GetMotionPolicy(ctx, motion)
+		p.Update(
+			ctx,
+			cloned,
+			motion,
+			policy.MotionPolicyNS(motions[i].ID),
+		)
+	}
+
+	motions.Sort()
+
+	return git.NewChange(
+		fmt.Sprintf("Update all %d motions", len(motions)),
+		"docket_update_motions",
+		form.Map{},
+		form.None{},
+		form.Forms{},
+	)
 }

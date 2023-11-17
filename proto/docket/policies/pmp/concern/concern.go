@@ -71,6 +71,17 @@ func (x concernPolicy) Score(
 	}
 }
 
+func (x concernPolicy) Update(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion schema.Motion,
+	policyNS ns.NS,
+
+) {
+
+	//XXX: update eligible proposals
+}
+
 func (x concernPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

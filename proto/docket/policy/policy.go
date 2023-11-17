@@ -49,6 +49,7 @@ type Policy interface {
 		instancePolicyNS ns.NS,
 	) form.Map
 
+	// AddRefTo is invoked only when to and from motions are open.
 	AddRefTo(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
@@ -59,6 +60,7 @@ type Policy interface {
 		toPolicyNS ns.NS,
 	)
 
+	// AddRefFrom is invoked only when to and from motions are open.
 	AddRefFrom(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
@@ -69,6 +71,7 @@ type Policy interface {
 		toPolicyNS ns.NS,
 	)
 
+	// RemoveRefTo is invoked only when to and from motions are open.
 	RemoveRefTo(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
@@ -79,6 +82,7 @@ type Policy interface {
 		toPolicyNS ns.NS,
 	)
 
+	// RemoveRefFrom is invoked only when to and from motions are open.
 	RemoveRefFrom(
 		ctx context.Context,
 		cloned gov.OwnerCloned,

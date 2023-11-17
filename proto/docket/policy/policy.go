@@ -20,6 +20,7 @@ type Policy interface {
 		instancePolicyNS ns.NS,
 	)
 
+	// Score is invoked only on open motions.
 	Score(
 		ctx context.Context,
 		cloned gov.OwnerCloned,

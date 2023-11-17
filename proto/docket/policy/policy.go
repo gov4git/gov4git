@@ -28,6 +28,14 @@ type Policy interface {
 		instancePolicyNS ns.NS,
 	) schema.Score
 
+	// Update is invoked only on open motions, after rescoring all motions.
+	Update(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		motion schema.Motion,
+		instancePolicyNS ns.NS,
+	)
+
 	Close(
 		ctx context.Context,
 		cloned gov.OwnerCloned,

@@ -10,6 +10,7 @@ import (
 	govgh "github.com/gov4git/gov4git/github"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
+	"github.com/gov4git/gov4git/proto/docket/ops"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
@@ -78,6 +79,9 @@ func Cron(
 
 		// tally votes for all ballots from all community members
 		report["tally"] = ballot.TallyAll_StageOnly(ctx, govCloned, maxPar).Result
+
+		// rescore motions to capture updated tallies
+		ops.ScoreMotions_StageOnly(ctx, govCloned)
 
 		state.LastCommunityTally = time.Now()
 	}

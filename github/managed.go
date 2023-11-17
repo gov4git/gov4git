@@ -140,7 +140,7 @@ func syncMeta(
 		slices.Equal(motion.Labels, issue.Labels) {
 		return false
 	}
-	ops.UpdateMotionMeta_StageOnly(
+	ops.EditMotionMeta_StageOnly(
 		ctx,
 		t,
 		motion.ID,

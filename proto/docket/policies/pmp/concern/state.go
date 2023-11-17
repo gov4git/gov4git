@@ -9,7 +9,8 @@ import (
 const StateFilebase = "state.json"
 
 type ConcernState struct {
-	PriorityPoll common.BallotName `json:"priority_poll_ballot"`
+	PriorityPoll      common.BallotName `json:"priority_poll_ballot"`
+	EligibleProposals schema.Refs       `json:"eligible_proposals"`
 }
 
 func NewConcernState(id schema.MotionID) *ConcernState {

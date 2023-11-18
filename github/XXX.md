@@ -5,8 +5,12 @@
 
 ———————
 
-- [ ] remove freeze triggers (eligible proposals) if referencing proposals drop in score (become ineligible)
+- [ ] make a zero policy for derek + testing
+
+- [x] remove freeze triggers (eligible proposals) if referencing proposals drop in score (become ineligible)
   - [x] Policy.Update, called after rescoring
+
+- [ ] designate a reference type for eligible proposals
 
 - [ ] produce a report when freezing a motion (generically on all policy interactions)
 

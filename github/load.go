@@ -117,6 +117,6 @@ func parseIssueRefs(ctx context.Context, repo Repo, issue *github.Issue) []Impor
 	return refs
 }
 
-const refRegexpSrc = `^([a-zA-Z0-9\-]+)\s+https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)/(issues|pull)/(\d+)$`
+const refRegexpSrc = `^([a-zA-Z0-9\-:_]+)\s+https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)/(issues|pull)/(\d+)$`
 
 var refRegexp = regexp.MustCompile(refRegexpSrc)

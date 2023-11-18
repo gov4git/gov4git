@@ -8,6 +8,8 @@ import (
 	"github.com/gov4git/gov4git/proto/gov"
 )
 
+var AddressesRefType = schema.RefType("gov4git-addresses")
+
 func IsProposalEligible(
 	ctx context.Context,
 	cloned gov.Cloned,
@@ -15,6 +17,10 @@ func IsProposalEligible(
 
 ) bool {
 
-	mv := ops.ShowMotion_Local(ctx, cloned, proposalID)
+	mv := ops.ShowMotion_Local(ctx, cloned, proposalID) //XXX: calls policy show
+
+	if !mv.Motion.IsProposal() {
+		return false
+	}
 	return mv.Motion.Score.Attention > 0 //XXX: use a global threshold param
 }

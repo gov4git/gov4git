@@ -180,8 +180,11 @@ func (x concernPolicy) AddRefFrom(
 
 ) {
 
-	// freeze poll if from-motion is an eligible proposal
-	if !from.IsProposal() {
+	if refType != AddressesRefType {
+		return
+	}
+
+	if !IsProposalEligible(ctx, cloned.PublicClone(), from.ID) {
 		return
 	}
 

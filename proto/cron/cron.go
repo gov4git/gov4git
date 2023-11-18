@@ -83,11 +83,11 @@ func Cron(
 		// rescore motions to capture updated tallies
 		ops.ScoreMotions_StageOnly(ctx, govCloned)
 
-		// update motion policies
-		ops.UpdateMotions_StageOnly(ctx, govCloned)
-
 		state.LastCommunityTally = time.Now()
 	}
+
+	// update motion policies
+	ops.UpdateMotions_StageOnly(ctx, govCloned)
 
 	report["cron"] = state
 	cronChg := git.NewChange[form.Map, form.Map](

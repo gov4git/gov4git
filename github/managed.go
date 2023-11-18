@@ -87,14 +87,14 @@ func SyncManagedIssues_StageOnly(
 				switch {
 				case issue.Closed && motion.Closed:
 				case issue.Closed && !motion.Closed:
-					syncFrozen(ctx, t, syncChanges, issue, motion)
+					syncFrozen(ctx, govCloned, syncChanges, issue, motion)
 					ops.CloseMotion_StageOnly(ctx, govCloned, id)
 					syncChanges.Closed.Add(id)
 					changed = true
 				case !issue.Closed && motion.Closed:
 					base.Infof("GitHub issue %v has been re-opened; corresonding motion remains closed", issue.Number)
 				case !issue.Closed && !motion.Closed:
-					changed = changed || syncFrozen(ctx, t, syncChanges, issue, motion)
+					changed = changed || syncFrozen(ctx, govCloned, syncChanges, issue, motion)
 				}
 				if changed {
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
@@ -109,7 +109,7 @@ func SyncManagedIssues_StageOnly(
 				// if motion frozen, do nothing
 				// otherwise, freeze motion
 				if !motion.Closed && !motion.Frozen {
-					ops.FreezeMotion_StageOnly(ctx, t, id)
+					ops.FreezeMotion_StageOnly(ctx, govCloned, id)
 					syncChanges.Froze.Add(id)
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
@@ -155,7 +155,7 @@ func syncMeta(
 
 func syncFrozen(
 	ctx context.Context,
-	t *git.Tree,
+	cloned gov.OwnerCloned,
 	chg *SyncManagedChanges,
 	ghIssue ImportedIssue,
 	govMotion schema.Motion,
@@ -164,11 +164,11 @@ func syncFrozen(
 	case ghIssue.Locked && govMotion.Frozen:
 		return false
 	case ghIssue.Locked && !govMotion.Frozen:
-		ops.FreezeMotion_StageOnly(ctx, t, govMotion.ID)
+		ops.FreezeMotion_StageOnly(ctx, cloned, govMotion.ID)
 		chg.Froze.Add(govMotion.ID)
 		return true
 	case !ghIssue.Locked && govMotion.Frozen:
-		ops.UnfreezeMotion_StageOnly(ctx, t, govMotion.ID)
+		ops.UnfreezeMotion_StageOnly(ctx, cloned, govMotion.ID)
 		chg.Unfroze.Add(govMotion.ID)
 		return true
 	case !ghIssue.Locked && !govMotion.Frozen:
@@ -221,7 +221,7 @@ func syncCreateMotionForIssue(
 	)
 	chg.Opened.Add(id)
 	if issue.Locked {
-		ops.FreezeMotion_StageOnly(ctx, t, id)
+		ops.FreezeMotion_StageOnly(ctx, cloned, id)
 		chg.Froze.Add(id)
 	}
 	if issue.Closed {

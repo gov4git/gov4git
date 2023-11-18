@@ -66,6 +66,14 @@ func (x Refs) Remove(unref Ref) Refs {
 	return w
 }
 
+func (x Refs) RefSet() RefSet {
+	rs := RefSet{}
+	for _, ref := range x {
+		rs[ref] = true
+	}
+	return rs
+}
+
 type RefSet map[Ref]bool
 
 func (x RefSet) Add(r Ref) {

@@ -37,13 +37,18 @@ func ScoreMotions_StageOnly(
 			continue
 		}
 		p := policy.GetMotionPolicy(ctx, motion)
-		motions[i].Score = p.Score(
+		// NOTE: motion structure may change during scoring (if Score calls motion methods)
+		score := p.Score(
 			ctx,
 			cloned,
 			motion,
 			policy.MotionPolicyNS(motions[i].ID),
 		)
-		schema.MotionKV.Set(ctx, schema.MotionNS, t, motions[i].ID, motions[i])
+
+		// reload motion, update score and save
+		m := schema.MotionKV.Get(ctx, schema.MotionNS, t, motions[i].ID)
+		m.Score = score
+		schema.MotionKV.Set(ctx, schema.MotionNS, t, motions[i].ID, m)
 	}
 
 	motions.Sort()

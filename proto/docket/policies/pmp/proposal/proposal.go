@@ -182,3 +182,21 @@ func (x proposalPolicy) RemoveRefFrom(
 	toPolicyNS ns.NS,
 ) {
 }
+
+func (x proposalPolicy) Freeze(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion schema.Motion,
+	policyNS ns.NS,
+
+) {
+}
+
+func (x proposalPolicy) Unfreeze(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion schema.Motion,
+	policyNS ns.NS,
+
+) {
+}

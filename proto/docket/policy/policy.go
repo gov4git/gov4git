@@ -100,6 +100,22 @@ type Policy interface {
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
 	)
+
+	// Freeze is invoked by motion.Freeze
+	Freeze(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		motion schema.Motion,
+		instancePolicyNS ns.NS,
+	)
+
+	// Unfreeze is invoked by motion.Unfreeze
+	Unfreeze(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		motion schema.Motion,
+		instancePolicyNS ns.NS,
+	)
 }
 
 var policyRegistry = mod.NewModuleRegistry[Policy]()

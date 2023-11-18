@@ -5,10 +5,10 @@
 - [x] remove freeze triggers (eligible proposals) if referencing proposals drop in score (become ineligible)
   - [x] Policy.Update, called after rescoring
 - [x] make a zero policy for derek + testing
+- [x] designate a reference type for eligible references "gov4git-addresses"
 
 ———————
 
-- [ ] designate a reference type for eligible proposals
 
 - [ ] produce a report when freezing a motion (generically on all policy interactions)
 

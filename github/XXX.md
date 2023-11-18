@@ -2,13 +2,11 @@
 - [x] integration test github sync
 - [x] list all motions with corresponding motion and policy state (which includes ballot state)
 - [x] re-score managed issues and prs after tally in cron
-
-———————
-
-- [ ] make a zero policy for derek + testing
-
 - [x] remove freeze triggers (eligible proposals) if referencing proposals drop in score (become ineligible)
   - [x] Policy.Update, called after rescoring
+- [x] make a zero policy for derek + testing
+
+———————
 
 - [ ] designate a reference type for eligible proposals
 

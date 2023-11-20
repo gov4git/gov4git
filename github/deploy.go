@@ -78,6 +78,9 @@ func Deploy(
 	base.Infof("installing GitHub actions for governance in %v, targetting %v", govPublic, project)
 	installGithubActions(ctx, govOwnerAddr)
 
+	// install governance labels in project repo
+	createGovernanceIssueLabels(ctx, ghClient, project)
+
 	// return config for gov4git administrator
 	homeDir, err := os.UserHomeDir()
 	must.NoError(ctx, err)
@@ -128,6 +131,23 @@ func installGithubActions(
 
 	git.Commit(ctx, t, "install gov4git github actions")
 	govCloned.Push(ctx)
+}
+
+func createGovernanceIssueLabels(
+	ctx context.Context,
+	ghc *github.Client,
+	project Repo,
+) {
+
+	for _, l := range GovernanceLabels {
+		label := &github.Label{Name: github.String(l)}
+		_, _, err := ghc.Issues.CreateLabel(ctx, project.Owner, project.Name, label)
+		if IsLabelAlreadyExists(err) {
+			base.Infof("github issue label %v already exists in %v", l, project)
+			continue
+		}
+		must.NoError(ctx, err)
+	}
 }
 
 func createDeployEnvironment(

@@ -46,6 +46,13 @@ const (
 	DeployEnvName = "gov4git:governance"
 )
 
+var GovernanceLabels = []string{
+	PrioritizeIssueByGovernanceLabel,
+	JoinRequestLabel,
+	DirectiveLabel,
+	IssueIsManagedLabel,
+}
+
 type ImportedIssue struct {
 	Author string `json:"author"`
 	Number int64  `json:"number"`

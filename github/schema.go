@@ -33,7 +33,6 @@ const (
 	PrioritizeBallotChoice           = "prioritize"
 
 	// member join
-	JoinRequestLabel        = "gov4git:join"
 	JoinRequestApprovalWord = "approve"
 
 	// organizer directives
@@ -48,7 +47,6 @@ const (
 
 var GovernanceLabels = []string{
 	PrioritizeIssueByGovernanceLabel,
-	JoinRequestLabel,
 	DirectiveLabel,
 	IssueIsManagedLabel,
 }

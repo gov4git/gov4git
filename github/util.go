@@ -29,8 +29,8 @@ func FetchRepoMaintainers(
 	return m
 }
 
-func fetchOpenIssues(ctx context.Context, repo Repo, ghc *github.Client, labelled string) []*github.Issue {
-	opt := &github.IssueListByRepoOptions{State: "open", Labels: []string{labelled}}
+func fetchOpenIssues(ctx context.Context, repo Repo, ghc *github.Client, labelled ...string) []*github.Issue {
+	opt := &github.IssueListByRepoOptions{State: "open", Labels: labelled}
 	var allIssues []*github.Issue
 	for {
 		issues, resp, err := ghc.Issues.ListByRepo(ctx, repo.Owner, repo.Name, opt)

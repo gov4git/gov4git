@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	gov4git_root "github.com/gov4git/gov4git"
 	"github.com/gov4git/gov4git/github"
@@ -63,7 +64,7 @@ func initAfterFlags() {
 	} else {
 		base.LogQuietly()
 	}
-	base.Infof("gov4git version: %v", gov4git_root.Short())
+	base.Infof("gov4git version: %v, os: %v, arch: %v", gov4git_root.Short(), runtime.GOOS, runtime.GOARCH)
 }
 
 func LoadConfig() {

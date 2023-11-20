@@ -55,7 +55,7 @@ func TestProcessJoinRequests(t *testing.T) {
 				Number: github.Int(1),
 				Title:  github.String("Issue 1"),
 				URL:    github.String("https://test/issue/1"),
-				Labels: []*github.Label{{Name: github.String(govgh.JoinRequestLabel)}},
+				Labels: nil,
 				Locked: github.Bool(false),
 				State:  github.String("open"),
 				Body: github.String(

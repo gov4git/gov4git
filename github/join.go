@@ -70,8 +70,8 @@ func ProcessJoinRequestIssues_StageOnly(
 
 	report := ProcessJoinRequestIssuesReport{}
 
-	// fetch open issues labelled gov4git:join
-	issues := fetchOpenIssues(ctx, repo, ghc, JoinRequestLabel)
+	// fetch open issues
+	issues := fetchOpenIssues(ctx, repo, ghc)
 	for _, issue := range issues {
 		newMember := processJoinRequestIssue_StageOnly(ctx, repo, ghc, govAddr, govCloned, approvers, issue)
 		if newMember != "" {
@@ -96,6 +96,11 @@ func processJoinRequestIssue_StageOnly(
 ) string { // return new member username, if joined
 
 	must.Assertf(ctx, len(approverGitHubUsers) > 0, "no membership approvers")
+
+	// if issue does not parse as a join request, return without commenting on the issue
+	if _, _, err := parseJoinBody(issue.GetBody()); err != nil {
+		return ""
+	}
 
 	u := issue.GetUser()
 	if u == nil {
@@ -158,6 +163,7 @@ func (x JoinRequest) PublicAddress() id.PublicAddress {
 
 // example request body:
 // "### Your public repo\n\nhttps://github.com/petar/gov4git.public.git\n\n### Your public branch\n\nmain\n\n### Your email (optional)\n\npetar@protocol.ai"
+
 /*
 ### Your public repo
 
@@ -175,25 +181,33 @@ petar@protocol.ai
 var ErrJoinSyntax = fmt.Errorf("join request format is unrecognizable")
 
 func parseJoinRequest(authorLogin string, body string) (*JoinRequest, error) {
-	lines := strings.Split(body, "\n")
-	if len(lines) < 7 {
-		return nil, ErrJoinSyntax
-	}
-	if strings.Index(lines[0], "public repo") < 0 {
-		return nil, ErrJoinSyntax
-	}
-	if strings.Index(lines[4], "public branch") < 0 {
-		return nil, ErrJoinSyntax
-	}
-	if lines[1] != "" || lines[3] != "" || lines[5] != "" {
-		return nil, ErrJoinSyntax
-	}
-	if lines[2] == "" || lines[6] == "" {
-		return nil, ErrJoinSyntax
+	publicURL, publicBranch, err := parseJoinBody(body)
+	if err != nil {
+		return nil, err
 	}
 	return &JoinRequest{
 		User:         authorLogin,
-		PublicURL:    git.URL(lines[2]),
-		PublicBranch: git.Branch(lines[6]),
+		PublicURL:    publicURL,
+		PublicBranch: publicBranch,
 	}, nil
+}
+
+func parseJoinBody(body string) (publicURL git.URL, publicBranch git.Branch, err error) {
+	lines := strings.Split(body, "\n")
+	if len(lines) < 7 {
+		return "", "", ErrJoinSyntax
+	}
+	if strings.Index(lines[0], "public repo") < 0 {
+		return "", "", ErrJoinSyntax
+	}
+	if strings.Index(lines[4], "public branch") < 0 {
+		return "", "", ErrJoinSyntax
+	}
+	if lines[1] != "" || lines[3] != "" || lines[5] != "" {
+		return "", "", ErrJoinSyntax
+	}
+	if lines[2] == "" || lines[6] == "" {
+		return "", "", ErrJoinSyntax
+	}
+	return git.URL(lines[2]), git.Branch(lines[6]), nil
 }

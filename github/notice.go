@@ -2,6 +2,7 @@ package github
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto/gov"
@@ -27,7 +28,7 @@ func FlushNotices_Local(
 		if nstate.IsDisplayed() {
 			continue
 		}
-		payload := "### 🏛️ Gov4Git notice\n\n" + nstate.Notice.Body
+		payload := fmt.Sprintf("### 🏛️ Gov4Git notice `%v`\n\n", nstate.ID) + nstate.Notice.Body
 		replyToIssue(ctx, repo, ghc, issueNum, payload)
 		nstate.SetDisplayed()
 	}

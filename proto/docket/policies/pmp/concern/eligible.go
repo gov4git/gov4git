@@ -22,5 +22,5 @@ func IsProposalEligible(
 	if !mv.Motion.IsProposal() {
 		return false
 	}
-	return mv.Motion.Score.Attention > 0 //XXX: use a global threshold param
+	return mv.Motion.Score.Attention > 0
 }

@@ -13,7 +13,8 @@
 - [ ] produce a report when freezing a motion (generically on all policy interactions)
 
 - [ ] add a global threshold parameter for considering proposals as eligible solutions
-  - fixed number? number relative to community capitalization?
+  - [ ] fixed number? number relative to community capitalization?
+  - [ ] community-scope parameters, etc package and directory
 
 ———————
 

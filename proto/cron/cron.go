@@ -89,6 +89,10 @@ func Cron(
 	// update motion policies
 	ops.UpdateMotions_StageOnly(ctx, govCloned)
 
+	// display notices on github
+	govgh.DisplayNotices_StageOnly(ctx, repo, ghc, govCloned.PublicClone())
+
+	// prepare commit message
 	report["cron"] = state
 	cronChg := git.NewChange[form.Map, form.Map](
 		fmt.Sprintf("Cron job."),

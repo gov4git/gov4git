@@ -77,6 +77,10 @@ func (x ImportedIssue) Key() string {
 	return strconv.Itoa(int(x.Number))
 }
 
+func MotionIDToIssueNumber(id schema.MotionID) (int, error) {
+	return strconv.Atoi(id.String())
+}
+
 func IssueNumberToMotionID(no int64) schema.MotionID {
 	return schema.MotionID(strconv.Itoa(int(no)))
 }

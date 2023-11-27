@@ -102,9 +102,9 @@ func (x proposalPolicy) Close(
 		false,
 	)
 
-	panic("XXX") // XXX: apply reward mechanism
+	// XXX: apply reward mechanism
 
-	// return notice.Noticef("Closing managment of this PR, managed as Gov4Git proposal #%v).", motion.ID)
+	return notice.Noticef("Closing managment of this PR, managed as Gov4Git proposal #%v).", motion.ID)
 }
 
 func (x proposalPolicy) Cancel(

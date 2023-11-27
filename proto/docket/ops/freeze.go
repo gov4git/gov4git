@@ -21,12 +21,13 @@ func FreezeMotion_StageOnly(ctx context.Context, cloned gov.OwnerCloned, id sche
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy.String())
-	pcy.Freeze(
+	notices := pcy.Freeze(
 		ctx,
 		cloned,
 		motion,
 		policy.MotionPolicyNS(id),
 	)
+	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
 
 	return chg
 }
@@ -42,12 +43,13 @@ func UnfreezeMotion_StageOnly(ctx context.Context, cloned gov.OwnerCloned, id sc
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy.String())
-	pcy.Unfreeze(
+	notices := pcy.Unfreeze(
 		ctx,
 		cloned,
 		motion,
 		policy.MotionPolicyNS(id),
 	)
+	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
 
 	return chg
 }

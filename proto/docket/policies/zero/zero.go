@@ -6,6 +6,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/notice"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/ns"
 )
@@ -28,7 +29,9 @@ func (x zeroPolicy) Open(
 	motion schema.Motion,
 	policyNS ns.NS,
 
-) {
+) notice.Notices {
+
+	return notice.Noticef("open motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Score(
@@ -37,9 +40,9 @@ func (x zeroPolicy) Score(
 	motion schema.Motion,
 	policyNS ns.NS,
 
-) schema.Score {
+) (schema.Score, notice.Notices) {
 
-	return schema.Score{}
+	return schema.Score{}, notice.Noticef("score motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Update(
@@ -48,7 +51,9 @@ func (x zeroPolicy) Update(
 	motion schema.Motion,
 	policyNS ns.NS,
 
-) {
+) notice.Notices {
+
+	return notice.Noticef("update motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Close(
@@ -57,7 +62,9 @@ func (x zeroPolicy) Close(
 	motion schema.Motion,
 	policyNS ns.NS,
 
-) {
+) notice.Notices {
+
+	return notice.Noticef("close motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Cancel(
@@ -66,7 +73,9 @@ func (x zeroPolicy) Cancel(
 	motion schema.Motion,
 	policyNS ns.NS,
 
-) {
+) notice.Notices {
+
+	return notice.Noticef("cancel motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Show(
@@ -88,7 +97,9 @@ func (x zeroPolicy) AddRefTo(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
-) {
+) notice.Notices {
+
+	return notice.Noticef("add %v ref to motion #%v, from motion #%v", refType, to.ID, from.ID)
 }
 
 func (x zeroPolicy) AddRefFrom(
@@ -99,7 +110,9 @@ func (x zeroPolicy) AddRefFrom(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
-) {
+) notice.Notices {
+
+	return notice.Noticef("add %v ref from motion #%v, to motion #%v", refType, from.ID, to.ID)
 }
 
 func (x zeroPolicy) RemoveRefTo(
@@ -110,7 +123,9 @@ func (x zeroPolicy) RemoveRefTo(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
-) {
+) notice.Notices {
+
+	return notice.Noticef("remove %v ref to motion #%v, from motion #%v", refType, to.ID, from.ID)
 }
 
 func (x zeroPolicy) RemoveRefFrom(
@@ -121,7 +136,9 @@ func (x zeroPolicy) RemoveRefFrom(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
-) {
+) notice.Notices {
+
+	return notice.Noticef("remove %v ref from motion #%v, to motion #%v", refType, from.ID, to.ID)
 }
 
 func (x zeroPolicy) Freeze(
@@ -130,7 +147,9 @@ func (x zeroPolicy) Freeze(
 	motion schema.Motion,
 	policyNS ns.NS,
 
-) {
+) notice.Notices {
+
+	return notice.Noticef("freeze motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Unfreeze(
@@ -139,5 +158,7 @@ func (x zeroPolicy) Unfreeze(
 	motion schema.Motion,
 	policyNS ns.NS,
 
-) {
+) notice.Notices {
+
+	return notice.Noticef("unfreeze motion #%v", motion.ID)
 }

@@ -53,7 +53,7 @@ func UnlinkMotions_StageOnly(
 	fromPolicy := policy.Get(ctx, from.Policy.String())
 	toPolicy := policy.Get(ctx, to.Policy.String())
 	// RemoveRefs are called in the opposite order of AddRefs
-	toPolicy.RemoveRefTo(
+	noticesTo := toPolicy.RemoveRefTo(
 		ctx,
 		cloned,
 		unref.Type,
@@ -62,7 +62,8 @@ func UnlinkMotions_StageOnly(
 		policy.MotionPolicyNS(fromID),
 		policy.MotionPolicyNS(toID),
 	)
-	fromPolicy.RemoveRefFrom(
+	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), toID, noticesTo)
+	noticesFrom := fromPolicy.RemoveRefFrom(
 		ctx,
 		cloned,
 		unref.Type,
@@ -71,6 +72,7 @@ func UnlinkMotions_StageOnly(
 		policy.MotionPolicyNS(fromID),
 		policy.MotionPolicyNS(toID),
 	)
+	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), fromID, noticesFrom)
 
 	return git.NewChange(
 		fmt.Sprintf("Remove reference from motion %v to motion %v of type %v", fromID, toID, typ),

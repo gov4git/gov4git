@@ -36,12 +36,13 @@ func UpdateMotions_StageOnly(
 			continue
 		}
 		p := policy.GetMotionPolicy(ctx, motion)
-		p.Update(
+		notices := p.Update(
 			ctx,
 			cloned,
 			motion,
 			policy.MotionPolicyNS(motions[i].ID),
 		)
+		AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), motions[i].ID, notices)
 	}
 
 	motions.Sort()

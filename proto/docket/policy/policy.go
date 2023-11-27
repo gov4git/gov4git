@@ -6,6 +6,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/mod"
+	"github.com/gov4git/gov4git/proto/notice"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/ns"
 )
@@ -18,7 +19,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
-	)
+	) notice.Notices
 
 	// Score is invoked only on open motions.
 	Score(
@@ -26,7 +27,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
-	) schema.Score
+	) (schema.Score, notice.Notices)
 
 	// Update is invoked only on open motions, after rescoring all motions.
 	Update(
@@ -34,21 +35,21 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
-	)
+	) notice.Notices
 
 	Close(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
-	)
+	) notice.Notices
 
 	Cancel(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
-	)
+	) notice.Notices
 
 	Show(
 		ctx context.Context,
@@ -66,7 +67,7 @@ type Policy interface {
 		to schema.Motion,
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
-	)
+	) notice.Notices
 
 	// AddRefFrom is invoked only when to and from motions are open.
 	AddRefFrom(
@@ -77,7 +78,7 @@ type Policy interface {
 		to schema.Motion,
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
-	)
+	) notice.Notices
 
 	// RemoveRefTo is invoked only when to and from motions are open.
 	RemoveRefTo(
@@ -88,7 +89,7 @@ type Policy interface {
 		to schema.Motion,
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
-	)
+	) notice.Notices
 
 	// RemoveRefFrom is invoked only when to and from motions are open.
 	RemoveRefFrom(
@@ -99,7 +100,7 @@ type Policy interface {
 		to schema.Motion,
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
-	)
+	) notice.Notices
 
 	// Freeze is invoked by motion.Freeze
 	Freeze(
@@ -107,7 +108,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
-	)
+	) notice.Notices
 
 	// Unfreeze is invoked by motion.Unfreeze
 	Unfreeze(
@@ -115,7 +116,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
-	)
+	) notice.Notices
 }
 
 var policyRegistry = mod.NewModuleRegistry[Policy]()

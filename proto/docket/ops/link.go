@@ -54,7 +54,7 @@ func LinkMotions_StageOnly(
 	fromPolicy := policy.Get(ctx, from.Policy.String())
 	toPolicy := policy.Get(ctx, to.Policy.String())
 	// AddRefs are called in the opposite order of RemoveRefs
-	fromPolicy.AddRefFrom(
+	noticesFrom := fromPolicy.AddRefFrom(
 		ctx,
 		cloned,
 		ref.Type,
@@ -63,7 +63,8 @@ func LinkMotions_StageOnly(
 		policy.MotionPolicyNS(fromID),
 		policy.MotionPolicyNS(toID),
 	)
-	toPolicy.AddRefTo(
+	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), fromID, noticesFrom)
+	noticesTo := toPolicy.AddRefTo(
 		ctx,
 		cloned,
 		ref.Type,
@@ -72,6 +73,7 @@ func LinkMotions_StageOnly(
 		policy.MotionPolicyNS(fromID),
 		policy.MotionPolicyNS(toID),
 	)
+	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), toID, noticesTo)
 
 	return git.NewChange(
 		fmt.Sprintf("Add reference from motion %v to motion %v of type %v", fromID, toID, typ),

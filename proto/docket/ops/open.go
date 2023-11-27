@@ -72,12 +72,13 @@ func OpenMotion_StageOnly(
 
 	// apply policy
 	pcy := policy.Get(ctx, policyName.String())
-	pcy.Open(
+	notices := pcy.Open(
 		ctx,
 		cloned,
 		motion,
 		policy.MotionPolicyNS(id),
 	)
+	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
 
 	return git.NewChangeNoResult(fmt.Sprintf("Open motion %v", id), "docket_open_motion")
 }

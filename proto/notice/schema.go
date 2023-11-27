@@ -1,10 +1,21 @@
 package notice
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type Notice struct {
 	Body string `json:"body"`
 }
+
+func Noticef(format string, args ...any) Notices {
+	return Notices{
+		Notice{Body: fmt.Sprintf(format, args...)},
+	}
+}
+
+type Notices []Notice
 
 type NoticeState struct {
 	Stamp     time.Time `json:"stamp"`
@@ -28,11 +39,13 @@ func NewNoticeQueue() *NoticeQueue {
 	return &NoticeQueue{}
 }
 
-func (x *NoticeQueue) Push(notice Notice) {
-	s := NoticeState{
-		Stamp:     time.Now(),
-		Notice:    notice,
-		Displayed: false,
+func (x *NoticeQueue) Append(notices ...Notice) {
+	for _, notice := range notices {
+		s := NoticeState{
+			Stamp:     time.Now(),
+			Notice:    notice,
+			Displayed: false,
+		}
+		x.NoticeStates = append(x.NoticeStates, s)
 	}
-	x.NoticeStates = append(x.NoticeStates, s)
 }

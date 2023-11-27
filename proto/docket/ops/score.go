@@ -38,12 +38,13 @@ func ScoreMotions_StageOnly(
 		}
 		p := policy.GetMotionPolicy(ctx, motion)
 		// NOTE: motion structure may change during scoring (if Score calls motion methods)
-		score := p.Score(
+		score, notices := p.Score(
 			ctx,
 			cloned,
 			motion,
 			policy.MotionPolicyNS(motions[i].ID),
 		)
+		AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), motions[i].ID, notices)
 
 		// reload motion, update score and save
 		m := schema.MotionKV.Get(ctx, schema.MotionNS, t, motions[i].ID)

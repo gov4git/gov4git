@@ -39,12 +39,13 @@ func CancelMotion_StageOnly(
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy.String())
-	pcy.Cancel(
+	notices := pcy.Cancel(
 		ctx,
 		cloned,
 		motion,
 		policy.MotionPolicyNS(id),
 	)
+	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
 
 	return git.NewChangeNoResult(fmt.Sprintf("Cancel motion %v", id), "docket_cancel_motion")
 }

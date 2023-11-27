@@ -39,12 +39,13 @@ func CloseMotion_StageOnly(
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy.String())
-	pcy.Close(
+	notices := pcy.Close(
 		ctx,
 		cloned,
 		motion,
 		policy.MotionPolicyNS(id),
 	)
+	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
 
 	return git.NewChangeNoResult(fmt.Sprintf("Close motion %v", id), "docket_close_motion")
 }

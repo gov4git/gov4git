@@ -51,7 +51,7 @@ func replyAndCloseIssue(
 	issue *github.Issue,
 	payload string,
 ) {
-	replyToIssue(ctx, repo, ghc, issue, payload)
+	replyToIssue(ctx, repo, ghc, issue.GetNumber(), payload)
 	closeIssue(ctx, repo, ghc, issue)
 }
 
@@ -59,14 +59,14 @@ func replyToIssue(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	issue *github.Issue,
+	issueNum int,
 	payload string,
 ) {
 
 	comment := &github.IssueComment{
 		Body: github.String(payload),
 	}
-	_, _, err := ghc.Issues.CreateComment(ctx, repo.Owner, repo.Name, issue.GetNumber(), comment)
+	_, _, err := ghc.Issues.CreateComment(ctx, repo.Owner, repo.Name, issueNum, comment)
 	must.NoError(ctx, err)
 }
 

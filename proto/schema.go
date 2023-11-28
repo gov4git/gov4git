@@ -30,3 +30,20 @@ func CommitIfChanged[C git.Commitable](ctx context.Context, cloned git.Cloned, c
 	}
 	return commitable
 }
+
+func Commitf(
+	ctx context.Context,
+	cloned git.Cloned,
+	fn string,
+	msgFmt string,
+	msgArgs ...any,
+) git.ChangeNoResult {
+	return CommitIfChanged[git.ChangeNoResult](
+		ctx,
+		cloned,
+		git.NewChangeNoResult(
+			fmt.Sprintf(msgFmt, msgArgs...),
+			fn,
+		),
+	)
+}

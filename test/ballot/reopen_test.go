@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/proto/account"
-	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
@@ -30,8 +29,7 @@ func TestReopen(t *testing.T) {
 	ballot.Open(ctx, strat, cty.Organizer(), ballotName, "ballot_name", "ballot description", choices, member.Everybody)
 
 	// give credits to user
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 4.0)                        // XXX: accounting v1
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 4.0)) // XXX: accounting v2
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 4.0))
 
 	// vote#1
 	elections := common.Elections{

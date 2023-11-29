@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/gov4git/gov4git/proto/account"
-	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
@@ -22,9 +21,6 @@ func (qv QV) Cancel(
 
 	// refund users
 	for user, spent := range tally.Charges {
-		// XXX: accounting v1
-		balance.Add_StageOnly(ctx, govOwner.PublicClone(), user, VotingCredits, spent)
-		// XXX: accounting v2
 		account.Transfer_StageOnly(
 			ctx,
 			govOwner.PublicClone(),

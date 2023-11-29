@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gov4git/gov4git/proto"
-	"github.com/gov4git/gov4git/proto/balance"
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/mail"
 	"github.com/gov4git/gov4git/proto/member"
@@ -87,12 +87,12 @@ func processRequest_StageOnly(
 			continue
 		}
 		err := must.Try(func() {
-			balance.Transfer_StageOnly(
+			account.Transfer_StageOnly(
 				ctx,
 				govOwner.PublicClone(),
-				req.Transfer.FromUser, req.Transfer.FromBalance,
-				req.Transfer.ToUser, req.Transfer.ToBalance,
-				req.Transfer.Amount,
+				member.UserAccountID(req.Transfer.FromUser),
+				member.UserAccountID(req.Transfer.ToUser),
+				account.H(account.PluralAsset, req.Transfer.Amount),
 			)
 		})
 		if err != nil {
@@ -101,10 +101,10 @@ func processRequest_StageOnly(
 			continue
 		}
 		numOK++
-		base.Infof("bureau: transferred %v from %v:%v to %v:%v",
+		base.Infof("bureau: transferred %v credits from user %v to user %v",
 			req.Transfer.Amount,
-			req.Transfer.FromUser, req.Transfer.FromBalance,
-			req.Transfer.ToUser, req.Transfer.ToBalance,
+			req.Transfer.FromUser,
+			req.Transfer.ToUser,
 		)
 	}
 	return

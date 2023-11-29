@@ -112,15 +112,27 @@ func TestQV(t *testing.T) {
 	fmt.Println("close: ", form.SprintJSON(closeChg))
 
 	// check the balances
-	b0 := balance.Get(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits)
-	b1 := balance.Get(ctx, cty.Gov(), cty.MemberUser(1), qv.VotingCredits)
+	b0 := balance.Get(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits) // XXX: accounting v1
+	b1 := balance.Get(ctx, cty.Gov(), cty.MemberUser(1), qv.VotingCredits) // XXX: accounting v1
+
+	c0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset).Quantity // XXX: accounting v2
+	c1 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(1)).Balance(account.PluralAsset).Quantity // XXX: accounting v2
+
 	xb0 := 100.0 - 3.0
 	xb1 := 100.0 - 3.0
+
 	if b0 != xb0 {
 		t.Errorf("expecting %v, got %v", xb0, b0)
 	}
 	if b1 != xb1 {
 		t.Errorf("expecting %v, got %v", xb1, b1)
+	}
+
+	if c0 != xb0 {
+		t.Errorf("expecting %v, got %v", xb0, c0)
+	}
+	if c1 != xb1 {
+		t.Errorf("expecting %v, got %v", xb1, c1)
 	}
 
 	// testutil.Hang()

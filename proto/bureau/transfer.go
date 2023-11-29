@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/proto"
-	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/mail"
@@ -19,15 +18,13 @@ func Transfer(
 	userAddr id.OwnerAddress,
 	govAddr gov.Address,
 	fromUserOpt member.User, // optional, if empty string, a lookup forthe user is performed
-	fromBalance balance.Balance,
 	toUser member.User,
-	toBalance balance.Balance,
 	amount float64,
 ) git.Change[form.Map, mail.RequestEnvelope[Request]] {
 
 	govCloned := gov.Clone(ctx, govAddr)
 	userOwner := id.CloneOwner(ctx, userAddr)
-	chg := Transfer_StageOnly(ctx, userAddr, userOwner, govCloned, fromUserOpt, fromBalance, toUser, toBalance, amount)
+	chg := Transfer_StageOnly(ctx, userAddr, userOwner, govCloned, fromUserOpt, toUser, amount)
 	proto.Commit(ctx, userOwner.Public.Tree(), chg)
 	userOwner.Public.Push(ctx)
 	return chg
@@ -39,9 +36,7 @@ func Transfer_StageOnly(
 	userOwner id.OwnerCloned,
 	govCloned gov.Cloned,
 	fromUserOpt member.User,
-	fromBalance balance.Balance,
 	toUser member.User,
-	toBalance balance.Balance,
 	amount float64,
 ) git.Change[form.Map, mail.RequestEnvelope[Request]] {
 
@@ -62,11 +57,9 @@ func Transfer_StageOnly(
 
 	request := Request{
 		Transfer: &TransferRequest{
-			FromUser:    fromUserOpt,
-			FromBalance: fromBalance,
-			ToUser:      toUser,
-			ToBalance:   toBalance,
-			Amount:      amount,
+			FromUser: fromUserOpt,
+			ToUser:   toUser,
+			Amount:   amount,
 		},
 	}
 
@@ -75,11 +68,9 @@ func Transfer_StageOnly(
 		"Transfer account tokens.",
 		"bureau_transfer",
 		form.Map{
-			"from_user":    fromUserOpt,
-			"from_balance": fromBalance,
-			"to_user":      toUser,
-			"to_balance":   toBalance,
-			"amount":       amount,
+			"from_user": fromUserOpt,
+			"to_user":   toUser,
+			"amount":    amount,
 		},
 		sendOnly.Result,
 		form.Forms{sendOnly},

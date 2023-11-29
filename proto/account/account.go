@@ -46,21 +46,18 @@ func (x AssetHoldings) Balance(asset Asset) Holding {
 
 func (x AssetHoldings) Deposit(ctx context.Context, h Holding) {
 	if g, ok := x[h.Asset]; ok {
-		x[h.Asset] = SumHolding(ctx, g, h)
+		d := SumHolding(ctx, g, h)
+		must.Assertf(ctx, d.Quantity >= 0, "insufficient funds")
+		x[h.Asset] = d
 	} else {
-		x[h.Asset] = h
+		d := h
+		must.Assertf(ctx, d.Quantity >= 0, "no funds")
+		x[h.Asset] = d
 	}
 }
 
 func (x AssetHoldings) Withdraw(ctx context.Context, h Holding) {
-	if g, ok := x[h.Asset]; ok {
-		d := SumHolding(ctx, g, NegHolding(h))
-		must.Assertf(ctx, d.Quantity >= 0, "insufficient funds")
-		x[h.Asset] = d
-	} else {
-		must.Assertf(ctx, false, "no funds")
-		x[h.Asset] = NegHolding(h)
-	}
+	x.Deposit(ctx, NegHolding(h))
 }
 
 func NewAccount(id AccountID, owner OwnerID) *Account {
@@ -156,6 +153,16 @@ func Transfer_StageOnly(
 	Deposit_StageOnly(ctx, cloned, to, amount)
 }
 
+func TryTransfer_StageOnly(
+	ctx context.Context,
+	cloned gov.Cloned,
+	from AccountID,
+	to AccountID,
+	amount Holding,
+) error {
+	return must.Try(func() { Transfer_StageOnly(ctx, cloned, from, to, amount) })
+}
+
 func Deposit(
 	ctx context.Context,
 	addr gov.Address,
@@ -209,4 +216,19 @@ func set_StageOnly(
 	account *Account,
 ) {
 	accountKV.Set(ctx, accountNS, cloned.Tree(), id, account)
+}
+
+func List(
+	ctx context.Context,
+	addr gov.Address,
+) []AccountID {
+	cloned := gov.Clone(ctx, addr)
+	return List_Local(ctx, cloned)
+}
+
+func List_Local(
+	ctx context.Context,
+	cloned gov.Cloned,
+) []AccountID {
+	return accountKV.ListKeys(ctx, accountNS, cloned.Tree())
 }

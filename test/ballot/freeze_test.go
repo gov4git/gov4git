@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
@@ -39,7 +40,8 @@ func TestVoteFreezeVote(t *testing.T) {
 	fmt.Println("open: ", form.SprintJSON(openChg))
 
 	// give voter credits
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 1.0)
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 1.0)                        // XXX: accounting v1
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0)) // XXX: accounting v2
 
 	// vote
 	elections := common.Elections{
@@ -91,7 +93,8 @@ func TestVoteFreezeTally(t *testing.T) {
 	fmt.Println("open: ", form.SprintJSON(openChg))
 
 	// give voter credits
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 1.0)
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 1.0)                        // XXX: accounting v1
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0)) // XXX: accounting v2
 
 	// vote
 	elections := common.Elections{

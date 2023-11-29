@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/boot"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
@@ -95,6 +96,10 @@ func (x *TestCommunity) Organizer() gov.OwnerAddress {
 
 func (x *TestCommunity) MemberUser(i int) member.User {
 	return member.User("member_" + strconv.Itoa(i))
+}
+
+func (x *TestCommunity) MemberAccountID(i int) account.AccountID {
+	return member.UserAccountID(x.MemberUser(i))
 }
 
 func (x *TestCommunity) MemberOwner(i int) id.OwnerAddress {

@@ -1,0 +1,34 @@
+provision # community and one user
+
+# init-id
+
+gov4git init-gov
+stdout private_key_ed25519
+
+# init-gov
+
+gov4git init-id
+stdout private_key_ed25519
+
+# add/verify user
+
+gov4git user add --name member1 --repo member_public --branch main
+gov4git group list --name everybody
+stdout member1
+gov4git user add --name member2 --repo member_public --branch main
+
+# account
+
+gov4git account deposit --to user:member1 --asset apple --quantity 30.0
+gov4git account balance --id user:member1 --asset apple
+stdout 30
+
+gov4git account withdraw --from user:member1 --asset apple --quantity 10.0
+gov4git account balance --id user:member1 --asset apple
+stdout 20
+
+gov4git account transfer --from user:member1 --to user:member2 --asset apple --quantity 10.0
+gov4git account balance --id user:member1 --asset apple
+stdout 10
+gov4git account balance --id user:member2 --asset apple
+stdout 10

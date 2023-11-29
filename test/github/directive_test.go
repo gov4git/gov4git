@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/go-github/v55/github"
 	govgh "github.com/gov4git/gov4git/github"
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/gov4git/proto/gov"
@@ -90,6 +91,7 @@ func TestDirective(t *testing.T) {
 	}
 	fmt.Println(form.SprintJSON(chg.Result))
 
+	// XXX: accounting v1
 	b1 := balance.Get(ctx, gov.Address(cty.Organizer().Public), cty.MemberUser(0), qv.VotingCredits)
 	if b1 != 10.0 {
 		t.Errorf("expecting %v, got %v", 10.0, b1)
@@ -97,6 +99,16 @@ func TestDirective(t *testing.T) {
 	b2 := balance.Get(ctx, gov.Address(cty.Organizer().Public), cty.MemberUser(1), qv.VotingCredits)
 	if b2 != 10.0 {
 		t.Errorf("expecting %v, got %v", 10.0, b2)
+	}
+
+	// XXX: accounting v2
+	c1 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset).Quantity
+	if c1 != 10.0 {
+		t.Errorf("expecting %v, got %v", 10.0, c1)
+	}
+	c2 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(1)).Balance(account.PluralAsset).Quantity
+	if c2 != 10.0 {
+		t.Errorf("expecting %v, got %v", 10.0, c2)
 	}
 
 	// <-(chan int(nil))

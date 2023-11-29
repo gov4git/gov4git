@@ -1,7 +1,6 @@
 package bureau
 
 import (
-	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
 )
@@ -15,11 +14,9 @@ type Request struct {
 type Requests []Request
 
 type TransferRequest struct {
-	FromUser    member.User     `json:"from_user"`
-	FromBalance balance.Balance `json:"from_balance"`
-	ToUser      member.User     `json:"to_user"`
-	ToBalance   balance.Balance `json:"to_balance"`
-	Amount      float64         `json:"amount"`
+	FromUser member.User `json:"from_user"`
+	ToUser   member.User `json:"to_user"`
+	Amount   float64     `json:"amount"`
 }
 
 type FetchedRequest struct {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/gov4git/proto/gov"
@@ -147,12 +148,20 @@ func processDirectiveIssue_StageOnly(
 	case d.IssueVotingCredits != nil:
 		err = must.Try(
 			func() {
+				// XXX: accounting v1
 				balance.Add_StageOnly(
 					ctx,
 					govCloned.PublicClone(),
 					member.User(d.IssueVotingCredits.To),
 					qv.VotingCredits,
 					d.IssueVotingCredits.Amount,
+				)
+				// XXX: accounting v2
+				account.Deposit_StageOnly(
+					ctx,
+					govCloned.PublicClone(),
+					member.UserAccountID(member.User(d.IssueVotingCredits.To)),
+					account.H(account.PluralAsset, d.IssueVotingCredits.Amount),
 				)
 			},
 		)
@@ -173,6 +182,7 @@ func processDirectiveIssue_StageOnly(
 	case d.TransferVotingCredits != nil:
 		err = must.Try(
 			func() {
+				// XXX: accounting v1
 				balance.Transfer_StageOnly(
 					ctx,
 					govCloned.PublicClone(),
@@ -181,6 +191,14 @@ func processDirectiveIssue_StageOnly(
 					member.User(d.TransferVotingCredits.To),
 					qv.VotingCredits,
 					d.TransferVotingCredits.Amount,
+				)
+				// XXX: accounting v2
+				account.Transfer_StageOnly(
+					ctx,
+					govCloned.PublicClone(),
+					member.UserAccountID(member.User(d.TransferVotingCredits.From)),
+					member.UserAccountID(member.User(d.TransferVotingCredits.To)),
+					account.H(account.PluralAsset, d.TransferVotingCredits.Amount),
 				)
 			},
 		)

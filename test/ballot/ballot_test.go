@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/proto/account"
-	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
@@ -40,9 +39,6 @@ func TestOpenClose(t *testing.T) {
 	}
 
 	// give credits to user
-	// XXX: accounting v1
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 1.0)
-	// XXX: accounting v2
 	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0))
 
 	// vote
@@ -67,14 +63,8 @@ func TestOpenClose(t *testing.T) {
 	}
 
 	// verify no credits left
-	// XXX: accounting v1
-	credits := balance.Get(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits)
-	if credits != 0.0 {
-		t.Errorf("expecting %v, got %v", 0.0, credits)
-	}
-	// XXX: accounting v2
-	credits2 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
-	if credits2.Quantity != 0.0 {
+	credits := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
+	if credits.Quantity != 0.0 {
 		t.Errorf("expecting %v, got %v", 0.0, credits)
 	}
 
@@ -99,9 +89,6 @@ func TestOpenCancel(t *testing.T) {
 	}
 
 	// give credits to user
-	// XXX: accounting v1
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 1.0)
-	// XXX: accounting v2
 	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0))
 
 	// vote
@@ -126,14 +113,8 @@ func TestOpenCancel(t *testing.T) {
 	}
 
 	// verify no credits left
-	// XXX: accounting v1
-	credits := balance.Get(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits)
-	if credits != 1.0 {
-		t.Errorf("expecting %v, got %v", 1.0, credits)
-	}
-	// XXX: accounting v2
-	credits2 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
-	if credits2.Quantity != 1.0 {
+	credits := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
+	if credits.Quantity != 1.0 {
 		t.Errorf("expecting %v, got %v", 1.0, credits)
 	}
 
@@ -156,10 +137,8 @@ func TestTallyAll(t *testing.T) {
 	fmt.Println("open 1: ", form.SprintJSON(openChg1))
 
 	// give credits to users
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 5.0)                        // XXX: accounting v1
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 5.0)) // XXX: accounting v2
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(1), qv.VotingCredits, 5.0)                        // XXX: accounting v1
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 5.0)) // XXX: accounting v2
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 5.0))
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 5.0))
 
 	// vote
 	elections0 := common.Elections{common.NewElection(choices[0], 5.0)}

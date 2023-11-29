@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/proto/account"
-	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
@@ -24,10 +23,8 @@ func TestQV(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// give voter credits
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 100.0)                        // XXX: accounting v1
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 100.0)) // XXX: accounting v2
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(1), qv.VotingCredits, 100.0)                        // XXX: accounting v1
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 100.0)) // XXX: accounting v2
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 100.0))
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 100.0))
 
 	// open
 	strat := qv.QV{}
@@ -112,21 +109,11 @@ func TestQV(t *testing.T) {
 	fmt.Println("close: ", form.SprintJSON(closeChg))
 
 	// check the balances
-	b0 := balance.Get(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits) // XXX: accounting v1
-	b1 := balance.Get(ctx, cty.Gov(), cty.MemberUser(1), qv.VotingCredits) // XXX: accounting v1
-
-	c0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset).Quantity // XXX: accounting v2
-	c1 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(1)).Balance(account.PluralAsset).Quantity // XXX: accounting v2
+	c0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset).Quantity
+	c1 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(1)).Balance(account.PluralAsset).Quantity
 
 	xb0 := 100.0 - 3.0
 	xb1 := 100.0 - 3.0
-
-	if b0 != xb0 {
-		t.Errorf("expecting %v, got %v", xb0, b0)
-	}
-	if b1 != xb1 {
-		t.Errorf("expecting %v, got %v", xb1, b1)
-	}
 
 	if c0 != xb0 {
 		t.Errorf("expecting %v, got %v", xb0, c0)

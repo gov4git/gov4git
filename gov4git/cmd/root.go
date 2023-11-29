@@ -48,7 +48,6 @@ func init() {
 	rootCmd.AddCommand(groupCmd)
 	rootCmd.AddCommand(memberCmd)
 	rootCmd.AddCommand(ballotCmd)
-	rootCmd.AddCommand(balanceCmd)
 	rootCmd.AddCommand(accountCmd)
 	rootCmd.AddCommand(bureauCmd)
 	rootCmd.AddCommand(syncCmd)

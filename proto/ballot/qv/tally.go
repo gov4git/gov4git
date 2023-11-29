@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/gov4git/gov4git/proto/account"
-	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
@@ -99,12 +98,6 @@ func chargeUser(
 	charge float64,
 ) error {
 
-	// XXX: accounting v1
-	err := balance.TryCharge_StageOnly(ctx, govCloned, user, VotingCredits, charge)
-	if err != nil {
-		return err
-	}
-	// XXX: accounting v2
 	return account.TryTransfer_StageOnly(
 		ctx,
 		govCloned,

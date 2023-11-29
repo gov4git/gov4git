@@ -9,8 +9,6 @@ import (
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/account"
-	"github.com/gov4git/gov4git/proto/balance"
-	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
@@ -148,15 +146,6 @@ func processDirectiveIssue_StageOnly(
 	case d.IssueVotingCredits != nil:
 		err = must.Try(
 			func() {
-				// XXX: accounting v1
-				balance.Add_StageOnly(
-					ctx,
-					govCloned.PublicClone(),
-					member.User(d.IssueVotingCredits.To),
-					qv.VotingCredits,
-					d.IssueVotingCredits.Amount,
-				)
-				// XXX: accounting v2
 				account.Deposit_StageOnly(
 					ctx,
 					govCloned.PublicClone(),
@@ -182,17 +171,6 @@ func processDirectiveIssue_StageOnly(
 	case d.TransferVotingCredits != nil:
 		err = must.Try(
 			func() {
-				// XXX: accounting v1
-				balance.Transfer_StageOnly(
-					ctx,
-					govCloned.PublicClone(),
-					member.User(d.TransferVotingCredits.From),
-					qv.VotingCredits,
-					member.User(d.TransferVotingCredits.To),
-					qv.VotingCredits,
-					d.TransferVotingCredits.Amount,
-				)
-				// XXX: accounting v2
 				account.Transfer_StageOnly(
 					ctx,
 					govCloned.PublicClone(),

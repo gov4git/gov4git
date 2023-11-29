@@ -20,7 +20,14 @@ func (qv QV) Cancel(
 
 	// refund users
 	for user, spent := range tally.Charges {
-		balance.Add_StageOnly(ctx, govOwner.Public.Tree(), user, VotingCredits, spent)
+		balance.Add_StageOnly(ctx, govOwner.PublicClone(), user, VotingCredits, spent) //XXX: deprecated
+		// account.Transfer_StageOnly(
+		// 	ctx,
+		// 	govOwner.PublicClone(),
+		// 	common.BallotEscrowAccountID(ad.Name),
+		// 	member.UserAccountID(user),
+		// 	account.H(account.PluralAsset, spent),
+		// )
 	}
 
 	return git.NewChange(

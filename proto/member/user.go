@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/kv"
@@ -13,27 +14,20 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func SetUser(ctx context.Context, addr gov.Address, name User, acct Account) {
-	cloned := gov.Clone(ctx, addr)
-	chg := SetUser_StageOnly(ctx, cloned.Tree(), name, acct)
-	proto.Commit(ctx, cloned.Tree(), chg)
-	cloned.Push(ctx)
-}
-
-func SetUser_StageOnly(ctx context.Context, t *git.Tree, name User, user Account) git.ChangeNoResult {
-	SetGroup_StageOnly(ctx, t, Everybody)           // create everybody group, if it doesn't exist
-	AddMember_StageOnly(ctx, t, name, Everybody)    // add membership of user to everybody
-	return usersKV.Set(ctx, usersNS, t, name, user) // create the user record
+func setUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User, user Account) git.ChangeNoResult {
+	SetGroup_StageOnly(ctx, cloned, Everybody)                  // create everybody group, if it doesn't exist
+	AddMember_StageOnly(ctx, cloned, name, Everybody)           // add membership of user to everybody
+	return usersKV.Set(ctx, usersNS, cloned.Tree(), name, user) // create the user record
 }
 
 func GetUser(ctx context.Context, addr gov.Address, name User) Account {
-	return GetUser_Local(ctx, gov.Clone(ctx, addr).Tree(), name)
+	return GetUser_Local(ctx, gov.Clone(ctx, addr), name)
 }
 
-func IsUser_Local(ctx context.Context, t *git.Tree, name User) bool {
+func IsUser_Local(ctx context.Context, cloned gov.Cloned, name User) bool {
 	err := must.Try(
 		func() {
-			GetUser_Local(ctx, t, name)
+			GetUser_Local(ctx, cloned, name)
 		},
 	)
 	if err == nil {
@@ -46,8 +40,8 @@ func IsUser_Local(ctx context.Context, t *git.Tree, name User) bool {
 	return false
 }
 
-func GetUser_Local(ctx context.Context, t *git.Tree, name User) Account {
-	return usersKV.Get(ctx, usersNS, t, name)
+func GetUser_Local(ctx context.Context, cloned gov.Cloned, name User) Account {
+	return usersKV.Get(ctx, usersNS, cloned.Tree(), name)
 }
 
 func AddUserByPublicAddress(ctx context.Context, govAddr gov.Address, name User, userAddr id.PublicAddress) {
@@ -55,40 +49,41 @@ func AddUserByPublicAddress(ctx context.Context, govAddr gov.Address, name User,
 	AddUser(ctx, govAddr, name, Account{ID: cred.ID, PublicAddress: userAddr})
 }
 
-func AddUserByPublicAddress_StageOnly(ctx context.Context, t *git.Tree, name User, userAddr id.PublicAddress) {
+func AddUserByPublicAddress_StageOnly(ctx context.Context, cloned gov.Cloned, name User, userAddr id.PublicAddress) {
 	cred := id.FetchPublicCredentials(ctx, userAddr)
-	AddUser_StageOnly(ctx, t, name, Account{ID: cred.ID, PublicAddress: userAddr})
+	AddUser_StageOnly(ctx, cloned, name, Account{ID: cred.ID, PublicAddress: userAddr})
 }
 
 func AddUser(ctx context.Context, addr gov.Address, name User, acct Account) {
 	cloned := gov.Clone(ctx, addr)
-	chg := AddUser_StageOnly(ctx, cloned.Tree(), name, acct)
+	chg := AddUser_StageOnly(ctx, cloned, name, acct)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func AddUser_StageOnly(ctx context.Context, t *git.Tree, name User, user Account) git.ChangeNoResult {
-	if err := must.Try(func() { GetUser_Local(ctx, t, name) }); err == nil {
+func AddUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User, user Account) git.ChangeNoResult {
+	if err := must.Try(func() { GetUser_Local(ctx, cloned, name) }); err == nil {
 		must.Panic(ctx, fmt.Errorf("user already exists"))
 	}
-	return SetUser_StageOnly(ctx, t, name, user)
+	account.Create_StageOnly(ctx, cloned, UserAccountID(name), UserOwnerID(name))
+	return setUser_StageOnly(ctx, cloned, name, user)
 }
 
 func RemoveUser(ctx context.Context, addr gov.Address, name User) {
 	cloned := gov.Clone(ctx, addr)
-	chg := RemoveUser_StageOnly(ctx, cloned.Tree(), name)
+	chg := RemoveUser_StageOnly(ctx, cloned, name)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func RemoveUser_StageOnly(ctx context.Context, t *git.Tree, name User) git.ChangeNoResult {
-	must.Assertf(ctx, IsUser_Local(ctx, t, name), "%v is not a name", name)
+func RemoveUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User) git.ChangeNoResult {
+	must.Assertf(ctx, IsUser_Local(ctx, cloned, name), "%v is not a name", name)
 	// remove all group memberships of the user
-	for _, g := range ListUserGroups_Local(ctx, t, name) {
-		RemoveMember_StageOnly(ctx, t, name, g)
+	for _, g := range ListUserGroups_Local(ctx, cloned, name) {
+		RemoveMember_StageOnly(ctx, cloned, name, g)
 	}
 	// remove user record
-	usersKV.Remove(ctx, usersNS, t, name)
+	usersKV.Remove(ctx, usersNS, cloned.Tree(), name)
 	return git.NewChangeNoResult(fmt.Sprintf("Remove user %v", name), "member_remove_user")
 }
 
@@ -96,36 +91,48 @@ func RemoveUser_StageOnly(ctx context.Context, t *git.Tree, name User) git.Chang
 
 func SetUserProp[V form.Form](ctx context.Context, addr gov.Address, user User, key string, value V) {
 	cloned := gov.Clone(ctx, addr)
-	chg := SetUserProp_StageOnly(ctx, cloned.Tree(), user, key, value)
+	chg := SetUserProp_StageOnly(ctx, cloned, user, key, value)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func SetUserProp_StageOnly[V form.Form](ctx context.Context, t *git.Tree, user User, key string, value V) git.ChangeNoResult {
-	must.Assertf(ctx, IsUser_Local(ctx, t, user), "%v is not a user", user)
+func SetUserProp_StageOnly[V form.Form](
+	ctx context.Context,
+	cloned gov.Cloned,
+	user User,
+	key string,
+	value V,
+) git.ChangeNoResult {
+	must.Assertf(ctx, IsUser_Local(ctx, cloned, user), "%v is not a user", user)
 	propKV := kv.KV[string, V]{}
-	return propKV.Set(ctx, usersKV.KeyNS(usersNS, user), t, key, value)
+	return propKV.Set(ctx, usersKV.KeyNS(usersNS, user), cloned.Tree(), key, value)
 }
 
 // get prop
 
 func GetUserProp[V form.Form](ctx context.Context, addr gov.Address, user User, key string) V {
-	return GetUserProp_Local[V](ctx, gov.Clone(ctx, addr).Tree(), user, key)
+	return GetUserProp_Local[V](ctx, gov.Clone(ctx, addr), user, key)
 }
 
-func GetUserProp_Local[V form.Form](ctx context.Context, t *git.Tree, user User, key string) V {
-	must.Assertf(ctx, IsUser_Local(ctx, t, user), "%v is not a user", user)
+func GetUserProp_Local[V form.Form](ctx context.Context, cloned gov.Cloned, user User, key string) V {
+	must.Assertf(ctx, IsUser_Local(ctx, cloned, user), "%v is not a user", user)
 	propKV := kv.KV[string, V]{}
-	return propKV.Get(ctx, usersKV.KeyNS(usersNS, user), t, key)
+	return propKV.Get(ctx, usersKV.KeyNS(usersNS, user), cloned.Tree(), key)
 }
 
 func GetUserPropOrDefault[V form.Form](ctx context.Context, addr gov.Address, user User, key string, default_ V) V {
-	return GetUserPropOrDefault_Local[V](ctx, gov.Clone(ctx, addr).Tree(), user, key, default_)
+	return GetUserPropOrDefault_Local[V](ctx, gov.Clone(ctx, addr), user, key, default_)
 }
 
-func GetUserPropOrDefault_Local[V form.Form](ctx context.Context, t *git.Tree, user User, key string, default_ V) V {
-	must.Assertf(ctx, IsUser_Local(ctx, t, user), "%v is not a user", user)
-	v, err := must.Try1(func() V { return GetUserProp_Local[V](ctx, t, user, key) })
+func GetUserPropOrDefault_Local[V form.Form](
+	ctx context.Context,
+	cloned gov.Cloned,
+	user User,
+	key string,
+	default_ V,
+) V {
+	must.Assertf(ctx, IsUser_Local(ctx, cloned, user), "%v is not a user", user)
+	v, err := must.Try1(func() V { return GetUserProp_Local[V](ctx, cloned, user, key) })
 	if err != nil {
 		return default_
 	}
@@ -135,14 +142,14 @@ func GetUserPropOrDefault_Local[V form.Form](ctx context.Context, t *git.Tree, u
 // lookup
 
 func LookupUserByAddress(ctx context.Context, govAddr gov.Address, userAddr id.PublicAddress) []User {
-	return LookupUserByAddress_Local(ctx, gov.Clone(ctx, govAddr).Tree(), userAddr)
+	return LookupUserByAddress_Local(ctx, gov.Clone(ctx, govAddr), userAddr)
 }
 
-func LookupUserByAddress_Local(ctx context.Context, t *git.Tree, userAddr id.PublicAddress) []User {
-	us := usersKV.ListKeys(ctx, usersNS, t)
+func LookupUserByAddress_Local(ctx context.Context, cloned gov.Cloned, userAddr id.PublicAddress) []User {
+	us := usersKV.ListKeys(ctx, usersNS, cloned.Tree())
 	r := []User{}
 	for _, u := range us {
-		acct := GetUser_Local(ctx, t, u)
+		acct := GetUser_Local(ctx, cloned, u)
 		if acct.PublicAddress == userAddr {
 			r = append(r, u)
 		}
@@ -151,14 +158,14 @@ func LookupUserByAddress_Local(ctx context.Context, t *git.Tree, userAddr id.Pub
 }
 
 func LookupUserByID(ctx context.Context, govAddr gov.Address, userID id.ID) []User {
-	return LookupUserByID_Local(ctx, gov.Clone(ctx, govAddr).Tree(), userID)
+	return LookupUserByID_Local(ctx, gov.Clone(ctx, govAddr), userID)
 }
 
-func LookupUserByID_Local(ctx context.Context, t *git.Tree, userID id.ID) []User {
-	us := usersKV.ListKeys(ctx, usersNS, t)
+func LookupUserByID_Local(ctx context.Context, cloned gov.Cloned, userID id.ID) []User {
+	us := usersKV.ListKeys(ctx, usersNS, cloned.Tree())
 	r := []User{}
 	for _, u := range us {
-		acct := GetUser_Local(ctx, t, u)
+		acct := GetUser_Local(ctx, cloned, u)
 		if acct.ID == userID {
 			r = append(r, u)
 		}

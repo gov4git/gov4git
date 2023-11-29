@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/proto/ballot/common"
+	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -16,14 +17,14 @@ type participatingVoters struct {
 	VoterClones   map[member.User]git.Cloned
 }
 
-func loadParticipatingVoters(ctx context.Context, t *git.Tree, ad common.Advertisement) *participatingVoters {
+func loadParticipatingVoters(ctx context.Context, cloned gov.Cloned, ad common.Advertisement) *participatingVoters {
 	pv := &participatingVoters{}
 	pv.Ad = ad
 	pv.VoterAccounts = map[member.User]member.Account{}
 	pv.VoterClones = map[member.User]git.Cloned{}
-	pv.Voters = member.ListGroupUsers_Local(ctx, t, ad.Participants)
+	pv.Voters = member.ListGroupUsers_Local(ctx, cloned, ad.Participants)
 	for _, user := range pv.Voters {
-		account := member.GetUser_Local(ctx, t, user)
+		account := member.GetUser_Local(ctx, cloned, user)
 		pv.VoterAccounts[user] = account
 	}
 	return pv

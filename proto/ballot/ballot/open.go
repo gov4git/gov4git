@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
@@ -49,9 +50,16 @@ func Open_StageOnly(
 	}
 
 	// verify group exists
-	if !member.IsGroup_Local(ctx, govCloned.Public.Tree(), participants) {
+	if !member.IsGroup_Local(ctx, govCloned.PublicClone(), participants) {
 		must.Errorf(ctx, "participant group %v does not exist", participants)
 	}
+
+	// create escrow account
+	account.Create_StageOnly(
+		ctx, govCloned.PublicClone(),
+		common.BallotEscrowAccountID(name),
+		common.BallotOwnerID(name),
+	)
 
 	// write ad
 	ad := common.Advertisement{

@@ -12,6 +12,10 @@ type Holding struct {
 	Quantity float64 `json:"quantity"`
 }
 
+func H(a Asset, q float64) Holding {
+	return Holding{Asset: a, Quantity: q}
+}
+
 func (h Holding) String() string {
 	return fmt.Sprintf("%v:%v", h.Asset, h.Quantity)
 }

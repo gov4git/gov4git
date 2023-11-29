@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
@@ -23,8 +24,10 @@ func TestQV(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// give voter credits
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 100.0)
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(1), qv.VotingCredits, 100.0)
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 100.0)                        // XXX: accounting v1
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 100.0)) // XXX: accounting v2
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(1), qv.VotingCredits, 100.0)                        // XXX: accounting v1
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 100.0)) // XXX: accounting v2
 
 	// open
 	strat := qv.QV{}

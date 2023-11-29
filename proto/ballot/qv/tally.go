@@ -21,12 +21,12 @@ func (qv QV) Tally(
 	fetched map[member.User]common.Elections, // newly fetched votes from participating users
 ) git.Change[form.Map, common.Tally] {
 
-	return qv.tally(ctx, owner.Public, ad, prior, fetched, false)
+	return qv.tally(ctx, owner.PublicClone(), ad, prior, fetched, false)
 }
 
 func (qv QV) tally(
 	ctx context.Context,
-	govCloned git.Cloned, // clone of the public gov repo
+	govCloned gov.Cloned, // clone of the public gov repo
 	ad *common.Advertisement,
 	prior *common.Tally,
 	fetched map[member.User]common.Elections, // newly fetched votes from participating users
@@ -90,6 +90,6 @@ func (qv QV) tally(
 	)
 }
 
-func chargeUser(ctx context.Context, govCloned git.Cloned, user member.User, charge float64) error {
-	return balance.TryCharge_StageOnly(ctx, govCloned.Tree(), user, VotingCredits, charge)
+func chargeUser(ctx context.Context, govCloned gov.Cloned, user member.User, charge float64) error {
+	return balance.TryCharge_StageOnly(ctx, govCloned, user, VotingCredits, charge)
 }

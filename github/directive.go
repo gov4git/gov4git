@@ -149,7 +149,7 @@ func processDirectiveIssue_StageOnly(
 			func() {
 				balance.Add_StageOnly(
 					ctx,
-					govCloned.Public.Tree(),
+					govCloned.PublicClone(),
 					member.User(d.IssueVotingCredits.To),
 					qv.VotingCredits,
 					d.IssueVotingCredits.Amount,
@@ -175,7 +175,7 @@ func processDirectiveIssue_StageOnly(
 			func() {
 				balance.Transfer_StageOnly(
 					ctx,
-					govCloned.Public.Tree(),
+					govCloned.PublicClone(),
 					member.User(d.TransferVotingCredits.From),
 					qv.VotingCredits,
 					member.User(d.TransferVotingCredits.To),

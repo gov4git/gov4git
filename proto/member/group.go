@@ -13,47 +13,47 @@ import (
 
 func SetGroup(ctx context.Context, addr gov.Address, name Group) {
 	cloned := gov.Clone(ctx, addr)
-	chg := SetGroup_StageOnly(ctx, cloned.Tree(), name)
+	chg := SetGroup_StageOnly(ctx, cloned, name)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func SetGroup_StageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
-	return groupsKV.Set(ctx, groupsNS, t, name, form.None{})
+func SetGroup_StageOnly(ctx context.Context, cloned gov.Cloned, name Group) git.ChangeNoResult {
+	return groupsKV.Set(ctx, groupsNS, cloned.Tree(), name, form.None{})
 }
 
 func IsGroup(ctx context.Context, addr gov.Address, name Group) bool {
-	return IsGroup_Local(ctx, gov.Clone(ctx, addr).Tree(), name)
+	return IsGroup_Local(ctx, gov.Clone(ctx, addr), name)
 }
 
-func IsGroup_Local(ctx context.Context, t *git.Tree, name Group) bool {
-	err := must.Try(func() { groupsKV.Get(ctx, groupsNS, t, name) })
+func IsGroup_Local(ctx context.Context, cloned gov.Cloned, name Group) bool {
+	err := must.Try(func() { groupsKV.Get(ctx, groupsNS, cloned.Tree(), name) })
 	return err == nil
 }
 
 func AddGroup(ctx context.Context, addr gov.Address, name Group) {
 	cloned := gov.Clone(ctx, addr)
-	chg := AddGroup_StageOnly(ctx, cloned.Tree(), name)
+	chg := AddGroup_StageOnly(ctx, cloned, name)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func AddGroup_StageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
-	if IsGroup_Local(ctx, t, name) {
+func AddGroup_StageOnly(ctx context.Context, cloned gov.Cloned, name Group) git.ChangeNoResult {
+	if IsGroup_Local(ctx, cloned, name) {
 		must.Panic(ctx, fmt.Errorf("group already exists"))
 	}
-	return SetGroup_StageOnly(ctx, t, name)
+	return SetGroup_StageOnly(ctx, cloned, name)
 }
 
 func RemoveGroup(ctx context.Context, addr gov.Address, name Group) {
 	cloned := gov.Clone(ctx, addr)
-	chg := RemoveGroup_StageOnly(ctx, cloned.Tree(), name)
+	chg := RemoveGroup_StageOnly(ctx, cloned, name)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func RemoveGroup_StageOnly(ctx context.Context, t *git.Tree, name Group) git.ChangeNoResult {
-	groupsKV.Remove(ctx, groupsNS, t, name)
-	groupUsersKKV.RemovePrimary(ctx, groupUsersNS, t, name) // remove memberships
+func RemoveGroup_StageOnly(ctx context.Context, cloned gov.Cloned, name Group) git.ChangeNoResult {
+	groupsKV.Remove(ctx, groupsNS, cloned.Tree(), name)
+	groupUsersKKV.RemovePrimary(ctx, groupUsersNS, cloned.Tree(), name) // remove memberships
 	return git.NewChangeNoResult(fmt.Sprintf("Remove group %v", name), "member_remove_group")
 }

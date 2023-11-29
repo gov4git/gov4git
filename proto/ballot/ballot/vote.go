@@ -89,7 +89,7 @@ func verifyElections(
 	voterAddr id.OwnerAddress,
 	govAddr gov.Address,
 	voterOwner id.OwnerCloned,
-	govCloned git.Cloned,
+	govCloned gov.Cloned,
 	ad common.Advertisement,
 	elections common.Elections,
 ) {

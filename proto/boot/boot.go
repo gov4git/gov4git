@@ -29,7 +29,7 @@ func Boot_Local(
 ) git.Change[form.None, id.PrivateCredentials] {
 
 	chg := id.Init_Local(ctx, ownerCloned.IDOwnerCloned())
-	chg2 := member.SetGroup_StageOnly(ctx, ownerCloned.Public.Tree(), member.Everybody)
+	chg2 := member.SetGroup_StageOnly(ctx, ownerCloned.PublicClone(), member.Everybody)
 	proto.Commit(ctx, ownerCloned.Public.Tree(), chg2)
 
 	return chg

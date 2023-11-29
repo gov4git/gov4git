@@ -70,14 +70,14 @@ func NewTestCommunity(t *testing.T, ctx context.Context, numMembers int) *TestCo
 
 func (x *TestCommunity) addEverybody(t *testing.T, ctx context.Context) {
 
-	govCloned := git.CloneOne(ctx, git.Address(x.gov))
+	govCloned := gov.Clone(ctx, x.gov)
 
 	for i, m := range x.members {
-		member.AddUserByPublicAddress_StageOnly(ctx, govCloned.Tree(), x.MemberUser(i), m.Public)
+		member.AddUserByPublicAddress_StageOnly(ctx, govCloned, x.MemberUser(i), m.Public)
 	}
 
 	for i, m := range x.silentMembers {
-		member.AddUserByPublicAddress_StageOnly(ctx, govCloned.Tree(), x.InvalidMemberUser(i), m.Public)
+		member.AddUserByPublicAddress_StageOnly(ctx, govCloned, x.InvalidMemberUser(i), m.Public)
 	}
 
 	chg := git.NewChangeNoResult("add everybody", "test_add_everybody")

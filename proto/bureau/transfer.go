@@ -49,7 +49,7 @@ func Transfer_StageOnly(
 
 	// find the user name of userAddr in the community repo
 	if fromUserOpt == "" {
-		us := member.LookupUserByID_Local(ctx, govCloned.Tree(), userCred.ID)
+		us := member.LookupUserByID_Local(ctx, govCloned, userCred.ID)
 		switch len(us) {
 		case 0:
 			must.Errorf(ctx, "%s not found in community %v", userAddr.Public, govCloned.Address())

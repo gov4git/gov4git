@@ -38,15 +38,13 @@ func Process_StageOnly(
 	group member.Group,
 ) (change git.ChangeNoResult, changed bool) {
 
-	communityTree := govOwner.Public.Tree()
-
 	// list participating users
-	users := member.ListGroupUsers_Local(ctx, communityTree, group)
+	users := member.ListGroupUsers_Local(ctx, govOwner.PublicClone(), group)
 
 	// get user accounts
 	accounts := make([]member.Account, len(users))
 	for i, user := range users {
-		accounts[i] = member.GetUser_Local(ctx, communityTree, user)
+		accounts[i] = member.GetUser_Local(ctx, govOwner.PublicClone(), user)
 	}
 
 	// fetch user requests
@@ -91,7 +89,7 @@ func processRequest_StageOnly(
 		err := must.Try(func() {
 			balance.Transfer_StageOnly(
 				ctx,
-				govOwner.Public.Tree(),
+				govOwner.PublicClone(),
 				req.Transfer.FromUser, req.Transfer.FromBalance,
 				req.Transfer.ToUser, req.Transfer.ToBalance,
 				req.Transfer.Amount,

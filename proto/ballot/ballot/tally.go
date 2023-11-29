@@ -43,7 +43,7 @@ func Tally_StageOnly(
 	communityTree := govOwner.Public.Tree()
 	ad, _ := load.LoadStrategy(ctx, communityTree, ballotName)
 
-	pv := loadParticipatingVoters(ctx, communityTree, ad)
+	pv := loadParticipatingVoters(ctx, govOwner.PublicClone(), ad)
 	votersCloned := clonePar(ctx, pv.VoterAccounts, maxPar)
 	pv.attachVoterClones(ctx, votersCloned)
 

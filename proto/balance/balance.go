@@ -17,33 +17,33 @@ func Set(ctx context.Context, addr gov.Address, user member.User, key Balance, v
 	member.SetUserProp(ctx, addr, user, userPropKey(key), value)
 }
 
-func Set_StageOnly(ctx context.Context, t *git.Tree, user member.User, key Balance, value float64) {
-	member.SetUserProp_StageOnly(ctx, t, user, userPropKey(key), value)
+func Set_StageOnly(ctx context.Context, cloned gov.Cloned, user member.User, key Balance, value float64) {
+	member.SetUserProp_StageOnly(ctx, cloned, user, userPropKey(key), value)
 }
 
 func Get(ctx context.Context, addr gov.Address, user member.User, key Balance) float64 {
 	return member.GetUserPropOrDefault[float64](ctx, addr, user, userPropKey(key), 0.0)
 }
 
-func Get_Local(ctx context.Context, t *git.Tree, user member.User, key Balance) float64 {
-	return member.GetUserPropOrDefault_Local[float64](ctx, t, user, userPropKey(key), 0.0)
+func Get_Local(ctx context.Context, cloned gov.Cloned, user member.User, key Balance) float64 {
+	return member.GetUserPropOrDefault_Local[float64](ctx, cloned, user, userPropKey(key), 0.0)
 }
 
 func TryTransfer_StageOnly(
 	ctx context.Context,
-	t *git.Tree,
+	cloned gov.Cloned,
 	fromUser member.User,
 	fromBal Balance,
 	toUser member.User,
 	toBal Balance,
 	amount float64,
 ) error {
-	return must.Try(func() { Transfer_StageOnly(ctx, t, fromUser, fromBal, toUser, toBal, amount) })
+	return must.Try(func() { Transfer_StageOnly(ctx, cloned, fromUser, fromBal, toUser, toBal, amount) })
 }
 
 func Transfer_StageOnly(
 	ctx context.Context,
-	t *git.Tree,
+	cloned gov.Cloned,
 	fromUser member.User,
 	fromBal Balance,
 	toUser member.User,
@@ -52,38 +52,38 @@ func Transfer_StageOnly(
 ) {
 	base.Infof("transfering %v units from %v:%v to %v:%v", amount, fromUser, fromBal, toUser, toBal)
 	must.Assertf(ctx, amount >= 0, "negative transfer")
-	prior := Get_Local(ctx, t, fromUser, fromBal)
+	prior := Get_Local(ctx, cloned, fromUser, fromBal)
 	must.Assertf(ctx, prior >= amount, "insufficient balance")
-	Add_StageOnly(ctx, t, fromUser, fromBal, -amount)
-	Add_StageOnly(ctx, t, toUser, toBal, amount)
+	Add_StageOnly(ctx, cloned, fromUser, fromBal, -amount)
+	Add_StageOnly(ctx, cloned, toUser, toBal, amount)
 }
 
 func TryCharge_StageOnly(
 	ctx context.Context,
-	t *git.Tree,
+	cloned gov.Cloned,
 	user member.User,
 	bal Balance,
 	amount float64,
 ) error {
-	return must.Try(func() { Charge_StageOnly(ctx, t, user, bal, amount) })
+	return must.Try(func() { Charge_StageOnly(ctx, cloned, user, bal, amount) })
 }
 
 func Charge_StageOnly(
 	ctx context.Context,
-	t *git.Tree,
+	cloned gov.Cloned,
 	user member.User,
 	bal Balance,
 	amount float64,
 ) {
 	base.Infof("charging %v units from %v:%v", amount, user, bal)
-	prior := Get_Local(ctx, t, user, bal)
+	prior := Get_Local(ctx, cloned, user, bal)
 	must.Assertf(ctx, prior >= amount, "insufficient balance")
-	Add_StageOnly(ctx, t, user, bal, -amount)
+	Add_StageOnly(ctx, cloned, user, bal, -amount)
 }
 
 func Add(ctx context.Context, addr gov.Address, user member.User, key Balance, value float64) float64 {
 	cloned := gov.Clone(ctx, addr)
-	prior := Add_StageOnly(ctx, cloned.Tree(), user, key, value)
+	prior := Add_StageOnly(ctx, cloned, user, key, value)
 	chg := git.NewChange[form.Map, float64](
 		fmt.Sprintf("Add %v to balance %v of user %v", value, key, user),
 		"balance_add",
@@ -96,15 +96,15 @@ func Add(ctx context.Context, addr gov.Address, user member.User, key Balance, v
 	return prior
 }
 
-func Add_StageOnly(ctx context.Context, t *git.Tree, user member.User, key Balance, value float64) float64 {
-	prior := Get_Local(ctx, t, user, key)
-	Set_StageOnly(ctx, t, user, key, prior+value)
+func Add_StageOnly(ctx context.Context, cloned gov.Cloned, user member.User, key Balance, value float64) float64 {
+	prior := Get_Local(ctx, cloned, user, key)
+	Set_StageOnly(ctx, cloned, user, key, prior+value)
 	return prior
 }
 
 func Mul(ctx context.Context, addr gov.Address, user member.User, key Balance, value float64) float64 {
 	cloned := gov.Clone(ctx, addr)
-	prior := Mul_StageOnly(ctx, cloned.Tree(), user, key, value)
+	prior := Mul_StageOnly(ctx, cloned, user, key, value)
 	chg := git.NewChange[form.Map, float64](
 		fmt.Sprintf("Multiply %v into balance %v of user %v", value, key, user),
 		"balance_mul",
@@ -117,8 +117,8 @@ func Mul(ctx context.Context, addr gov.Address, user member.User, key Balance, v
 	return prior
 }
 
-func Mul_StageOnly(ctx context.Context, t *git.Tree, user member.User, key Balance, value float64) float64 {
-	prior := Get_Local(ctx, t, user, key)
-	Set_StageOnly(ctx, t, user, key, prior*value)
+func Mul_StageOnly(ctx context.Context, cloned gov.Cloned, user member.User, key Balance, value float64) float64 {
+	prior := Get_Local(ctx, cloned, user, key)
+	Set_StageOnly(ctx, cloned, user, key, prior*value)
 	return prior
 }

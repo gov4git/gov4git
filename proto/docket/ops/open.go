@@ -53,7 +53,7 @@ func OpenMotion_StageOnly(
 	slices.Sort(labels)
 
 	// verify author is a user, or empty string
-	must.Assertf(ctx, author == "" || member.IsUser_Local(ctx, t, author), "motion author %v is not in the community", author)
+	must.Assertf(ctx, author == "" || member.IsUser_Local(ctx, cloned.PublicClone(), author), "motion author %v is not in the community", author)
 
 	must.Assert(ctx, !IsMotion_Local(ctx, t, id), schema.ErrMotionAlreadyExists)
 	motion := schema.Motion{

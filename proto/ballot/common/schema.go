@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
@@ -46,6 +47,14 @@ func VoteLogPath(govID id.ID, ballotName BallotName) ns.NS {
 		form.StringHashForFilename(string(govID)),
 		form.StringHashForFilename(BallotTopic(ballotName)),
 	)
+}
+
+func BallotOwnerID(ballotName BallotName) account.OwnerID {
+	return account.OwnerID("ballot:" + ballotName.GitPath())
+}
+
+func BallotEscrowAccountID(ballotName BallotName) account.AccountID {
+	return account.AccountID("ballot_escrow:" + ballotName.GitPath())
 }
 
 func BallotTopic(ballotName BallotName) string {

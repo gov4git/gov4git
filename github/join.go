@@ -73,6 +73,9 @@ func ProcessJoinRequestIssues_StageOnly(
 	// fetch open issues
 	issues := fetchOpenIssues(ctx, repo, ghc)
 	for _, issue := range issues {
+		if !isJoinRequestIssue(issue) {
+			continue
+		}
 		newMember := processJoinRequestIssue_StageOnly(ctx, repo, ghc, govAddr, govCloned, approvers, issue)
 		if newMember != "" {
 			report.Joined = append(report.Joined, newMember)
@@ -83,6 +86,11 @@ func ProcessJoinRequestIssues_StageOnly(
 		}
 	}
 	return report
+}
+
+func isJoinRequestIssue(issue *github.Issue) bool {
+	_, _, err := parseJoinBody(issue.GetBody())
+	return err == nil
 }
 
 func processJoinRequestIssue_StageOnly(
@@ -97,8 +105,7 @@ func processJoinRequestIssue_StageOnly(
 
 	must.Assertf(ctx, len(approverGitHubUsers) > 0, "no membership approvers")
 
-	// if issue does not parse as a join request, return without commenting on the issue
-	if _, _, err := parseJoinBody(issue.GetBody()); err != nil {
+	if !isJoinRequestIssue(issue) {
 		return ""
 	}
 

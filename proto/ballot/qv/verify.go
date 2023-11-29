@@ -7,7 +7,6 @@ import (
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
-	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
 
@@ -16,14 +15,14 @@ func (qv QV) VerifyElections(
 	voterAddr id.OwnerAddress,
 	govAddr gov.Address,
 	voterCloned id.OwnerCloned,
-	govCloned git.Cloned,
+	govCloned gov.Cloned,
 	ad *common.Advertisement,
 	prior *common.Tally,
 	elections common.Elections,
 ) {
 
 	voterCred := id.GetPublicCredentials(ctx, voterCloned.Public.Tree())
-	user := member.LookupUserByID_Local(ctx, govCloned.Tree(), voterCred.ID)
+	user := member.LookupUserByID_Local(ctx, govCloned, voterCred.ID)
 	if len(user) == 0 {
 		must.Errorf(ctx, "cannot find user with id %v in the community", voterCred.ID)
 	}

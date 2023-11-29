@@ -198,12 +198,10 @@ func syncCreateMotionForIssue(
 	id schema.MotionID,
 ) {
 
-	t := cloned.Public.Tree()
-
 	// if the user is a community member, find their username
 	var author member.User
 	query := member.User(issue.Author)
-	if member.IsUser_Local(ctx, t, query) {
+	if member.IsUser_Local(ctx, cloned.PublicClone(), query) {
 		author = query
 	}
 

@@ -33,7 +33,7 @@ func Track_StageOnly(
 
 	// determine the voter's username in the community
 	voterCred := id.GetPublicCredentials(ctx, voterOwner.Public.Tree())
-	users := member.LookupUserByID_Local(ctx, govCloned.Tree(), voterCred.ID)
+	users := member.LookupUserByID_Local(ctx, govCloned, voterCred.ID)
 	must.Assertf(ctx, len(users) > 0, "user not found in community")
 	user := users[0]
 

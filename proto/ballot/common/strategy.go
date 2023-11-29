@@ -22,7 +22,7 @@ type Strategy interface {
 		voterAddr id.OwnerAddress,
 		govAddr gov.Address,
 		voterCloned id.OwnerCloned,
-		govCloned git.Cloned,
+		govCloned gov.Cloned,
 		ad *Advertisement,
 		prior *Tally,
 		elections Elections,

@@ -27,7 +27,7 @@ func TestBalance(t *testing.T) {
 
 	// test balance transfer
 	cloned := gov.Clone(ctx, cty.Gov())
-	balance.Transfer_StageOnly(ctx, cloned.Tree(), cty.MemberUser(0), bal, cty.MemberUser(1), bal, 10.0)
+	balance.Transfer_StageOnly(ctx, cloned, cty.MemberUser(0), bal, cty.MemberUser(1), bal, 10.0)
 	git.Commit(ctx, cloned.Tree(), "test commit")
 	cloned.Push(ctx)
 	actual2 := balance.Get(ctx, cty.Gov(), cty.MemberUser(1), bal)

@@ -15,17 +15,17 @@ func List(
 	govAddr gov.Address,
 ) []common.Advertisement {
 
-	return List_Local(ctx, git.CloneOne(ctx, git.Address(govAddr)).Tree())
+	return List_Local(ctx, gov.Clone(ctx, govAddr))
 }
 
 func List_Local(
 	ctx context.Context,
-	govTree *git.Tree,
+	cloned gov.Cloned,
 ) []common.Advertisement {
 
 	ballotsNS := common.BallotPath(common.BallotName{})
 
-	files, err := git.ListFilesRecursively(govTree, ballotsNS)
+	files, err := git.ListFilesRecursively(cloned.Tree(), ballotsNS)
 	must.NoError(ctx, err)
 
 	ads := []common.Advertisement{}
@@ -36,7 +36,7 @@ func List_Local(
 		var ad common.Advertisement
 		err := must.Try(
 			func() {
-				ad = git.FromFile[common.Advertisement](ctx, govTree, file)
+				ad = git.FromFile[common.Advertisement](ctx, cloned.Tree(), file)
 			},
 		)
 		if err != nil {
@@ -57,19 +57,19 @@ func ListFilter(
 	withParticipant member.User,
 ) []common.Advertisement {
 
-	return ListFilter_Local(ctx, gov.Clone(ctx, govAddr).Tree(), onlyOpen, onlyClosed, onlyFrozen, withParticipant)
+	return ListFilter_Local(ctx, gov.Clone(ctx, govAddr), onlyOpen, onlyClosed, onlyFrozen, withParticipant)
 }
 
 func ListFilter_Local(
 	ctx context.Context,
-	govTree *git.Tree,
+	cloned gov.Cloned,
 	onlyOpen bool,
 	onlyClosed bool,
 	onlyFrozen bool,
 	withParticipant member.User,
 ) []common.Advertisement {
 
-	ads := List_Local(ctx, govTree)
+	ads := List_Local(ctx, cloned)
 	if onlyOpen {
 		ads = common.FilterOpenClosedAds(false, ads)
 	}
@@ -80,7 +80,7 @@ func ListFilter_Local(
 		ads = common.FilterFrozenAds(true, ads)
 	}
 	if withParticipant != "" {
-		userGroups := member.ListUserGroups_Local(ctx, govTree, withParticipant)
+		userGroups := member.ListUserGroups_Local(ctx, cloned, withParticipant)
 		ads = common.FilterWithParticipants(userGroups, ads)
 	}
 	return ads

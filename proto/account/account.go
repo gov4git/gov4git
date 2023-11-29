@@ -17,17 +17,62 @@ func (x AccountID) String() string {
 }
 
 type Account struct {
-	ID      AccountID `json:"id"`
-	Owner   OwnerID   `json:"owner"`
-	Balance Holding   `json:"balance"`
+	ID     AccountID     `json:"id"`
+	Owner  OwnerID       `json:"owner"`
+	Assets AssetHoldings `json:"assets"`
 }
 
-func NewAccount(id AccountID, owner OwnerID, balance Holding) Account {
-	return Account{ID: id, Owner: owner, Balance: balance}
+func (a *Account) Deposit(ctx context.Context, h Holding) {
+	a.Assets.Deposit(ctx, h)
+}
+
+func (a *Account) Withdraw(ctx context.Context, h Holding) {
+	a.Assets.Withdraw(ctx, h)
+}
+
+func (a *Account) Balance(asset Asset) Holding {
+	return a.Assets.Balance(asset)
+}
+
+type AssetHoldings map[Asset]Holding
+
+func (x AssetHoldings) Balance(asset Asset) Holding {
+	if h, ok := x[asset]; ok {
+		return h
+	} else {
+		return ZeroHolding(asset)
+	}
+}
+
+func (x AssetHoldings) Deposit(ctx context.Context, h Holding) {
+	if g, ok := x[h.Asset]; ok {
+		x[h.Asset] = SumHolding(ctx, g, h)
+	} else {
+		x[h.Asset] = h
+	}
+}
+
+func (x AssetHoldings) Withdraw(ctx context.Context, h Holding) {
+	if g, ok := x[h.Asset]; ok {
+		d := SumHolding(ctx, g, NegHolding(h))
+		must.Assertf(ctx, d.Quantity >= 0, "insufficient funds")
+		x[h.Asset] = d
+	} else {
+		must.Assertf(ctx, false, "no funds")
+		x[h.Asset] = NegHolding(h)
+	}
+}
+
+func NewAccount(id AccountID, owner OwnerID) *Account {
+	return &Account{
+		ID:     id,
+		Owner:  owner,
+		Assets: AssetHoldings{},
+	}
 }
 
 var (
-	accountKV = kv.KV[AccountID, Account]{}
+	accountKV = kv.KV[AccountID, *Account]{}
 	accountNS = proto.RootNS.Append("account")
 )
 
@@ -36,10 +81,9 @@ func Create(
 	addr gov.Address,
 	id AccountID,
 	owner OwnerID,
-	holding Holding,
 ) {
 	cloned := gov.Clone(ctx, addr)
-	Create_StageOnly(ctx, cloned, id, owner, holding)
+	Create_StageOnly(ctx, cloned, id, owner)
 	proto.Commitf(ctx, cloned, "account_create", "create account %v", id)
 	cloned.Push(ctx)
 }
@@ -49,10 +93,9 @@ func Create_StageOnly(
 	cloned gov.Cloned,
 	id AccountID,
 	owner OwnerID,
-	balance Holding,
 ) {
 	must.Assertf(ctx, !Exists_Local(ctx, cloned, id), "account %v already exists", id)
-	set_StageOnly(ctx, cloned, id, NewAccount(id, owner, balance))
+	set_StageOnly(ctx, cloned, id, NewAccount(id, owner))
 }
 
 func Exists_Local(
@@ -76,7 +119,7 @@ func Get(
 	ctx context.Context,
 	addr gov.Address,
 	id AccountID,
-) Account {
+) *Account {
 	cloned := gov.Clone(ctx, addr)
 	return Get_Local(ctx, cloned, id)
 }
@@ -85,7 +128,7 @@ func Get_Local(
 	ctx context.Context,
 	cloned gov.Cloned,
 	id AccountID,
-) Account {
+) *Account {
 	return accountKV.Get(ctx, accountNS, cloned.Tree(), id)
 }
 
@@ -132,7 +175,7 @@ func Deposit_StageOnly(
 	amount Holding,
 ) {
 	a := Get_Local(ctx, cloned, to)
-	a.Balance = SumHolding(ctx, a.Balance, amount)
+	a.Deposit(ctx, amount)
 	set_StageOnly(ctx, cloned, to, a)
 }
 
@@ -155,9 +198,7 @@ func Withdraw_StageOnly(
 	amount Holding,
 ) {
 	a := Get_Local(ctx, cloned, from)
-	d := SumHolding(ctx, a.Balance, NegHolding(amount))
-	must.Assertf(ctx, d.Quantity >= 0, "insufficient funds")
-	a.Balance = d
+	a.Withdraw(ctx, amount)
 	set_StageOnly(ctx, cloned, from, a)
 }
 
@@ -165,7 +206,7 @@ func set_StageOnly(
 	ctx context.Context,
 	cloned gov.Cloned,
 	id AccountID,
-	account Account,
+	account *Account,
 ) {
 	accountKV.Set(ctx, accountNS, cloned.Tree(), id, account)
 }

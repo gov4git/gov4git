@@ -134,7 +134,7 @@ func processJoinRequestIssue_StageOnly(
 	// add user to community members
 	err = must.Try(
 		func() {
-			member.AddUserByPublicAddress_StageOnly(ctx, govCloned.Public.Tree(), member.User(login), info.PublicAddress())
+			member.AddUserByPublicAddress_StageOnly(ctx, govCloned.PublicClone(), member.User(login), info.PublicAddress())
 		},
 	)
 	if err != nil {

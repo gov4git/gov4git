@@ -5,6 +5,7 @@ import (
 	"math"
 	"testing"
 
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
@@ -33,8 +34,10 @@ func TestSync(t *testing.T) {
 	fmt.Println("open 1: ", form.SprintJSON(openChg1))
 
 	// give credits to users
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 5.0)
-	balance.Set(ctx, cty.Gov(), cty.MemberUser(1), qv.VotingCredits, 5.0)
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(0), qv.VotingCredits, 5.0)                        // XXX: accounting v1
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 5.0)) // XXX: accounting v2
+	balance.Set(ctx, cty.Gov(), cty.MemberUser(1), qv.VotingCredits, 5.0)                        // XXX: accounting v1
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 5.0)) // XXX: accounting v2
 
 	// vote
 	elections0 := common.Elections{common.NewElection(choices[0], 5.0)}

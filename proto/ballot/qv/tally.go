@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/balance"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/gov"
@@ -56,7 +57,7 @@ func (qv QV) tally(
 		costDiff := augmentedScore.Cost - oldScore.Cost
 
 		// try charging the user for the new votes
-		err := chargeUser(ctx, govCloned, u, costDiff)
+		err := chargeUser(ctx, govCloned, ad.Name, u, costDiff)
 		if strict {
 			must.NoError(ctx, err)
 		}
@@ -90,6 +91,25 @@ func (qv QV) tally(
 	)
 }
 
-func chargeUser(ctx context.Context, govCloned gov.Cloned, user member.User, charge float64) error {
-	return balance.TryCharge_StageOnly(ctx, govCloned, user, VotingCredits, charge)
+func chargeUser(
+	ctx context.Context,
+	govCloned gov.Cloned,
+	ballotName common.BallotName,
+	user member.User,
+	charge float64,
+) error {
+
+	// XXX: accounting v1
+	err := balance.TryCharge_StageOnly(ctx, govCloned, user, VotingCredits, charge)
+	if err != nil {
+		return err
+	}
+	// XXX: accounting v2
+	return account.TryTransfer_StageOnly(
+		ctx,
+		govCloned,
+		member.UserAccountID(user),
+		common.BallotEscrowAccountID(ballotName),
+		account.H(account.PluralAsset, charge),
+	)
 }

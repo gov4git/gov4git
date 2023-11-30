@@ -38,6 +38,7 @@ func Reopen_StageOnly(
 	// verify ad and strategy are present
 	ad, strat := load.LoadStrategy(ctx, govTree, ballotName)
 	must.Assertf(ctx, ad.Closed, "ballot is not closed")
+	must.Assertf(ctx, !ad.Cancelled, "ballot was cancelled")
 
 	tally := LoadTally(ctx, govTree, ballotName)
 	chg := strat.Reopen(ctx, govCloned, &ad, &tally)

@@ -50,11 +50,11 @@ func VoteLogPath(govID id.ID, ballotName BallotName) ns.NS {
 }
 
 func BallotOwnerID(ballotName BallotName) account.OwnerID {
-	return account.OwnerID("ballot:" + ballotName.GitPath())
+	return account.OwnerIDFromLine(account.Pair("ballot", ballotName.GitPath()))
 }
 
 func BallotEscrowAccountID(ballotName BallotName) account.AccountID {
-	return account.AccountID("ballot_escrow:" + ballotName.GitPath())
+	return account.AccountIDFromLine(account.Pair("ballot_escrow", ballotName.GitPath()))
 }
 
 func BallotTopic(ballotName BallotName) string {

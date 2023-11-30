@@ -8,9 +8,18 @@ import (
 	"github.com/gov4git/gov4git/proto/kv"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
+	"github.com/gov4git/lib4git/ns"
 )
 
 type AccountID string
+
+func AccountIDFromNS(p ns.NS) AccountID {
+	return AccountID(p.GitPath())
+}
+
+func AccountIDFromLine(line Line) AccountID {
+	return AccountID(line)
+}
 
 func (x AccountID) String() string {
 	return string(x)

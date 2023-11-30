@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/qv"
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
@@ -39,6 +40,14 @@ func (x proposalPolicy) Open(
 	// initialize state
 	state := NewProposalState(motion.ID)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+
+	// create an account for the proposal
+	account.Create_StageOnly(
+		ctx,
+		cloned.PublicClone(),
+		schema.PolicyAccountID(motion.ID),
+		schema.MotionOwnerID(motion.ID),
+	)
 
 	// open a poll for the motion
 	ballot.Open_StageOnly(

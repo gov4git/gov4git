@@ -17,8 +17,6 @@ func (qv QV) Reopen(
 	tally *common.Tally,
 ) git.Change[form.Map, form.None] {
 
-	// XXX: reopening a cancelled issue must charge user accounts again?
-
 	return git.NewChange(
 		fmt.Sprintf("reopened ballot %v", ad.Name),
 		"ballot_qv_reopen",

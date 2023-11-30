@@ -30,9 +30,9 @@ type Account struct {
 }
 
 func UserAccountID(user User) account.AccountID {
-	return account.AccountID("user:" + user)
+	return account.AccountIDFromLine(account.Pair("user", string(user)))
 }
 
 func UserOwnerID(user User) account.OwnerID {
-	return account.OwnerID("user:" + user)
+	return account.OwnerIDFromLine(account.Pair("user", string(user)))
 }

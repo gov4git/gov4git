@@ -11,7 +11,13 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func FreezeMotion_StageOnly(ctx context.Context, cloned gov.OwnerCloned, id schema.MotionID) git.ChangeNoResult {
+func FreezeMotion_StageOnly(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	id schema.MotionID,
+	args ...any,
+
+) git.ChangeNoResult {
 
 	t := cloned.Public.Tree()
 
@@ -27,6 +33,7 @@ func FreezeMotion_StageOnly(ctx context.Context, cloned gov.OwnerCloned, id sche
 		cloned,
 		motion,
 		policy.MotionPolicyNS(id),
+		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
 
@@ -42,7 +49,13 @@ func FreezeMotion_StageOnly(ctx context.Context, cloned gov.OwnerCloned, id sche
 	return chg
 }
 
-func UnfreezeMotion_StageOnly(ctx context.Context, cloned gov.OwnerCloned, id schema.MotionID) git.ChangeNoResult {
+func UnfreezeMotion_StageOnly(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	id schema.MotionID,
+	args ...any,
+
+) git.ChangeNoResult {
 
 	t := cloned.Public.Tree()
 
@@ -58,6 +71,7 @@ func UnfreezeMotion_StageOnly(ctx context.Context, cloned gov.OwnerCloned, id sc
 		cloned,
 		motion,
 		policy.MotionPolicyNS(id),
+		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
 

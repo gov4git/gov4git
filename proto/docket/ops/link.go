@@ -18,10 +18,12 @@ func LinkMotions(
 	fromID schema.MotionID,
 	toID schema.MotionID,
 	typ schema.RefType,
+	args ...any,
+
 ) git.Change[form.Map, schema.Ref] {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	chg := LinkMotions_StageOnly(ctx, cloned, fromID, toID, typ)
+	chg := LinkMotions_StageOnly(ctx, cloned, fromID, toID, typ, args...)
 	return proto.CommitIfChanged(ctx, cloned.Public, chg)
 }
 
@@ -31,6 +33,7 @@ func LinkMotions_StageOnly(
 	fromID schema.MotionID,
 	toID schema.MotionID,
 	typ schema.RefType,
+	args ...any,
 
 ) git.Change[form.Map, schema.Ref] {
 
@@ -62,6 +65,7 @@ func LinkMotions_StageOnly(
 		to,
 		policy.MotionPolicyNS(fromID),
 		policy.MotionPolicyNS(toID),
+		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), fromID, noticesFrom)
 	noticesTo := toPolicy.AddRefTo(
@@ -72,6 +76,7 @@ func LinkMotions_StageOnly(
 		to,
 		policy.MotionPolicyNS(fromID),
 		policy.MotionPolicyNS(toID),
+		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), toID, noticesTo)
 

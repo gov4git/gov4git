@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -28,12 +29,12 @@ func Close(
 
 func Close_StageOnly(
 	ctx context.Context,
-	govCloned gov.OwnerCloned,
+	cloned gov.OwnerCloned,
 	ballotName common.BallotName,
 	cancel bool,
 ) git.Change[form.Map, common.Outcome] {
 
-	govTree := govCloned.Public.Tree()
+	govTree := cloned.Public.Tree()
 
 	// verify ad and strategy are present
 	ad, strat := load.LoadStrategy(ctx, govTree, ballotName)
@@ -43,9 +44,9 @@ func Close_StageOnly(
 
 	var chg git.Change[map[string]form.Form, common.Outcome]
 	if cancel {
-		chg = strat.Cancel(ctx, govCloned, &ad, &tally)
+		chg = strat.Cancel(ctx, cloned, &ad, &tally)
 	} else {
-		chg = strat.Close(ctx, govCloned, &ad, &tally)
+		chg = strat.Close(ctx, cloned, &ad, &tally)
 	}
 
 	// write outcome
@@ -57,6 +58,25 @@ func Close_StageOnly(
 	ad.Cancelled = cancel
 	openAdNS := common.BallotPath(ballotName).Append(common.AdFilebase)
 	git.ToFileStage(ctx, govTree, openAdNS, ad)
+
+	// log
+	if cancel {
+		history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+			Op: &history.Op{
+				Op:     "ballot_cancel",
+				Args:   history.M{"name": ballotName},
+				Result: history.M{"ad": ad},
+			},
+		})
+	} else {
+		history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+			Op: &history.Op{
+				Op:     "ballot_close",
+				Args:   history.M{"name": ballotName},
+				Result: history.M{"ad": ad},
+			},
+		})
+	}
 
 	return chg
 }

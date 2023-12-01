@@ -8,6 +8,7 @@ import (
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -35,7 +36,7 @@ func Open(
 func Open_StageOnly(
 	ctx context.Context,
 	strat common.Strategy,
-	govCloned gov.OwnerCloned,
+	cloned gov.OwnerCloned,
 	name common.BallotName,
 	title string,
 	description string,
@@ -45,25 +46,25 @@ func Open_StageOnly(
 
 	// check no open ballots by the same name
 	openAdNS := common.BallotPath(name).Append(common.AdFilebase)
-	if _, err := git.TreeStat(ctx, govCloned.Public.Tree(), openAdNS); err == nil {
+	if _, err := git.TreeStat(ctx, cloned.Public.Tree(), openAdNS); err == nil {
 		must.Errorf(ctx, "ballot already exists: %v", openAdNS.GitPath())
 	}
 
 	// verify group exists
-	if !member.IsGroup_Local(ctx, govCloned.PublicClone(), participants) {
+	if !member.IsGroup_Local(ctx, cloned.PublicClone(), participants) {
 		must.Errorf(ctx, "participant group %v does not exist", participants)
 	}
 
 	// create escrow account
 	account.Create_StageOnly(
-		ctx, govCloned.PublicClone(),
+		ctx, cloned.PublicClone(),
 		common.BallotEscrowAccountID(name),
 		common.BallotOwnerID(name),
 	)
 
 	// write ad
 	ad := common.Advertisement{
-		Gov:          govCloned.GovAddress(),
+		Gov:          cloned.GovAddress(),
 		Name:         name,
 		Title:        title,
 		Description:  description,
@@ -73,9 +74,9 @@ func Open_StageOnly(
 		Frozen:       false,
 		Closed:       false,
 		Cancelled:    false,
-		ParentCommit: git.Head(ctx, govCloned.Public.Repo()),
+		ParentCommit: git.Head(ctx, cloned.Public.Repo()),
 	}
-	git.ToFileStage(ctx, govCloned.Public.Tree(), openAdNS, ad)
+	git.ToFileStage(ctx, cloned.Public.Tree(), openAdNS, ad)
 
 	// write initial tally
 	tally := common.Tally{
@@ -87,11 +88,20 @@ func Open_StageOnly(
 		Charges:       map[member.User]float64{},
 	}
 	openTallyNS := common.BallotPath(name).Append(common.TallyFilebase)
-	git.ToFileStage(ctx, govCloned.Public.Tree(), openTallyNS, tally)
+	git.ToFileStage(ctx, cloned.Public.Tree(), openTallyNS, tally)
 
 	// write strategy
 	openStratNS := common.BallotPath(name).Append(common.StrategyFilebase)
-	git.ToFileStage(ctx, govCloned.Public.Tree(), openStratNS, strat)
+	git.ToFileStage(ctx, cloned.Public.Tree(), openStratNS, strat)
+
+	// log
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Op: &history.Op{
+			Op:     "ballot_open",
+			Args:   history.M{"name": name},
+			Result: history.M{"ad": ad},
+		},
+	})
 
 	return git.NewChange(
 		fmt.Sprintf("Create ballot of type %v", strat.Name()),
@@ -101,7 +111,7 @@ func Open_StageOnly(
 			"name":         name,
 			"participants": participants,
 		},
-		common.BallotAddress{Gov: govCloned.GovAddress(), Name: name},
+		common.BallotAddress{Gov: cloned.GovAddress(), Name: name},
 		nil,
 	)
 }

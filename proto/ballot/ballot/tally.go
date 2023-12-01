@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -52,13 +53,13 @@ func Tally_StageOnly(
 
 func tallyVotersCloned_StageOnly(
 	ctx context.Context,
-	govOwner gov.OwnerCloned,
+	cloned gov.OwnerCloned,
 	ballotName common.BallotName,
-	voterAccounts map[member.User]member.Account,
+	voterAccounts map[member.User]member.UserProfile,
 	votersCloned map[member.User]git.Cloned,
 ) (git.Change[form.Map, common.Tally], bool) {
 
-	communityTree := govOwner.Public.Tree()
+	communityTree := cloned.Public.Tree()
 	ad, strat := load.LoadStrategy(ctx, communityTree, ballotName)
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 
@@ -68,7 +69,7 @@ func tallyVotersCloned_StageOnly(
 	var fetchedVotes FetchedVotes
 	var fetchVoteChanges []git.Change[form.Map, FetchedVotes]
 	for user, account := range voterAccounts {
-		chg := fetchVotesCloned(ctx, govOwner, ballotName, user, account, votersCloned[user])
+		chg := fetchVotesCloned(ctx, cloned, ballotName, user, account, votersCloned[user])
 		fetchVoteChanges = append(fetchVoteChanges, chg)
 		fetchedVotes = append(fetchedVotes, chg.Result...)
 	}
@@ -101,11 +102,20 @@ func tallyVotersCloned_StageOnly(
 		), true
 	}
 
-	updatedTally := strat.Tally(ctx, govOwner, &ad, &currentTally, fetchedVotesToElections(fetchedVotes)).Result
+	updatedTally := strat.Tally(ctx, cloned, &ad, &currentTally, fetchedVotesToElections(fetchedVotes)).Result
 
 	// write updated tally
 	openTallyNS := common.BallotPath(ballotName).Append(common.TallyFilebase)
 	git.ToFileStage(ctx, communityTree, openTallyNS, updatedTally)
+
+	// log
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Op: &history.Op{
+			Op:     "ballot_tally",
+			Args:   history.M{"ballot": ballotName},
+			Result: history.M{"ad": ad, "tally": updatedTally},
+		},
+	})
 
 	return git.NewChange(
 		fmt.Sprintf("Tally votes on ballot %v", ballotName),

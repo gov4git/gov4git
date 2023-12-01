@@ -6,6 +6,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
@@ -29,6 +30,15 @@ func FreezeMotion_StageOnly(ctx context.Context, cloned gov.OwnerCloned, id sche
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
 
+	// log
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Op: &history.Op{
+			Op:     "motion_freeze",
+			Args:   history.M{"id": id},
+			Result: history.M{"motion": motion},
+		},
+	})
+
 	return chg
 }
 
@@ -50,6 +60,15 @@ func UnfreezeMotion_StageOnly(ctx context.Context, cloned gov.OwnerCloned, id sc
 		policy.MotionPolicyNS(id),
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
+
+	// log
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Op: &history.Op{
+			Op:     "motion_unfreeze",
+			Args:   history.M{"id": id},
+			Result: history.M{"motion": motion},
+		},
+	})
 
 	return chg
 }

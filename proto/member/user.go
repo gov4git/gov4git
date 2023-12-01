@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/kv"
 	"github.com/gov4git/lib4git/form"
@@ -14,13 +15,13 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func setUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User, user Account) git.ChangeNoResult {
+func setUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User, user UserProfile) git.ChangeNoResult {
 	SetGroup_StageOnly(ctx, cloned, Everybody)                  // create everybody group, if it doesn't exist
 	AddMember_StageOnly(ctx, cloned, name, Everybody)           // add membership of user to everybody
 	return usersKV.Set(ctx, usersNS, cloned.Tree(), name, user) // create the user record
 }
 
-func GetUser(ctx context.Context, addr gov.Address, name User) Account {
+func GetUser(ctx context.Context, addr gov.Address, name User) UserProfile {
 	return GetUser_Local(ctx, gov.Clone(ctx, addr), name)
 }
 
@@ -40,33 +41,44 @@ func IsUser_Local(ctx context.Context, cloned gov.Cloned, name User) bool {
 	return false
 }
 
-func GetUser_Local(ctx context.Context, cloned gov.Cloned, name User) Account {
+func GetUser_Local(ctx context.Context, cloned gov.Cloned, name User) UserProfile {
 	return usersKV.Get(ctx, usersNS, cloned.Tree(), name)
 }
 
 func AddUserByPublicAddress(ctx context.Context, govAddr gov.Address, name User, userAddr id.PublicAddress) {
 	cred := id.FetchPublicCredentials(ctx, userAddr)
-	AddUser(ctx, govAddr, name, Account{ID: cred.ID, PublicAddress: userAddr})
+	AddUser(ctx, govAddr, name, UserProfile{ID: cred.ID, PublicAddress: userAddr})
 }
 
 func AddUserByPublicAddress_StageOnly(ctx context.Context, cloned gov.Cloned, name User, userAddr id.PublicAddress) {
 	cred := id.FetchPublicCredentials(ctx, userAddr)
-	AddUser_StageOnly(ctx, cloned, name, Account{ID: cred.ID, PublicAddress: userAddr})
+	AddUser_StageOnly(ctx, cloned, name, UserProfile{ID: cred.ID, PublicAddress: userAddr})
 }
 
-func AddUser(ctx context.Context, addr gov.Address, name User, acct Account) {
+func AddUser(ctx context.Context, addr gov.Address, name User, acct UserProfile) {
 	cloned := gov.Clone(ctx, addr)
 	chg := AddUser_StageOnly(ctx, cloned, name, acct)
 	proto.Commit(ctx, cloned.Tree(), chg)
 	cloned.Push(ctx)
 }
 
-func AddUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User, user Account) git.ChangeNoResult {
+func AddUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User, profile UserProfile) git.ChangeNoResult {
 	if err := must.Try(func() { GetUser_Local(ctx, cloned, name) }); err == nil {
 		must.Panic(ctx, fmt.Errorf("user already exists"))
 	}
 	account.Create_StageOnly(ctx, cloned, UserAccountID(name), UserOwnerID(name))
-	return setUser_StageOnly(ctx, cloned, name, user)
+	chg := setUser_StageOnly(ctx, cloned, name, profile)
+
+	// log
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Op: &history.Op{
+			Op:     "user_add",
+			Args:   history.M{"name": name, "profile": profile},
+			Result: nil,
+		},
+	})
+
+	return chg
 }
 
 func RemoveUser(ctx context.Context, addr gov.Address, name User) {
@@ -84,7 +96,18 @@ func RemoveUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User) git
 	}
 	// remove user record
 	usersKV.Remove(ctx, usersNS, cloned.Tree(), name)
-	return git.NewChangeNoResult(fmt.Sprintf("Remove user %v", name), "member_remove_user")
+	chg := git.NewChangeNoResult(fmt.Sprintf("Remove user %v", name), "member_remove_user")
+
+	// log
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Op: &history.Op{
+			Op:     "user_remove",
+			Args:   history.M{"name": name},
+			Result: nil,
+		},
+	})
+
+	return chg
 }
 
 // set prop

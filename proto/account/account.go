@@ -5,6 +5,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/gov4git/proto/kv"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -102,6 +103,13 @@ func Create_StageOnly(
 ) {
 	must.Assertf(ctx, !Exists_Local(ctx, cloned, id), "account %v already exists", id)
 	set_StageOnly(ctx, cloned, id, NewAccount(id, owner))
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Op: &history.Op{
+			Op:     "account_create",
+			Args:   history.M{"id": id, "owner": owner},
+			Result: nil,
+		},
+	})
 }
 
 func Exists_Local(
@@ -158,8 +166,15 @@ func Transfer_StageOnly(
 	to AccountID,
 	amount Holding,
 ) {
-	Withdraw_StageOnly(ctx, cloned, from, amount)
-	Deposit_StageOnly(ctx, cloned, to, amount)
+	Withdraw_StageOnly(history.Mute(ctx), cloned, from, amount)
+	Deposit_StageOnly(history.Mute(ctx), cloned, to, amount)
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Op: &history.Op{
+			Op:     "account_transfer",
+			Args:   history.M{"from": from, "to": to, "amount": amount},
+			Result: nil,
+		},
+	})
 }
 
 func TryTransfer_StageOnly(
@@ -193,6 +208,13 @@ func Deposit_StageOnly(
 	a := Get_Local(ctx, cloned, to)
 	a.Deposit(ctx, amount)
 	set_StageOnly(ctx, cloned, to, a)
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Op: &history.Op{
+			Op:     "account_deposit",
+			Args:   history.M{"to": to, "amount": amount},
+			Result: nil,
+		},
+	})
 }
 
 func Withdraw(
@@ -216,6 +238,13 @@ func Withdraw_StageOnly(
 	a := Get_Local(ctx, cloned, from)
 	a.Withdraw(ctx, amount)
 	set_StageOnly(ctx, cloned, from, a)
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Op: &history.Op{
+			Op:     "account_withdraw",
+			Args:   history.M{"from": from, "amount": amount},
+			Result: nil,
+		},
+	})
 }
 
 func set_StageOnly(

@@ -44,7 +44,7 @@ func TallyAll_StageOnly(
 
 	// compute union of all voter accounts from all open ballots
 	participatingVoters := make([]participatingVoters, len(ads))
-	allVoters := map[member.User]member.Account{}
+	allVoters := map[member.User]member.UserProfile{}
 	for i, ad := range ads {
 		participatingVoters[i] = *loadParticipatingVoters(ctx, cloned.PublicClone(), ad)
 		for user, acct := range participatingVoters[i].VoterAccounts {
@@ -79,7 +79,7 @@ func TallyAll_StageOnly(
 	)
 }
 
-func clonePar(ctx context.Context, userAccounts map[member.User]member.Account, maxPar int) map[member.User]git.Cloned {
+func clonePar(ctx context.Context, userAccounts map[member.User]member.UserProfile, maxPar int) map[member.User]git.Cloned {
 
 	must.Assertf(ctx, maxPar > 0, "clone parallelism must be greater than zero")
 
@@ -93,7 +93,7 @@ func clonePar(ctx context.Context, userAccounts map[member.User]member.Account, 
 
 	for u, a := range userAccounts {
 		sem <- true
-		go func(u member.User, a member.Account) {
+		go func(u member.User, a member.UserProfile) {
 
 			base.Infof("cloning voter %v repository %v", u, a.PublicAddress)
 			cloned, err := git.TryCloneOne(ctx, git.Address(a.PublicAddress))

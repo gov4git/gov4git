@@ -42,7 +42,7 @@ func Process_StageOnly(
 	users := member.ListGroupUsers_Local(ctx, govOwner.PublicClone(), group)
 
 	// get user accounts
-	accounts := make([]member.Account, len(users))
+	accounts := make([]member.UserProfile, len(users))
 	for i, user := range users {
 		accounts[i] = member.GetUser_Local(ctx, govOwner.PublicClone(), user)
 	}
@@ -114,7 +114,7 @@ func fetchUserRequests(
 	ctx context.Context,
 	govOwner gov.OwnerCloned,
 	user member.User,
-	account member.Account,
+	account member.UserProfile,
 ) (git.Change[form.Map, FetchedRequests], error) {
 
 	fetched := FetchedRequests{}

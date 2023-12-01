@@ -21,7 +21,7 @@ func TestMember(t *testing.T) {
 	cloned := gov.Clone(ctx, addr)
 
 	u1 := User("user1")
-	r1 := Account{
+	r1 := UserProfile{
 		PublicAddress: id.PublicAddress{
 			Repo:   git.URL("http://1"),
 			Branch: git.MainBranch,

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -42,7 +43,18 @@ func AddGroup_StageOnly(ctx context.Context, cloned gov.Cloned, name Group) git.
 	if IsGroup_Local(ctx, cloned, name) {
 		must.Panic(ctx, fmt.Errorf("group already exists"))
 	}
-	return SetGroup_StageOnly(ctx, cloned, name)
+	chg := SetGroup_StageOnly(ctx, cloned, name)
+
+	// log
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Op: &history.Op{
+			Op:     "group_add",
+			Args:   history.M{"name": name},
+			Result: nil,
+		},
+	})
+
+	return chg
 }
 
 func RemoveGroup(ctx context.Context, addr gov.Address, name Group) {
@@ -55,5 +67,15 @@ func RemoveGroup(ctx context.Context, addr gov.Address, name Group) {
 func RemoveGroup_StageOnly(ctx context.Context, cloned gov.Cloned, name Group) git.ChangeNoResult {
 	groupsKV.Remove(ctx, groupsNS, cloned.Tree(), name)
 	groupUsersKKV.RemovePrimary(ctx, groupUsersNS, cloned.Tree(), name) // remove memberships
+
+	// log
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Op: &history.Op{
+			Op:     "group_remove",
+			Args:   history.M{"name": name},
+			Result: nil,
+		},
+	})
+
 	return git.NewChangeNoResult(fmt.Sprintf("Remove group %v", name), "member_remove_group")
 }

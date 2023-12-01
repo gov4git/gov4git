@@ -9,16 +9,20 @@ import (
 )
 
 var (
-	PublicNS  = proto.RootNS.Sub("id")
-	PrivateNS = proto.RootNS.Sub("id")
+	PublicNS  = proto.RootNS.Append("id")
+	PrivateNS = proto.RootNS.Append("id")
 )
 
 var (
-	PublicCredentialsNS  = PublicNS.Sub("public_credentials.json")
-	PrivateCredentialsNS = PrivateNS.Sub("private_credentials.json")
+	PublicCredentialsNS  = PublicNS.Append("public_credentials.json")
+	PrivateCredentialsNS = PrivateNS.Append("private_credentials.json")
 )
 
 type ID string
+
+func (x ID) String() string {
+	return string(x)
+}
 
 func GenerateRandomID() ID {
 	const w = 512 / 8 // 512 bits, measured in bytes

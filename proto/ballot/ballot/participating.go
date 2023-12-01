@@ -13,14 +13,14 @@ import (
 type participatingVoters struct {
 	Ad            common.Advertisement
 	Voters        []member.User
-	VoterAccounts map[member.User]member.Account
+	VoterAccounts map[member.User]member.UserProfile
 	VoterClones   map[member.User]git.Cloned
 }
 
 func loadParticipatingVoters(ctx context.Context, cloned gov.Cloned, ad common.Advertisement) *participatingVoters {
 	pv := &participatingVoters{}
 	pv.Ad = ad
-	pv.VoterAccounts = map[member.User]member.Account{}
+	pv.VoterAccounts = map[member.User]member.UserProfile{}
 	pv.VoterClones = map[member.User]git.Cloned{}
 	pv.Voters = member.ListGroupUsers_Local(ctx, cloned, ad.Participants)
 	for _, user := range pv.Voters {

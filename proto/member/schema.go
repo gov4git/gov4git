@@ -12,7 +12,7 @@ var (
 	membersNS = proto.RootNS.Append("members")
 
 	usersNS = membersNS.Append("users")
-	usersKV = kv.KV[User, Account]{}
+	usersKV = kv.KV[User, UserProfile]{}
 
 	groupsNS = membersNS.Append("groups")
 	groupsKV = kv.KV[Group, form.None]{}
@@ -24,7 +24,7 @@ var (
 	groupUsersKKV = kv.KKV[Group, User, bool]{}
 )
 
-type Account struct {
+type UserProfile struct {
 	ID            id.ID            `json:"id"`
 	PublicAddress id.PublicAddress `json:"public_address"`
 }

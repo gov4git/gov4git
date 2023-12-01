@@ -10,6 +10,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -79,6 +80,15 @@ func OpenMotion_StageOnly(
 		policy.MotionPolicyNS(id),
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
+
+	// log
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Op: &history.Op{
+			Op:     "motion_open",
+			Args:   history.M{"id": id},
+			Result: history.M{"motion": motion},
+		},
+	})
 
 	return git.NewChangeNoResult(fmt.Sprintf("Open motion %v", id), "docket_open_motion")
 }

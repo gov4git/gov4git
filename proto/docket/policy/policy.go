@@ -19,6 +19,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
+		args ...any,
 	) notice.Notices
 
 	// Score is invoked only on open motions.
@@ -27,6 +28,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
+		args ...any,
 	) (schema.Score, notice.Notices)
 
 	// Update is invoked only on open motions, after rescoring all motions.
@@ -35,6 +37,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
+		args ...any,
 	) notice.Notices
 
 	Close(
@@ -42,6 +45,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
+		args ...any,
 	) notice.Notices
 
 	Cancel(
@@ -49,6 +53,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
+		args ...any,
 	) notice.Notices
 
 	Show(
@@ -56,6 +61,7 @@ type Policy interface {
 		cloned gov.Cloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
+		args ...any,
 	) form.Map
 
 	// AddRefTo is invoked only when to and from motions are open.
@@ -67,6 +73,7 @@ type Policy interface {
 		to schema.Motion,
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
+		args ...any,
 	) notice.Notices
 
 	// AddRefFrom is invoked only when to and from motions are open.
@@ -78,6 +85,7 @@ type Policy interface {
 		to schema.Motion,
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
+		args ...any,
 	) notice.Notices
 
 	// RemoveRefTo is invoked only when to and from motions are open.
@@ -89,6 +97,7 @@ type Policy interface {
 		to schema.Motion,
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
+		args ...any,
 	) notice.Notices
 
 	// RemoveRefFrom is invoked only when to and from motions are open.
@@ -100,6 +109,7 @@ type Policy interface {
 		to schema.Motion,
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
+		args ...any,
 	) notice.Notices
 
 	// Freeze is invoked by motion.Freeze
@@ -108,6 +118,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
+		args ...any,
 	) notice.Notices
 
 	// Unfreeze is invoked by motion.Unfreeze
@@ -116,6 +127,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
+		args ...any,
 	) notice.Notices
 }
 

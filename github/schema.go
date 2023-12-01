@@ -68,8 +68,9 @@ type ImportedIssue struct {
 	//
 	Locked            bool `json:"locked"`
 	Closed            bool `json:"closed"`
-	IsPullRequest     bool `json:"is_pull_request"`
-	IsManaged         bool `json:"is_governed"`
+	PullRequest       bool `json:"pull_request"`
+	Merged            bool `json:"merged"`
+	Managed           bool `json:"managed"`
 	ForPrioritization bool `json:"for_prioritization"`
 }
 
@@ -92,7 +93,7 @@ const (
 )
 
 func (x ImportedIssue) BallotName() common.BallotName {
-	if x.IsPullRequest {
+	if x.PullRequest {
 		return common.BallotName{ImportedGithubPrefix, ImportedPullPrefix, x.Key()}
 	} else {
 		return common.BallotName{ImportedGithubPrefix, ImportedIssuePrefix, x.Key()}
@@ -100,7 +101,7 @@ func (x ImportedIssue) BallotName() common.BallotName {
 }
 
 func (x ImportedIssue) MotionType() schema.MotionType {
-	if x.IsPullRequest {
+	if x.PullRequest {
 		return schema.MotionProposalType
 	} else {
 		return schema.MotionConcernType

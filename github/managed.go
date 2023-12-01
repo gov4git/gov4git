@@ -16,6 +16,7 @@ import (
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
 )
 
 func SyncManagedIssues(
@@ -81,14 +82,14 @@ func SyncManagedIssues_StageOnly(
 	// ensure every issue has a corresponding up-to-date motion
 	for key, issue := range issues {
 		id := schema.MotionID(key)
-		if issue.IsManaged {
+		if issue.Managed {
 			if motion, ok := motions[id]; ok { // if motion for issue already exists, update it
 				changed := syncMeta(ctx, t, syncChanges, issue, motion)
 				switch {
 				case issue.Closed && motion.Closed:
 				case issue.Closed && !motion.Closed:
 					syncFrozen(ctx, govCloned, syncChanges, issue, motion)
-					ops.CloseMotion_StageOnly(ctx, govCloned, id)
+					ops.CloseMotion_StageOnly(ctx, govCloned, id, issue.Merged)
 					syncChanges.Closed.Add(id)
 					changed = true
 				case !issue.Closed && motion.Closed:
@@ -100,8 +101,10 @@ func SyncManagedIssues_StageOnly(
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
 			} else { // otherwise, no motion for this issue exists, so create one
-				syncCreateMotionForIssue(ctx, govAddr, govCloned, syncChanges, issue, id)
-				syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
+				if !issue.Closed {
+					syncCreateMotionForIssue(ctx, govAddr, govCloned, syncChanges, issue, id)
+					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
+				}
 			}
 		} else { // issue is not governed, freeze motion if it exists and is open
 			if motion, ok := motions[id]; ok { // motion for issue already exists, update it
@@ -183,7 +186,7 @@ const (
 )
 
 func motionPolicyForIssue(issue ImportedIssue) schema.PolicyName {
-	if issue.IsPullRequest {
+	if issue.PullRequest {
 		return MotionPolicyForPR
 	}
 	return MotionPolicyForIssue
@@ -197,6 +200,8 @@ func syncCreateMotionForIssue(
 	issue ImportedIssue,
 	id schema.MotionID,
 ) {
+
+	must.Assertf(ctx, !issue.Closed, "issue is closed")
 
 	// if the user is a community member, find their username
 	var author member.User
@@ -221,10 +226,6 @@ func syncCreateMotionForIssue(
 	if issue.Locked {
 		ops.FreezeMotion_StageOnly(ctx, cloned, id)
 		chg.Froze.Add(id)
-	}
-	if issue.Closed {
-		ops.CloseMotion_StageOnly(ctx, cloned, id)
-		chg.Closed.Add(id)
 	}
 }
 

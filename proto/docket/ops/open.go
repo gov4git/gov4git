@@ -46,6 +46,7 @@ func OpenMotion_StageOnly(
 	typ schema.MotionType,
 	trackerURL string,
 	labels []string,
+	args ...any,
 
 ) git.ChangeNoResult {
 
@@ -78,6 +79,7 @@ func OpenMotion_StageOnly(
 		cloned,
 		motion,
 		policy.MotionPolicyNS(id),
+		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
 

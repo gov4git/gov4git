@@ -18,10 +18,12 @@ func UnlinkMotions(
 	fromID schema.MotionID,
 	toID schema.MotionID,
 	typ schema.RefType,
+	args ...any,
+
 ) git.Change[form.Map, schema.Ref] {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	chg := UnlinkMotions_StageOnly(ctx, cloned, fromID, toID, typ)
+	chg := UnlinkMotions_StageOnly(ctx, cloned, fromID, toID, typ, args...)
 	return proto.CommitIfChanged(ctx, cloned.Public, chg)
 }
 
@@ -31,6 +33,8 @@ func UnlinkMotions_StageOnly(
 	fromID schema.MotionID,
 	toID schema.MotionID,
 	typ schema.RefType,
+	args ...any,
+
 ) git.Change[form.Map, schema.Ref] {
 
 	t := cloned.Public.Tree()
@@ -61,6 +65,7 @@ func UnlinkMotions_StageOnly(
 		to,
 		policy.MotionPolicyNS(fromID),
 		policy.MotionPolicyNS(toID),
+		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), toID, noticesTo)
 	noticesFrom := fromPolicy.RemoveRefFrom(
@@ -71,6 +76,7 @@ func UnlinkMotions_StageOnly(
 		to,
 		policy.MotionPolicyNS(fromID),
 		policy.MotionPolicyNS(toID),
+		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), fromID, noticesFrom)
 

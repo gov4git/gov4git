@@ -15,17 +15,19 @@ import (
 func ScoreMotions(
 	ctx context.Context,
 	addr gov.OwnerAddress,
+	args ...any,
 
 ) git.Change[form.Map, schema.Motions] {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	chg := ScoreMotions_StageOnly(ctx, cloned)
+	chg := ScoreMotions_StageOnly(ctx, cloned, args...)
 	return proto.CommitIfChanged(ctx, cloned.Public, chg)
 }
 
 func ScoreMotions_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
+	args ...any,
 
 ) git.Change[form.Map, schema.Motions] {
 
@@ -43,6 +45,7 @@ func ScoreMotions_StageOnly(
 			cloned,
 			motion,
 			policy.MotionPolicyNS(motions[i].ID),
+			args...,
 		)
 		AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), motions[i].ID, notices)
 

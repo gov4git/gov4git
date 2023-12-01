@@ -28,6 +28,7 @@ func (x zeroPolicy) Open(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -39,6 +40,7 @@ func (x zeroPolicy) Score(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) (schema.Score, notice.Notices) {
 
@@ -50,6 +52,7 @@ func (x zeroPolicy) Update(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -61,6 +64,7 @@ func (x zeroPolicy) Close(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -72,6 +76,7 @@ func (x zeroPolicy) Cancel(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -83,6 +88,7 @@ func (x zeroPolicy) Show(
 	cloned gov.Cloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) form.Map {
 
@@ -97,6 +103,8 @@ func (x zeroPolicy) AddRefTo(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
+
 ) notice.Notices {
 
 	return notice.Noticef("add %v ref to motion #%v, from motion #%v", refType, to.ID, from.ID)
@@ -110,6 +118,8 @@ func (x zeroPolicy) AddRefFrom(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
+
 ) notice.Notices {
 
 	return notice.Noticef("add %v ref from motion #%v, to motion #%v", refType, from.ID, to.ID)
@@ -123,6 +133,8 @@ func (x zeroPolicy) RemoveRefTo(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
+
 ) notice.Notices {
 
 	return notice.Noticef("remove %v ref to motion #%v, from motion #%v", refType, to.ID, from.ID)
@@ -136,6 +148,8 @@ func (x zeroPolicy) RemoveRefFrom(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
+
 ) notice.Notices {
 
 	return notice.Noticef("remove %v ref from motion #%v, to motion #%v", refType, from.ID, to.ID)
@@ -146,6 +160,7 @@ func (x zeroPolicy) Freeze(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -157,6 +172,7 @@ func (x zeroPolicy) Unfreeze(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 

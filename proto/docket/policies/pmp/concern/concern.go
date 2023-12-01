@@ -35,6 +35,7 @@ func (x concernPolicy) Open(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -70,6 +71,7 @@ func (x concernPolicy) Score(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) (schema.Score, notice.Notices) {
 
@@ -89,6 +91,7 @@ func (x concernPolicy) Update(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -115,6 +118,7 @@ func (x concernPolicy) Close(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -135,6 +139,7 @@ func (x concernPolicy) Cancel(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -155,6 +160,7 @@ func (x concernPolicy) Show(
 	cloned gov.Cloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) form.Map {
 
@@ -179,6 +185,7 @@ func (x concernPolicy) AddRefTo(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -193,6 +200,7 @@ func (x concernPolicy) AddRefFrom(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -225,6 +233,8 @@ func (x concernPolicy) RemoveRefTo(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
+
 ) notice.Notices {
 
 	return nil
@@ -238,6 +248,7 @@ func (x concernPolicy) RemoveRefFrom(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -259,6 +270,7 @@ func (x concernPolicy) updateFreeze(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -282,6 +294,7 @@ func (x concernPolicy) Freeze(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -300,6 +313,7 @@ func (x concernPolicy) Unfreeze(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 

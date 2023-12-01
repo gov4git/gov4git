@@ -16,18 +16,18 @@ import (
 func LoadIssues(
 	ctx context.Context,
 	repo Repo,
-	githubClient *github.Client, // if nil, a new client for repo will be created
+	ghc *github.Client, // if nil, a new client for repo will be created
 ) (ImportedIssues, map[string]ImportedIssue) {
 
-	if githubClient == nil {
-		githubClient = GetGithubClient(ctx, repo)
+	if ghc == nil {
+		ghc = GetGithubClient(ctx, repo)
 	}
 
-	issues := FetchIssues(ctx, repo, githubClient)
+	issues := FetchIssues(ctx, repo, ghc)
 	key := map[string]ImportedIssue{}
 	order := ImportedIssues{}
 	for _, issue := range issues {
-		ghIssue := TransformIssue(ctx, repo, issue)
+		ghIssue := TransformIssue(ctx, ghc, repo, issue)
 		key[ghIssue.Key()] = ghIssue
 		order = append(order, ghIssue)
 	}
@@ -69,10 +69,24 @@ func IsIssueManaged(issue *github.Issue) bool {
 	return util.IsIn(IssueIsManagedLabel, LabelsToStrings(issue.Labels)...)
 }
 
-func TransformIssue(ctx context.Context, repo Repo, issue *github.Issue) ImportedIssue {
+func TransformIssue(
+	ctx context.Context,
+	ghc *github.Client,
+	repo Repo,
+	issue *github.Issue,
+
+) ImportedIssue {
+
 	author, _ := getIssueAuthorLogin(issue)
+	var pr *github.PullRequest
+	//XXX: for efficiency, load pr info only if "corresponding motion is open"
+	if issue.IsPullRequest() && issue.GetState() == "closed" { // merged state is not relevant for open prs
+		var err error
+		pr, _, err = ghc.PullRequests.Get(ctx, repo.Owner, repo.Name, issue.GetNumber())
+		must.NoError(ctx, err)
+	}
 	return ImportedIssue{
-		IsManaged:         IsIssueManaged(issue),
+		Managed:           IsIssueManaged(issue),
 		ForPrioritization: IsIssueForPrioritization(issue),
 		URL:               issue.GetURL(),
 		Author:            author,
@@ -86,7 +100,8 @@ func TransformIssue(ctx context.Context, repo Repo, issue *github.Issue) Importe
 		Refs:              parseIssueRefs(ctx, repo, issue),
 		Locked:            issue.GetLocked(),
 		Closed:            issue.GetState() == "closed",
-		IsPullRequest:     issue.GetPullRequestLinks() != nil,
+		PullRequest:       issue.IsPullRequest(),
+		Merged:            pr != nil && pr.GetMerged(),
 	}
 }
 

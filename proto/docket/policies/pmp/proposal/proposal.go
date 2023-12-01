@@ -14,6 +14,7 @@ import (
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/proto/notice"
 	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -34,6 +35,7 @@ func (x proposalPolicy) Open(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -69,6 +71,7 @@ func (x proposalPolicy) Score(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) (schema.Score, notice.Notices) {
 
@@ -88,6 +91,7 @@ func (x proposalPolicy) Update(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -99,8 +103,13 @@ func (x proposalPolicy) Close(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
+
+	must.Assertf(ctx, len(args) == 1, "proposal closure missing argument")
+	_, ok := args[0].(bool) // isMerged
+	must.Assertf(ctx, ok, "proposal closure unrecognized argument")
 
 	// close the referendum for the motion
 	referendumName := pmp.ProposalReferendumBallotName(motion.ID)
@@ -121,6 +130,7 @@ func (x proposalPolicy) Cancel(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -141,6 +151,7 @@ func (x proposalPolicy) Show(
 	cloned gov.Cloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) form.Map {
 
@@ -165,6 +176,8 @@ func (x proposalPolicy) AddRefTo(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
+
 ) notice.Notices {
 
 	return nil
@@ -178,6 +191,8 @@ func (x proposalPolicy) AddRefFrom(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
+
 ) notice.Notices {
 
 	return nil
@@ -191,6 +206,8 @@ func (x proposalPolicy) RemoveRefTo(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
+
 ) notice.Notices {
 
 	return nil
@@ -204,6 +221,8 @@ func (x proposalPolicy) RemoveRefFrom(
 	to schema.Motion,
 	fromPolicyNS ns.NS,
 	toPolicyNS ns.NS,
+	args ...any,
+
 ) notice.Notices {
 
 	return nil
@@ -214,6 +233,7 @@ func (x proposalPolicy) Freeze(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 
@@ -225,6 +245,7 @@ func (x proposalPolicy) Unfreeze(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	args ...any,
 
 ) notice.Notices {
 

@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/proto/sync"
 	"github.com/gov4git/gov4git/runtime"
@@ -26,7 +26,7 @@ func TestSync(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open two ballots
-	strat := qv.QV{}
+	strat := load.QVStrategyName
 	openChg0 := ballot.Open(ctx, strat, cty.Organizer(), ballotName0, "ballot_0", "ballot 0", choices, member.Everybody)
 	fmt.Println("open 0: ", form.SprintJSON(openChg0))
 	openChg1 := ballot.Open(ctx, strat, cty.Organizer(), ballotName1, "ballot_1", "ballot 1", choices, member.Everybody)

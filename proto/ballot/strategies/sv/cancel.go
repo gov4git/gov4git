@@ -1,4 +1,4 @@
-package qv
+package sv
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-func (qv QV) Cancel(
+func (qv SV) Cancel(
 	ctx context.Context,
 	govOwner gov.OwnerCloned,
 	ad *common.Advertisement,

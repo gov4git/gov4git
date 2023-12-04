@@ -7,7 +7,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
@@ -28,10 +28,9 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			strat := qv.QV{}
 			chg := ballot.Open(
 				ctx,
-				strat,
+				load.QVStrategyName,
 				setup.Organizer,
 				common.ParseBallotNameFromPath(ballotName),
 				ballotTitle,

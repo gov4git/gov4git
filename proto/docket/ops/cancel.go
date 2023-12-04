@@ -41,7 +41,7 @@ func CancelMotion_StageOnly(
 	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// apply policy
-	pcy := policy.Get(ctx, motion.Policy.String())
+	pcy := policy.Get(ctx, motion.Policy)
 	notices := pcy.Cancel(
 		ctx,
 		cloned,

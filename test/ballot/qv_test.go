@@ -7,7 +7,7 @@ import (
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
@@ -27,7 +27,7 @@ func TestQV(t *testing.T) {
 	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 100.0))
 
 	// open
-	strat := qv.QV{}
+	strat := load.QVStrategyName
 	openChg := ballot.Open(
 		ctx,
 		strat,

@@ -12,11 +12,13 @@ import (
 
 type Parameters interface{}
 
+type StrategyName string
+
+func (x StrategyName) String() string {
+	return string(x)
+}
+
 type Strategy interface {
-	form.Form
-
-	Name() string
-
 	VerifyElections(
 		ctx context.Context,
 		voterAddr id.OwnerAddress,

@@ -95,7 +95,7 @@ func init() {
 	motionCmd.AddCommand(motionOpenCmd)
 	motionOpenCmd.Flags().StringVar(&motionName, "name", "", "unique name for motion")
 	motionOpenCmd.MarkFlagRequired("name")
-	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(policy.InstalledPolicies(), ", ")+")")
+	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(policy.InstalledMotionPolicies(), ", ")+")")
 	motionOpenCmd.MarkFlagRequired("policy")
 	motionOpenCmd.Flags().StringVar(&motionAuthor, "author", "", "author user name")
 	motionOpenCmd.MarkFlagRequired("author")

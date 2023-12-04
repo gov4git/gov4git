@@ -8,29 +8,29 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-type ModuleRegistry[M any] struct {
+type ModuleRegistry[N ~string, M any] struct {
 	lk   sync.Mutex
-	mods map[string]M
+	mods map[N]M
 }
 
-func NewModuleRegistry[M any]() *ModuleRegistry[M] {
-	return &ModuleRegistry[M]{
-		mods: map[string]M{},
+func NewModuleRegistry[N ~string, M any]() *ModuleRegistry[N, M] {
+	return &ModuleRegistry[N, M]{
+		mods: map[N]M{},
 	}
 }
 
-func (r *ModuleRegistry[M]) Keys() []string {
+func (r *ModuleRegistry[N, M]) List() []N {
 	r.lk.Lock()
 	defer r.lk.Unlock()
-	ks := []string{}
+	ns := []N{}
 	for k := range r.mods {
-		ks = append(ks, k)
+		ns = append(ns, k)
 	}
-	slices.Sort(ks)
-	return ks
+	slices.Sort[[]N](ns)
+	return ns
 }
 
-func (r *ModuleRegistry[M]) Set(ctx context.Context, key string, module M) {
+func (r *ModuleRegistry[N, M]) Set(ctx context.Context, key N, module M) {
 	r.lk.Lock()
 	defer r.lk.Unlock()
 	_, ok := r.mods[key]
@@ -38,7 +38,7 @@ func (r *ModuleRegistry[M]) Set(ctx context.Context, key string, module M) {
 	r.mods[key] = module
 }
 
-func (r *ModuleRegistry[M]) Get(ctx context.Context, key string) M {
+func (r *ModuleRegistry[N, M]) Get(ctx context.Context, key N) M {
 	r.lk.Lock()
 	defer r.lk.Unlock()
 	v, ok := r.mods[key]

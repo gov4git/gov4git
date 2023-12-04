@@ -1,4 +1,4 @@
-package qv
+package sv
 
 import (
 	"context"
@@ -10,18 +10,21 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-func (qv QV) Reopen(
+func (qv SV) Close(
 	ctx context.Context,
 	govOwner gov.OwnerCloned,
 	ad *common.Advertisement,
 	tally *common.Tally,
-) git.Change[form.Map, form.None] {
+) git.Change[form.Map, common.Outcome] {
 
 	return git.NewChange(
-		fmt.Sprintf("reopened ballot %v", ad.Name),
-		"ballot_qv_reopen",
+		fmt.Sprintf("closed ballot %v", ad.Name),
+		"ballot_qv_close",
 		form.Map{"ballot_name": ad.Name},
-		form.None{},
+		common.Outcome{
+			Summary: "closed",
+			Scores:  tally.Scores,
+		},
 		nil,
 	)
 }

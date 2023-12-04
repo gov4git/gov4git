@@ -9,7 +9,7 @@ import (
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
@@ -85,7 +85,7 @@ func ImportIssuesForPrioritization_StageOnly(
 			} else { // no ballot for this issue, create it
 				ballot.Open_StageOnly(
 					ctx,
-					qv.QV{},
+					load.QVStrategyName,
 					govCloned,
 					ghIssue.BallotName(),
 					ghIssue.Title,

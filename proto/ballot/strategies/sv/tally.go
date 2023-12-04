@@ -1,4 +1,4 @@
-package qv
+package sv
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func (qv QV) Tally(
+func (qv SV) Tally(
 	ctx context.Context,
 	owner gov.OwnerCloned,
 	ad *common.Advertisement,
@@ -24,7 +24,7 @@ func (qv QV) Tally(
 	return qv.tally(ctx, owner.PublicClone(), ad, prior, fetched, false)
 }
 
-func (qv QV) tally(
+func (qv SV) tally(
 	ctx context.Context,
 	govCloned gov.Cloned, // clone of the public gov repo
 	ad *common.Advertisement,
@@ -52,7 +52,7 @@ func (qv QV) tally(
 
 	for u := range users {
 		oldVotes, newVotes := oldVotesByUser[u], newVotesByUser[u]
-		oldScore, augmentedScore := augmentAndScoreUserVotes(ctx, oldVotes, newVotes)
+		oldScore, augmentedScore := augmentAndScoreUserVotes(ctx, qv.GetScorer(), oldVotes, newVotes)
 		costDiff := augmentedScore.Cost - oldScore.Cost
 
 		// try charging the user for the new votes

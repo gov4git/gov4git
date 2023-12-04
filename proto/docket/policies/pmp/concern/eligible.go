@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/proto/gov"
 )
 
-var AddressesRefType = schema.RefType("gov4git-addresses")
+var ResolvesRefType = schema.RefType("gov4git-resolves")
 
 func IsProposalEligible(
 	ctx context.Context,

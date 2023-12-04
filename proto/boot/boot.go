@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/gov4git/proto/member"
@@ -28,9 +29,15 @@ func Boot_Local(
 	ownerCloned gov.OwnerCloned,
 ) git.Change[form.None, id.PrivateCredentials] {
 
+	// initialize project identity
 	chg := id.Init_Local(ctx, ownerCloned.IDOwnerCloned())
-	chg2 := member.SetGroup_StageOnly(ctx, ownerCloned.PublicClone(), member.Everybody)
-	proto.Commit(ctx, ownerCloned.Public.Tree(), chg2)
 
+	// create group everybody
+	chg2 := member.SetGroup_StageOnly(ctx, ownerCloned.PublicClone(), member.Everybody)
+
+	// create PMP accounts
+	pmp.Boot_StageOnly(ctx, ownerCloned.PublicClone())
+
+	proto.Commit(ctx, ownerCloned.Public.Tree(), chg2)
 	return chg
 }

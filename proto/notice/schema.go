@@ -13,6 +13,12 @@ type Notice struct {
 	Body string `json:"body"`
 }
 
+func NewNotice(body string) Notices {
+	return Notices{
+		Notice{Body: body},
+	}
+}
+
 func Noticef(format string, args ...any) Notices {
 	return Notices{
 		Notice{Body: fmt.Sprintf(format, args...)},

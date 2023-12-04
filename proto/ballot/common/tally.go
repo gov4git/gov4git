@@ -8,12 +8,12 @@ import (
 )
 
 type Tally struct {
-	Ad            Advertisement                               `json:"ballot_advertisement"`
-	Scores        map[string]float64                          `json:"ballot_scores"`        // choice -> score
-	VotesByUser   map[member.User]map[string]StrengthAndScore `json:"ballot_votes_by_user"` // user -> choice -> signed voting credits spent on the choice by the user
-	AcceptedVotes map[member.User]AcceptedElections           `json:"ballot_accepted_votes"`
-	RejectedVotes map[member.User]RejectedElections           `json:"ballot_rejected_votes"`
-	Charges       map[member.User]float64                     `json:"ballot_charges"`
+	Ad            Advertisement                               `json:"advertisement"`
+	Scores        map[string]float64                          `json:"scores"`         // choice -> score
+	ScoresByUser  map[member.User]map[string]StrengthAndScore `json:"scores_by_user"` // user -> choice -> signed voting credits spent on the choice by the user
+	AcceptedVotes map[member.User]AcceptedElections           `json:"accepted_votes"`
+	RejectedVotes map[member.User]RejectedElections           `json:"rejected_votes"`
+	Charges       map[member.User]float64                     `json:"charges"`
 }
 
 func (x Tally) Capitalization() float64 {
@@ -26,7 +26,7 @@ func (x Tally) Capitalization() float64 {
 
 func (x Tally) Attention() float64 {
 	score := 0.0
-	for _, choices := range x.VotesByUser {
+	for _, choices := range x.ScoresByUser {
 		for _, ss := range choices {
 			score += math.Abs(ss.Score)
 		}
@@ -37,6 +37,10 @@ func (x Tally) Attention() float64 {
 type StrengthAndScore struct {
 	Strength float64 `json:"strength"` // signed number of voting credits spent by the user
 	Score    float64 `json:"score"`    // qv score, based on the voting strength (above)
+}
+
+func (ss StrengthAndScore) Vote() float64 {
+	return ss.Score
 }
 
 type AcceptedElection struct {

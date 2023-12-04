@@ -65,7 +65,7 @@ func Close_StageOnly(
 			Op: &history.Op{
 				Op:     "ballot_cancel",
 				Args:   history.M{"name": ballotName},
-				Result: history.M{"ad": ad},
+				Result: history.M{"ad": ad, "outcome": chg.Result},
 			},
 		})
 	} else {
@@ -73,7 +73,7 @@ func Close_StageOnly(
 			Op: &history.Op{
 				Op:     "ballot_close",
 				Args:   history.M{"name": ballotName},
-				Result: history.M{"ad": ad},
+				Result: history.M{"ad": ad, "outcome": chg.Result},
 			},
 		})
 	}

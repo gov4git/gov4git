@@ -1,6 +1,7 @@
 package common
 
 import (
+	"sort"
 	"time"
 
 	"github.com/gov4git/gov4git/proto"
@@ -152,6 +153,40 @@ type AdTally struct {
 type Summary string
 
 type Outcome struct {
-	Summary string             `json:"ballot_summary"`
-	Scores  map[string]float64 `json:"ballot_scores"`
+	Summary      string                                      `json:"summary"`
+	Scores       map[string]float64                          `json:"scores"`
+	ScoresByUser map[member.User]map[string]StrengthAndScore `json:"scores_by_user"`
+	Refunded     map[member.User]account.Holding             `json:"refunded"`
+}
+
+func FlattenRefunds(m map[member.User]account.Holding) Refunds {
+	r := Refunds{}
+	for k, v := range m {
+		r = append(r, Refund{User: k, Amount: v})
+	}
+	r.Sort()
+	return r
+}
+
+type Refund struct {
+	User   member.User     `json:"user"`
+	Amount account.Holding `json:"amount"`
+}
+
+type Refunds []Refund
+
+func (x Refunds) Len() int {
+	return len(x)
+}
+
+func (x Refunds) Less(i, j int) bool {
+	return x[i].User < x[j].User
+}
+
+func (x Refunds) Swap(i, j int) {
+	x[i], x[j] = x[j], x[i]
+}
+
+func (x Refunds) Sort() {
+	sort.Sort(x)
 }

@@ -10,6 +10,11 @@ import (
 	"github.com/gov4git/gov4git/proto/gov"
 )
 
+var (
+	ConcernBallotChoice  = "priority"
+	ProposalBallotChoice = "approval"
+)
+
 func ConcernPollBallotName(id schema.MotionID) common.BallotName {
 	return common.BallotName{"pmp", "motion", "poll", id.String()}
 }

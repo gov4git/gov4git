@@ -7,7 +7,7 @@ import (
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/runtime"
@@ -25,7 +25,7 @@ func TestVoteFreezeVote(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := qv.QV{}
+	strat := load.QVStrategyName
 	openChg := ballot.Open(
 		ctx,
 		strat,
@@ -86,7 +86,7 @@ func TestVoteFreezeTally(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := qv.QV{}
+	strat := load.QVStrategyName
 	openChg := ballot.Open(ctx, strat, cty.Organizer(), ballotName, "ballot title", "ballot description", choices, member.Everybody)
 	fmt.Println("open: ", form.SprintJSON(openChg))
 

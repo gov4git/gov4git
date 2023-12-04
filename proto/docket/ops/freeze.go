@@ -27,7 +27,7 @@ func FreezeMotion_StageOnly(
 	chg := schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// apply policy
-	pcy := policy.Get(ctx, motion.Policy.String())
+	pcy := policy.Get(ctx, motion.Policy)
 	notices := pcy.Freeze(
 		ctx,
 		cloned,
@@ -65,7 +65,7 @@ func UnfreezeMotion_StageOnly(
 	chg := schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// apply policy
-	pcy := policy.Get(ctx, motion.Policy.String())
+	pcy := policy.Get(ctx, motion.Policy)
 	notices := pcy.Unfreeze(
 		ctx,
 		cloned,

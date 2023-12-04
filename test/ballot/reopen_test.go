@@ -7,7 +7,7 @@ import (
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/runtime"
@@ -25,7 +25,7 @@ func TestReopen(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := qv.QV{}
+	strat := load.QVStrategyName
 	ballot.Open(ctx, strat, cty.Organizer(), ballotName, "ballot_name", "ballot description", choices, member.Everybody)
 
 	// give credits to user

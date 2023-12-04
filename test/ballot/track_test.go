@@ -6,7 +6,7 @@ import (
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
@@ -26,7 +26,7 @@ func TestTrack(t *testing.T) {
 	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 6.0))
 
 	// open ballot
-	ballot.Open(ctx, qv.QV{}, cty.Organizer(), ballotName, "ballot title", "ballot description", choices, member.Everybody)
+	ballot.Open(ctx, load.QVStrategyName, cty.Organizer(), ballotName, "ballot title", "ballot description", choices, member.Everybody)
 
 	// vote 1: accepted vote
 	elections1 := common.Elections{common.NewElection(choices[0], 1.0)}

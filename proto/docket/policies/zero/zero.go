@@ -12,16 +12,12 @@ import (
 )
 
 func init() {
-	policy.Install(context.Background(), zeroPolicy{})
+	policy.Install(context.Background(), ZeroPolicyName, zeroPolicy{})
 }
 
 const ZeroPolicyName = schema.PolicyName("zero-policy")
 
 type zeroPolicy struct{}
-
-func (x zeroPolicy) Name() string {
-	return ZeroPolicyName.String()
-}
 
 func (x zeroPolicy) Open(
 	ctx context.Context,

@@ -17,7 +17,7 @@ import (
 
 func Open(
 	ctx context.Context,
-	strat common.Strategy,
+	strat common.StrategyName,
 	govAddr gov.OwnerAddress,
 	name common.BallotName,
 	title string,
@@ -35,7 +35,7 @@ func Open(
 
 func Open_StageOnly(
 	ctx context.Context,
-	strat common.Strategy,
+	strat common.StrategyName,
 	cloned gov.OwnerCloned,
 	name common.BallotName,
 	title string,
@@ -69,7 +69,7 @@ func Open_StageOnly(
 		Title:        title,
 		Description:  description,
 		Choices:      choices,
-		Strategy:     strat.Name(),
+		Strategy:     strat,
 		Participants: participants,
 		Frozen:       false,
 		Closed:       false,
@@ -90,10 +90,6 @@ func Open_StageOnly(
 	openTallyNS := common.BallotPath(name).Append(common.TallyFilebase)
 	git.ToFileStage(ctx, cloned.Public.Tree(), openTallyNS, tally)
 
-	// write strategy
-	openStratNS := common.BallotPath(name).Append(common.StrategyFilebase)
-	git.ToFileStage(ctx, cloned.Public.Tree(), openStratNS, strat)
-
 	// log
 	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
 		Op: &history.Op{
@@ -104,7 +100,7 @@ func Open_StageOnly(
 	})
 
 	return git.NewChange(
-		fmt.Sprintf("Create ballot of type %v", strat.Name()),
+		fmt.Sprintf("Create ballot of type %v", strat),
 		"ballot_open",
 		form.Map{
 			"strategy":     strat,

@@ -1,4 +1,4 @@
-package qv
+package sv
 
 import (
 	"github.com/gov4git/gov4git/proto/ballot/common"

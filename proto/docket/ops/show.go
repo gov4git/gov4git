@@ -29,7 +29,7 @@ func ShowMotion_Local(
 	t := cloned.Tree()
 	m := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
 
-	p := policy.Get(ctx, m.Policy.String())
+	p := policy.Get(ctx, m.Policy)
 	pv := p.Show(ctx, cloned, m, policy.MotionPolicyNS(id), args...)
 
 	return schema.MotionView{

@@ -1,4 +1,4 @@
-package qv
+package sv
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func (qv QV) VerifyElections(
+func (qv SV) VerifyElections(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
 	govAddr gov.Address,

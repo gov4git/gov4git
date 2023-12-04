@@ -6,7 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
-	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
@@ -19,16 +19,12 @@ import (
 )
 
 func init() {
-	policy.Install(context.Background(), proposalPolicy{})
+	policy.Install(context.Background(), ProposalPolicyName, proposalPolicy{})
 }
 
 const ProposalPolicyName = schema.PolicyName("pmp-proposal-policy")
 
 type proposalPolicy struct{}
-
-func (x proposalPolicy) Name() string {
-	return ProposalPolicyName.String()
-}
 
 func (x proposalPolicy) Open(
 	ctx context.Context,
@@ -54,7 +50,7 @@ func (x proposalPolicy) Open(
 	// open a poll for the motion
 	ballot.Open_StageOnly(
 		ctx,
-		qv.QV{},
+		load.QVStrategyName,
 		cloned,
 		state.ApprovalReferendum,
 		fmt.Sprintf("Approval referendum for motion %v", motion.ID),

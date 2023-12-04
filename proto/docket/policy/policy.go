@@ -12,8 +12,6 @@ import (
 )
 
 type Policy interface {
-	Name() string
-
 	Open(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
@@ -131,22 +129,30 @@ type Policy interface {
 	) notice.Notices
 }
 
-var policyRegistry = mod.NewModuleRegistry[Policy]()
+var policyRegistry = mod.NewModuleRegistry[schema.PolicyName, Policy]()
 
-func Install(ctx context.Context, policy Policy) {
-	policyRegistry.Set(ctx, policy.Name(), policy)
+func Install(ctx context.Context, name schema.PolicyName, policy Policy) {
+	policyRegistry.Set(ctx, name, policy)
 }
 
-func Get(ctx context.Context, key string) Policy {
+func Get(ctx context.Context, key schema.PolicyName) Policy {
 	return policyRegistry.Get(ctx, key)
 }
 
-func InstalledPolicies() []string {
-	return policyRegistry.Keys()
+func InstalledMotionPolicies() []string {
+	return namesToStrings(policyRegistry.List())
+}
+
+func namesToStrings(ns []schema.PolicyName) []string {
+	ss := make([]string, len(ns))
+	for i := range ns {
+		ss[i] = ns[i].String()
+	}
+	return ss
 }
 
 func GetMotionPolicy(ctx context.Context, m schema.Motion) Policy {
-	return Get(ctx, m.Policy.String())
+	return Get(ctx, m.Policy)
 }
 
 // MotionPolicyNS returns the private policy namespace for a given motion instance.

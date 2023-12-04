@@ -67,6 +67,10 @@ func BallotPath(name BallotName) ns.NS {
 	return BallotNS.Join(name.NS())
 }
 
+func BallotStrategyPath(name BallotName) ns.NS {
+	return BallotPath(name).Append(StrategyFilebase)
+}
+
 type BallotName ns.NS
 
 func (x BallotName) OSPath() string {
@@ -91,7 +95,7 @@ type Advertisement struct {
 	Title        string         `json:"title"`
 	Description  string         `json:"description"`
 	Choices      []string       `json:"choices"`
-	Strategy     string         `json:"strategy"`
+	Strategy     StrategyName   `json:"strategy"`
 	Participants member.Group   `json:"participants_group"`
 	Frozen       bool           `json:"frozen"` // if frozen, the ballot is not accepting votes
 	Closed       bool           `json:"closed"` // closed ballots cannot be re-opened
@@ -140,10 +144,9 @@ func (x VoteEnvelope) VerifyConsistency() bool {
 	return true
 }
 
-type AdStrategyTally struct {
-	Ad       Advertisement `json:"ballot_advertisement"`
-	Strategy Strategy      `json:"ballot_strategy"`
-	Tally    Tally         `json:"ballot_tally"`
+type AdTally struct {
+	Ad    Advertisement `json:"ballot_advertisement"`
+	Tally Tally         `json:"ballot_tally"`
 }
 
 type Summary string

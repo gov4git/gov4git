@@ -6,7 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
-	"github.com/gov4git/gov4git/proto/ballot/qv"
+	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/docket/ops"
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
 	"github.com/gov4git/gov4git/proto/docket/policy"
@@ -19,16 +19,12 @@ import (
 )
 
 func init() {
-	policy.Install(context.Background(), concernPolicy{})
+	policy.Install(context.Background(), ConcernPolicyName, concernPolicy{})
 }
 
 const ConcernPolicyName = schema.PolicyName("pmp-concern-policy")
 
 type concernPolicy struct{}
-
-func (x concernPolicy) Name() string {
-	return ConcernPolicyName.String()
-}
 
 func (x concernPolicy) Open(
 	ctx context.Context,
@@ -54,7 +50,7 @@ func (x concernPolicy) Open(
 	// open a poll for the motion
 	ballot.Open_StageOnly(
 		ctx,
-		qv.QV{},
+		load.QVStrategyName,
 		cloned,
 		state.PriorityPoll,
 		fmt.Sprintf("Prioritization poll for motion %v", motion.ID),

@@ -2,6 +2,7 @@ package mail
 
 import (
 	"context"
+	"path/filepath"
 	"strconv"
 
 	"github.com/gov4git/gov4git/proto/id"
@@ -30,11 +31,15 @@ func ListSent_Local[Msg form.Form](
 		if info.IsDir() {
 			continue
 		}
-		seqno, err := strconv.Atoi(info.Name())
+		n := info.Name()
+		if filepath.Ext(n) != ".json" {
+			continue
+		}
+		seqno, err := strconv.Atoi(n[:len(n)-len(".json")])
 		if err != nil {
 			continue
 		}
-		msg := git.FromFile[Msg](ctx, sender, senderTopicNS.Append(info.Name()))
+		msg := git.FromFile[Msg](ctx, sender, senderTopicNS.Append(n))
 		seqnoToMsg[SeqNo(seqno)] = msg
 		sentMsgs = append(sentMsgs, SentMsg[Msg]{SeqNo: SeqNo(seqno), Msg: msg})
 	}
@@ -64,11 +69,15 @@ func ListReceived_Local[Msg form.Form, Effect form.Form](
 		if info.IsDir() {
 			continue
 		}
-		seqno, err := strconv.Atoi(info.Name())
+		n := info.Name()
+		if filepath.Ext(n) != ".json" {
+			continue
+		}
+		seqno, err := strconv.Atoi(n[:len(n)-len(".json")])
 		if err != nil {
 			continue
 		}
-		msgEffect := git.FromFile[MsgEffect[Msg, Effect]](ctx, receiver, receiverTopicNS.Append(info.Name()))
+		msgEffect := git.FromFile[MsgEffect[Msg, Effect]](ctx, receiver, receiverTopicNS.Append(n))
 		must.Assertf(ctx, msgEffect.SeqNo == SeqNo(seqno), "receiver mailbox inconsistent")
 		seqnoToMsgEffect[SeqNo(seqno)] = msgEffect
 		msgEffects = append(msgEffects, msgEffect)

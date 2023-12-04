@@ -20,14 +20,17 @@ func (qv SV) Cancel(
 ) git.Change[form.Map, common.Outcome] {
 
 	// refund users
+	refunded := map[member.User]account.Holding{}
 	for user, spent := range tally.Charges {
+		refund := account.H(account.PluralAsset, spent)
 		account.Transfer_StageOnly(
 			ctx,
 			govOwner.PublicClone(),
 			common.BallotEscrowAccountID(ad.Name),
 			member.UserAccountID(user),
-			account.H(account.PluralAsset, spent),
+			refund,
 		)
+		refunded[user] = refund
 	}
 
 	return git.NewChange(
@@ -35,8 +38,10 @@ func (qv SV) Cancel(
 		"ballot_qv_cancel",
 		form.Map{"ballot_name": ad.Name},
 		common.Outcome{
-			Summary: "cancelled",
-			Scores:  tally.Scores,
+			Summary:      "cancelled",
+			Scores:       tally.Scores,
+			ScoresByUser: tally.ScoresByUser,
+			Refunded:     refunded,
 		},
 		nil,
 	)

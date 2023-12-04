@@ -10,10 +10,6 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-var (
-	MotionPollBallotChoice = "priority"
-)
-
 type MotionType string
 
 const (

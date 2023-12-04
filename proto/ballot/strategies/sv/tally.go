@@ -76,7 +76,7 @@ func (qv SV) tally(
 	tally := common.Tally{
 		Ad:            *ad,
 		Scores:        totalScore(ad.Choices, votesByUser),
-		VotesByUser:   votesByUser,
+		ScoresByUser:  votesByUser,
 		AcceptedVotes: acceptedVotes,
 		RejectedVotes: rejectedVotes,
 		Charges:       charges,

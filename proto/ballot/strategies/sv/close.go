@@ -22,8 +22,10 @@ func (qv SV) Close(
 		"ballot_qv_close",
 		form.Map{"ballot_name": ad.Name},
 		common.Outcome{
-			Summary: "closed",
-			Scores:  tally.Scores,
+			Summary:      "closed",
+			Scores:       tally.Scores,
+			ScoresByUser: tally.ScoresByUser,
+			Refunded:     nil,
 		},
 		nil,
 	)

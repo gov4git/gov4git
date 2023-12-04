@@ -55,11 +55,11 @@ func (x proposalPolicy) Open(
 		state.ApprovalReferendum,
 		fmt.Sprintf("Approval referendum for motion %v", motion.ID),
 		fmt.Sprintf("Up/down vote the approval vote for proposal (pull request) %v", motion.ID),
-		[]string{schema.MotionPollBallotChoice},
+		[]string{pmp.ProposalBallotChoice},
 		member.Everybody,
 	)
 
-	return notice.Noticef("Started managing this PR as Gov4Git proposal #%v.", motion.ID)
+	return notice.Noticef("Started managing this PR as Gov4Git proposal `%v`.", motion.ID)
 }
 
 func (x proposalPolicy) Score(
@@ -79,7 +79,7 @@ func (x proposalPolicy) Score(
 
 	return schema.Score{
 		Attention: attention,
-	}, notice.Noticef("Updated approval tally to %v.", ads.Tally.Scores[schema.MotionPollBallotChoice])
+	}, notice.Noticef("Updated approval tally to %v.", ads.Tally.Scores[pmp.ProposalBallotChoice])
 }
 
 func (x proposalPolicy) Update(
@@ -103,22 +103,39 @@ func (x proposalPolicy) Close(
 
 ) notice.Notices {
 
+	// was the PR merged or not
 	must.Assertf(ctx, len(args) == 1, "proposal closure missing argument")
-	_, ok := args[0].(bool) // isMerged
+	isMerged, ok := args[0].(bool) // isMerged
 	must.Assertf(ctx, ok, "proposal closure unrecognized argument")
 
-	// close the referendum for the motion
 	referendumName := pmp.ProposalReferendumBallotName(motion.ID)
-	ballot.Close_StageOnly(
-		ctx,
-		cloned,
-		referendumName,
-		false,
-	)
+	if !isMerged {
 
-	// XXX: apply reward mechanism
+		// cancel the referendum for the motion (refunds voters)
+		closeChg := ballot.Close_StageOnly(
+			ctx,
+			cloned,
+			referendumName,
+			true,
+		)
 
-	return notice.Noticef("Closing managment of this PR, managed as Gov4Git proposal #%v).", motion.ID)
+		return cancelNotice(ctx, motion, closeChg.Result)
+
+	} else {
+
+		// close the referendum for the motion
+		referendumName := pmp.ProposalReferendumBallotName(motion.ID)
+		closeChg := ballot.Close_StageOnly(
+			ctx,
+			cloned,
+			referendumName,
+			false,
+		)
+
+		// XXX: apply reward mechanism
+
+		return closeNotice(ctx, motion, closeChg.Result)
+	}
 }
 
 func (x proposalPolicy) Cancel(
@@ -139,7 +156,7 @@ func (x proposalPolicy) Cancel(
 		true,
 	)
 
-	return notice.Noticef("Cancelling management of this PR, managed as Gov4Git concern #%v.", motion.ID)
+	return notice.Noticef("Cancelling management of this PR, managed as Gov4Git concern `%v`.", motion.ID)
 }
 
 func (x proposalPolicy) Show(
@@ -233,7 +250,7 @@ func (x proposalPolicy) Freeze(
 
 ) notice.Notices {
 
-	return notice.Noticef("This PR, managed by Gov4Git proposal #%v, has been frozen.", motion.ID)
+	return notice.Noticef("This PR, managed by Gov4Git proposal `%v`, has been frozen ❄️", motion.ID)
 }
 
 func (x proposalPolicy) Unfreeze(
@@ -245,5 +262,5 @@ func (x proposalPolicy) Unfreeze(
 
 ) notice.Notices {
 
-	return notice.Noticef("This PR, managed by Gov4Git proposal #%v, has been unfrozen.", motion.ID)
+	return notice.Noticef("This PR, managed by Gov4Git proposal `%v`, has been unfrozen 🌤️", motion.ID)
 }

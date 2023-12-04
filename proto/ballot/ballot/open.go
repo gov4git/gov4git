@@ -82,7 +82,7 @@ func Open_StageOnly(
 	tally := common.Tally{
 		Ad:            ad,
 		Scores:        map[string]float64{},
-		VotesByUser:   map[member.User]map[string]common.StrengthAndScore{},
+		ScoresByUser:  map[member.User]map[string]common.StrengthAndScore{},
 		AcceptedVotes: map[member.User]common.AcceptedElections{},
 		RejectedVotes: map[member.User]common.RejectedElections{},
 		Charges:       map[member.User]float64{},

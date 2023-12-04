@@ -30,17 +30,17 @@ Every user I can cast a "contribution vote", V(I, J), and make an optional "bet"
 
 Q(I, J) = credits spent by user I on PR addressing issue J
 
-Q(I, J) = L * V(I, J)^2 - V, with bet (shouldn't this be a "+" sign?)
+Q(I, J) = L * V(I, J)^2 + V, with bet
 
 Q(I, J) = L * V(I, J)^2, without bet
 
-Q(I, J) is always positive
+V(I, J) is always positive
 
 S(I, J) = direction of vote, +1/-1 for "for"/"against", respectively
 
 PR J is ACCEPTED if VERDICT(J) > 0, and otherwise REJECTED
 
-VERDICT(J) = SUM over users I of S(I, J) * SQRT(Q(I, J))
+VERDICT(J) = SUM over users I of S(I, J) * SQRT(V(I, J))
 
 CC(J) = all credits spent on contribution votes = SUM over users I of Q(I, J)
 

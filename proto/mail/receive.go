@@ -62,7 +62,7 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 	base.Infof("receiving receiverSeqNo=%v senderSeqNo=%v", receiverNextSeqNo, senderNextSeqNo)
 	msgEffects := []MsgEffect[Msg, Effect]{}
 	for i := receiverNextSeqNo; i < senderNextSeqNo; i++ {
-		msgFilebase := strconv.Itoa(int(i))
+		msgFilebase := strconv.Itoa(int(i)) + ".json"
 		msg := git.FromFile[Msg](ctx, sender, senderTopicNS.Append(msgFilebase))
 		effect, err := receive(ctx, i, msg)
 		if err != nil {

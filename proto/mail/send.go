@@ -34,7 +34,7 @@ func SendMakeMsg_StageOnly[Msg form.Form](
 	nextSeqNo, _ := git.TryFromFile[SeqNo](ctx, sender, nextNS)
 
 	// write message
-	msgNS := topicNS.Append(strconv.Itoa(int(nextSeqNo)))
+	msgNS := topicNS.Append(strconv.Itoa(int(nextSeqNo)) + ".json")
 	msg := mkMsg(ctx, nextSeqNo)
 	git.ToFileStage(ctx, sender, msgNS, msg)
 

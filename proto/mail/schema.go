@@ -3,6 +3,7 @@ package mail
 import (
 	"sort"
 
+	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/id"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/ns"
@@ -49,8 +50,8 @@ const (
 	NextFilebase    = "next.json"
 )
 
-var SendNS = id.PublicNS.Append("mail/sent")
-var ReceiveNS = id.PublicNS.Append("mail/received")
+var SendNS = proto.RootNS.Append("mail", "sent")
+var ReceiveNS = proto.RootNS.Append("mail", "received")
 
 func ReceiveTopicNS(senderID id.ID, topic string) ns.NS {
 	return ReceiveNS.Append(

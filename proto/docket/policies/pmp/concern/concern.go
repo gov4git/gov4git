@@ -98,6 +98,8 @@ func (x concernPolicy) Update(
 	eligible.Sort()
 	state.EligibleProposals = eligible
 
+	state.PriorityPoll = pmp.ConcernPollBallotName(motion.ID)
+
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
 	return x.updateFreeze(ctx, cloned, motion, policyNS)

@@ -21,6 +21,16 @@ func AppendMotionNotices_StageOnly(
 	notice.SaveNoticeQueue_StageOnly(ctx, cloned, noticesNS, queue)
 }
 
+func LoadMotionNotices(
+	ctx context.Context,
+	addr gov.Address,
+	id schema.MotionID,
+) *notice.NoticeQueue {
+
+	cloned := gov.Clone(ctx, addr)
+	return LoadMotionNotices_Local(ctx, cloned, id)
+}
+
 func LoadMotionNotices_Local(
 	ctx context.Context,
 	cloned gov.Cloned,

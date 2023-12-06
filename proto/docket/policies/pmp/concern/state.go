@@ -9,7 +9,7 @@ import (
 const StateFilebase = "state.json"
 
 type ConcernState struct {
-	PriorityPoll      common.BallotName `json:"priority_poll_ballot"`
+	PriorityPoll      common.BallotName `json:"priority_poll"`
 	EligibleProposals schema.Refs       `json:"eligible_proposals"`
 }
 

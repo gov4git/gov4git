@@ -92,11 +92,11 @@ func disberseRewards(
 	adt := loadPropApprovalPollTally(ctx, cloned.PublicClone(), prop)
 
 	// get reward account balance
-	totalWinnings := account.Get_Local(
-		ctx,
-		cloned.PublicClone(),
-		pmp.ProposalRewardAccountID(prop.ID),
-	).Assets.Balance(account.PluralAsset).Quantity
+	// totalWinnings := account.Get_Local(
+	// 	ctx,
+	// 	cloned.PublicClone(),
+	// 	pmp.ProposalRewardAccountID(prop.ID),
+	// ).Assets.Balance(account.PluralAsset).Quantity
 
 	// compute reward distribution
 	rewardFund := 0.0                      // total credits spent on negative votes
@@ -119,7 +119,7 @@ func disberseRewards(
 		if ss.Score > 0.0 {
 			payout := account.H(
 				account.PluralAsset,
-				math.Abs(ss.Strength)+totalWinnings*winnerCut[user]/totalCut,
+				math.Abs(ss.Strength)+rewardFund*winnerCut[user]/totalCut,
 			)
 			rewards = append(rewards,
 				Reward{

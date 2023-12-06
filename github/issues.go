@@ -12,6 +12,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/proto/treasury"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -67,7 +68,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				case ghIssue.Closed && !govBallot.Closed:
 					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
 					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-					ballot.Close_StageOnly(ctx, govCloned, ghIssue.BallotName(), false)
+					ballot.Close_StageOnly(ctx, govCloned, ghIssue.BallotName(), treasury.BurnAccountID)
 					causedChange = append(causedChange, ghIssue)
 				case !ghIssue.Closed && govBallot.Closed:
 					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
@@ -97,7 +98,7 @@ func ImportIssuesForPrioritization_StageOnly(
 					ballot.Freeze_StageOnly(ctx, govCloned, ghIssue.BallotName())
 				}
 				if ghIssue.Closed {
-					ballot.Close_StageOnly(ctx, govCloned, ghIssue.BallotName(), false)
+					ballot.Close_StageOnly(ctx, govCloned, ghIssue.BallotName(), treasury.BurnAccountID)
 				}
 				causedChange = append(causedChange, ghIssue)
 			}

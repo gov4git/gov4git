@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
+	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/docket/ops"
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
@@ -38,14 +39,6 @@ func (x concernPolicy) Open(
 	// initialize state
 	state := NewConcernState(motion.ID)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
-
-	// create an account for the concern
-	account.Create_StageOnly(
-		ctx,
-		cloned.PublicClone(),
-		schema.PolicyAccountID(motion.ID),
-		schema.MotionOwnerID(motion.ID),
-	)
 
 	// open a poll for the motion
 	ballot.Open_StageOnly(
@@ -118,13 +111,18 @@ func (x concernPolicy) Close(
 
 ) notice.Notices {
 
+	toID, ok := args[0].(account.AccountID)
+	if !ok {
+		toID = pmp.BurnPoolAccountID
+	}
+
 	// close the poll for the motion
 	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
 	chg := ballot.Close_StageOnly(
 		ctx,
 		cloned,
 		priorityPollName,
-		false,
+		toID,
 	)
 
 	return closeNotice(ctx, motion, chg.Result)
@@ -141,14 +139,18 @@ func (x concernPolicy) Cancel(
 
 	// cancel the poll for the motion (returning credits to users)
 	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
-	chg := ballot.Close_StageOnly(
+	chg := ballot.Cancel_StageOnly(
 		ctx,
 		cloned,
 		priorityPollName,
-		true,
 	)
 
 	return cancelNotice(ctx, motion, chg.Result)
+}
+
+type PolicyView struct {
+	State        *ConcernState  `json:"state"`
+	PriorityPoll common.AdTally `json:"priority_poll"`
 }
 
 func (x concernPolicy) Show(
@@ -158,7 +160,7 @@ func (x concernPolicy) Show(
 	policyNS ns.NS,
 	args ...any,
 
-) form.Map {
+) form.Form {
 
 	// retrieve policy state
 	policyState := LoadState_Local(ctx, cloned.Tree(), policyNS)
@@ -167,9 +169,9 @@ func (x concernPolicy) Show(
 	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
 	pollState := ballot.Show_Local(ctx, cloned.Tree(), priorityPollName)
 
-	return form.Map{
-		"pmp_concern_policy_state":        policyState,
-		"pmp_concern_priority_poll_state": pollState,
+	return PolicyView{
+		State:        policyState,
+		PriorityPoll: pollState,
 	}
 }
 

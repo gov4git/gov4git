@@ -24,6 +24,7 @@ func Open(
 	description string,
 	choices []string,
 	participants member.Group,
+
 ) git.Change[form.Map, common.BallotAddress] {
 
 	govCloned := gov.CloneOwner(ctx, govAddr)
@@ -42,6 +43,7 @@ func Open_StageOnly(
 	description string,
 	choices []string,
 	participants member.Group,
+
 ) git.Change[form.Map, common.BallotAddress] {
 
 	// check no open ballots by the same name

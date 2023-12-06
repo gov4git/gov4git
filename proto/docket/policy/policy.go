@@ -11,6 +11,8 @@ import (
 	"github.com/gov4git/lib4git/ns"
 )
 
+type Report = any
+
 type Policy interface {
 	Open(
 		ctx context.Context,
@@ -18,7 +20,7 @@ type Policy interface {
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 		args ...any,
-	) notice.Notices
+	) (Report, notice.Notices)
 
 	// Score is invoked only on open motions.
 	Score(
@@ -36,7 +38,7 @@ type Policy interface {
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 		args ...any,
-	) notice.Notices
+	) (Report, notice.Notices)
 
 	Close(
 		ctx context.Context,
@@ -44,7 +46,7 @@ type Policy interface {
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 		args ...any,
-	) notice.Notices
+	) (Report, notice.Notices)
 
 	Cancel(
 		ctx context.Context,
@@ -52,7 +54,7 @@ type Policy interface {
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 		args ...any,
-	) notice.Notices
+	) (Report, notice.Notices)
 
 	Show(
 		ctx context.Context,
@@ -72,7 +74,7 @@ type Policy interface {
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
 		args ...any,
-	) notice.Notices
+	) (Report, notice.Notices)
 
 	// AddRefFrom is invoked only when to and from motions are open.
 	AddRefFrom(
@@ -84,7 +86,7 @@ type Policy interface {
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
 		args ...any,
-	) notice.Notices
+	) (Report, notice.Notices)
 
 	// RemoveRefTo is invoked only when to and from motions are open.
 	RemoveRefTo(
@@ -96,7 +98,7 @@ type Policy interface {
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
 		args ...any,
-	) notice.Notices
+	) (Report, notice.Notices)
 
 	// RemoveRefFrom is invoked only when to and from motions are open.
 	RemoveRefFrom(
@@ -108,7 +110,7 @@ type Policy interface {
 		fromPolicyNS ns.NS,
 		toPolicyNS ns.NS,
 		args ...any,
-	) notice.Notices
+	) (Report, notice.Notices)
 
 	// Freeze is invoked by motion.Freeze
 	Freeze(
@@ -117,7 +119,7 @@ type Policy interface {
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 		args ...any,
-	) notice.Notices
+	) (Report, notice.Notices)
 
 	// Unfreeze is invoked by motion.Unfreeze
 	Unfreeze(
@@ -126,7 +128,7 @@ type Policy interface {
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 		args ...any,
-	) notice.Notices
+	) (Report, notice.Notices)
 }
 
 var policyRegistry = mod.NewModuleRegistry[schema.PolicyName, Policy]()

@@ -2,7 +2,6 @@ package ops
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/gov4git/gov4git/proto"
@@ -10,7 +9,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/history"
-	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/gov4git/proto/notice"
 	"github.com/gov4git/lib4git/must"
 )
 
@@ -20,11 +19,12 @@ func CloseMotion(
 	id schema.MotionID,
 	args ...any,
 
-) git.ChangeNoResult {
+) (policy.Report, notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	chg := CloseMotion_StageOnly(ctx, cloned, id, args...)
-	return proto.CommitIfChanged(ctx, cloned.Public, chg)
+	report, notices := CloseMotion_StageOnly(ctx, cloned, id, args...)
+	proto.Commitf(ctx, cloned.Public, "motion_close", "Close motion %v", id)
+	return report, notices
 }
 
 func CloseMotion_StageOnly(
@@ -33,7 +33,7 @@ func CloseMotion_StageOnly(
 	id schema.MotionID,
 	args ...any,
 
-) git.ChangeNoResult {
+) (policy.Report, notice.Notices) {
 
 	t := cloned.Public.Tree()
 	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
@@ -44,7 +44,7 @@ func CloseMotion_StageOnly(
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy)
-	notices := pcy.Close(
+	report, notices := pcy.Close(
 		ctx,
 		cloned,
 		motion,
@@ -62,5 +62,5 @@ func CloseMotion_StageOnly(
 		},
 	})
 
-	return git.NewChangeNoResult(fmt.Sprintf("Close motion %v", id), "docket_close_motion")
+	return report, notices
 }

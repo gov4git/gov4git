@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/history"
-	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/gov4git/proto/notice"
 	"github.com/gov4git/lib4git/must"
 )
 
@@ -18,11 +18,12 @@ func FreezeMotion(
 	id schema.MotionID,
 	args ...any,
 
-) git.ChangeNoResult {
+) (policy.Report, notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	chg := FreezeMotion_StageOnly(ctx, cloned, id, args...)
-	return proto.CommitIfChanged(ctx, cloned.PublicClone(), chg)
+	report, notices := FreezeMotion_StageOnly(ctx, cloned, id, args...)
+	proto.Commitf(ctx, cloned.PublicClone(), "motion_freeze", "Freeze motion %v", id)
+	return report, notices
 }
 
 func FreezeMotion_StageOnly(
@@ -31,7 +32,7 @@ func FreezeMotion_StageOnly(
 	id schema.MotionID,
 	args ...any,
 
-) git.ChangeNoResult {
+) (policy.Report, notice.Notices) {
 
 	t := cloned.Public.Tree()
 
@@ -39,11 +40,11 @@ func FreezeMotion_StageOnly(
 	must.Assert(ctx, !motion.Closed, schema.ErrMotionAlreadyClosed)
 	must.Assert(ctx, !motion.Frozen, schema.ErrMotionAlreadyFrozen)
 	motion.Frozen = true
-	chg := schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
+	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy)
-	notices := pcy.Freeze(
+	report, notices := pcy.Freeze(
 		ctx,
 		cloned,
 		motion,
@@ -61,7 +62,7 @@ func FreezeMotion_StageOnly(
 		},
 	})
 
-	return chg
+	return report, notices
 }
 
 func UnfreezeMotion(
@@ -70,11 +71,12 @@ func UnfreezeMotion(
 	id schema.MotionID,
 	args ...any,
 
-) git.ChangeNoResult {
+) (policy.Report, notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	chg := UnfreezeMotion_StageOnly(ctx, cloned, id, args...)
-	return proto.CommitIfChanged(ctx, cloned.PublicClone(), chg)
+	report, notices := UnfreezeMotion_StageOnly(ctx, cloned, id, args...)
+	proto.Commitf(ctx, cloned.PublicClone(), "motion_unfreeze", "Unfreeze motion %v", id)
+	return report, notices
 }
 
 func UnfreezeMotion_StageOnly(
@@ -83,7 +85,7 @@ func UnfreezeMotion_StageOnly(
 	id schema.MotionID,
 	args ...any,
 
-) git.ChangeNoResult {
+) (policy.Report, notice.Notices) {
 
 	t := cloned.Public.Tree()
 
@@ -91,11 +93,11 @@ func UnfreezeMotion_StageOnly(
 	must.Assert(ctx, !motion.Closed, schema.ErrMotionAlreadyClosed)
 	must.Assert(ctx, motion.Frozen, schema.ErrMotionNotFrozen)
 	motion.Frozen = false
-	chg := schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
+	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy)
-	notices := pcy.Unfreeze(
+	report, notices := pcy.Unfreeze(
 		ctx,
 		cloned,
 		motion,
@@ -113,5 +115,5 @@ func UnfreezeMotion_StageOnly(
 		},
 	})
 
-	return chg
+	return report, notices
 }

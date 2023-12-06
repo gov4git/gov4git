@@ -87,12 +87,12 @@ func SyncManagedIssues_StageOnly(
 		id := schema.MotionID(key)
 		if issue.Managed {
 			if motion, ok := motions[id]; ok { // if motion for issue already exists, update it
-				changed := syncMeta(ctx, t, syncChanges, issue, motion)
+				changed := syncMeta(ctx, cloned, syncChanges, issue, motion)
 				switch {
 				case issue.Closed && motion.Closed:
 				case issue.Closed && !motion.Closed:
 					syncFrozen(ctx, cloned, syncChanges, issue, motion)
-					// proposal vs concern
+					// XXX: proposal vs concern (is this the best way to hardcode args dependent on policy here?)
 					if motion.IsConcern() {
 						// manually closing an issue motion cancels it
 						ops.CancelMotion_StageOnly(ctx, cloned, id)
@@ -151,7 +151,7 @@ func SyncManagedIssues_StageOnly(
 
 func syncMeta(
 	ctx context.Context,
-	t *git.Tree,
+	cloned gov.OwnerCloned,
 	chg *SyncManagedChanges,
 	issue ImportedIssue,
 	motion schema.Motion,
@@ -164,11 +164,11 @@ func syncMeta(
 	}
 	ops.EditMotionMeta_StageOnly(
 		ctx,
-		t,
+		cloned,
 		motion.ID,
-		issue.URL,
 		issue.Title,
 		issue.Body,
+		issue.URL,
 		issue.Labels,
 	)
 	chg.Updated.Add(motion.ID)

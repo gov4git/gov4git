@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
@@ -22,7 +23,8 @@ func CancelMotion(
 ) git.ChangeNoResult {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	return CancelMotion_StageOnly(ctx, cloned, id, args...)
+	chg := CancelMotion_StageOnly(ctx, cloned, id, args...)
+	return proto.CommitIfChanged(ctx, cloned.Public, chg)
 }
 
 func CancelMotion_StageOnly(

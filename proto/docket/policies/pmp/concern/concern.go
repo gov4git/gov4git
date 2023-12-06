@@ -16,6 +16,7 @@ import (
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/proto/notice"
 	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -108,13 +109,16 @@ func (x concernPolicy) Close(
 	motion schema.Motion,
 	policyNS ns.NS,
 	args ...any,
+	// args[0]=toID account.AccountID
+	// args[1]=prop schema.Motion
 
 ) notice.Notices {
 
+	must.Assertf(ctx, len(args) == 2, "issue closure requires two arguments, got %v", args)
 	toID, ok := args[0].(account.AccountID)
-	if !ok {
-		toID = pmp.BurnPoolAccountID
-	}
+	must.Assertf(ctx, ok, "unrecognized account ID argument %v", args[0])
+	prop, ok := args[1].(schema.Motion)
+	must.Assertf(ctx, ok, "unrecognized proposal motion argument %v", args[1])
 
 	// close the poll for the motion
 	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
@@ -125,7 +129,7 @@ func (x concernPolicy) Close(
 		toID,
 	)
 
-	return closeNotice(ctx, motion, chg.Result)
+	return closeNotice(ctx, motion, chg.Result, prop)
 }
 
 func (x concernPolicy) Cancel(

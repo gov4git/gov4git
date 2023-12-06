@@ -109,6 +109,7 @@ func (x proposalPolicy) Close(
 	prop schema.Motion,
 	policyNS ns.NS,
 	args ...any,
+	// args[0]=isMerged bool
 
 ) notice.Notices {
 
@@ -133,11 +134,11 @@ func (x proposalPolicy) Close(
 	} else {
 
 		// close the referendum for the motion
-		referendumName := pmp.ProposalApprovalPollName(prop.ID)
+		approvalPollName := pmp.ProposalApprovalPollName(prop.ID)
 		closeChg := ballot.Close_StageOnly(
 			ctx,
 			cloned,
-			referendumName,
+			approvalPollName,
 			pmp.ProposalRewardAccountID(prop.ID),
 		)
 

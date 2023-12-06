@@ -59,7 +59,8 @@ func closeResolvedConcerns(
 			ctx,
 			cloned,
 			con.ID,
-			pmp.ProposalBountyAccountID(prop.ID),
+			pmp.ProposalBountyAccountID(prop.ID), // account to send bounty to
+			prop,                                 // proposal that resolves the issue
 		)
 	}
 
@@ -91,13 +92,21 @@ func disberseRewards(
 	rewards := Rewards{}
 	adt := loadPropApprovalPollTally(ctx, cloned.PublicClone(), prop)
 
-	// compute XXX
-	rewardFund := 0.0
-	totalCut := 0.0
-	winnerCut := map[member.User]float64{}
+	// get reward account balance
+	totalWinnings := account.Get_Local(
+		ctx,
+		cloned.PublicClone(),
+		pmp.ProposalRewardAccountID(prop.ID),
+	).Assets.Balance(account.PluralAsset).Quantity
+
+	// compute reward distribution
+	rewardFund := 0.0                      // total credits spent on negative votes
+	totalCut := 0.0                        // sum of all positive votes
+	winnerCut := map[member.User]float64{} // positive votes per user
 	for user, choices := range adt.Tally.ScoresByUser {
 		ss := choices[pmp.ProposalBallotChoice]
-		if ss.Score == 0.0 {
+		if ss.Score <= 0.0 {
+			// compute total credits spent on negative votes
 			rewardFund += math.Abs(ss.Strength)
 		} else {
 			totalCut += ss.Score
@@ -106,13 +115,12 @@ func disberseRewards(
 	}
 
 	// payout winnings
-	// XXX: precion problems, make sure less is withdrawn than the actual reward account
 	for user, choices := range adt.Tally.ScoresByUser {
 		ss := choices[pmp.ProposalBallotChoice]
 		if ss.Score > 0.0 {
 			payout := account.H(
 				account.PluralAsset,
-				math.Abs(ss.Strength)+winnerCut[user]/totalCut,
+				math.Abs(ss.Strength)+totalWinnings*winnerCut[user]/totalCut,
 			)
 			rewards = append(rewards,
 				Reward{
@@ -120,14 +128,14 @@ func disberseRewards(
 					Amount: payout,
 				},
 			)
-			// XXX: transfer reward
-			// account.Transfer_StageOnly(
-			// 	ctx,
-			// 	cloned,
-			// 	XXX,
-			// 	member.UserAccountID(user),
-			// 	payout,
-			// )
+			// transfer reward
+			account.Transfer_StageOnly(
+				ctx,
+				cloned.PublicClone(),
+				pmp.ProposalRewardAccountID(prop.ID),
+				member.UserAccountID(user),
+				payout,
+			)
 		}
 	}
 

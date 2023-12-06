@@ -16,6 +16,7 @@ func EditMotionMeta_StageOnly(
 	title string,
 	desc string,
 	labels []string,
+
 ) git.ChangeNoResult {
 
 	labels = slices.Clone(labels)

@@ -13,6 +13,8 @@ import (
 var (
 	ConcernBallotChoice  = "priority"
 	ProposalBallotChoice = "approval"
+
+	ResolvesRefType = schema.RefType("gov4git-resolves")
 )
 
 func ConcernPollBallotName(id schema.MotionID) common.BallotName {

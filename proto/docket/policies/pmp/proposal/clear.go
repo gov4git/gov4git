@@ -10,7 +10,6 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/docket/ops"
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
-	"github.com/gov4git/gov4git/proto/docket/policies/pmp/concern"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
@@ -25,22 +24,22 @@ func loadResolvedConcerns(
 ) schema.Motions {
 
 	resolved := schema.Motions{}
-	for _, ref := range prop.RefBy {
-		if ref.Type != concern.ResolvesRefType {
+	for _, ref := range prop.RefTo {
+		if ref.Type != pmp.ResolvesRefType {
 			continue
 		}
-		concern := ops.LookupMotion_Local(ctx, cloned.PublicClone(), prop.ID)
-		if !concern.IsConcern() {
+		con := ops.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
+		if !con.IsConcern() {
 			continue
 		}
-		if concern.ID == prop.ID {
+		if con.ID == prop.ID {
 			base.Errorf("bug: concern and proposal with same id")
 			continue
 		}
-		if concern.Closed {
+		if con.Closed {
 			continue
 		}
-		resolved = append(resolved, concern)
+		resolved = append(resolved, con)
 	}
 	return resolved
 }

@@ -1,2 +1,3 @@
-- unit tests for docket
+- unit tests for pmp
+- integration tests for pmp
 - address XXX

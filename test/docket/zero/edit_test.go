@@ -24,11 +24,11 @@ func TestEdit(t *testing.T) {
 		ctx,
 		cty.Organizer(),
 		id,
+		schema.MotionConcernType,
 		zero.ZeroPolicyName,
 		cty.MemberUser(0),
 		"concern #1",
 		"description #1",
-		schema.MotionConcernType,
 		"https://1",
 		nil)
 

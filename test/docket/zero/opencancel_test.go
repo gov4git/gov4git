@@ -1,4 +1,4 @@
-package docket
+package zero
 
 import (
 	"testing"
@@ -13,9 +13,7 @@ import (
 	"github.com/gov4git/lib4git/testutil"
 )
 
-const testMaxPar = 3
-
-func TestOpenClose(t *testing.T) {
+func TestOpenCancel(t *testing.T) {
 	base.LogVerbosely()
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
@@ -47,13 +45,13 @@ func TestOpenClose(t *testing.T) {
 	// score
 	ops.ScoreMotions(ctx, cty.Organizer())
 
-	// close
+	// cancel
 	ops.CancelMotion(ctx, cty.Organizer(), id)
 
 	// verify state changed
 	m := ops.ShowMotion(ctx, cty.Gov(), id)
-	if !m.Motion.Closed {
-		t.Errorf("expecting closed")
+	if !m.Motion.Closed || !m.Motion.Cancelled {
+		t.Errorf("expecting closed and cancelled")
 	}
 
 	// testutil.Hang()

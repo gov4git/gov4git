@@ -26,9 +26,9 @@ func (x zeroPolicy) Open(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("open motion #%v", motion.ID)
+	return nil, notice.Noticef("open motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Score(
@@ -50,9 +50,9 @@ func (x zeroPolicy) Update(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("update motion #%v", motion.ID)
+	return nil, notice.Noticef("update motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Close(
@@ -62,9 +62,9 @@ func (x zeroPolicy) Close(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("close motion #%v", motion.ID)
+	return nil, notice.Noticef("close motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Cancel(
@@ -74,9 +74,9 @@ func (x zeroPolicy) Cancel(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("cancel motion #%v", motion.ID)
+	return nil, notice.Noticef("cancel motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Show(
@@ -101,9 +101,9 @@ func (x zeroPolicy) AddRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("add %v ref to motion #%v, from motion #%v", refType, to.ID, from.ID)
+	return nil, notice.Noticef("add %v ref to motion #%v, from motion #%v", refType, to.ID, from.ID)
 }
 
 func (x zeroPolicy) AddRefFrom(
@@ -116,9 +116,9 @@ func (x zeroPolicy) AddRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("add %v ref from motion #%v, to motion #%v", refType, from.ID, to.ID)
+	return nil, notice.Noticef("add %v ref from motion #%v, to motion #%v", refType, from.ID, to.ID)
 }
 
 func (x zeroPolicy) RemoveRefTo(
@@ -131,9 +131,9 @@ func (x zeroPolicy) RemoveRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("remove %v ref to motion #%v, from motion #%v", refType, to.ID, from.ID)
+	return nil, notice.Noticef("remove %v ref to motion #%v, from motion #%v", refType, to.ID, from.ID)
 }
 
 func (x zeroPolicy) RemoveRefFrom(
@@ -146,9 +146,9 @@ func (x zeroPolicy) RemoveRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("remove %v ref from motion #%v, to motion #%v", refType, from.ID, to.ID)
+	return nil, notice.Noticef("remove %v ref from motion #%v, to motion #%v", refType, from.ID, to.ID)
 }
 
 func (x zeroPolicy) Freeze(
@@ -158,9 +158,9 @@ func (x zeroPolicy) Freeze(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("freeze motion #%v", motion.ID)
+	return nil, notice.Noticef("freeze motion #%v", motion.ID)
 }
 
 func (x zeroPolicy) Unfreeze(
@@ -170,7 +170,7 @@ func (x zeroPolicy) Unfreeze(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("unfreeze motion #%v", motion.ID)
+	return nil, notice.Noticef("unfreeze motion #%v", motion.ID)
 }

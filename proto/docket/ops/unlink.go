@@ -2,14 +2,12 @@ package ops
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/lib4git/form"
-	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/gov4git/proto/notice"
 )
 
 func UnlinkMotions(
@@ -20,11 +18,12 @@ func UnlinkMotions(
 	typ schema.RefType,
 	args ...any,
 
-) git.Change[form.Map, schema.Ref] {
+) (fromReport policy.Report, fromNotices notice.Notices, toReport policy.Report, toNotices notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	chg := UnlinkMotions_StageOnly(ctx, cloned, fromID, toID, typ, args...)
-	return proto.CommitIfChanged(ctx, cloned.Public, chg)
+	ft, fn, tr, tn := UnlinkMotions_StageOnly(ctx, cloned, fromID, toID, typ, args...)
+	proto.Commitf(ctx, cloned.PublicClone(), "motion_unlink", "Unlink from motion %v to motion %v as %v", fromID, toID, typ)
+	return ft, fn, tr, tn
 }
 
 func UnlinkMotions_StageOnly(
@@ -35,7 +34,7 @@ func UnlinkMotions_StageOnly(
 	typ schema.RefType,
 	args ...any,
 
-) git.Change[form.Map, schema.Ref] {
+) (fromReport policy.Report, fromNotices notice.Notices, toReport policy.Report, toNotices notice.Notices) {
 
 	t := cloned.Public.Tree()
 
@@ -57,7 +56,7 @@ func UnlinkMotions_StageOnly(
 	fromPolicy := policy.Get(ctx, from.Policy)
 	toPolicy := policy.Get(ctx, to.Policy)
 	// RemoveRefs are called in the opposite order of AddRefs
-	noticesTo := toPolicy.RemoveRefTo(
+	reportTo, noticesTo := toPolicy.RemoveRefTo(
 		ctx,
 		cloned,
 		unref.Type,
@@ -68,7 +67,7 @@ func UnlinkMotions_StageOnly(
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), toID, noticesTo)
-	noticesFrom := fromPolicy.RemoveRefFrom(
+	reportFrom, noticesFrom := fromPolicy.RemoveRefFrom(
 		ctx,
 		cloned,
 		unref.Type,
@@ -80,11 +79,5 @@ func UnlinkMotions_StageOnly(
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), fromID, noticesFrom)
 
-	return git.NewChange(
-		fmt.Sprintf("Remove reference from motion %v to motion %v of type %v", fromID, toID, typ),
-		"collab_unlink_motions",
-		form.Map{"from": fromID, "to": toID, "type": typ},
-		unref,
-		nil,
-	)
+	return reportFrom, noticesFrom, reportTo, noticesTo
 }

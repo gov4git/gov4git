@@ -127,6 +127,10 @@ func NewElection(choice string, strength float64) Election {
 
 type Elections []Election
 
+func OneElection(choice string, strength float64) Elections {
+	return Elections{NewElection(choice, strength)}
+}
+
 type VoteEnvelope struct {
 	AdCommit  git.CommitHash `json:"ballot_ad_commit"`
 	Ad        Advertisement  `json:"ballot_ad"`

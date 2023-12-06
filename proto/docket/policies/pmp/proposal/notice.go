@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
 	"github.com/gov4git/gov4git/proto/docket/schema"
@@ -35,17 +36,37 @@ func cancelNotice(ctx context.Context, motion schema.Motion, outcome common.Outc
 	return notice.NewNotice(w.String())
 }
 
-func closeNotice(ctx context.Context, motion schema.Motion, outcome common.Outcome) notice.Notices {
+func closeNotice(
+	ctx context.Context,
+	prop schema.Motion,
+	outcome common.Outcome,
+	resolved schema.Motions,
+	bounty account.Holding,
+	rewards Rewards,
+
+) notice.Notices {
 
 	var w bytes.Buffer
 
-	fmt.Fprintf(&w, "This PR, managed as Gov4Git proposal `%v`, has been closed 🎉\n\n", motion.ID)
+	fmt.Fprintf(&w, "This PR, managed as Gov4Git proposal `%v`, has been closed 🎉\n\n", prop.ID)
 
 	fmt.Fprintf(&w, "The PR approval tally was %v.\n\n", outcome.Scores[pmp.ProposalBallotChoice])
 
-	// rewards
-	fmt.Fprintf(&w, "Rewards issued:\n")
-	// XXX
+	// bounty
+	fmt.Fprintf(&w, "Bounty %v was awarded to @%v.\n\n", bounty, prop.Author)
+
+	// resolved issues
+	fmt.Fprintf(&w, "Resolved issues:\n")
+	for _, con := range resolved {
+		fmt.Fprintf(&w, "- [Issue #%v](%v)\n", con.ID, con.TrackerURL)
+	}
+	fmt.Fprintln(&w, "")
+
+	// rewarded reviewers
+	fmt.Fprintf(&w, "Rewarded PR reviewers:\n")
+	for _, reward := range rewards {
+		fmt.Fprintf(&w, "- Reviewer @%v was awarded %v\n", reward.To, reward.Amount)
+	}
 	fmt.Fprintln(&w, "")
 
 	// tally by user

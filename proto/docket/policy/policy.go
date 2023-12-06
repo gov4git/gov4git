@@ -60,7 +60,7 @@ type Policy interface {
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
 		args ...any,
-	) form.Map
+	) form.Form
 
 	// AddRefTo is invoked only when to and from motions are open.
 	AddRefTo(

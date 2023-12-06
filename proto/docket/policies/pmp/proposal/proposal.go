@@ -6,6 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
+	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
 	"github.com/gov4git/gov4git/proto/docket/policy"
@@ -39,11 +40,19 @@ func (x proposalPolicy) Open(
 	state := NewProposalState(motion.ID)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
-	// create an account for the proposal
+	// create a bounty account for the proposal
 	account.Create_StageOnly(
 		ctx,
 		cloned.PublicClone(),
-		schema.PolicyAccountID(motion.ID),
+		pmp.ProposalBountyAccountID(motion.ID),
+		schema.MotionOwnerID(motion.ID),
+	)
+
+	// create a reward account for the proposal
+	account.Create_StageOnly(
+		ctx,
+		cloned.PublicClone(),
+		pmp.ProposalRewardAccountID(motion.ID),
 		schema.MotionOwnerID(motion.ID),
 	)
 
@@ -52,7 +61,7 @@ func (x proposalPolicy) Open(
 		ctx,
 		load.QVStrategyName,
 		cloned,
-		state.ApprovalReferendum,
+		state.ApprovalPoll,
 		fmt.Sprintf("Approval referendum for motion %v", motion.ID),
 		fmt.Sprintf("Up/down vote the approval vote for proposal (pull request) %v", motion.ID),
 		[]string{pmp.ProposalBallotChoice},
@@ -74,7 +83,7 @@ func (x proposalPolicy) Score(
 	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
 
 	// compute score
-	ads := ballot.Show_Local(ctx, cloned.Public.Tree(), state.ApprovalReferendum)
+	ads := ballot.Show_Local(ctx, cloned.Public.Tree(), state.ApprovalPoll)
 	attention := ads.Tally.Attention()
 
 	return schema.Score{
@@ -97,7 +106,7 @@ func (x proposalPolicy) Update(
 func (x proposalPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion schema.Motion,
+	prop schema.Motion,
 	policyNS ns.NS,
 	args ...any,
 
@@ -108,33 +117,48 @@ func (x proposalPolicy) Close(
 	isMerged, ok := args[0].(bool) // isMerged
 	must.Assertf(ctx, ok, "proposal closure unrecognized argument")
 
-	referendumName := pmp.ProposalReferendumBallotName(motion.ID)
+	referendumName := pmp.ProposalApprovalPollName(prop.ID)
+
 	if !isMerged {
 
 		// cancel the referendum for the motion (refunds voters)
-		closeChg := ballot.Close_StageOnly(
+		closeChg := ballot.Cancel_StageOnly(
 			ctx,
 			cloned,
 			referendumName,
-			true,
 		)
 
-		return cancelNotice(ctx, motion, closeChg.Result)
+		return cancelNotice(ctx, prop, closeChg.Result)
 
 	} else {
 
 		// close the referendum for the motion
-		referendumName := pmp.ProposalReferendumBallotName(motion.ID)
+		referendumName := pmp.ProposalApprovalPollName(prop.ID)
 		closeChg := ballot.Close_StageOnly(
 			ctx,
 			cloned,
 			referendumName,
-			false,
+			pmp.ProposalRewardAccountID(prop.ID),
 		)
 
-		// XXX: apply reward mechanism
+		// close all concerns resolved by the motion, and
+		// transfer their escrows into the bounty account
+		resolved := loadResolvedConcerns(ctx, cloned, prop)
+		bounty := closeResolvedConcerns(ctx, cloned, prop, resolved)
 
-		return closeNotice(ctx, motion, closeChg.Result)
+		// transfer bounty to author
+		account.Transfer_StageOnly(
+			ctx,
+			cloned.PublicClone(),
+			pmp.ProposalBountyAccountID(prop.ID),
+			member.UserAccountID(prop.Author),
+			bounty,
+		)
+
+		// distribute rewards
+		rewards := disberseRewards(ctx, cloned, prop)
+
+		return closeNotice(ctx, prop, closeChg.Result, resolved, bounty, rewards)
 	}
 }
 
@@ -148,15 +172,21 @@ func (x proposalPolicy) Cancel(
 ) notice.Notices {
 
 	// cancel the referendum for the motion (and return credits to users)
-	referendumName := pmp.ProposalReferendumBallotName(motion.ID)
-	ballot.Close_StageOnly(
+	referendumName := pmp.ProposalApprovalPollName(motion.ID)
+	ballot.Cancel_StageOnly(
 		ctx,
 		cloned,
 		referendumName,
-		true,
 	)
 
 	return notice.Noticef("Cancelling management of this PR, managed as Gov4Git concern `%v`.", motion.ID)
+}
+
+type PolicyView struct {
+	State         *ProposalState    `json:"state"`
+	ApprovalPoll  common.AdTally    `json:"approval_poll"`
+	BountyAccount account.AccountID `json:"bounty_account"`
+	RewardAccount account.AccountID `json:"reward_account"`
 }
 
 func (x proposalPolicy) Show(
@@ -166,18 +196,19 @@ func (x proposalPolicy) Show(
 	policyNS ns.NS,
 	args ...any,
 
-) form.Map {
+) form.Form {
 
 	// retrieve policy state
 	policyState := LoadState_Local(ctx, cloned.Tree(), policyNS)
 
-	// retrieve referendum state
-	referendumName := pmp.ProposalReferendumBallotName(motion.ID)
-	referendumState := ballot.Show_Local(ctx, cloned.Tree(), referendumName)
+	// retrieve approval poll
+	approvalPoll := loadPropApprovalPollTally(ctx, cloned, motion)
 
-	return form.Map{
-		"pmp_proposal_policy_state":              policyState,
-		"pmp_proposal_approval_referendum_state": referendumState,
+	return PolicyView{
+		State:         policyState,
+		ApprovalPoll:  approvalPoll,
+		BountyAccount: pmp.ProposalBountyAccountID(motion.ID),
+		RewardAccount: pmp.ProposalRewardAccountID(motion.ID),
 	}
 }
 

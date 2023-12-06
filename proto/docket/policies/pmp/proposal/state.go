@@ -9,11 +9,11 @@ import (
 const StateFilebase = "state.json"
 
 type ProposalState struct {
-	ApprovalReferendum common.BallotName `json:"approval_referendum_ballot"`
+	ApprovalPoll common.BallotName `json:"approval_poll"`
 }
 
 func NewProposalState(id schema.MotionID) *ProposalState {
 	return &ProposalState{
-		ApprovalReferendum: pmp.ProposalReferendumBallotName(id),
+		ApprovalPoll: pmp.ProposalApprovalPollName(id),
 	}
 }

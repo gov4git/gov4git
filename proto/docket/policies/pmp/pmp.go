@@ -19,29 +19,61 @@ func ConcernPollBallotName(id schema.MotionID) common.BallotName {
 	return common.BallotName{"pmp", "motion", "poll", id.String()}
 }
 
-func ProposalReferendumBallotName(id schema.MotionID) common.BallotName {
+func ProposalApprovalPollName(id schema.MotionID) common.BallotName {
 	return common.BallotName{"pmp", "motion", "referendum", id.String()}
+}
+
+func ProposalBountyAccountID(motionID schema.MotionID) account.AccountID {
+	return account.AccountIDFromLine(
+		account.Cat(
+			account.Pair("motion", motionID.String()),
+			account.Term("pmp-proposal-bounty"),
+		),
+	)
+}
+
+func ProposalRewardAccountID(motionID schema.MotionID) account.AccountID {
+	return account.AccountIDFromLine(
+		account.Cat(
+			account.Pair("motion", motionID.String()),
+			account.Term("pmp-proposal-reward"),
+		),
+	)
 }
 
 var (
 	OwnerID = account.AccountIDFromLine(
 		account.Term("pmp"),
 	)
+	BurnPoolAccountID = account.AccountIDFromLine(
+		account.Cat(
+			account.Term("pmp"),
+			account.Term("burn"),
+		),
+	)
 	TaxPoolAccountID = account.AccountIDFromLine(
 		account.Cat(
 			account.Term("pmp"),
-			account.Term("tax_pool"),
+			account.Term("tax"),
 		),
 	)
 	MatchingPoolAccountID = account.AccountIDFromLine(
 		account.Cat(
 			account.Term("pmp"),
-			account.Term("matching_pool"),
+			account.Term("matching"),
 		),
 	)
 )
 
 func Boot_StageOnly(ctx context.Context, cloned gov.Cloned) {
+
+	// create burn pool account
+	account.Create_StageOnly(
+		ctx,
+		cloned,
+		BurnPoolAccountID,
+		account.OwnerID(OwnerID),
+	)
 
 	// create tax pool account
 	account.Create_StageOnly(

@@ -7,8 +7,8 @@ import (
 )
 
 type MotionView struct {
-	Motion Motion   `json:"motion"`
-	Policy form.Map `json:"policy"`
+	Motion Motion    `json:"motion"`
+	Policy form.Form `json:"policy"`
 }
 
 type MotionViews []MotionView

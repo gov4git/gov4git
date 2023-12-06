@@ -100,6 +100,12 @@ func (x proposalPolicy) Update(
 
 ) notice.Notices {
 
+	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+
+	state.ApprovalPoll = pmp.ProposalApprovalPollName(motion.ID)
+
+	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+
 	return nil
 }
 

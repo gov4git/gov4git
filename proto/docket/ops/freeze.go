@@ -3,6 +3,7 @@ package ops
 import (
 	"context"
 
+	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
@@ -10,6 +11,19 @@ import (
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
+
+func FreezeMotion(
+	ctx context.Context,
+	addr gov.OwnerAddress,
+	id schema.MotionID,
+	args ...any,
+
+) git.ChangeNoResult {
+
+	cloned := gov.CloneOwner(ctx, addr)
+	chg := FreezeMotion_StageOnly(ctx, cloned, id, args...)
+	return proto.CommitIfChanged(ctx, cloned.PublicClone(), chg)
+}
 
 func FreezeMotion_StageOnly(
 	ctx context.Context,
@@ -22,6 +36,7 @@ func FreezeMotion_StageOnly(
 	t := cloned.Public.Tree()
 
 	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
+	must.Assert(ctx, !motion.Closed, schema.ErrMotionAlreadyClosed)
 	must.Assert(ctx, !motion.Frozen, schema.ErrMotionAlreadyFrozen)
 	motion.Frozen = true
 	chg := schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
@@ -49,6 +64,19 @@ func FreezeMotion_StageOnly(
 	return chg
 }
 
+func UnfreezeMotion(
+	ctx context.Context,
+	addr gov.OwnerAddress,
+	id schema.MotionID,
+	args ...any,
+
+) git.ChangeNoResult {
+
+	cloned := gov.CloneOwner(ctx, addr)
+	chg := UnfreezeMotion_StageOnly(ctx, cloned, id, args...)
+	return proto.CommitIfChanged(ctx, cloned.PublicClone(), chg)
+}
+
 func UnfreezeMotion_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
@@ -60,6 +88,7 @@ func UnfreezeMotion_StageOnly(
 	t := cloned.Public.Tree()
 
 	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
+	must.Assert(ctx, !motion.Closed, schema.ErrMotionAlreadyClosed)
 	must.Assert(ctx, motion.Frozen, schema.ErrMotionNotFrozen)
 	motion.Frozen = false
 	chg := schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)

@@ -34,7 +34,7 @@ func (x proposalPolicy) Open(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	// initialize state
 	state := NewProposalState(motion.ID)
@@ -68,7 +68,7 @@ func (x proposalPolicy) Open(
 		member.Everybody,
 	)
 
-	return notice.Noticef("Started managing this PR as Gov4Git proposal `%v`.", motion.ID)
+	return nil, notice.Noticef("Started managing this PR as Gov4Git proposal `%v`.", motion.ID)
 }
 
 func (x proposalPolicy) Score(
@@ -98,7 +98,7 @@ func (x proposalPolicy) Update(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
 
@@ -106,7 +106,7 @@ func (x proposalPolicy) Update(
 
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
-	return nil
+	return nil, nil
 }
 
 func (x proposalPolicy) Close(
@@ -117,7 +117,7 @@ func (x proposalPolicy) Close(
 	args ...any,
 	// args[0]=isMerged bool
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	// was the PR merged or not
 	must.Assertf(ctx, len(args) == 1, "proposal closure missing argument")
@@ -135,7 +135,7 @@ func (x proposalPolicy) Close(
 			referendumName,
 		)
 
-		return cancelNotice(ctx, prop, closeChg.Result)
+		return nil, cancelNotice(ctx, prop, closeChg.Result)
 
 	} else {
 
@@ -165,7 +165,7 @@ func (x proposalPolicy) Close(
 		// distribute rewards
 		rewards := disberseRewards(ctx, cloned, prop)
 
-		return closeNotice(ctx, prop, closeChg.Result, resolved, bounty, rewards)
+		return nil, closeNotice(ctx, prop, closeChg.Result, resolved, bounty, rewards)
 	}
 }
 
@@ -176,7 +176,7 @@ func (x proposalPolicy) Cancel(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	// cancel the referendum for the motion (and return credits to users)
 	referendumName := pmp.ProposalApprovalPollName(motion.ID)
@@ -186,7 +186,7 @@ func (x proposalPolicy) Cancel(
 		referendumName,
 	)
 
-	return notice.Noticef("Cancelling management of this PR, managed as Gov4Git concern `%v`.", motion.ID)
+	return nil, notice.Noticef("Cancelling management of this PR, managed as Gov4Git concern `%v`.", motion.ID)
 }
 
 type PolicyView struct {
@@ -229,9 +229,9 @@ func (x proposalPolicy) AddRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return nil
+	return nil, nil
 }
 
 func (x proposalPolicy) AddRefFrom(
@@ -244,9 +244,9 @@ func (x proposalPolicy) AddRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return nil
+	return nil, nil
 }
 
 func (x proposalPolicy) RemoveRefTo(
@@ -259,9 +259,9 @@ func (x proposalPolicy) RemoveRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return nil
+	return nil, nil
 }
 
 func (x proposalPolicy) RemoveRefFrom(
@@ -274,9 +274,9 @@ func (x proposalPolicy) RemoveRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return nil
+	return nil, nil
 }
 
 func (x proposalPolicy) Freeze(
@@ -286,9 +286,9 @@ func (x proposalPolicy) Freeze(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("This PR, managed by Gov4Git proposal `%v`, has been frozen ❄️", motion.ID)
+	return nil, notice.Noticef("This PR, managed by Gov4Git proposal `%v`, has been frozen ❄️", motion.ID)
 }
 
 func (x proposalPolicy) Unfreeze(
@@ -298,7 +298,7 @@ func (x proposalPolicy) Unfreeze(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return notice.Noticef("This PR, managed by Gov4Git proposal `%v`, has been unfrozen 🌤️", motion.ID)
+	return nil, notice.Noticef("This PR, managed by Gov4Git proposal `%v`, has been unfrozen 🌤️", motion.ID)
 }

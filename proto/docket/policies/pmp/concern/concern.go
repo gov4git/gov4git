@@ -35,7 +35,7 @@ func (x concernPolicy) Open(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	// initialize state
 	state := NewConcernState(motion.ID)
@@ -53,7 +53,7 @@ func (x concernPolicy) Open(
 		member.Everybody,
 	)
 
-	return notice.Noticef("Started managing this issue as Gov4Git concern `%v`.", motion.ID)
+	return nil, notice.Noticef("Started managing this issue as Gov4Git concern `%v`.", motion.ID)
 }
 
 func (x concernPolicy) Score(
@@ -83,7 +83,7 @@ func (x concernPolicy) Update(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	// update eligible proposals
 
@@ -114,7 +114,7 @@ func (x concernPolicy) Close(
 	// args[0]=toID account.AccountID
 	// args[1]=prop schema.Motion
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	must.Assertf(ctx, len(args) == 2, "issue closure requires two arguments, got %v", args)
 	toID, ok := args[0].(account.AccountID)
@@ -131,7 +131,7 @@ func (x concernPolicy) Close(
 		toID,
 	)
 
-	return closeNotice(ctx, motion, chg.Result, prop)
+	return nil, closeNotice(ctx, motion, chg.Result, prop)
 }
 
 func (x concernPolicy) Cancel(
@@ -141,7 +141,7 @@ func (x concernPolicy) Cancel(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	// cancel the poll for the motion (returning credits to users)
 	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
@@ -151,7 +151,7 @@ func (x concernPolicy) Cancel(
 		priorityPollName,
 	)
 
-	return cancelNotice(ctx, motion, chg.Result)
+	return nil, cancelNotice(ctx, motion, chg.Result)
 }
 
 type PolicyView struct {
@@ -191,9 +191,9 @@ func (x concernPolicy) AddRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return nil
+	return nil, nil
 }
 
 func (x concernPolicy) AddRefFrom(
@@ -206,27 +206,27 @@ func (x concernPolicy) AddRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	if refType != pmp.ResolvesRefType {
-		return nil
+		return nil, nil
 	}
 
 	if !IsProposalEligible(ctx, cloned.PublicClone(), from.ID) {
-		return nil
+		return nil, nil
 	}
 
 	toState := LoadState_Local(ctx, cloned.Public.Tree(), toPolicyNS)
 	ref := schema.Ref{Type: refType, From: from.ID, To: to.ID}
 
 	if toState.EligibleProposals.Contains(ref) {
-		return nil
+		return nil, nil
 	}
 
 	toState.EligibleProposals = append(toState.EligibleProposals, ref)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
 
-	return notice.Noticef("This issue has been referenced by an eligible PR, managed as Gov4Git proposal `%v`.", from.ID)
+	return nil, notice.Noticef("This issue has been referenced by an eligible PR, managed as Gov4Git proposal `%v`.", from.ID)
 }
 
 func (x concernPolicy) RemoveRefTo(
@@ -239,9 +239,9 @@ func (x concernPolicy) RemoveRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
-	return nil
+	return nil, nil
 }
 
 func (x concernPolicy) RemoveRefFrom(
@@ -254,19 +254,19 @@ func (x concernPolicy) RemoveRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	toState := LoadState_Local(ctx, cloned.Public.Tree(), toPolicyNS)
 	ref := schema.Ref{Type: refType, From: from.ID, To: to.ID}
 
 	if !toState.EligibleProposals.Contains(ref) {
-		return nil
+		return nil, nil
 	}
 
 	toState.EligibleProposals = toState.EligibleProposals.Remove(ref)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
 
-	return notice.Noticef("This issue is no longer referenced by the PR, managed as Gov4Git proposal `%v`.", from.ID)
+	return nil, notice.Noticef("This issue is no longer referenced by the PR, managed as Gov4Git proposal `%v`.", from.ID)
 }
 
 func (x concernPolicy) updateFreeze(
@@ -276,7 +276,7 @@ func (x concernPolicy) updateFreeze(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	toState := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
 
@@ -290,7 +290,7 @@ func (x concernPolicy) updateFreeze(
 		notices = append(notices, notice.Noticef("Unfreezing 🌤️ issue as there are no eligible PRs are addressing it.")...)
 	}
 
-	return notices
+	return nil, notices
 }
 
 func (x concernPolicy) Freeze(
@@ -300,16 +300,16 @@ func (x concernPolicy) Freeze(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	// freeze priority poll, if not already frozen
 	priorityPoll := pmp.ConcernPollBallotName(motion.ID)
 	if ballot.IsFrozen_Local(ctx, cloned.PublicClone(), priorityPoll) {
-		return nil
+		return nil, nil
 	}
 	ballot.Freeze_StageOnly(ctx, cloned, priorityPoll)
 
-	return notice.Noticef("This issue, managed by Gov4Git concern `%v`, has been frozen ❄️", motion.ID)
+	return nil, notice.Noticef("This issue, managed by Gov4Git concern `%v`, has been frozen ❄️", motion.ID)
 }
 
 func (x concernPolicy) Unfreeze(
@@ -319,16 +319,16 @@ func (x concernPolicy) Unfreeze(
 	policyNS ns.NS,
 	args ...any,
 
-) notice.Notices {
+) (policy.Report, notice.Notices) {
 
 	// unfreeze the priority poll ballot, if frozen
 	priorityPoll := pmp.ConcernPollBallotName(motion.ID)
 	if !ballot.IsFrozen_Local(ctx, cloned.PublicClone(), priorityPoll) {
-		return nil
+		return nil, nil
 	}
 	ballot.Unfreeze_StageOnly(ctx, cloned, priorityPoll)
 
-	return notice.Noticef("This issue, managed by Gov4Git concern `%v`, has been unfrozen 🌤️", motion.ID)
+	return nil, notice.Noticef("This issue, managed by Gov4Git concern `%v`, has been unfrozen 🌤️", motion.ID)
 }
 
 // motion.Un/Freeze --calls--> policy Un/Freeze --calls--> ballot Un/Freeze

@@ -2,7 +2,6 @@ package ops
 
 import (
 	"context"
-	"fmt"
 	"slices"
 	"time"
 
@@ -12,7 +11,7 @@ import (
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/gov4git/proto/member"
-	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/gov4git/proto/notice"
 	"github.com/gov4git/lib4git/must"
 )
 
@@ -28,11 +27,12 @@ func OpenMotion(
 	trackerURL string,
 	labels []string,
 
-) git.ChangeNoResult {
+) (policy.Report, notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	chg := OpenMotion_StageOnly(ctx, cloned, id, typ, policy, author, title, desc, trackerURL, labels)
-	return proto.CommitIfChanged(ctx, cloned.Public, chg)
+	report, notices := OpenMotion_StageOnly(ctx, cloned, id, typ, policy, author, title, desc, trackerURL, labels)
+	proto.Commitf(ctx, cloned.PublicClone(), "motion_open", "Open motion %v", id)
+	return report, notices
 }
 
 func OpenMotion_StageOnly(
@@ -48,7 +48,7 @@ func OpenMotion_StageOnly(
 	labels []string,
 	args ...any,
 
-) git.ChangeNoResult {
+) (policy.Report, notice.Notices) {
 
 	t := cloned.Public.Tree()
 	labels = slices.Clone(labels)
@@ -74,7 +74,7 @@ func OpenMotion_StageOnly(
 
 	// apply policy
 	pcy := policy.Get(ctx, policyName)
-	notices := pcy.Open(
+	report, notices := pcy.Open(
 		ctx,
 		cloned,
 		motion,
@@ -92,5 +92,5 @@ func OpenMotion_StageOnly(
 		},
 	})
 
-	return git.NewChangeNoResult(fmt.Sprintf("Open motion %v", id), "docket_open_motion")
+	return report, notices
 }

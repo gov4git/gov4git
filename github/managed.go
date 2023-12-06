@@ -13,6 +13,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/proto/notice"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -43,6 +44,7 @@ type SyncManagedChanges struct {
 	Updated             schema.MotionIDSet `json:"updated_motions"`
 	Opened              schema.MotionIDSet `json:"opened_motions"`
 	Closed              schema.MotionIDSet `json:"closed_motions"`
+	Cancelled           schema.MotionIDSet `json:"cancelled_motions"`
 	Froze               schema.MotionIDSet `json:"froze_motions"`
 	Unfroze             schema.MotionIDSet `json:"unfroze_motions"`
 	AddedRefs           schema.RefSet      `json:"added_refs"`
@@ -55,6 +57,7 @@ func newSyncManagedChanges() *SyncManagedChanges {
 		Updated:             schema.MotionIDSet{},
 		Opened:              schema.MotionIDSet{},
 		Closed:              schema.MotionIDSet{},
+		Cancelled:           schema.MotionIDSet{},
 		Froze:               schema.MotionIDSet{},
 		Unfroze:             schema.MotionIDSet{},
 		AddedRefs:           schema.RefSet{},
@@ -67,12 +70,12 @@ func SyncManagedIssues_StageOnly(
 	repo Repo,
 	githubClient *github.Client,
 	govAddr gov.OwnerAddress,
-	govCloned gov.OwnerCloned,
+	cloned gov.OwnerCloned,
 ) (syncChanges *SyncManagedChanges) {
 
 	syncChanges = newSyncManagedChanges()
 
-	t := govCloned.Public.Tree()
+	t := cloned.Public.Tree()
 
 	// load github issues and governance motions, and
 	// index them under a common key space
@@ -88,21 +91,37 @@ func SyncManagedIssues_StageOnly(
 				switch {
 				case issue.Closed && motion.Closed:
 				case issue.Closed && !motion.Closed:
-					syncFrozen(ctx, govCloned, syncChanges, issue, motion)
-					ops.CloseMotion_StageOnly(ctx, govCloned, id, issue.Merged)
-					syncChanges.Closed.Add(id)
+					syncFrozen(ctx, cloned, syncChanges, issue, motion)
+					// proposal vs concern
+					if motion.IsConcern() {
+						// manually closing an issue motion cancels it
+						ops.CancelMotion_StageOnly(ctx, cloned, id)
+						syncChanges.Cancelled.Add(id)
+					} else if motion.IsProposal() {
+						// manually closing a proposal motion closes it
+						ops.CloseMotion_StageOnly(ctx, cloned, id, issue.Merged)
+						syncChanges.Closed.Add(id)
+					} else {
+						must.Errorf(ctx, "motion is neither a concern nor a proposal")
+					}
 					changed = true
 				case !issue.Closed && motion.Closed:
 					base.Infof("GitHub issue %v has been re-opened; corresonding motion remains closed", issue.Number)
+					ops.AppendMotionNotices_StageOnly(
+						ctx,
+						cloned.PublicClone(),
+						id,
+						notice.Noticef("Reopening an issue or a PR [#%v](%v) is not allowed. Create a new one instead.", id, motion.TrackerURL),
+					)
 				case !issue.Closed && !motion.Closed:
-					changed = changed || syncFrozen(ctx, govCloned, syncChanges, issue, motion)
+					changed = changed || syncFrozen(ctx, cloned, syncChanges, issue, motion)
 				}
 				if changed {
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
 			} else { // otherwise, no motion for this issue exists, so create one
 				if !issue.Closed {
-					syncCreateMotionForIssue(ctx, govAddr, govCloned, syncChanges, issue, id)
+					syncCreateMotionForIssue(ctx, govAddr, cloned, syncChanges, issue, id)
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
 			}
@@ -112,7 +131,7 @@ func SyncManagedIssues_StageOnly(
 				// if motion frozen, do nothing
 				// otherwise, freeze motion
 				if !motion.Closed && !motion.Frozen {
-					ops.FreezeMotion_StageOnly(ctx, govCloned, id)
+					ops.FreezeMotion_StageOnly(ctx, cloned, id)
 					syncChanges.Froze.Add(id)
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
@@ -124,7 +143,7 @@ func SyncManagedIssues_StageOnly(
 
 	// update references on open motions only (on both sides of the reference)
 	matchingMotions := indexMotions(schema.FilterClosedMotions(ops.ListMotions_Local(ctx, t)))
-	syncRefs(ctx, govCloned, syncChanges, issues, matchingMotions)
+	syncRefs(ctx, cloned, syncChanges, issues, matchingMotions)
 
 	syncChanges.IssuesCausingChange.Sort()
 	return

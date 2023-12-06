@@ -35,18 +35,22 @@ func cancelNotice(ctx context.Context, motion schema.Motion, outcome common.Outc
 	return notice.NewNotice(w.String())
 }
 
-func closeNotice(ctx context.Context, motion schema.Motion, outcome common.Outcome) notice.Notices {
+func closeNotice(
+	ctx context.Context,
+	con schema.Motion,
+	outcome common.Outcome,
+	prop schema.Motion,
+
+) notice.Notices {
 
 	var w bytes.Buffer
 
-	fmt.Fprintf(&w, "This issue, managed as Gov4Git proposal `%v`, has been closed 🎉\n\n", motion.ID)
+	fmt.Fprintf(&w, "This issue, managed as Gov4Git proposal `%v`, has been closed 🎉\n\n", con.ID)
 
 	fmt.Fprintf(&w, "The issue priority tally was %v.\n\n", outcome.Scores[pmp.ProposalBallotChoice])
 
-	// rewards
-	fmt.Fprintf(&w, "Rewards issued:\n")
-	// XXX
-	fmt.Fprintln(&w, "")
+	// resolved by PR
+	fmt.Fprintf(&w, "Issued was resolved by [PR #%v](%v):\n\n", prop.ID, prop.TrackerURL)
 
 	// tally by user
 	fmt.Fprintf(&w, "Tally breakdown by user:\n")

@@ -17,10 +17,10 @@ func IsProposalEligible(
 
 ) bool {
 
-	mv := ops.ShowMotion_Local(ctx, cloned, proposalID) //XXX: calls policy show
+	mv := ops.LookupMotion_Local(ctx, cloned, proposalID)
 
-	if !mv.Motion.IsProposal() {
+	if !mv.IsProposal() {
 		return false
 	}
-	return mv.Motion.Score.Attention > 0
+	return mv.Score.Attention > 0
 }

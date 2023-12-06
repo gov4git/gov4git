@@ -25,8 +25,6 @@ func Reopen(
 	return chg
 }
 
-// XXX: can reopen only if not cancelled
-
 func Reopen_StageOnly(
 	ctx context.Context,
 	govCloned gov.OwnerCloned,

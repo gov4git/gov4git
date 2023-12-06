@@ -233,11 +233,11 @@ func syncCreateMotionForIssue(
 		ctx,
 		cloned,
 		id,
+		issue.MotionType(),
 		motionPolicyForIssue(issue),
 		author,
 		issue.Title,
 		issue.Body,
-		issue.MotionType(),
 		issue.URL,
 		issue.Labels,
 	)

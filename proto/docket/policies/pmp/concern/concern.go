@@ -206,7 +206,7 @@ func (x concernPolicy) AddRefFrom(
 
 ) notice.Notices {
 
-	if refType != ResolvesRefType {
+	if refType != pmp.ResolvesRefType {
 		return nil
 	}
 

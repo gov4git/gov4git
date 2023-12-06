@@ -31,11 +31,11 @@ var (
 				ctx,
 				setup.Organizer,
 				schema.MotionID(motionName),
+				schema.ParseMotionType(ctx, motionType),
 				schema.PolicyName(motionPolicy),
 				member.User(motionAuthor),
 				motionTitle,
 				motionDesc,
-				schema.ParseMotionType(ctx, motionType),
 				motionTrackerURL,
 				nil,
 			)

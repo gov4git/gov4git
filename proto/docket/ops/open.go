@@ -20,18 +20,18 @@ func OpenMotion(
 	ctx context.Context,
 	addr gov.OwnerAddress,
 	id schema.MotionID,
+	typ schema.MotionType,
 	policy schema.PolicyName,
 	author member.User,
 	title string,
 	desc string,
-	typ schema.MotionType,
 	trackerURL string,
 	labels []string,
 
 ) git.ChangeNoResult {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	chg := OpenMotion_StageOnly(ctx, cloned, id, policy, author, title, desc, typ, trackerURL, labels)
+	chg := OpenMotion_StageOnly(ctx, cloned, id, typ, policy, author, title, desc, trackerURL, labels)
 	return proto.CommitIfChanged(ctx, cloned.Public, chg)
 }
 
@@ -39,11 +39,11 @@ func OpenMotion_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	id schema.MotionID,
+	typ schema.MotionType,
 	policyName schema.PolicyName,
 	author member.User,
 	title string,
 	desc string,
-	typ schema.MotionType,
 	trackerURL string,
 	labels []string,
 	args ...any,

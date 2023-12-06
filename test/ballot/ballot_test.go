@@ -11,6 +11,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/proto/treasury"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/base"
@@ -54,7 +55,7 @@ func TestOpenClose(t *testing.T) {
 	}
 
 	// close
-	ballot.Close(ctx, cty.Organizer(), ballotName, false)
+	ballot.Close(ctx, cty.Organizer(), ballotName, treasury.BurnAccountID)
 
 	// verify state changed
 	ast := ballot.Show(ctx, gov.Address(cty.Organizer().Public), ballotName)
@@ -104,7 +105,7 @@ func TestOpenCancel(t *testing.T) {
 	}
 
 	// close
-	ballot.Close(ctx, cty.Organizer(), ballotName, true)
+	ballot.Cancel(ctx, cty.Organizer(), ballotName)
 
 	// verify state changed
 	ast := ballot.Show(ctx, gov.Address(cty.Organizer().Public), ballotName)

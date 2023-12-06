@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/proto/treasury"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
 	"github.com/spf13/cobra"
@@ -82,7 +84,22 @@ var (
 				ctx,
 				setup.Organizer,
 				common.ParseBallotNameFromPath(ballotName),
-				ballotCancel,
+				account.AccountID(ballotEscrowTo),
+			)
+			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
+		},
+	}
+
+	ballotCancelCmd = &cobra.Command{
+		Use:   "cancel",
+		Short: "Cancel an open ballot",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
+			chg := ballot.Cancel(
+				ctx,
+				setup.Organizer,
+				common.ParseBallotNameFromPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -204,13 +221,13 @@ var (
 	ballotElectionChoice   []string
 	ballotElectionStrength []float64
 	ballotUseVotingCredits bool
-	ballotCancel           bool
 	ballotOnlyNames        bool
 	ballotOnlyOpen         bool
 	ballotOnlyClosed       bool
 	ballotOnlyFrozen       bool
 	ballotWithParticipant  string
 	ballotFetchPar         int
+	ballotEscrowTo         string
 )
 
 func init() {
@@ -232,7 +249,12 @@ func init() {
 	ballotCmd.AddCommand(ballotCloseCmd)
 	ballotCloseCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
 	ballotCloseCmd.MarkFlagRequired("name")
-	ballotCloseCmd.Flags().BoolVar(&ballotCancel, "cancel", false, "if set, the ballot is cancelled and voters are refunded")
+	ballotCloseCmd.Flags().StringVar(&ballotEscrowTo, "to", treasury.BurnAccountID.String(), "account id to receive ballot escrows")
+
+	// cancel
+	ballotCmd.AddCommand(ballotCancelCmd)
+	ballotCancelCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
+	ballotCancelCmd.MarkFlagRequired("name")
 
 	// freeze
 	ballotCmd.AddCommand(ballotFreezeCmd)

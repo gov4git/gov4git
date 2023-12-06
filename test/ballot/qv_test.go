@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/proto/treasury"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/form"
@@ -105,7 +106,7 @@ func TestQV(t *testing.T) {
 	}
 
 	// close
-	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, false)
+	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, treasury.BurnAccountID)
 	fmt.Println("close: ", form.SprintJSON(closeChg))
 
 	// check the balances

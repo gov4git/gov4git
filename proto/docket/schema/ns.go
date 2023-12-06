@@ -24,12 +24,3 @@ func MotionAccountID(motionID MotionID) account.AccountID {
 func MotionOwnerID(motionID MotionID) account.OwnerID {
 	return account.OwnerIDFromLine(account.Pair("motion", motionID.String()))
 }
-
-func PolicyAccountID(motionID MotionID) account.AccountID {
-	return account.AccountIDFromLine(
-		account.Cat(
-			account.Pair("motion", motionID.String()),
-			account.Term("policy"),
-		),
-	)
-}

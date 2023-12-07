@@ -23,6 +23,23 @@ func Log_StageOnly(
 	history.Journal().Log_StageOnly(ctx, cloned.Tree(), event)
 }
 
+func List(
+	ctx context.Context,
+	addr gov.Address,
+) journal.Entries[*Event] {
+
+	cloned := gov.Clone(ctx, addr)
+	return List_Local(ctx, cloned)
+}
+
+func List_Local(
+	ctx context.Context,
+	cloned gov.Cloned,
+) journal.Entries[*Event] {
+
+	return history.Journal().List_Local(ctx, cloned.Tree())
+}
+
 type muteCtxKey struct{}
 
 func Mute(ctx context.Context) context.Context {

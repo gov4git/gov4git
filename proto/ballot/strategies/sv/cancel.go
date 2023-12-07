@@ -29,6 +29,7 @@ func (qv SV) Cancel(
 			common.BallotEscrowAccountID(ad.Name),
 			member.UserAccountID(user),
 			refund,
+			fmt.Sprintf("refund from cancelling ballot %v", ad.Name),
 		)
 		refunded[user] = refund
 	}

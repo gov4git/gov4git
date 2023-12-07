@@ -151,6 +151,7 @@ func processDirectiveIssue_StageOnly(
 					govCloned.PublicClone(),
 					member.UserAccountID(member.User(d.IssueVotingCredits.To)),
 					account.H(account.PluralAsset, d.IssueVotingCredits.Amount),
+					fmt.Sprintf("directive from GitHub issue #%v", issue.GetNumber()),
 				)
 			},
 		)
@@ -177,6 +178,7 @@ func processDirectiveIssue_StageOnly(
 					member.UserAccountID(member.User(d.TransferVotingCredits.From)),
 					member.UserAccountID(member.User(d.TransferVotingCredits.To)),
 					account.H(account.PluralAsset, d.TransferVotingCredits.Amount),
+					fmt.Sprintf("directive from GitHub issue #%v", issue.GetNumber()),
 				)
 			},
 		)

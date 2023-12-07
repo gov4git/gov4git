@@ -12,11 +12,20 @@ import (
 	"github.com/gov4git/gov4git/proto/notice"
 )
 
-func cancelNotice(ctx context.Context, motion schema.Motion, outcome common.Outcome) notice.Notices {
+func cancelNotice(
+	ctx context.Context,
+	motion schema.Motion,
+	againstPopular bool,
+	outcome common.Outcome,
+) notice.Notices {
 
 	var w bytes.Buffer
 
 	fmt.Fprintf(&w, "This unmerged PR, managed as Gov4Git proposal `%v`, has been cancelled 🌂\n\n", motion.ID)
+
+	if againstPopular {
+		fmt.Fprintf(&w, "⚠️ Note that the PR was cancelled against the popular vote.\n\n")
+	}
 
 	fmt.Fprintf(&w, "The PR approval tally was `%0.6f`.\n\n", outcome.Scores[pmp.ProposalBallotChoice])
 
@@ -39,6 +48,7 @@ func cancelNotice(ctx context.Context, motion schema.Motion, outcome common.Outc
 func closeNotice(
 	ctx context.Context,
 	prop schema.Motion,
+	againstPopular bool,
 	outcome common.Outcome,
 	resolved schema.Motions,
 	bounty account.Holding,
@@ -49,6 +59,10 @@ func closeNotice(
 	var w bytes.Buffer
 
 	fmt.Fprintf(&w, "This PR, managed as Gov4Git proposal `%v`, has been closed 🎉\n\n", prop.ID)
+
+	if againstPopular {
+		fmt.Fprintf(&w, "⚠️ Note that the PR was merged against the popular vote.\n\n")
+	}
 
 	fmt.Fprintf(&w, "The PR approval tally was `%0.6f`.\n\n", outcome.Scores[pmp.ProposalBallotChoice])
 

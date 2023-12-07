@@ -2,6 +2,7 @@ package treasury
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/gov"
@@ -27,6 +28,7 @@ func Boot_StageOnly(ctx context.Context, cloned gov.Cloned) {
 		cloned,
 		BurnAccountID,
 		account.OwnerID(OwnerID),
+		fmt.Sprintf("burn account for treasury"),
 	)
 
 }

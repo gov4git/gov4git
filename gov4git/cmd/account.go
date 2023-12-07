@@ -31,6 +31,7 @@ var (
 					account.Asset(accountAsset),
 					accountQuantity,
 				),
+				accountNote,
 			)
 		},
 	}
@@ -49,6 +50,7 @@ var (
 					account.Asset(accountAsset),
 					accountQuantity,
 				),
+				accountNote,
 			)
 		},
 	}
@@ -68,6 +70,7 @@ var (
 					account.Asset(accountAsset),
 					accountQuantity,
 				),
+				accountNote,
 			)
 		},
 	}
@@ -123,6 +126,7 @@ var (
 	accountToID     string
 	accountAsset    string
 	accountQuantity float64
+	accountNote     string
 )
 
 func init() {
@@ -134,6 +138,7 @@ func init() {
 	accountDepositCmd.MarkFlagRequired("asset")
 	accountDepositCmd.Flags().Float64VarP(&accountQuantity, "quantity", "q", 0.0, "quantity")
 	accountDepositCmd.MarkFlagRequired("quantity")
+	accountDepositCmd.Flags().StringVarP(&accountNote, "Note", "n", "manual", "note")
 	// withdraw
 	accountCmd.AddCommand(accountWithdrawCmd)
 	accountWithdrawCmd.Flags().StringVar(&accountFromID, "from", "", "from account id")
@@ -142,6 +147,7 @@ func init() {
 	accountWithdrawCmd.MarkFlagRequired("asset")
 	accountWithdrawCmd.Flags().Float64VarP(&accountQuantity, "quantity", "q", 0.0, "quantity")
 	accountWithdrawCmd.MarkFlagRequired("quantity")
+	accountWithdrawCmd.Flags().StringVarP(&accountNote, "Note", "n", "manual", "note")
 	// transfer
 	accountCmd.AddCommand(accountTransferCmd)
 	accountTransferCmd.Flags().StringVar(&accountFromID, "from", "", "from account id")
@@ -152,6 +158,7 @@ func init() {
 	accountTransferCmd.MarkFlagRequired("asset")
 	accountTransferCmd.Flags().Float64VarP(&accountQuantity, "quantity", "q", 0.0, "quantity")
 	accountTransferCmd.MarkFlagRequired("quantity")
+	accountTransferCmd.Flags().StringVarP(&accountNote, "Note", "n", "manual", "note")
 	// list
 	accountCmd.AddCommand(accountListCmd)
 	// show

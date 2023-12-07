@@ -24,8 +24,8 @@ func TestQV(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// give voter credits
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 100.0))
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 100.0))
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 100.0), "test")
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 100.0), "test")
 
 	// open
 	strat := load.QVStrategyName

@@ -30,7 +30,7 @@ func TestReopen(t *testing.T) {
 	ballot.Open(ctx, strat, cty.Organizer(), ballotName, "ballot_name", "ballot description", choices, member.Everybody)
 
 	// give credits to user
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 4.0))
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 4.0), "test")
 
 	// vote#1
 	elections := common.Elections{

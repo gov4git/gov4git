@@ -66,7 +66,7 @@ func AddUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User, profil
 	if err := must.Try(func() { GetUser_Local(ctx, cloned, name) }); err == nil {
 		must.Panic(ctx, fmt.Errorf("user already exists"))
 	}
-	account.Create_StageOnly(ctx, cloned, UserAccountID(name), UserOwnerID(name))
+	account.Create_StageOnly(ctx, cloned, UserAccountID(name), UserOwnerID(name), fmt.Sprintf("account for user %v", name))
 	chg := setUser_StageOnly(ctx, cloned, name, profile)
 
 	// log

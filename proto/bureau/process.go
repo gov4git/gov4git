@@ -93,6 +93,7 @@ func processRequest_StageOnly(
 				member.UserAccountID(req.Transfer.FromUser),
 				member.UserAccountID(req.Transfer.ToUser),
 				account.H(account.PluralAsset, req.Transfer.Amount),
+				fmt.Sprintf("bureau transfer"),
 			)
 		})
 		if err != nil {

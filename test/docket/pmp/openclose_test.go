@@ -117,8 +117,8 @@ func TestOpenCancelConcernCloseProposal(t *testing.T) {
 
 	testSetup(t, ctx, cty)
 
-	ops.CancelMotion(ctx, cty.Organizer(), testConcernID)       // issue
-	ops.CloseMotion(ctx, cty.Organizer(), testProposalID, true) // pr
+	ops.CancelMotion(ctx, cty.Organizer(), testConcernID)                // issue
+	ops.CloseMotion(ctx, cty.Organizer(), testProposalID, schema.Accept) // pr
 
 	// uncomment to view and adjust notices
 	// conNotices := ops.LoadMotionNotices(ctx, cty.Gov(), testConcernID)
@@ -198,7 +198,7 @@ func TestOpenCloseProposalCancelConcern(t *testing.T) {
 
 	testSetup(t, ctx, cty)
 
-	ops.CloseMotion(ctx, cty.Organizer(), testProposalID, true) // pr
+	ops.CloseMotion(ctx, cty.Organizer(), testProposalID, schema.Accept) // pr
 	err := must.Try(
 		func() {
 			ops.CancelMotion(ctx, cty.Organizer(), testConcernID)

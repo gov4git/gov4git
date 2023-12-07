@@ -49,10 +49,17 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
+			var d schema.Decision
+			if motionAccept {
+				d = schema.Accept
+			} else {
+				d = schema.Reject
+			}
 			ops.CloseMotion(
 				ctx,
 				setup.Organizer,
 				schema.MotionID(motionName),
+				d,
 			)
 			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -89,6 +96,7 @@ var (
 	motionDesc       string
 	motionType       string
 	motionTrackerURL string
+	motionAccept     bool
 )
 
 func init() {
@@ -108,6 +116,7 @@ func init() {
 	motionCmd.AddCommand(motionCloseCmd)
 	motionCloseCmd.Flags().StringVar(&motionName, "name", "", "name of motion")
 	motionCloseCmd.MarkFlagRequired("name")
+	motionCloseCmd.Flags().BoolVar(&motionAccept, "accept", false, "accept/reject")
 
 	motionCmd.AddCommand(motionListCmd)
 	motionListCmd.Flags().StringVar(&motionName, "name", "", "name of motion")

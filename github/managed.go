@@ -92,14 +92,17 @@ func SyncManagedIssues_StageOnly(
 				case issue.Closed && motion.Closed:
 				case issue.Closed && !motion.Closed:
 					syncFrozen(ctx, cloned, syncChanges, issue, motion)
-					// XXX: proposal vs concern (is this the best way to hardcode args dependent on policy here?)
 					if motion.IsConcern() {
 						// manually closing an issue motion cancels it
 						ops.CancelMotion_StageOnly(ctx, cloned, id)
 						syncChanges.Cancelled.Add(id)
 					} else if motion.IsProposal() {
 						// manually closing a proposal motion closes it
-						ops.CloseMotion_StageOnly(ctx, cloned, id, issue.Merged)
+						if issue.Merged {
+							ops.CloseMotion_StageOnly(ctx, cloned, id, schema.Accept)
+						} else {
+							ops.CloseMotion_StageOnly(ctx, cloned, id, schema.Reject)
+						}
 						syncChanges.Closed.Add(id)
 					} else {
 						must.Errorf(ctx, "motion is neither a concern nor a proposal")

@@ -110,6 +110,7 @@ func (x concernPolicy) Close(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	decision schema.Decision,
 	args ...any,
 	// args[0]=toID account.AccountID
 	// args[1]=prop schema.Motion

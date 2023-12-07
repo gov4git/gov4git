@@ -2,6 +2,7 @@ package pmp
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"testing"
 
@@ -16,6 +17,7 @@ import (
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/base"
+	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/testutil"
 )
@@ -147,6 +149,20 @@ func TestOpenCancelConcernCancelProposal(t *testing.T) {
 
 	ops.CancelMotion(ctx, cty.Organizer(), testConcernID)        // issue
 	ops.CancelMotion(ctx, cty.Organizer(), testProposalID, true) // pr
+
+	// user accounts
+	u0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
+	u1 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(1)).Balance(account.PluralAsset)
+
+	exp0 := testUser0Credits
+	if u0.Quantity != exp0 {
+		t.Errorf("expecting %v, got %v", exp0, u0.Quantity)
+	}
+
+	exp1 := testUser1Credits
+	if u1.Quantity != exp1 {
+		t.Errorf("expecting %v, got %v", exp1, u1.Quantity)
+	}
 }
 
 func TestOpenCancelProposalCancelConcern(t *testing.T) {
@@ -158,6 +174,20 @@ func TestOpenCancelProposalCancelConcern(t *testing.T) {
 
 	ops.CancelMotion(ctx, cty.Organizer(), testProposalID, true) // pr
 	ops.CancelMotion(ctx, cty.Organizer(), testConcernID)        // issue
+
+	// user accounts
+	u0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
+	u1 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(1)).Balance(account.PluralAsset)
+
+	exp0 := testUser0Credits
+	if u0.Quantity != exp0 {
+		t.Errorf("expecting %v, got %v", exp0, u0.Quantity)
+	}
+
+	exp1 := testUser1Credits
+	if u1.Quantity != exp1 {
+		t.Errorf("expecting %v, got %v", exp1, u1.Quantity)
+	}
 }
 
 func TestOpenCloseProposalCancelConcern(t *testing.T) {
@@ -175,5 +205,28 @@ func TestOpenCloseProposalCancelConcern(t *testing.T) {
 	) // issue
 	if err == nil {
 		t.Errorf("expecting error")
+	}
+
+	// uncomment to view and adjust notices
+	conNotices := ops.LoadMotionNotices(ctx, cty.Gov(), testConcernID)
+	propNotices := ops.LoadMotionNotices(ctx, cty.Gov(), testProposalID)
+	fmt.Println("CONCERN:", form.SprintJSON(conNotices))
+	fmt.Println("PROPOSAL:", form.SprintJSON(propNotices))
+
+	// uncomment to view journal entries
+	// XXX
+
+	// user accounts
+	u0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
+	u1 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(1)).Balance(account.PluralAsset)
+
+	exp0 := testUser0Credits - math.Abs(testUser0ConcernStrenth) + math.Abs(testUser0ProposalStrength)
+	if u0.Quantity <= exp0 {
+		t.Errorf("expecting more than %v, got %v", exp0, u0.Quantity)
+	}
+
+	exp1 := testUser1Credits - math.Abs(testUser1ConcernStrength) - math.Abs(testUser1ProposalStrength)
+	if u1.Quantity <= exp1 {
+		t.Errorf("expecting more than %v, got %v", exp1, u1.Quantity)
 	}
 }

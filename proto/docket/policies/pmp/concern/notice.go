@@ -50,7 +50,7 @@ func closeNotice(
 	fmt.Fprintf(&w, "The issue priority tally was `%0.6f`.\n\n", outcome.Scores[pmp.ConcernBallotChoice])
 
 	// resolved by PR
-	fmt.Fprintf(&w, "Issued was resolved by [PR #%v](%v):\n\n", prop.ID, prop.TrackerURL)
+	fmt.Fprintf(&w, "Ths issue was resolved by [PR #%v](%v):\n\n", prop.ID, prop.TrackerURL)
 
 	// tally by user
 	fmt.Fprintf(&w, "Tally breakdown by user:\n")

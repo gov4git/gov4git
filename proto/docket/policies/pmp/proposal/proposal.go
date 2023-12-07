@@ -126,22 +126,13 @@ func (x proposalPolicy) Close(
 
 	referendumName := pmp.ProposalApprovalPollName(prop.ID)
 
-	if !isMerged {
+	if isMerged {
 
-		// cancel the referendum for the motion (refunds voters)
-		closeChg := ballot.Cancel_StageOnly(
-			ctx,
-			cloned,
-			referendumName,
-		)
-
-		return nil, cancelNotice(ctx, prop, closeChg.Result)
-
-	} else {
+		// XXX: accepting a proposal against the popular vote?
 
 		// close the referendum for the motion
 		approvalPollName := pmp.ProposalApprovalPollName(prop.ID)
-		closeChg := ballot.Close_StageOnly(
+		closeApprovalPoll := ballot.Close_StageOnly(
 			ctx,
 			cloned,
 			approvalPollName,
@@ -165,7 +156,33 @@ func (x proposalPolicy) Close(
 		// distribute rewards
 		rewards := disberseRewards(ctx, cloned, prop)
 
-		return nil, closeNotice(ctx, prop, closeChg.Result, resolved, bounty, rewards)
+		return &CloseReport{
+			Accepted:            true,
+			ApprovalPollOutcome: closeApprovalPoll.Result,
+			Resolved:            resolved,
+			Bounty:              bounty,
+			Rewarded:            rewards,
+		}, closeNotice(ctx, prop, closeApprovalPoll.Result, resolved, bounty, rewards)
+
+	} else {
+
+		// XXX: rejecting a proposal against the popular vote?
+
+		// cancel the referendum for the motion (refunds voters)
+		cancelApprovalPoll := ballot.Cancel_StageOnly(
+			ctx,
+			cloned,
+			referendumName,
+		)
+
+		return &CloseReport{
+			Accepted:            false,
+			ApprovalPollOutcome: cancelApprovalPoll.Result,
+			Resolved:            nil,
+			Bounty:              account.H(account.PluralAsset, 0.0),
+			Rewarded:            nil,
+		}, cancelNotice(ctx, prop, cancelApprovalPoll.Result)
+
 	}
 }
 
@@ -180,13 +197,15 @@ func (x proposalPolicy) Cancel(
 
 	// cancel the referendum for the motion (and return credits to users)
 	referendumName := pmp.ProposalApprovalPollName(motion.ID)
-	ballot.Cancel_StageOnly(
+	chg := ballot.Cancel_StageOnly(
 		ctx,
 		cloned,
 		referendumName,
 	)
 
-	return nil, notice.Noticef("Cancelling management of this PR, managed as Gov4Git concern `%v`.", motion.ID)
+	return &CancelReport{
+		ApprovalPollOutcome: chg.Result,
+	}, notice.Noticef("Cancelling management of this PR, managed as Gov4Git concern `%v`.", motion.ID)
 }
 
 type PolicyView struct {

@@ -131,7 +131,7 @@ func (x concernPolicy) Close(
 		toID,
 	)
 
-	return nil, closeNotice(ctx, motion, chg.Result, prop)
+	return &CloseReport{}, closeNotice(ctx, motion, chg.Result, prop)
 }
 
 func (x concernPolicy) Cancel(
@@ -151,7 +151,9 @@ func (x concernPolicy) Cancel(
 		priorityPollName,
 	)
 
-	return nil, cancelNotice(ctx, motion, chg.Result)
+	return &CancelReport{
+		PriorityPollOutcome: chg.Result,
+	}, cancelNotice(ctx, motion, chg.Result)
 }
 
 type PolicyView struct {

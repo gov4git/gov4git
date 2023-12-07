@@ -59,6 +59,7 @@ func closeResolvedConcerns(
 			ctx,
 			cloned,
 			con.ID,
+			schema.Accept,
 			pmp.ProposalBountyAccountID(prop.ID), // account to send bounty to
 			prop,                                 // proposal that resolves the issue
 		)

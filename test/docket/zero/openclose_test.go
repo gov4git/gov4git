@@ -46,7 +46,7 @@ func TestOpenClose(t *testing.T) {
 	ops.ScoreMotions(ctx, cty.Organizer())
 
 	// close
-	ops.CloseMotion(ctx, cty.Organizer(), id)
+	ops.CloseMotion(ctx, cty.Organizer(), id, schema.Accept)
 
 	// verify state changed
 	m := ops.ShowMotion(ctx, cty.Gov(), id)

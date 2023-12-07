@@ -39,7 +39,7 @@ func TestInsufficientCredits(t *testing.T) {
 	fmt.Println("open: ", form.SprintJSON(openChg))
 
 	// give voter credits
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0))
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0), "test")
 
 	// vote
 	elections := common.Elections{

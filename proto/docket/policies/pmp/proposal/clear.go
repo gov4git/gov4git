@@ -2,6 +2,7 @@ package proposal
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"sort"
 
@@ -134,6 +135,7 @@ func disberseRewards(
 				pmp.ProposalRewardAccountID(prop.ID),
 				member.UserAccountID(user),
 				payout,
+				fmt.Sprintf("reward for proposal %v", prop.ID),
 			)
 		}
 	}

@@ -88,10 +88,11 @@ func Create(
 	addr gov.Address,
 	id AccountID,
 	owner OwnerID,
+	note string,
 ) {
 	cloned := gov.Clone(ctx, addr)
-	Create_StageOnly(ctx, cloned, id, owner)
-	proto.Commitf(ctx, cloned, "account_create", "create account %v", id)
+	Create_StageOnly(ctx, cloned, id, owner, note)
+	proto.Commitf(ctx, cloned, "account_create", "create account %v (%v)", id, note)
 	cloned.Push(ctx)
 }
 
@@ -100,12 +101,14 @@ func Create_StageOnly(
 	cloned gov.Cloned,
 	id AccountID,
 	owner OwnerID,
+	note string,
 ) {
 	must.Assertf(ctx, !Exists_Local(ctx, cloned, id), "account %v already exists", id)
 	set_StageOnly(ctx, cloned, id, NewAccount(id, owner))
 	history.Log_StageOnly(ctx, cloned, &history.Event{
 		Op: &history.Op{
 			Op:     "account_create",
+			Note:   note,
 			Args:   history.M{"id": id, "owner": owner},
 			Result: nil,
 		},
@@ -152,10 +155,11 @@ func Transfer(
 	from AccountID,
 	to AccountID,
 	amount Holding,
+	note string,
 ) {
 	cloned := gov.Clone(ctx, addr)
-	Transfer_StageOnly(ctx, cloned, from, to, amount)
-	proto.Commitf(ctx, cloned, "account_transfer", "transfer %v from %v to %v", amount, from, to)
+	Transfer_StageOnly(ctx, cloned, from, to, amount, note)
+	proto.Commitf(ctx, cloned, "account_transfer", "transfer %v from %v to %v (%v)", amount, from, to, note)
 	cloned.Push(ctx)
 }
 
@@ -165,12 +169,14 @@ func Transfer_StageOnly(
 	from AccountID,
 	to AccountID,
 	amount Holding,
+	note string,
 ) {
-	Withdraw_StageOnly(history.Mute(ctx), cloned, from, amount)
-	Deposit_StageOnly(history.Mute(ctx), cloned, to, amount)
+	Withdraw_StageOnly(history.Mute(ctx), cloned, from, amount, note)
+	Deposit_StageOnly(history.Mute(ctx), cloned, to, amount, note)
 	history.Log_StageOnly(ctx, cloned, &history.Event{
 		Op: &history.Op{
 			Op:     "account_transfer",
+			Note:   note,
 			Args:   history.M{"from": from, "to": to, "amount": amount},
 			Result: nil,
 		},
@@ -183,8 +189,9 @@ func TryTransfer_StageOnly(
 	from AccountID,
 	to AccountID,
 	amount Holding,
+	note string,
 ) error {
-	return must.Try(func() { Transfer_StageOnly(ctx, cloned, from, to, amount) })
+	return must.Try(func() { Transfer_StageOnly(ctx, cloned, from, to, amount, note) })
 }
 
 func Deposit(
@@ -192,10 +199,11 @@ func Deposit(
 	addr gov.Address,
 	to AccountID,
 	amount Holding,
+	note string,
 ) {
 	cloned := gov.Clone(ctx, addr)
-	Deposit_StageOnly(ctx, cloned, to, amount)
-	proto.Commitf(ctx, cloned, "account_deposit", "deposit %v to %v", amount, to)
+	Deposit_StageOnly(ctx, cloned, to, amount, note)
+	proto.Commitf(ctx, cloned, "account_deposit", "deposit %v to %v (%v)", amount, to, note)
 	cloned.Push(ctx)
 }
 
@@ -204,6 +212,7 @@ func Deposit_StageOnly(
 	cloned gov.Cloned,
 	to AccountID,
 	amount Holding,
+	note string,
 ) {
 	a := Get_Local(ctx, cloned, to)
 	a.Deposit(ctx, amount)
@@ -211,6 +220,7 @@ func Deposit_StageOnly(
 	history.Log_StageOnly(ctx, cloned, &history.Event{
 		Op: &history.Op{
 			Op:     "account_deposit",
+			Note:   note,
 			Args:   history.M{"to": to, "amount": amount},
 			Result: nil,
 		},
@@ -222,10 +232,11 @@ func Withdraw(
 	addr gov.Address,
 	from AccountID,
 	amount Holding,
+	note string,
 ) {
 	cloned := gov.Clone(ctx, addr)
-	Withdraw_StageOnly(ctx, cloned, from, amount)
-	proto.Commitf(ctx, cloned, "account_withdraw", "withdraw %v from %v", amount, from)
+	Withdraw_StageOnly(ctx, cloned, from, amount, note)
+	proto.Commitf(ctx, cloned, "account_withdraw", "withdraw %v from %v (%v)", amount, from, note)
 	cloned.Push(ctx)
 }
 
@@ -234,6 +245,7 @@ func Withdraw_StageOnly(
 	cloned gov.Cloned,
 	from AccountID,
 	amount Holding,
+	note string,
 ) {
 	a := Get_Local(ctx, cloned, from)
 	a.Withdraw(ctx, amount)
@@ -241,6 +253,7 @@ func Withdraw_StageOnly(
 	history.Log_StageOnly(ctx, cloned, &history.Event{
 		Op: &history.Op{
 			Op:     "account_withdraw",
+			Note:   note,
 			Args:   history.M{"from": from, "amount": amount},
 			Result: nil,
 		},

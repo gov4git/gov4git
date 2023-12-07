@@ -2,6 +2,7 @@ package ballot
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/account"
@@ -72,6 +73,7 @@ func Close_StageOnly(
 			escrowAccountID,
 			escrowTo,
 			holding,
+			fmt.Sprintf("closing ballot %v", ballotName),
 		)
 	}
 

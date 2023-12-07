@@ -56,7 +56,7 @@ func (qv SV) tally(
 		costDiff := augmentedScore.Cost - oldScore.Cost
 
 		// try charging the user for the new votes
-		err := chargeUser(ctx, govCloned, ad.Name, u, costDiff)
+		err := chargeUser(ctx, govCloned, ad.Name, u, costDiff, fmt.Sprintf("vote charge for ballot %v", ad.Name))
 		if strict {
 			must.NoError(ctx, err)
 		}
@@ -96,6 +96,7 @@ func chargeUser(
 	ballotName common.BallotName,
 	user member.User,
 	charge float64,
+	note string,
 ) error {
 
 	return account.TryTransfer_StageOnly(
@@ -104,5 +105,6 @@ func chargeUser(
 		member.UserAccountID(user),
 		common.BallotEscrowAccountID(ballotName),
 		account.H(account.PluralAsset, charge),
+		note,
 	)
 }

@@ -40,7 +40,7 @@ func TestOpenClose(t *testing.T) {
 	}
 
 	// give credits to user
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0))
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0), "test")
 
 	// vote
 	elections := common.Elections{
@@ -90,7 +90,7 @@ func TestOpenCancel(t *testing.T) {
 	}
 
 	// give credits to user
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0))
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0), "test")
 
 	// vote
 	elections := common.Elections{
@@ -138,8 +138,8 @@ func TestTallyAll(t *testing.T) {
 	fmt.Println("open 1: ", form.SprintJSON(openChg1))
 
 	// give credits to users
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 5.0))
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 5.0))
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 5.0), "test")
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 5.0), "test")
 
 	// vote
 	elections0 := common.Elections{common.NewElection(choices[0], 5.0)}

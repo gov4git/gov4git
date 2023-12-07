@@ -15,7 +15,6 @@ import (
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/gov4git/proto/notice"
 	"github.com/gov4git/lib4git/form"
-	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -116,15 +115,13 @@ func (x proposalPolicy) Close(
 	cloned gov.OwnerCloned,
 	prop schema.Motion,
 	policyNS ns.NS,
+	decision schema.Decision,
 	args ...any,
-	// args[0]=isMerged bool
 
 ) (policy.Report, notice.Notices) {
 
 	// was the PR merged or not
-	must.Assertf(ctx, len(args) == 1, "proposal closure missing argument")
-	isMerged, ok := args[0].(bool) // isMerged
-	must.Assertf(ctx, ok, "proposal closure unrecognized argument")
+	isMerged := decision.IsAccept()
 
 	approvalPollName := pmp.ProposalApprovalPollName(prop.ID)
 	adt := loadPropApprovalPollTally(ctx, cloned.PublicClone(), prop)

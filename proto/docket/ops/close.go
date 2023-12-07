@@ -17,12 +17,13 @@ func CloseMotion(
 	ctx context.Context,
 	addr gov.OwnerAddress,
 	id schema.MotionID,
+	decision schema.Decision,
 	args ...any,
 
 ) (policy.Report, notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	report, notices := CloseMotion_StageOnly(ctx, cloned, id, args...)
+	report, notices := CloseMotion_StageOnly(ctx, cloned, id, decision, args...)
 	proto.Commitf(ctx, cloned.Public, "motion_close", "Close motion %v", id)
 	return report, notices
 }
@@ -31,6 +32,7 @@ func CloseMotion_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	id schema.MotionID,
+	decision schema.Decision,
 	args ...any,
 
 ) (policy.Report, notice.Notices) {
@@ -49,6 +51,7 @@ func CloseMotion_StageOnly(
 		cloned,
 		motion,
 		policy.MotionPolicyNS(id),
+		decision,
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)

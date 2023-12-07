@@ -45,6 +45,7 @@ type Policy interface {
 		cloned gov.OwnerCloned,
 		motion schema.Motion,
 		instancePolicyNS ns.NS,
+		decision schema.Decision,
 		args ...any,
 	) (Report, notice.Notices)
 

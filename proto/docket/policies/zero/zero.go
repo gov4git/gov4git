@@ -60,6 +60,7 @@ func (x zeroPolicy) Close(
 	cloned gov.OwnerCloned,
 	motion schema.Motion,
 	policyNS ns.NS,
+	decision schema.Decision,
 	args ...any,
 
 ) (policy.Report, notice.Notices) {

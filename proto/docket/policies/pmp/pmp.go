@@ -3,6 +3,7 @@ package pmp
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/common"
@@ -18,11 +19,11 @@ var (
 )
 
 func ConcernPollBallotName(id schema.MotionID) common.BallotName {
-	return common.BallotName{"pmp", "motion", "poll", id.String()}
+	return common.BallotName{"pmp", "motion", "priority_poll", id.String()}
 }
 
 func ProposalApprovalPollName(id schema.MotionID) common.BallotName {
-	return common.BallotName{"pmp", "motion", "referendum", id.String()}
+	return common.BallotName{"pmp", "motion", "approval_poll", id.String()}
 }
 
 func ProposalBountyAccountID(motionID schema.MotionID) account.AccountID {
@@ -75,6 +76,7 @@ func Boot_StageOnly(ctx context.Context, cloned gov.Cloned) {
 		cloned,
 		BurnPoolAccountID,
 		account.OwnerID(OwnerID),
+		fmt.Sprintf("burn account for PMP"),
 	)
 
 	// create tax pool account
@@ -83,6 +85,7 @@ func Boot_StageOnly(ctx context.Context, cloned gov.Cloned) {
 		cloned,
 		TaxPoolAccountID,
 		account.OwnerID(OwnerID),
+		fmt.Sprintf("tax account for PMP"),
 	)
 
 	// create matching pool account
@@ -91,6 +94,7 @@ func Boot_StageOnly(ctx context.Context, cloned gov.Cloned) {
 		cloned,
 		MatchingPoolAccountID,
 		account.OwnerID(OwnerID),
+		fmt.Sprintf("matching pool account for PMP"),
 	)
 
 }

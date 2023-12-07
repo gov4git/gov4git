@@ -13,6 +13,7 @@ type Event struct {
 
 type Op struct {
 	Op     string `json:"op"`
+	Note   string `json:"note"`
 	Args   M      `json:"args,omitempty"`
 	Result M      `json:"result,omitempty"`
 }

@@ -62,6 +62,7 @@ func Open_StageOnly(
 		ctx, cloned.PublicClone(),
 		common.BallotEscrowAccountID(name),
 		common.BallotOwnerID(name),
+		fmt.Sprintf("opening ballot %v", name),
 	)
 
 	// write ad

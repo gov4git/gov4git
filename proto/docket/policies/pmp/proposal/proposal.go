@@ -30,30 +30,32 @@ type proposalPolicy struct{}
 func (x proposalPolicy) Open(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion schema.Motion,
+	prop schema.Motion,
 	policyNS ns.NS,
 	args ...any,
 
 ) (policy.Report, notice.Notices) {
 
 	// initialize state
-	state := NewProposalState(motion.ID)
+	state := NewProposalState(prop.ID)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
 	// create a bounty account for the proposal
 	account.Create_StageOnly(
 		ctx,
 		cloned.PublicClone(),
-		pmp.ProposalBountyAccountID(motion.ID),
-		schema.MotionOwnerID(motion.ID),
+		pmp.ProposalBountyAccountID(prop.ID),
+		schema.MotionOwnerID(prop.ID),
+		fmt.Sprintf("bounty account for proposal %v", prop.ID),
 	)
 
 	// create a reward account for the proposal
 	account.Create_StageOnly(
 		ctx,
 		cloned.PublicClone(),
-		pmp.ProposalRewardAccountID(motion.ID),
-		schema.MotionOwnerID(motion.ID),
+		pmp.ProposalRewardAccountID(prop.ID),
+		schema.MotionOwnerID(prop.ID),
+		fmt.Sprintf("reward account for proposal %v", prop.ID),
 	)
 
 	// open a poll for the motion
@@ -62,13 +64,13 @@ func (x proposalPolicy) Open(
 		load.QVStrategyName,
 		cloned,
 		state.ApprovalPoll,
-		fmt.Sprintf("Approval referendum for motion %v", motion.ID),
-		fmt.Sprintf("Up/down vote the approval vote for proposal (pull request) %v", motion.ID),
+		fmt.Sprintf("Approval referendum for motion %v", prop.ID),
+		fmt.Sprintf("Up/down vote the approval vote for proposal (pull request) %v", prop.ID),
 		[]string{pmp.ProposalBallotChoice},
 		member.Everybody,
 	)
 
-	return nil, notice.Noticef("Started managing this PR as Gov4Git proposal `%v`.", motion.ID)
+	return nil, notice.Noticef("Started managing this PR as Gov4Git proposal `%v`.", prop.ID)
 }
 
 func (x proposalPolicy) Score(
@@ -124,11 +126,13 @@ func (x proposalPolicy) Close(
 	isMerged, ok := args[0].(bool) // isMerged
 	must.Assertf(ctx, ok, "proposal closure unrecognized argument")
 
-	referendumName := pmp.ProposalApprovalPollName(prop.ID)
+	approvalPollName := pmp.ProposalApprovalPollName(prop.ID)
+	adt := loadPropApprovalPollTally(ctx, cloned.PublicClone(), prop)
 
 	if isMerged {
 
-		// XXX: accepting a proposal against the popular vote?
+		// accepting a proposal against the popular vote?
+		againstPopular := adt.Tally.Scores[pmp.ProposalBallotChoice] < 0
 
 		// close the referendum for the motion
 		approvalPollName := pmp.ProposalApprovalPollName(prop.ID)
@@ -151,6 +155,7 @@ func (x proposalPolicy) Close(
 			pmp.ProposalBountyAccountID(prop.ID),
 			member.UserAccountID(prop.Author),
 			bounty,
+			fmt.Sprintf("bounty for proposal %v", prop.ID),
 		)
 
 		// distribute rewards
@@ -162,17 +167,18 @@ func (x proposalPolicy) Close(
 			Resolved:            resolved,
 			Bounty:              bounty,
 			Rewarded:            rewards,
-		}, closeNotice(ctx, prop, closeApprovalPoll.Result, resolved, bounty, rewards)
+		}, closeNotice(ctx, prop, againstPopular, closeApprovalPoll.Result, resolved, bounty, rewards)
 
 	} else {
 
-		// XXX: rejecting a proposal against the popular vote?
+		// rejecting a proposal against the popular vote?
+		againstPopular := adt.Tally.Scores[pmp.ProposalBallotChoice] > 0
 
 		// cancel the referendum for the motion (refunds voters)
 		cancelApprovalPoll := ballot.Cancel_StageOnly(
 			ctx,
 			cloned,
-			referendumName,
+			approvalPollName,
 		)
 
 		return &CloseReport{
@@ -181,7 +187,7 @@ func (x proposalPolicy) Close(
 			Resolved:            nil,
 			Bounty:              account.H(account.PluralAsset, 0.0),
 			Rewarded:            nil,
-		}, cancelNotice(ctx, prop, cancelApprovalPoll.Result)
+		}, cancelNotice(ctx, prop, againstPopular, cancelApprovalPoll.Result)
 
 	}
 }

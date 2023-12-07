@@ -14,6 +14,7 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp/concern"
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp/proposal"
 	"github.com/gov4git/gov4git/proto/docket/schema"
+	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/base"
@@ -84,8 +85,8 @@ func testSetup(
 	}
 
 	// give credits to users
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, testUser0Credits))
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, testUser1Credits))
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, testUser0Credits), "test")
+	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, testUser1Credits), "test")
 
 	// cast votes
 	conEls := func(amt float64) common.Elections {
@@ -214,17 +215,17 @@ func TestOpenCloseProposalCancelConcern(t *testing.T) {
 	fmt.Println("PROPOSAL:", form.SprintJSON(propNotices))
 
 	// uncomment to view journal entries
-	// XXX
+	h := history.List(ctx, cty.Gov())
+	fmt.Println("HISTORY:", form.SprintJSON(h))
 
 	// user accounts
-	// u0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
+	u0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
 	u1 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(1)).Balance(account.PluralAsset)
 
-	// XXX: FAILS
-	// exp0 := testUser0Credits - math.Abs(testUser0ConcernStrenth) + math.Abs(testUser0ProposalStrength)
-	// if u0.Quantity <= exp0 {
-	// 	t.Errorf("expecting more than %v, got %v", exp0, u0.Quantity)
-	// }
+	exp0 := testUser0Credits - math.Abs(testUser0ConcernStrenth)
+	if u0.Quantity <= exp0 {
+		t.Errorf("expecting more than %v, got %v", exp0, u0.Quantity)
+	}
 
 	exp1 := testUser1Credits - math.Abs(testUser1ConcernStrength) - math.Abs(testUser1ProposalStrength)
 	if u1.Quantity <= exp1 {

@@ -16,8 +16,10 @@ import (
 
 func LoadIssues(
 	ctx context.Context,
-	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
+	repo Repo,
+	loadPR LoadPRFunc,
+
 ) (ImportedIssues, map[string]ImportedIssue) {
 
 	if ghc == nil {
@@ -28,7 +30,7 @@ func LoadIssues(
 	key := map[string]ImportedIssue{}
 	order := ImportedIssues{}
 	for _, issue := range issues {
-		ghIssue := TransformIssue(ctx, ghc, repo, issue)
+		ghIssue := TransformIssue(ctx, ghc, repo, issue, loadPR)
 		key[ghIssue.Key()] = ghIssue
 		order = append(order, ghIssue)
 	}
@@ -70,18 +72,24 @@ func IsIssueManaged(issue *github.Issue) bool {
 	return util.IsIn(IssueIsManagedLabel, LabelsToStrings(issue.Labels)...)
 }
 
+type LoadPRFunc func(
+	ctx context.Context,
+	repo Repo,
+	issue *github.Issue,
+) bool
+
 func TransformIssue(
 	ctx context.Context,
 	ghc *github.Client,
 	repo Repo,
 	issue *github.Issue,
+	loadPR LoadPRFunc,
 
 ) ImportedIssue {
 
 	author, _ := getIssueAuthorLogin(issue)
 	var pr *github.PullRequest
-	//XXX: for efficiency, load pr info only if "corresponding motion is open"
-	if issue.IsPullRequest() && issue.GetState() == "closed" { // merged state is not relevant for open prs
+	if issue.IsPullRequest() && loadPR(ctx, repo, issue) {
 		var err error
 		pr, _, err = ghc.PullRequests.Get(ctx, repo.Owner, repo.Name, issue.GetNumber())
 		must.NoError(ctx, err)

@@ -17,13 +17,13 @@ var (
 		Run:   func(cmd *cobra.Command, args []string) {},
 	}
 
-	accountDepositCmd = &cobra.Command{
-		Use:   "deposit",
-		Short: "Make a deposit",
+	accountIssueCmd = &cobra.Command{
+		Use:   "issue",
+		Short: "Issue to account",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			account.Deposit(
+			account.Issue(
 				ctx,
 				setup.Gov,
 				account.AccountID(accountToID),
@@ -36,13 +36,13 @@ var (
 		},
 	}
 
-	accountWithdrawCmd = &cobra.Command{
-		Use:   "withdraw",
-		Short: "Make a withdrawal",
+	accountBurnCmd = &cobra.Command{
+		Use:   "burn",
+		Short: "Burn from account",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			account.Withdraw(
+			account.Burn(
 				ctx,
 				setup.Gov,
 				account.AccountID(accountFromID),
@@ -130,24 +130,24 @@ var (
 )
 
 func init() {
-	// deposit
-	accountCmd.AddCommand(accountDepositCmd)
-	accountDepositCmd.Flags().StringVar(&accountToID, "to", "", "to account id")
-	accountDepositCmd.MarkFlagRequired("to")
-	accountDepositCmd.Flags().StringVarP(&accountAsset, "asset", "a", "", "asset")
-	accountDepositCmd.MarkFlagRequired("asset")
-	accountDepositCmd.Flags().Float64VarP(&accountQuantity, "quantity", "q", 0.0, "quantity")
-	accountDepositCmd.MarkFlagRequired("quantity")
-	accountDepositCmd.Flags().StringVarP(&accountNote, "Note", "n", "manual", "note")
-	// withdraw
-	accountCmd.AddCommand(accountWithdrawCmd)
-	accountWithdrawCmd.Flags().StringVar(&accountFromID, "from", "", "from account id")
-	accountWithdrawCmd.MarkFlagRequired("from")
-	accountWithdrawCmd.Flags().StringVarP(&accountAsset, "asset", "a", "", "asset")
-	accountWithdrawCmd.MarkFlagRequired("asset")
-	accountWithdrawCmd.Flags().Float64VarP(&accountQuantity, "quantity", "q", 0.0, "quantity")
-	accountWithdrawCmd.MarkFlagRequired("quantity")
-	accountWithdrawCmd.Flags().StringVarP(&accountNote, "Note", "n", "manual", "note")
+	// issue
+	accountCmd.AddCommand(accountIssueCmd)
+	accountIssueCmd.Flags().StringVar(&accountToID, "to", "", "to account id")
+	accountIssueCmd.MarkFlagRequired("to")
+	accountIssueCmd.Flags().StringVarP(&accountAsset, "asset", "a", "", "asset")
+	accountIssueCmd.MarkFlagRequired("asset")
+	accountIssueCmd.Flags().Float64VarP(&accountQuantity, "quantity", "q", 0.0, "quantity")
+	accountIssueCmd.MarkFlagRequired("quantity")
+	accountIssueCmd.Flags().StringVarP(&accountNote, "Note", "n", "manual", "note")
+	// burn
+	accountCmd.AddCommand(accountBurnCmd)
+	accountBurnCmd.Flags().StringVar(&accountFromID, "from", "", "from account id")
+	accountBurnCmd.MarkFlagRequired("from")
+	accountBurnCmd.Flags().StringVarP(&accountAsset, "asset", "a", "", "asset")
+	accountBurnCmd.MarkFlagRequired("asset")
+	accountBurnCmd.Flags().Float64VarP(&accountQuantity, "quantity", "q", 0.0, "quantity")
+	accountBurnCmd.MarkFlagRequired("quantity")
+	accountBurnCmd.Flags().StringVarP(&accountNote, "Note", "n", "manual", "note")
 	// transfer
 	accountCmd.AddCommand(accountTransferCmd)
 	accountTransferCmd.Flags().StringVar(&accountFromID, "from", "", "from account id")

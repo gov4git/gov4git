@@ -10,7 +10,6 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/member"
-	"github.com/gov4git/gov4git/proto/treasury"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
 	"github.com/spf13/cobra"
@@ -249,7 +248,7 @@ func init() {
 	ballotCmd.AddCommand(ballotCloseCmd)
 	ballotCloseCmd.Flags().StringVar(&ballotName, "name", "", "ballot name")
 	ballotCloseCmd.MarkFlagRequired("name")
-	ballotCloseCmd.Flags().StringVar(&ballotEscrowTo, "to", treasury.BurnAccountID.String(), "account id to receive ballot escrows")
+	ballotCloseCmd.Flags().StringVar(&ballotEscrowTo, "to", account.BurnAccountID.String(), "account id to receive ballot escrows")
 
 	// cancel
 	ballotCmd.AddCommand(ballotCancelCmd)

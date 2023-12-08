@@ -85,8 +85,8 @@ func testSetup(
 	}
 
 	// give credits to users
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, testUser0Credits), "test")
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, testUser1Credits), "test")
+	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, testUser0Credits), "test")
+	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, testUser1Credits), "test")
 
 	// cast votes
 	conEls := func(amt float64) common.Elections {

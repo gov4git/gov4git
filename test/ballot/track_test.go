@@ -23,7 +23,7 @@ func TestTrack(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// give voter credits
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 6.0), "test")
+	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 6.0), "test")
 
 	// open ballot
 	ballot.Open(ctx, load.QVStrategyName, cty.Organizer(), ballotName, "ballot title", "ballot description", choices, member.Everybody)

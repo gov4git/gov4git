@@ -32,8 +32,16 @@ type Account struct {
 	Assets AssetHoldings `json:"assets"`
 }
 
+func (a *Account) DepositOverDraft(ctx context.Context, h Holding) {
+	a.Assets.DepositOverDraft(ctx, h)
+}
+
 func (a *Account) Deposit(ctx context.Context, h Holding) {
 	a.Assets.Deposit(ctx, h)
+}
+
+func (a *Account) WithdrawOverDraft(ctx context.Context, h Holding) {
+	a.Assets.WithdrawOverDraft(ctx, h)
 }
 
 func (a *Account) Withdraw(ctx context.Context, h Holding) {
@@ -54,6 +62,14 @@ func (x AssetHoldings) Balance(asset Asset) Holding {
 	}
 }
 
+func (x AssetHoldings) DepositOverDraft(ctx context.Context, h Holding) {
+	if g, ok := x[h.Asset]; ok {
+		x[h.Asset] = SumHolding(ctx, g, h)
+	} else {
+		x[h.Asset] = h
+	}
+}
+
 func (x AssetHoldings) Deposit(ctx context.Context, h Holding) {
 	if g, ok := x[h.Asset]; ok {
 		d := SumHolding(ctx, g, h)
@@ -64,6 +80,10 @@ func (x AssetHoldings) Deposit(ctx context.Context, h Holding) {
 		must.Assertf(ctx, d.Quantity >= 0, "no funds")
 		x[h.Asset] = d
 	}
+}
+
+func (x AssetHoldings) WithdrawOverDraft(ctx context.Context, h Holding) {
+	x.DepositOverDraft(ctx, NegHolding(h))
 }
 
 func (x AssetHoldings) Withdraw(ctx context.Context, h Holding) {
@@ -89,6 +109,7 @@ func Create(
 	id AccountID,
 	owner OwnerID,
 	note string,
+
 ) {
 	cloned := gov.Clone(ctx, addr)
 	Create_StageOnly(ctx, cloned, id, owner, note)
@@ -102,6 +123,7 @@ func Create_StageOnly(
 	id AccountID,
 	owner OwnerID,
 	note string,
+
 ) {
 	must.Assertf(ctx, !Exists_Local(ctx, cloned, id), "account %v already exists", id)
 	set_StageOnly(ctx, cloned, id, NewAccount(id, owner))
@@ -119,6 +141,7 @@ func Exists_Local(
 	ctx context.Context,
 	cloned gov.Cloned,
 	id AccountID,
+
 ) bool {
 	err := must.Try(func() { Get_Local(ctx, cloned, id) })
 	switch {
@@ -136,6 +159,7 @@ func Get(
 	ctx context.Context,
 	addr gov.Address,
 	id AccountID,
+
 ) *Account {
 	cloned := gov.Clone(ctx, addr)
 	return Get_Local(ctx, cloned, id)
@@ -145,6 +169,7 @@ func Get_Local(
 	ctx context.Context,
 	cloned gov.Cloned,
 	id AccountID,
+
 ) *Account {
 	return accountKV.Get(ctx, accountNS, cloned.Tree(), id)
 }
@@ -156,6 +181,7 @@ func Transfer(
 	to AccountID,
 	amount Holding,
 	note string,
+
 ) {
 	cloned := gov.Clone(ctx, addr)
 	Transfer_StageOnly(ctx, cloned, from, to, amount, note)
@@ -166,18 +192,27 @@ func Transfer(
 func Transfer_StageOnly(
 	ctx context.Context,
 	cloned gov.Cloned,
-	from AccountID,
-	to AccountID,
+	fromID AccountID,
+	toID AccountID,
 	amount Holding,
 	note string,
+
 ) {
-	Withdraw_StageOnly(history.Mute(ctx), cloned, from, amount, note)
-	Deposit_StageOnly(history.Mute(ctx), cloned, to, amount, note)
+
+	from := Get_Local(ctx, cloned, fromID)
+	from.Withdraw(ctx, amount)
+
+	to := Get_Local(ctx, cloned, toID)
+	to.Deposit(ctx, amount)
+
+	set_StageOnly(ctx, cloned, fromID, from)
+	set_StageOnly(ctx, cloned, toID, to)
+
 	history.Log_StageOnly(ctx, cloned, &history.Event{
 		Op: &history.Op{
 			Op:     "account_transfer",
 			Note:   note,
-			Args:   history.M{"from": from, "to": to, "amount": amount},
+			Args:   history.M{"from": fromID, "to": toID, "amount": amount},
 			Result: nil,
 		},
 	})
@@ -190,71 +225,89 @@ func TryTransfer_StageOnly(
 	to AccountID,
 	amount Holding,
 	note string,
+
 ) error {
 	return must.Try(func() { Transfer_StageOnly(ctx, cloned, from, to, amount, note) })
 }
 
-func Deposit(
+func Issue(
 	ctx context.Context,
 	addr gov.Address,
 	to AccountID,
 	amount Holding,
 	note string,
+
 ) {
+
 	cloned := gov.Clone(ctx, addr)
-	Deposit_StageOnly(ctx, cloned, to, amount, note)
-	proto.Commitf(ctx, cloned, "account_deposit", "deposit %v to %v (%v)", amount, to, note)
+	Issue_StageOnly(ctx, cloned, to, amount, note)
+	proto.Commitf(ctx, cloned, "account_issue", "issue %v to %v (%v)", amount, to, note)
 	cloned.Push(ctx)
 }
 
-func Deposit_StageOnly(
+func Issue_StageOnly(
 	ctx context.Context,
 	cloned gov.Cloned,
-	to AccountID,
+	toID AccountID,
 	amount Holding,
 	note string,
+
 ) {
-	a := Get_Local(ctx, cloned, to)
-	a.Deposit(ctx, amount)
-	set_StageOnly(ctx, cloned, to, a)
+
+	TransferOverDraft_StageOnly(
+		history.Mute(ctx),
+		cloned,
+		IssueAccountID,
+		toID,
+		amount,
+		note,
+	)
 	history.Log_StageOnly(ctx, cloned, &history.Event{
 		Op: &history.Op{
-			Op:     "account_deposit",
+			Op:     "account_issue",
 			Note:   note,
-			Args:   history.M{"to": to, "amount": amount},
+			Args:   history.M{"from": IssueAccountID, "to": toID, "amount": amount},
 			Result: nil,
 		},
 	})
 }
 
-func Withdraw(
+func Burn(
 	ctx context.Context,
 	addr gov.Address,
-	from AccountID,
+	fromID AccountID,
 	amount Holding,
 	note string,
+
 ) {
+
 	cloned := gov.Clone(ctx, addr)
-	Withdraw_StageOnly(ctx, cloned, from, amount, note)
-	proto.Commitf(ctx, cloned, "account_withdraw", "withdraw %v from %v (%v)", amount, from, note)
+	Burn_StageOnly(ctx, cloned, fromID, amount, note)
+	proto.Commitf(ctx, cloned, "account_burn", "burn %v from %v (%v)", amount, fromID, note)
 	cloned.Push(ctx)
 }
 
-func Withdraw_StageOnly(
+func Burn_StageOnly(
 	ctx context.Context,
 	cloned gov.Cloned,
-	from AccountID,
+	fromID AccountID,
 	amount Holding,
 	note string,
+
 ) {
-	a := Get_Local(ctx, cloned, from)
-	a.Withdraw(ctx, amount)
-	set_StageOnly(ctx, cloned, from, a)
+	TransferOverDraft_StageOnly(
+		history.Mute(ctx),
+		cloned,
+		fromID,
+		BurnAccountID,
+		amount,
+		note,
+	)
 	history.Log_StageOnly(ctx, cloned, &history.Event{
 		Op: &history.Op{
-			Op:     "account_withdraw",
+			Op:     "account_burn",
 			Note:   note,
-			Args:   history.M{"from": from, "amount": amount},
+			Args:   history.M{"from": fromID, "to": BurnAccountID, "amount": amount},
 			Result: nil,
 		},
 	})
@@ -265,6 +318,7 @@ func set_StageOnly(
 	cloned gov.Cloned,
 	id AccountID,
 	account *Account,
+
 ) {
 	accountKV.Set(ctx, accountNS, cloned.Tree(), id, account)
 }
@@ -272,6 +326,7 @@ func set_StageOnly(
 func List(
 	ctx context.Context,
 	addr gov.Address,
+
 ) []AccountID {
 	cloned := gov.Clone(ctx, addr)
 	return List_Local(ctx, cloned)
@@ -280,6 +335,48 @@ func List(
 func List_Local(
 	ctx context.Context,
 	cloned gov.Cloned,
+
 ) []AccountID {
 	return accountKV.ListKeys(ctx, accountNS, cloned.Tree())
+}
+
+func TransferOverDraft_StageOnly(
+	ctx context.Context,
+	cloned gov.Cloned,
+	fromID AccountID,
+	toID AccountID,
+	amount Holding,
+	note string,
+
+) {
+
+	from := Get_Local(ctx, cloned, fromID)
+	from.WithdrawOverDraft(ctx, amount)
+
+	to := Get_Local(ctx, cloned, toID)
+	to.DepositOverDraft(ctx, amount)
+
+	set_StageOnly(ctx, cloned, fromID, from)
+	set_StageOnly(ctx, cloned, toID, to)
+
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Op: &history.Op{
+			Op:     "account_transfer_overdraft",
+			Note:   note,
+			Args:   history.M{"from": fromID, "to": toID, "amount": amount},
+			Result: nil,
+		},
+	})
+}
+
+func TryTransferOverDraft_StageOnly(
+	ctx context.Context,
+	cloned gov.Cloned,
+	from AccountID,
+	to AccountID,
+	amount Holding,
+	note string,
+
+) error {
+	return must.Try(func() { TransferOverDraft_StageOnly(ctx, cloned, from, to, amount, note) })
 }

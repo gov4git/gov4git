@@ -15,8 +15,7 @@ var (
 	ConcernBallotChoice  = "rank"
 	ProposalBallotChoice = "rank"
 
-	// We chose not to use "resolves", because it triggers GitHub to close the resolved issue immediately.
-	ResolvesRefType = schema.RefType("addresses")
+	ResolvesRefType = schema.RefType("resolves")
 )
 
 func ConcernPollBallotName(id schema.MotionID) common.BallotName {

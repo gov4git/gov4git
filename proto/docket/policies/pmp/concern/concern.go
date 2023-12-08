@@ -105,6 +105,30 @@ func (x concernPolicy) Update(
 	return x.updateFreeze(ctx, cloned, motion, policyNS)
 }
 
+func (x concernPolicy) updateFreeze(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion schema.Motion,
+	policyNS ns.NS,
+	args ...any,
+
+) (policy.Report, notice.Notices) {
+
+	toState := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+
+	notices := notice.Notices{}
+	if toState.EligibleProposals.Len() > 0 && !motion.Frozen {
+		ops.FreezeMotion_StageOnly(ctx, cloned, motion.ID)
+		notices = append(notices, notice.Noticef("Freezing ❄️ issue as there are eligible PRs addressing it.")...)
+	}
+	if toState.EligibleProposals.Len() == 0 && motion.Frozen {
+		ops.UnfreezeMotion_StageOnly(ctx, cloned, motion.ID)
+		notices = append(notices, notice.Noticef("Unfreezing 🌤️ issue as there are no eligible PRs are addressing it.")...)
+	}
+
+	return nil, notices
+}
+
 func (x concernPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
@@ -270,30 +294,6 @@ func (x concernPolicy) RemoveRefFrom(
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
 
 	return nil, notice.Noticef("This issue is no longer referenced by the PR, managed as Gov4Git proposal `%v`.", from.ID)
-}
-
-func (x concernPolicy) updateFreeze(
-	ctx context.Context,
-	cloned gov.OwnerCloned,
-	motion schema.Motion,
-	policyNS ns.NS,
-	args ...any,
-
-) (policy.Report, notice.Notices) {
-
-	toState := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
-
-	notices := notice.Notices{}
-	if toState.EligibleProposals.Len() > 0 && !motion.Frozen {
-		ops.FreezeMotion_StageOnly(ctx, cloned, motion.ID)
-		notices = append(notices, notice.Noticef("Freezing ❄️ issue as there are eligible PRs addressing it.")...)
-	}
-	if toState.EligibleProposals.Len() == 0 && motion.Frozen {
-		ops.UnfreezeMotion_StageOnly(ctx, cloned, motion.ID)
-		notices = append(notices, notice.Noticef("Unfreezing 🌤️ issue as there are no eligible PRs are addressing it.")...)
-	}
-
-	return nil, notices
 }
 
 func (x concernPolicy) Freeze(

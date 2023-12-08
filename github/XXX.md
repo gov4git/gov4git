@@ -1,2 +1,3 @@
+- manual integration test
 - multiple issues per proposal
 - multiple proposals per issue

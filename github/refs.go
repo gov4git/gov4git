@@ -2,6 +2,7 @@ package github
 
 import (
 	"context"
+	"strings"
 
 	"github.com/gov4git/gov4git/proto/docket/ops"
 	"github.com/gov4git/gov4git/proto/docket/schema"
@@ -38,7 +39,7 @@ func syncRefs(
 				ref := schema.Ref{
 					From: from,
 					To:   to,
-					Type: schema.RefType(importedRef.Type),
+					Type: schema.RefType(strings.ToLower(importedRef.Type)),
 				}
 				issueRefs[ref] = true
 			}

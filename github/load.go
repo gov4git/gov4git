@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/go-github/v55/github"
@@ -126,12 +127,12 @@ func parseIssueRefs(ctx context.Context, repo Repo, issue *github.Issue) []Impor
 			base.Infof("reference %q has unparsable issue number %q", m[0], m[5])
 			continue
 		}
-		ref := ImportedRef{To: int64(n), Type: m[1]}
+		ref := ImportedRef{To: int64(n), Type: strings.ToLower(m[1])}
 		refs = append(refs, ref)
 	}
 	return refs
 }
 
-const refRegexpSrc = `^([a-zA-Z0-9\-:_]+)\s+https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)/(issues|pull)/(\d+)$`
+const refRegexpSrc = `([a-zA-Z0-9\-:_]+)\s+https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)/(issues|pull)/(\d+)`
 
 var refRegexp = regexp.MustCompile(refRegexpSrc)

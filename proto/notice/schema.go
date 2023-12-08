@@ -28,22 +28,22 @@ func Noticef(format string, args ...any) Notices {
 type Notices []Notice
 
 type NoticeState struct {
-	ID        string    `json:"id"`
-	Stamp     time.Time `json:"stamp"`
-	Notice    Notice    `json:"notice"`
-	Displayed bool      `json:"shown"`
+	ID     string    `json:"id"`
+	Stamp  time.Time `json:"stamp"`
+	Notice Notice    `json:"notice"`
+	Shown  bool      `json:"shown"`
 }
 
-func (x *NoticeState) IsDisplayed() bool {
-	return x.Displayed
+func (x *NoticeState) IsShown() bool {
+	return x.Shown
 }
 
-func (x *NoticeState) SetDisplayed() {
-	x.Displayed = true
+func (x *NoticeState) MarkShown() {
+	x.Shown = true
 }
 
 type NoticeQueue struct {
-	NoticeStates []NoticeState `json:"notices"`
+	NoticeStates []*NoticeState `json:"notices"`
 }
 
 func NewNoticeQueue() *NoticeQueue {
@@ -52,11 +52,11 @@ func NewNoticeQueue() *NoticeQueue {
 
 func (x *NoticeQueue) Append(notices ...Notice) {
 	for _, notice := range notices {
-		s := NoticeState{
-			ID:        GenerateRandomNoticeID(),
-			Stamp:     time.Now(),
-			Notice:    notice,
-			Displayed: false,
+		s := &NoticeState{
+			ID:     GenerateRandomNoticeID(),
+			Stamp:  time.Now(),
+			Notice: notice,
+			Shown:  false,
 		}
 		x.NoticeStates = append(x.NoticeStates, s)
 	}

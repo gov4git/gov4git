@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	ConcernBallotChoice  = "priority"
-	ProposalBallotChoice = "approval"
+	ConcernBallotChoice  = "rank"
+	ProposalBallotChoice = "rank"
 
 	// We chose not to use "resolves", because it triggers GitHub to close the resolved issue immediately.
 	ResolvesRefType = schema.RefType("addresses")

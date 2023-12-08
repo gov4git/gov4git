@@ -10,7 +10,6 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
-	"github.com/gov4git/gov4git/proto/treasury"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/base"
@@ -30,7 +29,7 @@ func TestReopen(t *testing.T) {
 	ballot.Open(ctx, strat, cty.Organizer(), ballotName, "ballot_name", "ballot description", choices, member.Everybody)
 
 	// give credits to user
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 4.0), "test")
+	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 4.0), "test")
 
 	// vote#1
 	elections := common.Elections{
@@ -45,7 +44,7 @@ func TestReopen(t *testing.T) {
 	}
 
 	// close
-	ballot.Close(ctx, cty.Organizer(), ballotName, treasury.BurnAccountID)
+	ballot.Close(ctx, cty.Organizer(), ballotName, account.BurnAccountID)
 
 	// verify state changed
 	ast := ballot.Show(ctx, gov.Address(cty.Organizer().Public), ballotName)

@@ -16,7 +16,7 @@ func TestBureau(t *testing.T) {
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	// credit user 0 with some cash
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 3.0), "test")
+	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 3.0), "test")
 
 	// user 0 requests transfer to user 1
 	bureau.Transfer(ctx, cty.MemberOwner(0), cty.Gov(), member.User(""), cty.MemberUser(1), 1.0)

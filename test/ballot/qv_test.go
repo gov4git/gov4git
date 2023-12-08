@@ -9,7 +9,6 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/member"
-	"github.com/gov4git/gov4git/proto/treasury"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/form"
@@ -24,8 +23,8 @@ func TestQV(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// give voter credits
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 100.0), "test")
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 100.0), "test")
+	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 100.0), "test")
+	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 100.0), "test")
 
 	// open
 	strat := load.QVStrategyName
@@ -106,7 +105,7 @@ func TestQV(t *testing.T) {
 	}
 
 	// close
-	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, treasury.BurnAccountID)
+	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, account.BurnAccountID)
 	fmt.Println("close: ", form.SprintJSON(closeChg))
 
 	// check the balances

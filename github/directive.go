@@ -146,7 +146,7 @@ func processDirectiveIssue_StageOnly(
 	case d.IssueVotingCredits != nil:
 		err = must.Try(
 			func() {
-				account.Deposit_StageOnly(
+				account.Issue_StageOnly(
 					ctx,
 					govCloned.PublicClone(),
 					member.UserAccountID(member.User(d.IssueVotingCredits.To)),

@@ -40,7 +40,7 @@ func TestOpenClose(t *testing.T) {
 	}
 
 	// give credits to user
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 13.0), "test")
+	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 13.0), "test")
 
 	// score
 	ops.ScoreMotions(ctx, cty.Organizer())

@@ -19,11 +19,11 @@ gov4git user add --name member2 --repo member_public --branch main
 
 # account
 
-gov4git account deposit --to user:member1 --asset apple --quantity 30.0
+gov4git account issue --to user:member1 --asset apple --quantity 30.0
 gov4git account balance --id user:member1 --asset apple
 stdout 30
 
-gov4git account withdraw --from user:member1 --asset apple --quantity 10.0
+gov4git account burn --from user:member1 --asset apple --quantity 10.0
 gov4git account balance --id user:member1 --asset apple
 stdout 20
 

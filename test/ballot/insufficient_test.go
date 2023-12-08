@@ -9,7 +9,6 @@ import (
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/member"
-	"github.com/gov4git/gov4git/proto/treasury"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/form"
@@ -39,7 +38,7 @@ func TestInsufficientCredits(t *testing.T) {
 	fmt.Println("open: ", form.SprintJSON(openChg))
 
 	// give voter credits
-	account.Deposit(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0), "test")
+	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0), "test")
 
 	// vote
 	elections := common.Elections{
@@ -61,7 +60,7 @@ func TestInsufficientCredits(t *testing.T) {
 	}
 
 	// close
-	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, treasury.BurnAccountID)
+	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, account.BurnAccountID)
 	fmt.Println("close: ", form.SprintJSON(closeChg))
 
 	// testutil.Hang()

@@ -130,6 +130,5 @@ func (j Journal[X]) Log_StageOnly(
 		now.Second(),
 		id,
 	)
-	fmt.Println(filebase)
 	git.ToFileStage[Entry[X]](ctx, t, dirNS.Append(filebase), entry)
 }

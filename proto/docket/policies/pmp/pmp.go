@@ -15,7 +15,8 @@ var (
 	ConcernBallotChoice  = "priority"
 	ProposalBallotChoice = "approval"
 
-	ResolvesRefType = schema.RefType("gov4git-resolves")
+	// We chose not to use "resolves", because it triggers GitHub to close the resolved issue immediately.
+	ResolvesRefType = schema.RefType("addresses")
 )
 
 func ConcernPollBallotName(id schema.MotionID) common.BallotName {

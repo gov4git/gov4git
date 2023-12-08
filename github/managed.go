@@ -89,7 +89,9 @@ func SyncManagedIssues_StageOnly(
 			if motion, ok := motions[id]; ok { // if motion for issue already exists, update it
 				changed := syncMeta(ctx, cloned, syncChanges, issue, motion)
 				switch {
+
 				case issue.Closed && motion.Closed:
+
 				case issue.Closed && !motion.Closed:
 					syncFrozen(ctx, cloned, syncChanges, issue, motion)
 					if motion.IsConcern() {
@@ -108,6 +110,7 @@ func SyncManagedIssues_StageOnly(
 						must.Errorf(ctx, "motion is neither a concern nor a proposal")
 					}
 					changed = true
+
 				case !issue.Closed && motion.Closed:
 					base.Infof("GitHub issue %v has been re-opened; corresonding motion remains closed", issue.Number)
 					ops.AppendMotionNotices_StageOnly(
@@ -116,19 +119,25 @@ func SyncManagedIssues_StageOnly(
 						id,
 						notice.Noticef("Reopening an issue or a PR [#%v](%v) is not allowed. Create a new one instead.", id, motion.TrackerURL),
 					)
+
 				case !issue.Closed && !motion.Closed:
 					changed = changed || syncFrozen(ctx, cloned, syncChanges, issue, motion)
+
 				}
 				if changed {
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
+
 			} else { // otherwise, no motion for this issue exists, so create one
+
 				if !issue.Closed {
 					syncCreateMotionForIssue(ctx, govAddr, cloned, syncChanges, issue, id)
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
+
 			}
 		} else { // issue is not governed, freeze motion if it exists and is open
+
 			if motion, ok := motions[id]; ok { // motion for issue already exists, update it
 				// if motion closed, do nothing
 				// if motion frozen, do nothing
@@ -139,6 +148,7 @@ func SyncManagedIssues_StageOnly(
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
 			}
+
 		}
 	}
 

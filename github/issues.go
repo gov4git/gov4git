@@ -50,7 +50,14 @@ func ImportIssuesForPrioritization_StageOnly(
 
 	// load github issues and governance ballots, and
 	// index them under a common key space
-	_, issues := LoadIssues(ctx, repo, githubClient)
+	loadPR := func(ctx context.Context,
+		repo Repo,
+		issue *github.Issue,
+	) bool {
+
+		return false
+	}
+	_, issues := LoadIssues(ctx, githubClient, repo, loadPR)
 	ballots := filterIssuesForPrioritization(ballot.List_Local(ctx, govCloned.PublicClone()))
 
 	// ensure every issue has a corresponding up-to-date ballot

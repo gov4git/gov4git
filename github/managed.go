@@ -79,8 +79,21 @@ func SyncManagedIssues_StageOnly(
 
 	// load github issues and governance motions, and
 	// index them under a common key space
-	_, issues := LoadIssues(ctx, repo, githubClient)
 	motions := indexMotions(ops.ListMotions_Local(ctx, t))
+	loadPR := func(ctx context.Context,
+		repo Repo,
+		issue *github.Issue,
+	) bool {
+
+		id := IssueNumberToMotionID(int64(issue.GetNumber()))
+		m, motionExists := motions[id]
+
+		return IsIssueManaged(issue) && // merged state not relevant if issue is not managed
+			issue.GetState() == "closed" && // merged state is not relevant for open prs
+			(!motionExists || !m.Closed) // merged state is relevant, when no corresponding motion exists or motion is open
+	}
+
+	_, issues := LoadIssues(ctx, githubClient, repo, loadPR)
 
 	// ensure every issue has a corresponding up-to-date motion
 	for key, issue := range issues {

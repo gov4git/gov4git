@@ -5,6 +5,7 @@ import (
 	"os"
 
 	govgh "github.com/gov4git/gov4git/github"
+	"github.com/gov4git/gov4git/github/deploy/tools"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/vendor4git/github"
@@ -120,6 +121,21 @@ This creates a public repo. Adding the flag --private will result in creating a 
 			must.NoError(ctx, err)
 		},
 	}
+
+	githubClearCommentsCmd = &cobra.Command{
+		Use:   "clear-comments",
+		Short: "Delete all comments from an issue or PR",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			ghRepo := govgh.ParseRepo(ctx, githubRepo)
+			tools.ClearComments(
+				ctx,
+				githubToken,
+				ghRepo,
+				githubIssueNo,
+			)
+		},
+	}
 )
 
 var (
@@ -129,6 +145,7 @@ var (
 	githubGov     string
 	githubRepo    string
 	githubPrivate bool
+	githubIssueNo int64
 )
 
 func init() {
@@ -159,5 +176,13 @@ func init() {
 	githubRemoveCmd.Flags().StringVar(&githubRepo, "repo", "", "GitHub owner/repo")
 	githubRemoveCmd.MarkFlagRequired("token")
 	githubRemoveCmd.MarkFlagRequired("repo")
+
+	githubCmd.AddCommand(githubClearCommentsCmd)
+	githubClearCommentsCmd.Flags().StringVar(&githubToken, "token", "", "GitHub access token")
+	githubClearCommentsCmd.Flags().StringVar(&githubRepo, "repo", "", "GitHub owner/repo")
+	githubClearCommentsCmd.Flags().Int64Var(&githubIssueNo, "issue", -1, "GitHub issue or PR number (0 means all)")
+	githubClearCommentsCmd.MarkFlagRequired("token")
+	githubClearCommentsCmd.MarkFlagRequired("project")
+	githubClearCommentsCmd.MarkFlagRequired("issue")
 
 }

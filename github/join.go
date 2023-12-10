@@ -112,20 +112,20 @@ func processJoinRequestIssue_StageOnly(
 	u := issue.GetUser()
 	if u == nil {
 		base.Infof("github identity of issue author is not available: %v", form.SprintJSON(issue))
-		replyAndCloseIssue(ctx, repo, ghc, issue, "The GitHub identity of the issue's author is not available.")
+		replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject, "The GitHub identity of the issue's author is not available.")
 		return ""
 	}
 	login := strings.ToLower(u.GetLogin())
 	if login == "" {
 		base.Infof("github user of issue author is not available: %v", form.SprintJSON(issue))
-		replyAndCloseIssue(ctx, repo, ghc, issue, "The GitHub user of the issue's author is not available.")
+		replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject, "The GitHub user of the issue's author is not available.")
 		return ""
 	}
 
 	info, err := parseJoinRequest(login, issue.GetBody())
 	if err != nil {
 		base.Infof("request form cannot be parsed: %q", issue.GetBody())
-		replyAndCloseIssue(ctx, repo, ghc, issue, "The join request form cannot be parsed.")
+		replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject, "The join request form cannot be parsed.")
 		return ""
 	}
 	if info.Email == "" {
@@ -146,11 +146,11 @@ func processJoinRequestIssue_StageOnly(
 	)
 	if err != nil {
 		base.Infof("could not add member %v (%v)", login, err)
-		replyAndCloseIssue(ctx, repo, ghc, issue, fmt.Sprintf("Could not add member due to `%v`. Reopen the issue to retry.", err))
+		replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject, fmt.Sprintf("Could not add member due to `%v`. Reopen the issue to retry.", err))
 		return ""
 	}
 
-	replyAndCloseIssue(ctx, repo, ghc, issue, fmt.Sprintf("@%v was added to the community.", login))
+	replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject, fmt.Sprintf("@%v was added to the community.", login))
 	return login
 }
 

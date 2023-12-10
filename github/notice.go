@@ -50,8 +50,8 @@ func flushNotices(
 
 		// TODO: check if notice already displayed, according to github
 
-		payload := fmt.Sprintf("### 🏛️ Gov4Git notice `%v`\n\n", nstate.ID) + nstate.Notice.Body
-		replyToIssue(ctx, repo, ghc, issueNum, payload)
+		subject := fmt.Sprintf("Gov4Git notice `%v`", nstate.ID)
+		replyToIssue(ctx, repo, ghc, issueNum, subject, nstate.Notice.Body)
 		nstate.MarkShown()
 	}
 }

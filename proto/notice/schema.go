@@ -66,5 +66,5 @@ func GenerateRandomNoticeID() string {
 	const w = 512 / 8 // 512 bits, measured in bytes
 	buf := make([]byte, w)
 	rand.Read(buf)
-	return strings.ToUpper(form.BytesHashForFilename(buf)[:6])
+	return strings.ToLower(form.BytesHashForFilename(buf)[:6])
 }

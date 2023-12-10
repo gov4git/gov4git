@@ -125,20 +125,20 @@ func processDirectiveIssue_StageOnly(
 	u := issue.GetUser()
 	if u == nil {
 		base.Infof("github identity of issue author is not available: %v", form.SprintJSON(issue))
-		replyAndCloseIssue(ctx, repo, ghc, issue, "The GitHub identity of the issue's author is not available.")
+		replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject, "The GitHub identity of the issue's author is not available.")
 		return DirectiveIssue{}, fmt.Errorf("identity of issue author is not available")
 	}
 	login := strings.ToLower(u.GetLogin())
 	if login == "" {
 		base.Infof("github user of issue author is not available: %v", form.SprintJSON(issue))
-		replyAndCloseIssue(ctx, repo, ghc, issue, "The GitHub login of the issue's author is not available.")
+		replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject, "The GitHub login of the issue's author is not available.")
 		return DirectiveIssue{}, fmt.Errorf("user of issue author is not available")
 	}
 
 	d, err := parseDirective(issue.GetBody())
 	if err != nil {
 		base.Infof("directive cannot be parsed (%v): %q", err, issue.GetBody())
-		replyAndCloseIssue(ctx, repo, ghc, issue, "Your directive cannot be parsed.")
+		replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject, "Your directive cannot be parsed.")
 		return DirectiveIssue{}, err
 	}
 
@@ -160,11 +160,13 @@ func processDirectiveIssue_StageOnly(
 				d.IssueVotingCredits.Amount, d.IssueVotingCredits.To, err)
 			replyAndCloseIssue(
 				ctx, repo, ghc, issue,
+				FollowUpSubject,
 				fmt.Sprintf("Could not issue `%v` credits to member @%v. Reopen the issue to retry.\n\nBecause: `%v`",
 					d.IssueVotingCredits.Amount, d.IssueVotingCredits.To, err))
 			return DirectiveIssue{}, err
 		}
 		replyAndCloseIssue(ctx, repo, ghc, issue,
+			FollowUpSubject,
 			fmt.Sprintf("Issued `%v` credits to member @%v.",
 				d.IssueVotingCredits.Amount, d.IssueVotingCredits.To))
 		return d, nil
@@ -187,11 +189,13 @@ func processDirectiveIssue_StageOnly(
 				d.TransferVotingCredits.Amount, d.TransferVotingCredits.From, d.TransferVotingCredits.To, err)
 			replyAndCloseIssue(
 				ctx, repo, ghc, issue,
+				FollowUpSubject,
 				fmt.Sprintf("Could not transfer `%v` credits from member @%v to member @%v. Reopen the issue to retry.\n\nBecause: `%v`",
 					d.TransferVotingCredits.Amount, d.TransferVotingCredits.From, d.TransferVotingCredits.To, err))
 			return DirectiveIssue{}, err
 		}
 		replyAndCloseIssue(ctx, repo, ghc, issue,
+			FollowUpSubject,
 			fmt.Sprintf("Transferred `%v` credits from member @%v to member @%v.",
 				d.TransferVotingCredits.Amount, d.TransferVotingCredits.From, d.TransferVotingCredits.To))
 		return d, nil

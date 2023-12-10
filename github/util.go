@@ -49,9 +49,10 @@ func replyAndCloseIssue(
 	repo Repo,
 	ghc *github.Client,
 	issue *github.Issue,
+	subject string,
 	payload string,
 ) {
-	replyToIssue(ctx, repo, ghc, issue.GetNumber(), payload)
+	replyToIssue(ctx, repo, ghc, issue.GetNumber(), subject, payload)
 	closeIssue(ctx, repo, ghc, issue)
 }
 
@@ -60,15 +61,24 @@ func replyToIssue(
 	repo Repo,
 	ghc *github.Client,
 	issueNum int,
+	subject string,
 	payload string,
 ) {
 
+	header := fmt.Sprintf("## <a href=\"https://gov4git.org\"><img src=%q alt=\"This project is governed with Gov4Git.\" width=\"65\" /></a> %s\n\n",
+		Gov4GitAvatarURL, subject)
+
 	comment := &github.IssueComment{
-		Body: github.String(payload),
+		Body: github.String(header + payload),
 	}
 	_, _, err := ghc.Issues.CreateComment(ctx, repo.Owner, repo.Name, issueNum, comment)
 	must.NoError(ctx, err)
 }
+
+const (
+	Gov4GitAvatarURL = "https://raw.githubusercontent.com/gov4git/gov4git/collab/materials/gov4git-avatar.png"
+	FollowUpSubject  = "Follow up"
+)
 
 func closeIssue(
 	ctx context.Context,

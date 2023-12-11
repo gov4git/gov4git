@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v55/github"
+	"github.com/gov4git/gov4git/materials"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/util"
 )
@@ -65,8 +66,8 @@ func replyToIssue(
 	payload string,
 ) {
 
-	header := fmt.Sprintf("## <a href=\"https://gov4git.org\"><img src=%q alt=\"This project is governed with Gov4Git.\" width=\"65\" /></a> %s\n\n",
-		Gov4GitAvatarURL, subject)
+	header := fmt.Sprintf("## <a href=%q><img src=%q alt=\"This project is governed with Gov4Git.\" width=\"65\" /></a> %s\n\n",
+		materials.Gov4GitWebsiteURL, materials.Gov4GitAvatarURL, subject)
 
 	comment := &github.IssueComment{
 		Body: github.String(header + payload),
@@ -76,8 +77,7 @@ func replyToIssue(
 }
 
 const (
-	Gov4GitAvatarURL = "https://raw.githubusercontent.com/gov4git/gov4git/collab/materials/gov4git-avatar.png"
-	FollowUpSubject  = "Follow up"
+	FollowUpSubject = "Follow up"
 )
 
 func closeIssue(

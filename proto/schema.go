@@ -11,7 +11,10 @@ import (
 	"github.com/gov4git/lib4git/ns"
 )
 
-var RootNS = ns.NS{}
+var (
+	RootNS   = ns.NS{}
+	ReadmeNS = RootNS.Append("README.md")
+)
 
 func Commit(ctx context.Context, t *git.Tree, chg git.Commitable) {
 	var w bytes.Buffer

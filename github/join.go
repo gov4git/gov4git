@@ -3,6 +3,7 @@ package github
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/google/go-github/v55/github"
@@ -21,11 +22,12 @@ func ProcessJoinRequestIssuesApprovedByMaintainer(
 	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OwnerAddress,
+	allowNonGithubJoins bool,
 ) git.Change[form.Map, ProcessJoinRequestIssuesReport] {
 
 	maintainers := FetchRepoMaintainers(ctx, repo, ghc)
 	base.Infof("maintainers for %v are %v", repo, form.SprintJSON(maintainers))
-	return ProcessJoinRequestIssues(ctx, repo, ghc, govAddr, maintainers)
+	return ProcessJoinRequestIssues(ctx, repo, ghc, govAddr, maintainers, allowNonGithubJoins)
 }
 
 func ProcessJoinRequestIssues(
@@ -34,10 +36,19 @@ func ProcessJoinRequestIssues(
 	ghc *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OwnerAddress,
 	approverGitHubUsers []string,
+	allowNonGithubJoins bool,
 ) git.Change[form.Map, ProcessJoinRequestIssuesReport] {
 
 	govCloned := gov.CloneOwner(ctx, govAddr)
-	report := ProcessJoinRequestIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned, approverGitHubUsers)
+	report := ProcessJoinRequestIssues_StageOnly(
+		ctx,
+		repo,
+		ghc,
+		govAddr,
+		govCloned,
+		approverGitHubUsers,
+		allowNonGithubJoins,
+	)
 	chg := git.NewChange[form.Map, ProcessJoinRequestIssuesReport](
 		fmt.Sprintf("Add %d new community members; skipped %d", len(report.Joined), len(report.NotJoined)),
 		"github_process_join_request_issues",
@@ -66,6 +77,7 @@ func ProcessJoinRequestIssues_StageOnly(
 	govAddr gov.OwnerAddress,
 	govCloned gov.OwnerCloned,
 	approvers []string,
+	allowNonGithubJoins bool,
 ) ProcessJoinRequestIssuesReport { // return list of new member usernames
 
 	report := ProcessJoinRequestIssuesReport{}
@@ -76,7 +88,7 @@ func ProcessJoinRequestIssues_StageOnly(
 		if !isJoinRequestIssue(issue) {
 			continue
 		}
-		newMember := processJoinRequestIssue_StageOnly(ctx, repo, ghc, govAddr, govCloned, approvers, issue)
+		newMember := processJoinRequestIssue_StageOnly(ctx, repo, ghc, govAddr, govCloned, approvers, allowNonGithubJoins, issue)
 		if newMember != "" {
 			report.Joined = append(report.Joined, newMember)
 		} else {
@@ -100,6 +112,7 @@ func processJoinRequestIssue_StageOnly(
 	govAddr gov.OwnerAddress,
 	govCloned gov.OwnerCloned,
 	approverGitHubUsers []string,
+	allowNonGithubJoins bool,
 	issue *github.Issue,
 ) string { // return new member username, if joined
 
@@ -109,6 +122,7 @@ func processJoinRequestIssue_StageOnly(
 		return ""
 	}
 
+	// find the github login of the requesting user
 	u := issue.GetUser()
 	if u == nil {
 		base.Infof("github identity of issue author is not available: %v", form.SprintJSON(issue))
@@ -122,6 +136,7 @@ func processJoinRequestIssue_StageOnly(
 		return ""
 	}
 
+	// extract the join request from the github issue body
 	info, err := parseJoinRequest(login, issue.GetBody())
 	if err != nil {
 		base.Infof("request form cannot be parsed: %q", issue.GetBody())
@@ -130,6 +145,19 @@ func processJoinRequestIssue_StageOnly(
 	}
 	if info.Email == "" {
 		info.Email = u.GetEmail()
+	}
+
+	// verify that the gov4git repo url matches the login of the requesting user
+	if !allowNonGithubJoins && info.PublicRepo.Owner != info.User {
+		base.Infof("reguster's GitHub login %s does not match the public repo owner %s", info.User, info.PublicRepo.Owner)
+		replyAndCloseIssue(
+			ctx, repo, ghc, issue, FollowUpSubject,
+			fmt.Sprintf(
+				"The regusting user, @%s, does not match the owner, @%s, of the provided Gov4Git public identity repo.",
+				info.User, info.PublicRepo.Owner,
+			),
+		)
+		return ""
 	}
 
 	// fetch comments and find a join approval
@@ -156,6 +184,7 @@ func processJoinRequestIssue_StageOnly(
 
 type JoinRequest struct {
 	User         string     `json:"github_user"`
+	PublicRepo   Repo       `json:"public_repo"`
 	PublicURL    git.URL    `json:"public_url"`
 	PublicBranch git.Branch `json:"public_branch"`
 	Email        string     `json:"email"`
@@ -192,12 +221,34 @@ func parseJoinRequest(authorLogin string, body string) (*JoinRequest, error) {
 	if err != nil {
 		return nil, err
 	}
+	publicURL = git.URL(strings.TrimSpace(string(publicURL)))
+	repo, _ := parseGithubRepoHTTPSURL(string(publicURL))
+	// if repo is not a GitHub URL, that's ok
 	return &JoinRequest{
 		User:         authorLogin,
+		PublicRepo:   repo,
 		PublicURL:    publicURL,
 		PublicBranch: publicBranch,
 	}, nil
 }
+
+func parseGithubRepoHTTPSURL(s string) (repo Repo, err error) {
+	m := githubRepoHTTPSURLRegexp.FindStringSubmatch(s)
+	if m == nil {
+		return Repo{}, fmt.Errorf("not a github https repo url")
+	}
+	if !strings.HasSuffix(m[2], ".git") {
+		return Repo{}, fmt.Errorf("not a github https repo url")
+	}
+	return Repo{
+		Owner: strings.ToLower(m[1]),
+		Name:  m[2][:len(m[2])-len(".git")],
+	}, nil
+}
+
+const githubRepoHTTPSURLRegexpSrc = `https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)`
+
+var githubRepoHTTPSURLRegexp = regexp.MustCompile(githubRepoHTTPSURLRegexpSrc)
 
 func parseJoinBody(body string) (publicURL git.URL, publicBranch git.Branch, err error) {
 	lines := strings.Split(body, "\n")

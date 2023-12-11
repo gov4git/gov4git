@@ -79,7 +79,14 @@ func TestProcessJoinRequests(t *testing.T) {
 	ghClient := github.NewClient(mockedHTTPClient)
 
 	// process join requests
-	chg := govgh.ProcessJoinRequestIssues(ctx, ghRepo, ghClient, cty.Organizer(), []string{testProcessJoinRequestsOrganizerGithubUser})
+	chg := govgh.ProcessJoinRequestIssues(
+		ctx,
+		ghRepo,
+		ghClient,
+		cty.Organizer(),
+		[]string{testProcessJoinRequestsOrganizerGithubUser},
+		true,
+	)
 	if len(chg.Result.Joined) != 1 {
 		t.Fatalf("expecting 1 join")
 	}

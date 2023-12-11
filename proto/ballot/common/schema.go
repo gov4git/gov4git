@@ -104,6 +104,24 @@ type Advertisement struct {
 	ParentCommit git.CommitHash `json:"parent_commit"`
 }
 
+type Advertisements []Advertisement
+
+func (x Advertisements) Len() int {
+	return len(x)
+}
+
+func (x Advertisements) Less(i, j int) bool {
+	return x[i].Name.GitPath() < x[j].Name.GitPath()
+}
+
+func (x Advertisements) Swap(i, j int) {
+	x[i], x[j] = x[j], x[i]
+}
+
+func (x Advertisements) Sort() {
+	sort.Sort(x)
+}
+
 type BallotAddress struct {
 	Gov  gov.Address
 	Name BallotName

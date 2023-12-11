@@ -37,7 +37,7 @@ func ImportJoinsAndDirectives(
 	maintainers := FetchRepoMaintainers(ctx, repo, ghc)
 	base.Infof("maintainers for %v are %v", repo, form.SprintJSON(maintainers))
 
-	chg1 := ProcessJoinRequestIssues(ctx, repo, ghc, govAddr, maintainers)
+	chg1 := ProcessJoinRequestIssues(ctx, repo, ghc, govAddr, maintainers, false)
 	chg2 := ProcessDirectiveIssues(ctx, repo, ghc, govAddr, maintainers)
 	return form.Map{
 		"joins":      chg1.Result,

@@ -13,7 +13,8 @@ import (
 func List(
 	ctx context.Context,
 	govAddr gov.Address,
-) []common.Advertisement {
+
+) common.Advertisements {
 
 	return List_Local(ctx, gov.Clone(ctx, govAddr))
 }
@@ -21,14 +22,15 @@ func List(
 func List_Local(
 	ctx context.Context,
 	cloned gov.Cloned,
-) []common.Advertisement {
+
+) common.Advertisements {
 
 	ballotsNS := common.BallotPath(common.BallotName{})
 
 	files, err := git.ListFilesRecursively(cloned.Tree(), ballotsNS)
 	must.NoError(ctx, err)
 
-	ads := []common.Advertisement{}
+	ads := common.Advertisements{}
 	for _, file := range files {
 		if file.Base() != common.AdFilebase {
 			continue
@@ -45,6 +47,7 @@ func List_Local(
 		ads = append(ads, ad)
 	}
 
+	ads.Sort()
 	return ads
 }
 
@@ -55,7 +58,8 @@ func ListFilter(
 	onlyClosed bool,
 	onlyFrozen bool,
 	withParticipant member.User,
-) []common.Advertisement {
+
+) common.Advertisements {
 
 	return ListFilter_Local(ctx, gov.Clone(ctx, govAddr), onlyOpen, onlyClosed, onlyFrozen, withParticipant)
 }
@@ -67,7 +71,8 @@ func ListFilter_Local(
 	onlyClosed bool,
 	onlyFrozen bool,
 	withParticipant member.User,
-) []common.Advertisement {
+
+) common.Advertisements {
 
 	ads := List_Local(ctx, cloned)
 	if onlyOpen {
@@ -83,5 +88,6 @@ func ListFilter_Local(
 		userGroups := member.ListUserGroups_Local(ctx, cloned, withParticipant)
 		ads = common.FilterWithParticipants(userGroups, ads)
 	}
+	ads.Sort()
 	return ads
 }

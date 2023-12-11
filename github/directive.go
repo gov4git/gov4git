@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/account"
+	"github.com/gov4git/gov4git/proto/docket/ops"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
 	"github.com/gov4git/lib4git/base"
@@ -29,6 +30,8 @@ type ProcessDirectiveIssueReport struct {
 type DirectiveIssue struct {
 	IssueVotingCredits    *IssueVotingCreditsDirective    `json:"issue_voting_credits,omitempty"`
 	TransferVotingCredits *TransferVotingCreditsDirective `json:"transfer_voting_credits,omitempty"`
+	Freeze                *FreezeDirective                `json:"freeze,omitempty"`
+	Unfreeze              *UnfreezeDirective              `json:"unfreeze,omitempty"`
 }
 
 type IssueVotingCreditsDirective struct {
@@ -42,11 +45,22 @@ type TransferVotingCreditsDirective struct {
 	To     string  `json:"to_user"`
 }
 
+type FreezeDirective struct {
+	IssueURL    string `json:"issue_url"`
+	IssueNumber int64  `json:"issue_number"`
+}
+
+type UnfreezeDirective struct {
+	IssueURL    string `json:"issue_url"`
+	IssueNumber int64  `json:"issue_number"`
+}
+
 func ProcessDirectiveIssuesByMaintainer(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
 	govAddr gov.OwnerAddress,
+
 ) git.Change[form.Map, ProcessDirectiveIssueReports] {
 
 	maintainers := FetchRepoMaintainers(ctx, repo, ghc)
@@ -60,10 +74,11 @@ func ProcessDirectiveIssues(
 	ghc *github.Client,
 	govAddr gov.OwnerAddress,
 	approverGitHubUsers []string,
+
 ) git.Change[form.Map, ProcessDirectiveIssueReports] {
 
-	govCloned := gov.CloneOwner(ctx, govAddr)
-	report := ProcessDirectiveIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned, approverGitHubUsers)
+	cloned := gov.CloneOwner(ctx, govAddr)
+	report := ProcessDirectiveIssues_StageOnly(ctx, repo, ghc, govAddr, cloned, approverGitHubUsers)
 	chg := git.NewChange[form.Map, ProcessDirectiveIssueReports](
 		fmt.Sprintf("Process %d organizer directives", len(report)),
 		"github_directive_issues",
@@ -71,11 +86,11 @@ func ProcessDirectiveIssues(
 		report,
 		nil,
 	)
-	status, err := govCloned.Public.Tree().Status()
+	status, err := cloned.Public.Tree().Status()
 	must.NoError(ctx, err)
 	if !status.IsClean() {
-		proto.Commit(ctx, govCloned.Public.Tree(), chg)
-		govCloned.Public.Push(ctx)
+		proto.Commit(ctx, cloned.Public.Tree(), chg)
+		cloned.Public.Push(ctx)
 	}
 	return chg
 }
@@ -87,6 +102,7 @@ func ProcessDirectiveIssues_StageOnly(
 	govAddr gov.OwnerAddress,
 	govCloned gov.OwnerCloned,
 	maintainers []string,
+
 ) ProcessDirectiveIssueReports { // return list of processed directives
 
 	report := ProcessDirectiveIssueReports{}
@@ -115,9 +131,10 @@ func processDirectiveIssue_StageOnly(
 	repo Repo,
 	ghc *github.Client,
 	govAddr gov.OwnerAddress,
-	govCloned gov.OwnerCloned,
+	cloned gov.OwnerCloned,
 	maintainers []string,
 	issue *github.Issue,
+
 ) (DirectiveIssue, error) {
 
 	must.Assertf(ctx, len(maintainers) > 0, "no maintainers found")
@@ -143,12 +160,13 @@ func processDirectiveIssue_StageOnly(
 	}
 
 	switch {
+
 	case d.IssueVotingCredits != nil:
 		err = must.Try(
 			func() {
 				account.Issue_StageOnly(
 					ctx,
-					govCloned.PublicClone(),
+					cloned.PublicClone(),
 					member.UserAccountID(member.User(d.IssueVotingCredits.To)),
 					account.H(account.PluralAsset, d.IssueVotingCredits.Amount),
 					fmt.Sprintf("directive from GitHub issue #%v", issue.GetNumber()),
@@ -176,7 +194,7 @@ func processDirectiveIssue_StageOnly(
 			func() {
 				account.Transfer_StageOnly(
 					ctx,
-					govCloned.PublicClone(),
+					cloned.PublicClone(),
 					member.UserAccountID(member.User(d.TransferVotingCredits.From)),
 					member.UserAccountID(member.User(d.TransferVotingCredits.To)),
 					account.H(account.PluralAsset, d.TransferVotingCredits.Amount),
@@ -200,6 +218,46 @@ func processDirectiveIssue_StageOnly(
 				d.TransferVotingCredits.Amount, d.TransferVotingCredits.From, d.TransferVotingCredits.To))
 		return d, nil
 
+	case d.Freeze != nil:
+		id := IssueNumberToMotionID(d.Freeze.IssueNumber)
+		err = must.Try(
+			func() {
+				ops.FreezeMotion_StageOnly(ctx, cloned, id)
+			},
+		)
+		if err != nil {
+			base.Infof("could not freeze issue/PR %v (%v)", d.Freeze.IssueURL, err)
+			replyAndCloseIssue(
+				ctx, repo, ghc, issue, FollowUpSubject,
+				fmt.Sprintf("Could not freeze issue/PR %v. Reopen this issue to retry.\n\nBecause: `%v`", d.Freeze.IssueURL, err))
+			return DirectiveIssue{}, err
+		}
+		replyAndCloseIssue(
+			ctx, repo, ghc, issue, FollowUpSubject,
+			fmt.Sprintf("Froze issue/PR %v.", d.Freeze.IssueURL),
+		)
+		return d, nil
+
+	case d.Unfreeze != nil:
+		id := IssueNumberToMotionID(d.Unfreeze.IssueNumber)
+		err = must.Try(
+			func() {
+				ops.UnfreezeMotion_StageOnly(ctx, cloned, id)
+			},
+		)
+		if err != nil {
+			base.Infof("could not unfreeze issue/PR %v (%v)", d.Unfreeze.IssueURL, err)
+			replyAndCloseIssue(
+				ctx, repo, ghc, issue, FollowUpSubject,
+				fmt.Sprintf("Could not unfreeze issue/PR %v. Reopen this issue to retry.\n\nBecause: `%v`", d.Unfreeze.IssueURL, err))
+			return DirectiveIssue{}, err
+		}
+		replyAndCloseIssue(
+			ctx, repo, ghc, issue, FollowUpSubject,
+			fmt.Sprintf("Unfroze issue/PR %v.", d.Unfreeze.IssueURL),
+		)
+		return d, nil
+
 	}
 	panic("unknown directive")
 }
@@ -221,7 +279,27 @@ func parseDirective(body string) (DirectiveIssue, error) {
 		}
 	}
 
-	// "issue 30 credits to @user"
+	if d, err := parseIssueCreditsDirective(words); err == nil {
+		return d, nil
+	}
+
+	if d, err := parseTransferCreditsDirective(words); err == nil {
+		return d, nil
+	}
+
+	if d, err := parseFreezeIssueDirective(words); err == nil {
+		return d, nil
+	}
+
+	if d, err := parseUnfreezeIssueDirective(words); err == nil {
+		return d, nil
+	}
+
+	return DirectiveIssue{}, fmt.Errorf("unrecognized directive")
+}
+
+// "issue 30 credits to @user"
+func parseIssueCreditsDirective(words []string) (DirectiveIssue, error) {
 	if len(words) == 5 &&
 		words[0] == "issue" &&
 		util.IsIn(words[2], "credit", "credits", "token", "tokens") &&
@@ -238,8 +316,11 @@ func parseDirective(body string) (DirectiveIssue, error) {
 			IssueVotingCredits: &IssueVotingCreditsDirective{Amount: amount, To: user},
 		}, nil
 	}
+	return DirectiveIssue{}, fmt.Errorf("cannot parse issue credits directive")
+}
 
-	// "transfer 20 credits from @user1 to @user2"
+// "transfer 20 credits from @user1 to @user2"
+func parseTransferCreditsDirective(words []string) (DirectiveIssue, error) {
 	if len(words) == 7 &&
 		words[0] == "transfer" &&
 		util.IsIn(words[2], "credit", "credits", "token", "tokens") &&
@@ -261,8 +342,53 @@ func parseDirective(body string) (DirectiveIssue, error) {
 			TransferVotingCredits: &TransferVotingCreditsDirective{Amount: amount, From: from, To: to},
 		}, nil
 	}
+	return DirectiveIssue{}, fmt.Errorf("cannot parse transfer credits directive")
+}
 
-	return DirectiveIssue{}, fmt.Errorf("unrecognized directive")
+// "freeze issueURL"
+func parseFreezeIssueDirective(words []string) (DirectiveIssue, error) {
+	if len(words) < 2 || words[0] != "freeze" {
+		return DirectiveIssue{}, fmt.Errorf("cannot parse freeze issue directive")
+	}
+
+	matches := refRegexp.FindStringSubmatch(words[1])
+	if matches == nil {
+		return DirectiveIssue{}, fmt.Errorf("cannot parse freeze issue directive (expecting an issue URL)")
+	}
+	n, err := strconv.Atoi(matches[5])
+	if err != nil {
+		return DirectiveIssue{}, fmt.Errorf("cannot parse freeze issue directive (issue number not parsable)")
+	}
+
+	return DirectiveIssue{
+		Freeze: &FreezeDirective{
+			IssueURL:    matches[0],
+			IssueNumber: int64(n),
+		},
+	}, nil
+}
+
+// "unfreeze issueURL"
+func parseUnfreezeIssueDirective(words []string) (DirectiveIssue, error) {
+	if len(words) < 2 || words[0] != "unfreeze" {
+		return DirectiveIssue{}, fmt.Errorf("cannot parse unfreeze issue directive")
+	}
+
+	matches := refRegexp.FindStringSubmatch(words[1])
+	if matches == nil {
+		return DirectiveIssue{}, fmt.Errorf("cannot parse unfreeze issue directive (expecting an issue URL)")
+	}
+	n, err := strconv.Atoi(matches[5])
+	if err != nil {
+		return DirectiveIssue{}, fmt.Errorf("cannot parse unfreeze issue directive (issue number not parsable)")
+	}
+
+	return DirectiveIssue{
+		Unfreeze: &UnfreezeDirective{
+			IssueURL:    matches[0],
+			IssueNumber: int64(n),
+		},
+	}, nil
 }
 
 func parseUser(s string) (string, error) {

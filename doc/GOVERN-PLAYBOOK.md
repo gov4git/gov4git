@@ -14,11 +14,19 @@ Apply the label `gov4git:prioritize` to the GitHub issue.
 
 ### Freeze polling on an issue
 
-Lock the GitHub issue.
+Create a GitHub issue, labelled `gov4git:directive`, containing a sentence of the form:
+
+```
+Freeze ISSUE_OR_PR_URL
+```
 
 ### Unfreeze polling on an issue
 
-Unlock the GitHub issue.
+Create a GitHub issue, labelled `gov4git:directive`, containing a sentence of the form:
+
+```
+Unfreeze ISSUE_OR_PR_URL
+```
 
 ## Membership
 

@@ -106,7 +106,6 @@ func SyncManagedIssues_StageOnly(
 				case issue.Closed && motion.Closed:
 
 				case issue.Closed && !motion.Closed:
-					syncFrozen(ctx, cloned, syncChanges, issue, motion)
 					if motion.IsConcern() {
 						// manually closing an issue motion cancels it
 						ops.CancelMotion_StageOnly(ctx, cloned, id)
@@ -134,7 +133,6 @@ func SyncManagedIssues_StageOnly(
 					)
 
 				case !issue.Closed && !motion.Closed:
-					changed = changed || syncFrozen(ctx, cloned, syncChanges, issue, motion)
 
 				}
 				if changed {
@@ -149,6 +147,7 @@ func SyncManagedIssues_StageOnly(
 				}
 
 			}
+
 		} else { // issue is not governed, freeze motion if it exists and is open
 
 			if motion, ok := motions[id]; ok { // motion for issue already exists, update it
@@ -199,30 +198,6 @@ func syncMeta(
 	)
 	chg.Updated.Add(motion.ID)
 	return true
-}
-
-func syncFrozen(
-	ctx context.Context,
-	cloned gov.OwnerCloned,
-	chg *SyncManagedChanges,
-	ghIssue ImportedIssue,
-	govMotion schema.Motion,
-) bool {
-	switch {
-	case ghIssue.Locked && govMotion.Frozen:
-		return false
-	case ghIssue.Locked && !govMotion.Frozen:
-		ops.FreezeMotion_StageOnly(ctx, cloned, govMotion.ID)
-		chg.Froze.Add(govMotion.ID)
-		return true
-	case !ghIssue.Locked && govMotion.Frozen:
-		ops.UnfreezeMotion_StageOnly(ctx, cloned, govMotion.ID)
-		chg.Unfroze.Add(govMotion.ID)
-		return true
-	case !ghIssue.Locked && !govMotion.Frozen:
-		return false
-	}
-	panic("unreachable")
 }
 
 const (

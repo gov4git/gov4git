@@ -32,7 +32,7 @@ func cancelNotice(ctx context.Context, motion schema.Motion, outcome common.Outc
 		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp.ConcernBallotChoice].Vote())
 	}
 
-	return notice.NewNotice(w.String())
+	return notice.NewNotice(ctx, w.String())
 }
 
 func closeNotice(
@@ -58,5 +58,5 @@ func closeNotice(
 		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp.ConcernBallotChoice].Vote())
 	}
 
-	return notice.NewNotice(w.String())
+	return notice.NewNotice(ctx, w.String())
 }

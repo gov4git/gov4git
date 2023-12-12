@@ -54,7 +54,7 @@ func (x concernPolicy) Open(
 		member.Everybody,
 	)
 
-	return nil, notice.Noticef("Started managing this issue as Gov4Git concern `%v`.", motion.ID)
+	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v`.", motion.ID)
 }
 
 func (x concernPolicy) Score(
@@ -74,7 +74,7 @@ func (x concernPolicy) Score(
 
 	return schema.Score{
 		Attention: attention,
-	}, notice.Noticef("Updated prioritization tally to %v.", ads.Tally.Scores[pmp.ConcernBallotChoice])
+	}, notice.Noticef(ctx, "Updated prioritization tally to %v.", ads.Tally.Scores[pmp.ConcernBallotChoice])
 }
 
 func (x concernPolicy) Update(
@@ -119,7 +119,7 @@ func (x concernPolicy) updateFreeze(
 
 	notices := notice.Notices{}
 	if toState.EligibleProposals.Len() > 0 && !motion.Frozen {
-		ops.FreezeMotion_StageOnly(ctx, cloned, motion.ID)
+		ops.FreezeMotion_StageOnly(notice.Mute(ctx), cloned, motion.ID)
 
 		var w bytes.Buffer
 		fmt.Fprintf(&w, "Freezing ❄️ this issue as there are eligible PRs addressing it:\n")
@@ -127,11 +127,11 @@ func (x concernPolicy) updateFreeze(
 			pr := ops.LookupMotion_Local(ctx, cloned.PublicClone(), pr.From)
 			fmt.Fprintf(&w, "- %s\n", pr.TrackerURL)
 		}
-		notices = append(notices, notice.Noticef(w.String())...)
+		notices = append(notices, notice.Noticef(ctx, w.String())...)
 	}
 	if toState.EligibleProposals.Len() == 0 && motion.Frozen {
-		ops.UnfreezeMotion_StageOnly(ctx, cloned, motion.ID)
-		notices = append(notices, notice.Noticef("Unfreezing 🌤️ issue as there are no eligible PRs are addressing it.")...)
+		ops.UnfreezeMotion_StageOnly(notice.Mute(ctx), cloned, motion.ID)
+		notices = append(notices, notice.Noticef(ctx, "Unfreezing 🌤️ issue as there are no eligible PRs are addressing it.")...)
 	}
 
 	return nil, notices
@@ -261,7 +261,7 @@ func (x concernPolicy) AddRefFrom(
 	toState.EligibleProposals = append(toState.EligibleProposals, ref)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
 
-	return nil, notice.Noticef("This issue has been referenced by an eligible PR, managed as Gov4Git proposal `%v`.", from.ID)
+	return nil, notice.Noticef(ctx, "This issue has been referenced by an eligible PR, managed as Gov4Git proposal `%v`.", from.ID)
 }
 
 func (x concernPolicy) RemoveRefTo(
@@ -301,7 +301,7 @@ func (x concernPolicy) RemoveRefFrom(
 	toState.EligibleProposals = toState.EligibleProposals.Remove(ref)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
 
-	return nil, notice.Noticef("This issue is no longer referenced by the PR, managed as Gov4Git proposal `%v`.", from.ID)
+	return nil, notice.Noticef(ctx, "This issue is no longer referenced by the PR, managed as Gov4Git proposal `%v`.", from.ID)
 }
 
 func (x concernPolicy) Freeze(
@@ -320,7 +320,7 @@ func (x concernPolicy) Freeze(
 	}
 	ballot.Freeze_StageOnly(ctx, cloned, priorityPoll)
 
-	return nil, notice.Noticef("This issue, managed by Gov4Git concern `%v`, has been frozen ❄️", motion.ID)
+	return nil, notice.Noticef(ctx, "This issue, managed by Gov4Git concern `%v`, has been frozen ❄️", motion.ID)
 }
 
 func (x concernPolicy) Unfreeze(
@@ -339,7 +339,7 @@ func (x concernPolicy) Unfreeze(
 	}
 	ballot.Unfreeze_StageOnly(ctx, cloned, priorityPoll)
 
-	return nil, notice.Noticef("This issue, managed by Gov4Git concern `%v`, has been unfrozen 🌤️", motion.ID)
+	return nil, notice.Noticef(ctx, "This issue, managed by Gov4Git concern `%v`, has been unfrozen 🌤️", motion.ID)
 }
 
 // motion.Un/Freeze --calls--> policy Un/Freeze --calls--> ballot Un/Freeze

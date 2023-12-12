@@ -98,7 +98,11 @@ func Cron(
 		fmt.Sprintf("Cron job."),
 		"cron",
 		form.Map{"time": now},
-		report,
+		// We used to include the report in the commit message. However this causes a problem on GitHub.
+		// The report includes the bodies of the issues that were processed.
+		// It turns out GitHub scans the commit message for "resolves issue" text and automatically closes issues based on those.
+		// This triggers spurious closures.
+		nil,
 		nil,
 	)
 

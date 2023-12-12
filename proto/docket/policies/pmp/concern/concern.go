@@ -1,6 +1,7 @@
 package concern
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 
@@ -119,7 +120,14 @@ func (x concernPolicy) updateFreeze(
 	notices := notice.Notices{}
 	if toState.EligibleProposals.Len() > 0 && !motion.Frozen {
 		ops.FreezeMotion_StageOnly(ctx, cloned, motion.ID)
-		notices = append(notices, notice.Noticef("Freezing ❄️ issue as there are eligible PRs addressing it.")...)
+
+		var w bytes.Buffer
+		fmt.Fprintf(&w, "Freezing ❄️ this issue as there are eligible PRs addressing it:\n")
+		for _, pr := range toState.EligibleProposals {
+			pr := ops.LookupMotion_Local(ctx, cloned.PublicClone(), pr.From)
+			fmt.Fprintf(&w, "- %s\n", pr.TrackerURL)
+		}
+		notices = append(notices, notice.Noticef(w.String())...)
 	}
 	if toState.EligibleProposals.Len() == 0 && motion.Frozen {
 		ops.UnfreezeMotion_StageOnly(ctx, cloned, motion.ID)

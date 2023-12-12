@@ -69,7 +69,7 @@ func (x proposalPolicy) Open(
 		member.Everybody,
 	)
 
-	return nil, notice.Noticef(ctx, "Started managing this PR as Gov4Git proposal `%v`.", prop.ID)
+	return nil, notice.Noticef(ctx, "Started managing this PR as Gov4Git proposal `%v`."+pmp.Welcome, prop.ID)
 }
 
 func (x proposalPolicy) Score(

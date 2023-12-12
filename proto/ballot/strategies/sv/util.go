@@ -10,14 +10,14 @@ import (
 
 func augmentAndScoreUserVotes(
 	ctx context.Context,
-	scoreFunc ScoreFunc,
+	kernel ScoreKernel,
 	oldVotes common.AcceptedElections,
 	newVotes common.Elections,
 ) (oldScore, augmentedScore ScoredVotes) {
 
-	oldScore = scoreFunc(ctx, oldVotes)
+	oldScore = kernel.Score(ctx, oldVotes)
 	augmentedVotes := append(append(common.AcceptedElections{}, oldVotes...), acceptVotes(newVotes)...)
-	augmentedScore = scoreFunc(ctx, augmentedVotes)
+	augmentedScore = kernel.Score(ctx, augmentedVotes)
 	return
 }
 

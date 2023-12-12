@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/proto"
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/common"
+	"github.com/gov4git/gov4git/proto/ballot/load"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/gov4git/proto/member"
@@ -46,6 +47,8 @@ func Open_StageOnly(
 
 ) git.Change[form.Map, common.BallotAddress] {
 
+	s := load.LookupStrategy(ctx, strat)
+
 	// check no open ballots by the same name
 	openAdNS := common.BallotPath(name).Append(common.AdFilebase)
 	if _, err := git.TreeStat(ctx, cloned.Public.Tree(), openAdNS); err == nil {
@@ -67,17 +70,18 @@ func Open_StageOnly(
 
 	// write ad
 	ad := common.Advertisement{
-		Gov:          cloned.GovAddress(),
-		Name:         name,
-		Title:        title,
-		Description:  description,
-		Choices:      choices,
-		Strategy:     strat,
-		Participants: participants,
-		Frozen:       false,
-		Closed:       false,
-		Cancelled:    false,
-		ParentCommit: git.Head(ctx, cloned.Public.Repo()),
+		Gov:            cloned.GovAddress(),
+		Name:           name,
+		Title:          title,
+		Description:    description,
+		Choices:        choices,
+		Strategy:       strat,
+		StrategyCalcJS: s.CalcJS(ctx),
+		Participants:   participants,
+		Frozen:         false,
+		Closed:         false,
+		Cancelled:      false,
+		ParentCommit:   git.Head(ctx, cloned.Public.Repo()),
 	}
 	git.ToFileStage(ctx, cloned.Public.Tree(), openAdNS, ad)
 

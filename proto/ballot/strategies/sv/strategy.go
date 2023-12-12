@@ -2,23 +2,27 @@ package sv
 
 import (
 	"context"
+	_ "embed"
 	"math"
 
 	"github.com/gov4git/gov4git/proto/ballot/common"
 )
 
 type SV struct {
-	Scorer ScoreFunc
+	Kernel ScoreKernel
 }
 
-func (x SV) GetScorer() ScoreFunc {
-	if x.Scorer == nil {
-		return QVScore
+func (x SV) GetScorer() ScoreKernel {
+	if x.Kernel == nil {
+		return QVScore{}
 	}
-	return x.Scorer
+	return x.Kernel
 }
 
-type ScoreFunc func(ctx context.Context, el common.AcceptedElections) ScoredVotes
+type ScoreKernel interface {
+	Score(ctx context.Context, el common.AcceptedElections) ScoredVotes
+	CalcJS(ctx context.Context) string
+}
 
 type ScoredVotes struct {
 	Votes common.AcceptedElections
@@ -26,7 +30,9 @@ type ScoredVotes struct {
 	Cost  float64
 }
 
-func QVScore(ctx context.Context, el common.AcceptedElections) ScoredVotes {
+type QVScore struct{}
+
+func (QVScore) Score(ctx context.Context, el common.AcceptedElections) ScoredVotes {
 	// aggregate voting strength on each choice
 	score := map[string]common.StrengthAndScore{}
 	for _, el := range el {
@@ -55,4 +61,13 @@ func qvScoreFromStrength(strength float64) float64 {
 		sign = -1.0
 	}
 	return sign * math.Sqrt(math.Abs(strength))
+}
+
+var (
+	//go:embed calc.js
+	calcJS string
+)
+
+func (QVScore) CalcJS(context.Context) string {
+	return calcJS
 }

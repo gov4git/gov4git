@@ -32,11 +32,15 @@ type Strategy interface {
 
 	Tally(
 		ctx context.Context,
-		gov gov.OwnerCloned,
+		cloned gov.OwnerCloned,
 		ad *Advertisement,
 		current *Tally,
 		fetched map[member.User]Elections,
 	) git.Change[form.Map, Tally] // tallying can change other aspects of the repo, like user balances
+
+	CalcJS(
+		ctx context.Context,
+	) string
 
 	Close(
 		ctx context.Context,

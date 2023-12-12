@@ -1,6 +1,7 @@
 package notice
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 	"strings"
@@ -13,13 +14,19 @@ type Notice struct {
 	Body string `json:"body"`
 }
 
-func NewNotice(body string) Notices {
+func NewNotice(ctx context.Context, body string) Notices {
+	if IsMuted(ctx) {
+		return nil
+	}
 	return Notices{
 		Notice{Body: body},
 	}
 }
 
-func Noticef(format string, args ...any) Notices {
+func Noticef(ctx context.Context, format string, args ...any) Notices {
+	if IsMuted(ctx) {
+		return nil
+	}
 	return Notices{
 		Notice{Body: fmt.Sprintf(format, args...)},
 	}

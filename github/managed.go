@@ -129,7 +129,12 @@ func SyncManagedIssues_StageOnly(
 						ctx,
 						cloned.PublicClone(),
 						id,
-						notice.Noticef("Reopening an issue or a PR [#%v](%v) is not allowed. Create a new one instead.", id, motion.TrackerURL),
+						notice.Noticef(
+							ctx,
+							"Reopening an issue or a PR [#%v](%v) is not allowed. Create a new one instead.",
+							id,
+							motion.TrackerURL,
+						),
 					)
 
 				case !issue.Closed && !motion.Closed:
@@ -243,10 +248,6 @@ func syncCreateMotionForIssue(
 		issue.Labels,
 	)
 	chg.Opened.Add(id)
-	if issue.Locked {
-		ops.FreezeMotion_StageOnly(ctx, cloned, id)
-		chg.Froze.Add(id)
-	}
 }
 
 func indexMotions(ms schema.Motions) map[schema.MotionID]schema.Motion {

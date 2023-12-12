@@ -54,7 +54,7 @@ func (x concernPolicy) Open(
 		member.Everybody,
 	)
 
-	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v`.", motion.ID)
+	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v`."+pmp.Welcome, motion.ID)
 }
 
 func (x concernPolicy) Score(

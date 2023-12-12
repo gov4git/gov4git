@@ -108,14 +108,26 @@ func SyncManagedIssues_StageOnly(
 				case issue.Closed && !motion.Closed:
 					if motion.IsConcern() {
 						// manually closing an issue motion cancels it
-						ops.CancelMotion_StageOnly(ctx, cloned, id)
+						ops.AppendMotionNotices_StageOnly(
+							ctx,
+							cloned.PublicClone(),
+							id,
+							notice.Noticef(ctx, "The Gov4Git motion for this issue has been cancelled, since the issue was closed."),
+						)
+						ops.CancelMotion_StageOnly(notice.Mute(ctx), cloned, id)
 						syncChanges.Cancelled.Add(id)
 					} else if motion.IsProposal() {
 						// manually closing a proposal motion closes it
+						ops.AppendMotionNotices_StageOnly(
+							ctx,
+							cloned.PublicClone(),
+							id,
+							notice.Noticef(ctx, "The Gov4Git motion for this PR has been closed, since the PR was closed."),
+						)
 						if issue.Merged {
-							ops.CloseMotion_StageOnly(ctx, cloned, id, schema.Accept)
+							ops.CloseMotion_StageOnly(notice.Mute(ctx), cloned, id, schema.Accept)
 						} else {
-							ops.CloseMotion_StageOnly(ctx, cloned, id, schema.Reject)
+							ops.CloseMotion_StageOnly(notice.Mute(ctx), cloned, id, schema.Reject)
 						}
 						syncChanges.Closed.Add(id)
 					} else {
@@ -160,7 +172,13 @@ func SyncManagedIssues_StageOnly(
 				// if motion frozen, do nothing
 				// otherwise, freeze motion
 				if !motion.Closed && !motion.Frozen {
-					ops.FreezeMotion_StageOnly(ctx, cloned, id)
+					ops.AppendMotionNotices_StageOnly(
+						ctx,
+						cloned.PublicClone(),
+						id,
+						notice.Noticef(ctx, "The Gov4Git motion for this no longer managed issue/PR has been frozen."),
+					)
+					ops.FreezeMotion_StageOnly(notice.Mute(ctx), cloned, id)
 					syncChanges.Froze.Add(id)
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}

@@ -69,7 +69,7 @@ func (x proposalPolicy) Open(
 		member.Everybody,
 	)
 
-	return nil, notice.Noticef("Started managing this PR as Gov4Git proposal `%v`.", prop.ID)
+	return nil, notice.Noticef(ctx, "Started managing this PR as Gov4Git proposal `%v`.", prop.ID)
 }
 
 func (x proposalPolicy) Score(
@@ -89,7 +89,7 @@ func (x proposalPolicy) Score(
 
 	return schema.Score{
 		Attention: attention,
-	}, notice.Noticef("Updated approval tally to %v.", ads.Tally.Scores[pmp.ProposalBallotChoice])
+	}, notice.Noticef(ctx, "Updated approval tally to %v.", ads.Tally.Scores[pmp.ProposalBallotChoice])
 }
 
 func (x proposalPolicy) Update(
@@ -208,7 +208,7 @@ func (x proposalPolicy) Cancel(
 
 	return &CancelReport{
 		ApprovalPollOutcome: chg.Result,
-	}, notice.Noticef("Cancelling management of this PR, managed as Gov4Git concern `%v`.", motion.ID)
+	}, notice.Noticef(ctx, "Cancelling management of this PR, managed as Gov4Git concern `%v`.", motion.ID)
 }
 
 type PolicyView struct {
@@ -310,7 +310,7 @@ func (x proposalPolicy) Freeze(
 
 ) (policy.Report, notice.Notices) {
 
-	return nil, notice.Noticef("This PR, managed by Gov4Git proposal `%v`, has been frozen ❄️", motion.ID)
+	return nil, notice.Noticef(ctx, "This PR, managed by Gov4Git proposal `%v`, has been frozen ❄️", motion.ID)
 }
 
 func (x proposalPolicy) Unfreeze(
@@ -322,5 +322,5 @@ func (x proposalPolicy) Unfreeze(
 
 ) (policy.Report, notice.Notices) {
 
-	return nil, notice.Noticef("This PR, managed by Gov4Git proposal `%v`, has been unfrozen 🌤️", motion.ID)
+	return nil, notice.Noticef(ctx, "This PR, managed by Gov4Git proposal `%v`, has been unfrozen 🌤️", motion.ID)
 }

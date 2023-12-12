@@ -42,7 +42,7 @@ func cancelNotice(
 		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp.ProposalBallotChoice].Vote())
 	}
 
-	return notice.NewNotice(w.String())
+	return notice.NewNotice(ctx, w.String())
 }
 
 func closeNotice(
@@ -89,5 +89,5 @@ func closeNotice(
 		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp.ProposalBallotChoice].Vote())
 	}
 
-	return notice.NewNotice(w.String())
+	return notice.NewNotice(ctx, w.String())
 }

@@ -26,7 +26,7 @@ func TestProcessJoinRequestIssues(t *testing.T) {
 	cty := test.NewTestCommunity(t, ctx, 2)
 
 	// import issues
-	chg := govgh.ProcessJoinRequestIssuesApprovedByMaintainer(ctx, ghRepo, ghClient, cty.Organizer())
+	chg := govgh.ProcessJoinRequestIssuesApprovedByMaintainer(ctx, ghRepo, ghClient, cty.Organizer(), false)
 	fmt.Println("REPORT", form.SprintJSON(chg.Result))
 
 	if len(chg.Result.Joined) != 0 {

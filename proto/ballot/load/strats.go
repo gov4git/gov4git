@@ -17,7 +17,7 @@ const (
 
 func init() {
 	ctx := context.Background()
-	strategyRegistry.Set(ctx, QVStrategyName, sv.SV{Scorer: sv.QVScore})
+	strategyRegistry.Set(ctx, QVStrategyName, sv.SV{Kernel: sv.QVScore{}})
 }
 
 func LoadStrategy(
@@ -30,4 +30,8 @@ func LoadStrategy(
 	ad := git.FromFile[common.Advertisement](ctx, t, adNS)
 
 	return ad, strategyRegistry.Get(ctx, ad.Strategy)
+}
+
+func LookupStrategy(ctx context.Context, name common.StrategyName) common.Strategy {
+	return strategyRegistry.Get(ctx, name)
 }

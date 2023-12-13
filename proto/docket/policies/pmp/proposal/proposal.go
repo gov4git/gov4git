@@ -1,13 +1,16 @@
 package proposal
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
 	"github.com/gov4git/gov4git/proto/ballot/common"
 	"github.com/gov4git/gov4git/proto/ballot/load"
+	"github.com/gov4git/gov4git/proto/docket/ops"
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
 	"github.com/gov4git/gov4git/proto/docket/policy"
 	"github.com/gov4git/gov4git/proto/docket/schema"
@@ -117,6 +120,29 @@ func (x proposalPolicy) Update(
 		)
 	}
 	state.LatestApprovalScore = latestApprovalScore
+
+	// update eligible concerns
+
+	eligible := schema.Refs{}
+	for ref := range state.ResolvingConcerns.RefSet() {
+		if pmp.IsConcernProposalEligible(ctx, cloned.PublicClone(), ref.To, motion.ID) {
+			eligible = append(eligible, ref)
+		}
+	}
+	eligible.Sort()
+	if !slices.Equal[schema.Refs](eligible, state.EligibleConcerns) {
+		// display list of eligible concerns
+		var w bytes.Buffer
+		for _, ref := range eligible {
+			conMot := ops.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
+			fmt.Fprintf(&w, "- %s", conMot.TrackerURL)
+		}
+		notices = append(
+			notices,
+			notice.Noticef(ctx, "The set of eligible issues addressed by this PR changed:\n"+w.String())...,
+		)
+	}
+	state.EligibleConcerns = eligible
 
 	//
 

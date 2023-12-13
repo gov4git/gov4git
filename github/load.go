@@ -97,7 +97,7 @@ func TransformIssue(
 	return ImportedIssue{
 		Managed:           IsIssueManaged(issue),
 		ForPrioritization: IsIssueForPrioritization(issue),
-		URL:               issue.GetURL(),
+		URL:               issue.GetHTMLURL(),
 		Author:            author,
 		Number:            int64(issue.GetNumber()),
 		Title:             issue.GetTitle(),

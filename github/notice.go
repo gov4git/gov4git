@@ -1,6 +1,7 @@
 package github
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 
@@ -41,6 +42,8 @@ func flushNotices(
 	issueNum int,
 ) {
 
+	var w bytes.Buffer
+
 	for _, nstate := range queue.NoticeStates {
 
 		// check if notice already displayed, based on governance records
@@ -50,8 +53,9 @@ func flushNotices(
 
 		// TODO: check if notice already displayed, according to github
 
-		subject := fmt.Sprintf("Gov4Git notice `%v`", nstate.ID)
-		replyToIssue(ctx, repo, ghc, issueNum, subject, nstate.Notice.Body)
+		fmt.Fprintf(&w, "### Notice `%v`\n%s\n\n", nstate.ID, nstate.Notice.Body)
 		nstate.MarkShown()
 	}
+
+	replyToIssue(ctx, repo, ghc, issueNum, "Gov4Git notices", w.String())
 }

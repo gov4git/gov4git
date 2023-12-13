@@ -41,3 +41,15 @@ Check for an updated tally in the GitHub UI:
 - https://github.com/gov4git/testing.project/pull/5
 
 Check in the GitHub UI that issue #1 and pr #5 show one eligible reference to each other.
+
+### cancel pr #5
+
+Cancel pr #5 through the GitHub UI.
+
+Check that issues #1 and #2:
+- were unfrozen
+- the set of eligible references was updated
+
+Reopen pr #5 through the UI. (For next time.)
+
+### 

@@ -1,2 +1,2 @@
-- combine multiple notices when showing?
+- troubleshoot when user enters invalid URL
 - 

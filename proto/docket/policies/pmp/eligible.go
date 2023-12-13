@@ -32,5 +32,13 @@ func IsConcernProposalEligible(
 		return false
 	}
 
+	if conMot.Closed {
+		return false
+	}
+
+	if propMot.Closed {
+		return false
+	}
+
 	return propMot.Score.Attention > 0
 }

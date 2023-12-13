@@ -65,6 +65,7 @@ type Policy interface {
 		args ...any,
 	) form.Form
 
+	// AddRefTo is invoked when a reference to this motion is added.
 	// AddRefTo is invoked only when to and from motions are open.
 	AddRefTo(
 		ctx context.Context,
@@ -77,6 +78,7 @@ type Policy interface {
 		args ...any,
 	) (Report, notice.Notices)
 
+	// AddRefFrom is invoked when a reference from this motion is added.
 	// AddRefFrom is invoked only when to and from motions are open.
 	AddRefFrom(
 		ctx context.Context,
@@ -89,6 +91,7 @@ type Policy interface {
 		args ...any,
 	) (Report, notice.Notices)
 
+	// RemoveRefTo is invoked when a reference to this motion is removed.
 	// RemoveRefTo is invoked only when to and from motions are open.
 	RemoveRefTo(
 		ctx context.Context,
@@ -101,6 +104,7 @@ type Policy interface {
 		args ...any,
 	) (Report, notice.Notices)
 
+	// RemoveRefFrom is invoked when a reference from this motion is removed.
 	// RemoveRefFrom is invoked only when to and from motions are open.
 	RemoveRefFrom(
 		ctx context.Context,

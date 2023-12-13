@@ -17,6 +17,11 @@ const (
 )
 
 type User string
+
+func (u User) IsNone() bool {
+	return u == ""
+}
+
 type Group string
 
 func AddMember(ctx context.Context, addr gov.Address, user User, group Group) {

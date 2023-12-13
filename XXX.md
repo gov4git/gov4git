@@ -5,4 +5,6 @@
   - [ ] on each update check if author is a community member and add
   - [ ] wherever author is used, display notice asking to join the author
 
+- unify json field names convention
+
 - troubleshoot when user enters invalid URL

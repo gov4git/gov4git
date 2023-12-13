@@ -11,6 +11,7 @@ type CloseReport struct {
 	ApprovalPollOutcome common.Outcome  `json:"approval_poll_outcome"`
 	Resolved            schema.Motions  `json:"resolved"`
 	Bounty              account.Holding `json:"bounty"`
+	BountyDonated       bool            `json:"bounty_donated"`
 	Rewarded            Rewards         `json:"rewards"`
 }
 

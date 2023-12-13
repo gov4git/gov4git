@@ -98,7 +98,7 @@ func (x concernPolicy) Update(
 	if latestPriorityScore != state.LatestPriorityScore {
 		notices = append(
 			notices,
-			notice.Noticef(ctx, "This issue's __priority score__ was updated to `%v`.", latestPriorityScore)...,
+			notice.Noticef(ctx, "This issue's __priority score__ was updated to `%0.6f`.", latestPriorityScore)...,
 		)
 	}
 	state.LatestPriorityScore = latestPriorityScore

@@ -135,7 +135,7 @@ func (x proposalPolicy) Update(
 		var w bytes.Buffer
 		for _, ref := range eligible {
 			conMot := ops.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
-			fmt.Fprintf(&w, "- %s, managed as Gov4Git motion `%v`", conMot.TrackerURL, conMot.ID)
+			fmt.Fprintf(&w, "- %s, managed as Gov4Git motion `%v`\n", conMot.TrackerURL, conMot.ID)
 		}
 		notices = append(
 			notices,

@@ -11,7 +11,6 @@ const StateFilebase = "state.json"
 type ConcernState struct {
 	PriorityPoll        common.BallotName `json:"priority_poll"`
 	LatestPriorityScore float64           `json:"latest_priority_score"`
-	ResolvingProposals  schema.Refs       `json:"resolving_proposals"`
 	EligibleProposals   schema.Refs       `json:"eligible_proposals"`
 }
 

@@ -13,13 +13,24 @@ func IsConcernProposalEligible(
 	cloned gov.Cloned,
 	conID schema.MotionID,
 	propID schema.MotionID,
+	refType schema.RefType,
 
 ) bool {
 
+	if refType != ResolvesRefType {
+		return false
+	}
+
+	conMot := ops.LookupMotion_Local(ctx, cloned, conID)
 	propMot := ops.LookupMotion_Local(ctx, cloned, propID)
+
+	if !conMot.IsConcern() {
+		return false
+	}
 
 	if !propMot.IsProposal() {
 		return false
 	}
+
 	return propMot.Score.Attention > 0
 }

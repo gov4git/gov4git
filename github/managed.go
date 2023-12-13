@@ -190,8 +190,8 @@ func SyncManagedIssues_StageOnly(
 
 	// don't touch motions that have no corresponding issue
 
-	// update references on open motions only (on both sides of the reference)
-	matchingMotions := indexMotions(schema.FilterClosedMotions(ops.ListMotions_Local(ctx, t)))
+	// update references
+	matchingMotions := indexMotions(ops.ListMotions_Local(ctx, t))
 	syncRefs(ctx, cloned, syncChanges, issues, matchingMotions)
 
 	syncChanges.IssuesCausingChange.Sort()

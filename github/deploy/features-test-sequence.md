@@ -48,7 +48,7 @@ Cancel pr #5 through the GitHub UI.
 
 Check that issues #1 and #2:
 - were unfrozen
-- the set of eligible references was updated
+- the set of eligible references was updated to empty
 
 Reopen pr #5 through the UI. (For next time.)
 

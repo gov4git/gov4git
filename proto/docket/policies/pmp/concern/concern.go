@@ -258,7 +258,15 @@ func (x concernPolicy) AddRefTo(
 
 	fmt.Println("CONCERN AddRefTo", from.ID, to.ID, refType)
 
-	return nil, nil
+	if !from.IsProposal() {
+		return nil, nil
+	}
+
+	if refType != pmp.ResolvesRefType {
+		return nil, nil
+	}
+
+	return nil, notice.Noticef(ctx, "This issue was referenced by %v, managed as Gov4Git proposal `%v`.", from.TrackerURL, from.ID)
 }
 
 func (x concernPolicy) AddRefFrom(
@@ -275,15 +283,7 @@ func (x concernPolicy) AddRefFrom(
 
 	fmt.Println("CONCERN AddRefFrom", from.ID, to.ID, refType)
 
-	if !from.IsProposal() {
-		return nil, nil
-	}
-
-	if refType != pmp.ResolvesRefType {
-		return nil, nil
-	}
-
-	return nil, notice.Noticef(ctx, "This issue was referenced by %v, managed as Gov4Git proposal `%v`.", from.TrackerURL, from.ID)
+	return nil, nil
 }
 
 func (x concernPolicy) RemoveRefTo(
@@ -300,7 +300,15 @@ func (x concernPolicy) RemoveRefTo(
 
 	fmt.Println("CONCERN RemoveRefTo", from.ID, to.ID, refType)
 
-	return nil, nil
+	if !from.IsProposal() {
+		return nil, nil
+	}
+
+	if refType != pmp.ResolvesRefType {
+		return nil, nil
+	}
+
+	return nil, notice.Noticef(ctx, "This issue is no longer referenced by %v, managed as Gov4Git proposal `%v`.", from.TrackerURL, from.ID)
 }
 
 func (x concernPolicy) RemoveRefFrom(
@@ -317,15 +325,7 @@ func (x concernPolicy) RemoveRefFrom(
 
 	fmt.Println("CONCERN RemoveRefFrom", from.ID, to.ID, refType)
 
-	if !from.IsProposal() {
-		return nil, nil
-	}
-
-	if refType != pmp.ResolvesRefType {
-		return nil, nil
-	}
-
-	return nil, notice.Noticef(ctx, "This issue is no longer referenced by %v, managed as Gov4Git proposal `%v`.", from.TrackerURL, from.ID)
+	return nil, nil
 }
 
 func (x concernPolicy) Freeze(

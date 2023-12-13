@@ -140,12 +140,13 @@ func (x proposalPolicy) Update(
 		} else {
 			var w bytes.Buffer
 			for _, ref := range eligible {
-				conMot := ops.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
-				fmt.Fprintf(&w, "- %s, managed as Gov4Git motion `%v`\n", conMot.TrackerURL, conMot.ID)
+				con := ops.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
+				fmt.Fprintf(&w, "- %s, managed as Gov4Git motion `%v` with community attention of `%0.6f`\n",
+					con.TrackerURL, con.ID, con.Score.Attention)
 			}
 			notices = append(
 				notices,
-				notice.Noticef(ctx, "The set of eligible issues addressed by this PR changed:\n"+w.String())...,
+				notice.Noticef(ctx, "The set of eligible issues addressed by this PR changed to:\n"+w.String())...,
 			)
 		}
 	}

@@ -60,15 +60,19 @@ func Cron(
 		base.Infof("maintainers for %v are %v", repo, form.SprintJSON(maintainers))
 
 		// process issues and pull requests
+		base.Infof("CRON: syncing issues for prioritization")
 		report["processed_prioritization_issues"] = govgh.ImportIssuesForPrioritization_StageOnly(ctx, repo, ghc, govAddr, govCloned)
 
 		// process managed issues and pull requests
+		base.Infof("CRON: syncing managed issues and pull requests")
 		report["processed_managed_issues"] = govgh.SyncManagedIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned)
 
 		// process joins
+		base.Infof("CRON: processing join requests")
 		report["processed_joins"] = govgh.ProcessJoinRequestIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned, maintainers, false)
 
 		// process directives
+		base.Infof("CRON: processing directives")
 		report["processed_directives"] = govgh.ProcessDirectiveIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned, maintainers)
 
 		state.LastGithubImport = time.Now()
@@ -78,9 +82,11 @@ func Cron(
 	if shouldSyncCommunity {
 
 		// tally votes for all ballots from all community members
+		base.Infof("CRON: tallying community votes")
 		report["tally"] = ballot.TallyAll_StageOnly(ctx, govCloned, maxPar).Result
 
 		// rescore motions to capture updated tallies
+		base.Infof("CRON: scoring motions")
 		ops.ScoreMotions_StageOnly(ctx, govCloned)
 
 		state.LastCommunityTally = time.Now()

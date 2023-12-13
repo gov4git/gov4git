@@ -54,7 +54,8 @@ func (x concernPolicy) Open(
 		member.Everybody,
 	)
 
-	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v`."+pmp.Welcome, motion.ID)
+	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v` with initial __priority score__ of `%v`."+
+		pmp.Welcome, motion.ID, state.LatestPriorityScore)
 }
 
 func (x concernPolicy) Score(
@@ -74,7 +75,7 @@ func (x concernPolicy) Score(
 
 	return schema.Score{
 		Attention: attention,
-	}, notice.Noticef(ctx, "Updated prioritization tally to %v.", ads.Tally.Scores[pmp.ConcernBallotChoice])
+	}, nil
 }
 
 func (x concernPolicy) Update(
@@ -86,12 +87,25 @@ func (x concernPolicy) Update(
 
 ) (policy.Report, notice.Notices) {
 
-	// update eligible proposals
-
+	notices := notice.Notices{}
 	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
 
+	// update priority score
+
+	ads := ballot.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
+	latestPriorityScore := ads.Tally.Scores[pmp.ConcernBallotChoice]
+	if latestPriorityScore != state.LatestPriorityScore {
+		notices = append(
+			notices,
+			notice.Noticef(ctx, "This issue's __priority score__ was updated to `%v`.", latestPriorityScore)...,
+		)
+	}
+	state.LatestPriorityScore = latestPriorityScore
+
+	// update eligible proposals
+
 	eligible := schema.Refs{}
-	for ref := range state.EligibleProposals.RefSet() {
+	for ref := range state.ResolvingProposals.RefSet() {
 		if IsProposalEligible(ctx, cloned.PublicClone(), ref.From) {
 			eligible = append(eligible, ref)
 		}
@@ -99,11 +113,12 @@ func (x concernPolicy) Update(
 	eligible.Sort()
 	state.EligibleProposals = eligible
 
-	state.PriorityPoll = pmp.ConcernPollBallotName(motion.ID)
+	//
 
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
-	return x.updateFreeze(ctx, cloned, motion, policyNS)
+	r0, n0 := x.updateFreeze(ctx, cloned, motion, policyNS)
+	return r0, append(notices, n0...)
 }
 
 func (x concernPolicy) updateFreeze(
@@ -243,25 +258,25 @@ func (x concernPolicy) AddRefFrom(
 
 ) (policy.Report, notice.Notices) {
 
-	if refType != pmp.ResolvesRefType {
+	if !from.IsProposal() {
 		return nil, nil
 	}
 
-	if !IsProposalEligible(ctx, cloned.PublicClone(), from.ID) {
+	if refType != pmp.ResolvesRefType {
 		return nil, nil
 	}
 
 	toState := LoadState_Local(ctx, cloned.Public.Tree(), toPolicyNS)
 	ref := schema.Ref{Type: refType, From: from.ID, To: to.ID}
 
-	if toState.EligibleProposals.Contains(ref) {
+	if toState.ResolvingProposals.Contains(ref) {
 		return nil, nil
 	}
 
-	toState.EligibleProposals = append(toState.EligibleProposals, ref)
+	toState.ResolvingProposals = append(toState.ResolvingProposals, ref)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
 
-	return nil, notice.Noticef(ctx, "This issue has been referenced by an eligible PR, managed as Gov4Git proposal `%v`.", from.ID)
+	return nil, notice.Noticef(ctx, "This issue was referenced by a PR, managed as Gov4Git proposal `%v`.", from.ID)
 }
 
 func (x concernPolicy) RemoveRefTo(
@@ -294,11 +309,11 @@ func (x concernPolicy) RemoveRefFrom(
 	toState := LoadState_Local(ctx, cloned.Public.Tree(), toPolicyNS)
 	ref := schema.Ref{Type: refType, From: from.ID, To: to.ID}
 
-	if !toState.EligibleProposals.Contains(ref) {
+	if !toState.ResolvingProposals.Contains(ref) {
 		return nil, nil
 	}
 
-	toState.EligibleProposals = toState.EligibleProposals.Remove(ref)
+	toState.ResolvingProposals = toState.ResolvingProposals.Remove(ref)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
 
 	return nil, notice.Noticef(ctx, "This issue is no longer referenced by the PR, managed as Gov4Git proposal `%v`.", from.ID)

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"slices"
 
 	"github.com/gov4git/gov4git/proto/account"
 	"github.com/gov4git/gov4git/proto/ballot/ballot"
@@ -106,11 +107,23 @@ func (x concernPolicy) Update(
 
 	eligible := schema.Refs{}
 	for ref := range state.ResolvingProposals.RefSet() {
-		if IsProposalEligible(ctx, cloned.PublicClone(), ref.From) {
+		if pmp.IsConcernProposalEligible(ctx, cloned.PublicClone(), motion.ID, ref.From) {
 			eligible = append(eligible, ref)
 		}
 	}
 	eligible.Sort()
+	if !slices.Equal[schema.Refs](eligible, state.EligibleProposals) {
+		// display updated list of eligible proposals
+		var w bytes.Buffer
+		for _, ref := range eligible {
+			propMot := ops.LookupMotion_Local(ctx, cloned.PublicClone(), ref.From)
+			fmt.Fprintf(&w, "- %s", propMot.TrackerURL)
+		}
+		notices = append(
+			notices,
+			notice.Noticef(ctx, "The set of eligible proposals addressing this issue changed:\n"+w.String())...,
+		)
+	}
 	state.EligibleProposals = eligible
 
 	//

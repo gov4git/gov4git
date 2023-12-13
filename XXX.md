@@ -1,1 +1,2 @@
-- show tally notices only if a change occurs
+- combine multiple notices when showing?
+- 

@@ -1,4 +1,4 @@
-package concern
+package pmp
 
 import (
 	"context"
@@ -8,17 +8,18 @@ import (
 	"github.com/gov4git/gov4git/proto/gov"
 )
 
-func IsProposalEligible(
+func IsConcernProposalEligible(
 	ctx context.Context,
 	cloned gov.Cloned,
-	proposalID schema.MotionID,
+	conID schema.MotionID,
+	propID schema.MotionID,
 
 ) bool {
 
-	mv := ops.LookupMotion_Local(ctx, cloned, proposalID)
+	propMot := ops.LookupMotion_Local(ctx, cloned, propID)
 
-	if !mv.IsProposal() {
+	if !propMot.IsProposal() {
 		return false
 	}
-	return mv.Score.Attention > 0
+	return propMot.Score.Attention > 0
 }

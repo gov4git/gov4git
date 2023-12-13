@@ -132,15 +132,22 @@ func (x proposalPolicy) Update(
 	eligible.Sort()
 	if !slices.Equal[schema.Refs](eligible, state.EligibleConcerns) {
 		// display list of eligible concerns
-		var w bytes.Buffer
-		for _, ref := range eligible {
-			conMot := ops.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
-			fmt.Fprintf(&w, "- %s, managed as Gov4Git motion `%v`\n", conMot.TrackerURL, conMot.ID)
+		if len(eligible) == 0 {
+			notices = append(
+				notices,
+				notice.Noticef(ctx, "The set of eligible issues addressed by this PR is now empty.\n")...,
+			)
+		} else {
+			var w bytes.Buffer
+			for _, ref := range eligible {
+				conMot := ops.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
+				fmt.Fprintf(&w, "- %s, managed as Gov4Git motion `%v`\n", conMot.TrackerURL, conMot.ID)
+			}
+			notices = append(
+				notices,
+				notice.Noticef(ctx, "The set of eligible issues addressed by this PR changed:\n"+w.String())...,
+			)
 		}
-		notices = append(
-			notices,
-			notice.Noticef(ctx, "The set of eligible issues addressed by this PR changed:\n"+w.String())...,
-		)
 	}
 	state.EligibleConcerns = eligible
 

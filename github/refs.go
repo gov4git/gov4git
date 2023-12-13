@@ -54,6 +54,7 @@ func syncRefs(
 	// update edge differences
 
 	// add refs in issues, not in motions
+	fmt.Println("REF ALL motionRefs", motionRefs)
 	for issueRef := range issueRefs {
 		fmt.Println("REF--- considering issueRef", issueRef)
 		if !motionRefs[issueRef] {

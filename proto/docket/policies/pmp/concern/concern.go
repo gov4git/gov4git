@@ -55,7 +55,7 @@ func (x concernPolicy) Open(
 		member.Everybody,
 	)
 
-	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v` with initial __priority score__ of `%v`."+
+	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v` with initial __priority score__ of `%0.6f`."+
 		pmp.Welcome, motion.ID, state.LatestPriorityScore)
 }
 

@@ -116,7 +116,7 @@ func (x proposalPolicy) Update(
 	if latestApprovalScore != state.LatestApprovalScore {
 		notices = append(
 			notices,
-			notice.Noticef(ctx, "This PR's __approval score__ was updated to `%v`.", latestApprovalScore)...,
+			notice.Noticef(ctx, "This PR's __approval score__ was updated to `%0.6f`.", latestApprovalScore)...,
 		)
 	}
 	state.LatestApprovalScore = latestApprovalScore
@@ -187,14 +187,27 @@ func (x proposalPolicy) Close(
 		bounty := closeResolvedConcerns(ctx, cloned, prop, resolved)
 
 		// transfer bounty to author
-		account.Transfer_StageOnly(
-			ctx,
-			cloned.PublicClone(),
-			pmp.ProposalBountyAccountID(prop.ID),
-			member.UserAccountID(prop.Author),
-			bounty,
-			fmt.Sprintf("bounty for proposal %v", prop.ID),
-		)
+		var bountyDonated bool
+		if prop.Author.IsNone() {
+			account.Transfer_StageOnly(
+				ctx,
+				cloned.PublicClone(),
+				pmp.ProposalBountyAccountID(prop.ID),
+				pmp.MatchingPoolAccountID,
+				bounty,
+				fmt.Sprintf("bounty for proposal %v", prop.ID),
+			)
+			bountyDonated = true
+		} else {
+			account.Transfer_StageOnly(
+				ctx,
+				cloned.PublicClone(),
+				pmp.ProposalBountyAccountID(prop.ID),
+				member.UserAccountID(prop.Author),
+				bounty,
+				fmt.Sprintf("bounty for proposal %v", prop.ID),
+			)
+		}
 
 		// distribute rewards
 		rewards := disberseRewards(ctx, cloned, prop)
@@ -204,8 +217,9 @@ func (x proposalPolicy) Close(
 			ApprovalPollOutcome: closeApprovalPoll.Result,
 			Resolved:            resolved,
 			Bounty:              bounty,
+			BountyDonated:       bountyDonated,
 			Rewarded:            rewards,
-		}, closeNotice(ctx, prop, againstPopular, closeApprovalPoll.Result, resolved, bounty, rewards)
+		}, closeNotice(ctx, prop, againstPopular, closeApprovalPoll.Result, resolved, bounty, bountyDonated, rewards)
 
 	} else {
 
@@ -224,6 +238,7 @@ func (x proposalPolicy) Close(
 			ApprovalPollOutcome: cancelApprovalPoll.Result,
 			Resolved:            nil,
 			Bounty:              account.H(account.PluralAsset, 0.0),
+			BountyDonated:       false,
 			Rewarded:            nil,
 		}, cancelNotice(ctx, prop, againstPopular, cancelApprovalPoll.Result)
 

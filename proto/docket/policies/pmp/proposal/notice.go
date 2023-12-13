@@ -52,6 +52,7 @@ func closeNotice(
 	outcome common.Outcome,
 	resolved schema.Motions,
 	bounty account.Holding,
+	bountyDonated bool,
 	rewards Rewards,
 
 ) notice.Notices {
@@ -67,7 +68,11 @@ func closeNotice(
 	fmt.Fprintf(&w, "The PR approval tally was `%0.6f`.\n\n", outcome.Scores[pmp.ProposalBallotChoice])
 
 	// bounty
-	fmt.Fprintf(&w, "Bounty of `%0.6f` credits was awarded to @%v.\n\n", bounty.Quantity, prop.Author)
+	if bountyDonated {
+		fmt.Fprintf(&w, "Bounty of `%0.6f` credits was donated to the community's matching fund.\n\n", bounty.Quantity)
+	} else {
+		fmt.Fprintf(&w, "Bounty of `%0.6f` credits was awarded to @%v.\n\n", bounty.Quantity, prop.Author)
+	}
 
 	// resolved issues
 	fmt.Fprintf(&w, "Resolved issues:\n")

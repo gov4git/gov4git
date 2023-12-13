@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/proto"
@@ -203,8 +204,12 @@ func syncMeta(
 	chg *SyncManagedChanges,
 	issue ImportedIssue,
 	motion schema.Motion,
+
 ) bool {
+
+	author := findMemberForGithubLogin(ctx, cloned.PublicClone(), issue.Author)
 	if motion.TrackerURL == issue.URL &&
+		motion.Author == author &&
 		motion.Title == issue.Title &&
 		motion.Body == issue.Body &&
 		slices.Equal(motion.Labels, issue.Labels) {
@@ -214,6 +219,7 @@ func syncMeta(
 		ctx,
 		cloned,
 		motion.ID,
+		author,
 		issue.Title,
 		issue.Body,
 		issue.URL,
@@ -246,26 +252,31 @@ func syncCreateMotionForIssue(
 
 	must.Assertf(ctx, !issue.Closed, "issue is closed")
 
-	// if the user is a community member, find their username
-	var author member.User
-	query := member.User(issue.Author)
-	if member.IsUser_Local(ctx, cloned.PublicClone(), query) {
-		author = query
-	}
-
 	ops.OpenMotion_StageOnly(
 		ctx,
 		cloned,
 		id,
 		issue.MotionType(),
 		motionPolicyForIssue(issue),
-		author,
+		findMemberForGithubLogin(ctx, cloned.PublicClone(), issue.Author),
 		issue.Title,
 		issue.Body,
 		issue.URL,
 		issue.Labels,
 	)
 	chg.Opened.Add(id)
+}
+
+// findMemberForGithubLogin returns the community user corresponding to a GitHub login.
+// If there is no corresponding community member, an empty string user is returned.
+func findMemberForGithubLogin(ctx context.Context, cloned gov.Cloned, login string) member.User {
+
+	var user member.User
+	query := member.User(strings.ToLower(login))
+	if member.IsUser_Local(ctx, cloned, query) {
+		user = query
+	}
+	return user
 }
 
 func indexMotions(ms schema.Motions) map[schema.MotionID]schema.Motion {

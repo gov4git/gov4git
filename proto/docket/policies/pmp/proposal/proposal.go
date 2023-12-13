@@ -100,7 +100,7 @@ func (x proposalPolicy) Score(
 func (x proposalPolicy) Update(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion schema.Motion,
+	prop schema.Motion,
 	policyNS ns.NS,
 	args ...any,
 
@@ -124,8 +124,8 @@ func (x proposalPolicy) Update(
 	// update eligible concerns
 
 	eligible := schema.Refs{}
-	for ref := range state.ResolvingConcerns.RefSet() {
-		if pmp.IsConcernProposalEligible(ctx, cloned.PublicClone(), ref.To, motion.ID) {
+	for _, ref := range prop.RefTo {
+		if pmp.IsConcernProposalEligible(ctx, cloned.PublicClone(), ref.To, prop.ID, ref.Type) {
 			eligible = append(eligible, ref)
 		}
 	}
@@ -135,7 +135,7 @@ func (x proposalPolicy) Update(
 		var w bytes.Buffer
 		for _, ref := range eligible {
 			conMot := ops.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
-			fmt.Fprintf(&w, "- %s", conMot.TrackerURL)
+			fmt.Fprintf(&w, "- %s, managed as Gov4Git motion `%v`", conMot.TrackerURL, conMot.ID)
 		}
 		notices = append(
 			notices,
@@ -294,6 +294,8 @@ func (x proposalPolicy) AddRefTo(
 
 ) (policy.Report, notice.Notices) {
 
+	fmt.Println("PROPOSAL AddRefTo", from.ID, to.ID, refType)
+
 	if !to.IsConcern() {
 		return nil, nil
 	}
@@ -302,17 +304,7 @@ func (x proposalPolicy) AddRefTo(
 		return nil, nil
 	}
 
-	toState := LoadState_Local(ctx, cloned.Public.Tree(), toPolicyNS)
-	ref := schema.Ref{Type: refType, From: from.ID, To: to.ID}
-
-	if toState.ResolvingConcerns.Contains(ref) {
-		return nil, nil
-	}
-
-	toState.ResolvingConcerns = append(toState.ResolvingConcerns, ref)
-	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
-
-	return nil, notice.Noticef(ctx, "This PR referenced an issue, managed as Gov4Git concern `%v`.", to.ID)
+	return nil, notice.Noticef(ctx, "This PR referenced %v, managed as Gov4Git concern `%v`.", to.TrackerURL, to.ID)
 }
 
 func (x proposalPolicy) AddRefFrom(
@@ -342,17 +334,17 @@ func (x proposalPolicy) RemoveRefTo(
 
 ) (policy.Report, notice.Notices) {
 
-	toState := LoadState_Local(ctx, cloned.Public.Tree(), toPolicyNS)
-	ref := schema.Ref{Type: refType, From: from.ID, To: to.ID}
+	fmt.Println("PROPOSAL RemoveRefTo", from.ID, to.ID, refType)
 
-	if !toState.ResolvingConcerns.Contains(ref) {
+	if !to.IsConcern() {
 		return nil, nil
 	}
 
-	toState.ResolvingConcerns = toState.ResolvingConcerns.Remove(ref)
-	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
+	if refType != pmp.ResolvesRefType {
+		return nil, nil
+	}
 
-	return nil, notice.Noticef(ctx, "This PR is no longer references the issue, managed as Gov4Git concern `%v`.", to.ID)
+	return nil, notice.Noticef(ctx, "This PR no longer references %v, managed as Gov4Git concern `%v`.", to.TrackerURL, to.ID)
 }
 
 func (x proposalPolicy) RemoveRefFrom(

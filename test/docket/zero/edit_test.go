@@ -33,7 +33,7 @@ func TestEdit(t *testing.T) {
 		nil)
 
 	// edit
-	ops.EditMotion(ctx, cty.Organizer(), id, "concern #2", "description #2", "https://2", nil)
+	ops.EditMotion(ctx, cty.Organizer(), id, cty.MemberUser(0), "concern #2", "description #2", "https://2", nil)
 
 	// verify state changed
 	m := ops.ShowMotion(ctx, cty.Gov(), id)

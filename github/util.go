@@ -67,8 +67,13 @@ func replyToIssue(
 	payload string,
 ) {
 
-	header := fmt.Sprintf("## <a href=%q><img src=%q alt=\"This project is governed with Gov4Git.\" width=\"65\" /></a> %s\nIssued on `%s`\n\n",
-		materials.Gov4GitWebsiteURL, materials.Gov4GitAvatarURL, subject, time.Now().Format(time.RFC850))
+	header := fmt.Sprintf(
+		"## <a href=%q><img src=%q alt=\"This project is governed with Gov4Git.\" width=\"65\" /></a> %s\nOn `%s`\n\n",
+		materials.Gov4GitWebsiteURL,
+		materials.Gov4GitAvatarURL,
+		subject,
+		time.Now().Format(time.RFC850),
+	)
 
 	comment := &github.IssueComment{
 		Body: github.String(header + payload),

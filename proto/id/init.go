@@ -66,11 +66,11 @@ var (
 	PrivateReadmeMD = readmeMDHeader("This is a Gov4Git private identity repository.") + readmeBody
 
 	readmeBody = fmt.Sprintf(`
-		[Gov4Git](%s) is a decentralized governance and management system for git projects.
+[Gov4Git](%s) is a decentralized governance and management system for git projects.
 
-		Learn about Gov4Git:
-		[Gov4Git on GitHub](%s).
-		[Gov4Git on Twitter/X](%s).
+Learn about Gov4Git:
+[Gov4Git on GitHub](%s).
+[Gov4Git on Twitter/X](%s).
 		`,
 		materials.Gov4GitWebsiteURL, materials.Gov4GitGithubURL, materials.Gov4GitXURL)
 )

@@ -69,7 +69,9 @@ func (x proposalPolicy) Open(
 		member.Everybody,
 	)
 
-	return nil, notice.Noticef(ctx, "Started managing this PR as Gov4Git proposal `%v`."+pmp.Welcome, prop.ID)
+	return nil, notice.Noticef(ctx,
+		"Started managing this PR as Gov4Git proposal `%v` with initial __approval score__ of `%v`."+
+			pmp.Welcome, prop.ID, state.LatestApprovalScore)
 }
 
 func (x proposalPolicy) Score(
@@ -89,7 +91,7 @@ func (x proposalPolicy) Score(
 
 	return schema.Score{
 		Attention: attention,
-	}, notice.Noticef(ctx, "Updated approval tally to %v.", ads.Tally.Scores[pmp.ProposalBallotChoice])
+	}, nil
 }
 
 func (x proposalPolicy) Update(
@@ -101,13 +103,26 @@ func (x proposalPolicy) Update(
 
 ) (policy.Report, notice.Notices) {
 
+	notices := notice.Notices{}
 	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
 
-	state.ApprovalPoll = pmp.ProposalApprovalPollName(motion.ID)
+	// update approval score
+
+	ads := ballot.Show_Local(ctx, cloned.Public.Tree(), state.ApprovalPoll)
+	latestApprovalScore := ads.Tally.Scores[pmp.ProposalBallotChoice]
+	if latestApprovalScore != state.LatestApprovalScore {
+		notices = append(
+			notices,
+			notice.Noticef(ctx, "This PR's __approval score__ was updated to `%v`.", latestApprovalScore)...,
+		)
+	}
+	state.LatestApprovalScore = latestApprovalScore
+
+	//
 
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
-	return nil, nil
+	return nil, notices
 }
 
 func (x proposalPolicy) Close(
@@ -253,7 +268,25 @@ func (x proposalPolicy) AddRefTo(
 
 ) (policy.Report, notice.Notices) {
 
-	return nil, nil
+	if !to.IsConcern() {
+		return nil, nil
+	}
+
+	if refType != pmp.ResolvesRefType {
+		return nil, nil
+	}
+
+	toState := LoadState_Local(ctx, cloned.Public.Tree(), toPolicyNS)
+	ref := schema.Ref{Type: refType, From: from.ID, To: to.ID}
+
+	if toState.ResolvingConcerns.Contains(ref) {
+		return nil, nil
+	}
+
+	toState.ResolvingConcerns = append(toState.ResolvingConcerns, ref)
+	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
+
+	return nil, notice.Noticef(ctx, "This PR referenced an issue, managed as Gov4Git concern `%v`.", to.ID)
 }
 
 func (x proposalPolicy) AddRefFrom(
@@ -283,7 +316,17 @@ func (x proposalPolicy) RemoveRefTo(
 
 ) (policy.Report, notice.Notices) {
 
-	return nil, nil
+	toState := LoadState_Local(ctx, cloned.Public.Tree(), toPolicyNS)
+	ref := schema.Ref{Type: refType, From: from.ID, To: to.ID}
+
+	if !toState.ResolvingConcerns.Contains(ref) {
+		return nil, nil
+	}
+
+	toState.ResolvingConcerns = toState.ResolvingConcerns.Remove(ref)
+	SaveState_StageOnly(ctx, cloned.Public.Tree(), toPolicyNS, toState)
+
+	return nil, notice.Noticef(ctx, "This PR is no longer references the issue, managed as Gov4Git concern `%v`.", to.ID)
 }
 
 func (x proposalPolicy) RemoveRefFrom(

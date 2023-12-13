@@ -9,7 +9,9 @@ import (
 const StateFilebase = "state.json"
 
 type ProposalState struct {
-	ApprovalPoll common.BallotName `json:"approval_poll"`
+	ApprovalPoll        common.BallotName `json:"approval_poll"`
+	LatestApprovalScore float64           `json:"latest_approval_score"`
+	ResolvingConcerns   schema.Refs       `json:"resolving_concerns"`
 }
 
 func NewProposalState(id schema.MotionID) *ProposalState {

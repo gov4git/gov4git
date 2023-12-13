@@ -44,6 +44,7 @@ func flushNotices(
 
 	var w bytes.Buffer
 
+	notShown := 0
 	for _, nstate := range queue.NoticeStates {
 
 		// check if notice already displayed, based on governance records
@@ -55,7 +56,10 @@ func flushNotices(
 
 		fmt.Fprintf(&w, "### Notice `%v`\n%s\n\n", nstate.ID, nstate.Notice.Body)
 		nstate.MarkShown()
+		notShown++
 	}
 
-	replyToIssue(ctx, repo, ghc, issueNum, "Gov4Git notices", w.String())
+	if notShown > 0 {
+		replyToIssue(ctx, repo, ghc, issueNum, "Gov4Git notices", w.String())
+	}
 }

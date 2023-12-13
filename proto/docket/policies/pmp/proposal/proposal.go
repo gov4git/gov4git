@@ -319,6 +319,8 @@ func (x proposalPolicy) AddRefFrom(
 
 ) (policy.Report, notice.Notices) {
 
+	fmt.Println("PROPOSAL AddRefFrom", from.ID, to.ID, refType)
+
 	return nil, nil
 }
 
@@ -358,6 +360,8 @@ func (x proposalPolicy) RemoveRefFrom(
 	args ...any,
 
 ) (policy.Report, notice.Notices) {
+
+	fmt.Println("PROPOSAL RemoveRefFrom", from.ID, to.ID, refType)
 
 	return nil, nil
 }

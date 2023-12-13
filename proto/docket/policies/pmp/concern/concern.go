@@ -256,6 +256,8 @@ func (x concernPolicy) AddRefTo(
 
 ) (policy.Report, notice.Notices) {
 
+	fmt.Println("CONCERN AddRefTo", from.ID, to.ID, refType)
+
 	return nil, nil
 }
 
@@ -295,6 +297,8 @@ func (x concernPolicy) RemoveRefTo(
 	args ...any,
 
 ) (policy.Report, notice.Notices) {
+
+	fmt.Println("CONCERN RemoveRefTo", from.ID, to.ID, refType)
 
 	return nil, nil
 }

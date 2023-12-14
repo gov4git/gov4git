@@ -125,21 +125,38 @@ func SyncManagedIssues_StageOnly(
 					changed = true
 
 				case !issue.Closed && motion.Closed:
-					base.Infof("GitHub issue %v has been re-opened; corresonding motion remains closed", issue.Number)
-					ops.AppendMotionNotices_StageOnly(
-						ctx,
-						cloned.PublicClone(),
-						id,
-						notice.Noticef(
-							ctx,
-							"Reopening %s %s [#%v](%v) does not reopen the corresponding motion. Consider creating a new %s instead.",
-							motion.GithubArticle(),
-							motion.GithubType(),
-							id,
-							motion.TrackerURL,
-							motion.GithubType(),
-						),
+
+					err := must.Try(
+						func() {
+							closeIssue(ctx, repo, githubClient, int(issue.Number))
+						},
 					)
+					if err != nil {
+						base.Infof("GitHub %s %v is open, while corresonding motion is closed. Failed to close GitHub issue (%v)",
+							motion.GithubType(), issue.Number, err)
+						ops.AppendMotionNotices_StageOnly(
+							ctx,
+							cloned.PublicClone(),
+							id,
+							notice.Noticef(
+								ctx,
+								"This %s must now be closed, as the corresponding Gov4Git motion has closed. Consider creating a new %s, if you want to revive it.",
+								motion.GithubType(),
+								motion.GithubType(),
+							),
+						)
+					} else {
+						ops.AppendMotionNotices_StageOnly(
+							ctx,
+							cloned.PublicClone(),
+							id,
+							notice.Noticef(
+								ctx,
+								"Gov4Git closed this issue, as the corresponding governance motion `%v` has now been closed.",
+								id,
+							),
+						)
+					}
 
 				case !issue.Closed && !motion.Closed:
 

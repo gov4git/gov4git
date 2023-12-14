@@ -108,7 +108,9 @@ func SyncManagedIssues_StageOnly(
 
 				case issue.Closed && !motion.Closed:
 					if motion.IsConcern() {
+						fmt.Printf("MOTION in managed loop: %v\n", motion)
 						// manually closing an issue motion cancels it
+						// XXX: only if not already cancelled
 						ops.CancelMotion_StageOnly(ctx, cloned, id)
 						syncChanges.Cancelled.Add(id)
 					} else if motion.IsProposal() {

@@ -37,7 +37,8 @@ func CancelMotion_StageOnly(
 
 	t := cloned.Public.Tree()
 	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
-	must.Assert(ctx, !motion.Closed && !motion.Cancelled, schema.ErrMotionAlreadyClosed)
+	must.Assertf(ctx, !motion.Closed, "motion %v already closed", motion.ID)
+	must.Assertf(ctx, !motion.Cancelled, "motion %v already cancelled", motion.ID)
 	motion.Closed = true
 	motion.Cancelled = true
 	motion.ClosedAt = time.Now()

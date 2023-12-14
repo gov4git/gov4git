@@ -198,6 +198,10 @@ func syncMeta(
 
 ) bool {
 
+	if motion.Closed {
+		return false
+	}
+
 	author := findMemberForGithubLogin(ctx, cloned.PublicClone(), issue.Author)
 	if motion.TrackerURL == issue.URL &&
 		motion.Author == author &&

@@ -50,6 +50,20 @@ Check that issues #1 and #2:
 - were unfrozen
 - the set of eligible references was updated to empty
 
-Reopen pr #5 through the UI. (For next time.)
+[ Reopen pr #5 through the UI, for the next experiment. ]
 
-### 
+### vote for pr #26
+
+```sh
+gov4git --config testing-config.json ballot vote --name pmp/motion/approval_poll/26 --choices rank --strengths 10.0
+```
+
+Verify it shows up as eligible for issues #1 and #2, and vice-versa.
+
+Merge pr #26.
+
+Verify issues #1 and #2 closed.
+
+Verify bounty and reward disbursed.
+
+[ Revert pull request and re-open. ]

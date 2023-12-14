@@ -167,7 +167,7 @@ func (x concernPolicy) updateFreeze(
 	}
 	if toState.EligibleProposals.Len() == 0 && motion.Frozen {
 		ops.UnfreezeMotion_StageOnly(notice.Mute(ctx), cloned, motion.ID)
-		notices = append(notices, notice.Noticef(ctx, "Unfreezing 🌤️ issue as there are no eligible PRs are addressing it.")...)
+		notices = append(notices, notice.Noticef(ctx, "Unfreezing 🌤️ issue as there are no eligible PRs addressing it.")...)
 	}
 
 	return nil, notices

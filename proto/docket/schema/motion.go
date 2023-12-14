@@ -60,6 +60,28 @@ func (m Motion) IsProposal() bool {
 	return m.Type == MotionProposalType
 }
 
+func (m Motion) GithubArticle() string {
+	switch m.Type {
+	case MotionConcernType:
+		return "an"
+	case MotionProposalType:
+		return "a"
+	default:
+		return "an"
+	}
+}
+
+func (m Motion) GithubType() string {
+	switch m.Type {
+	case MotionConcernType:
+		return "issue"
+	case MotionProposalType:
+		return "PR"
+	default:
+		return "issue/PR"
+	}
+}
+
 func (m Motion) RefersTo(toID MotionID, typ RefType) bool {
 	for _, ref := range m.RefTo {
 		if ref.To == toID && ref.Type == typ {

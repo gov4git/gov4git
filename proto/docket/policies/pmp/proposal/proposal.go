@@ -123,13 +123,7 @@ func (x proposalPolicy) Update(
 
 	// update eligible concerns
 
-	eligible := schema.Refs{}
-	for _, ref := range prop.RefTo {
-		if pmp.IsConcernProposalEligible(ctx, cloned.PublicClone(), ref.To, prop.ID, ref.Type) {
-			eligible = append(eligible, ref)
-		}
-	}
-	eligible.Sort()
+	eligible := computeEligibleConcerns(ctx, cloned.PublicClone(), prop)
 	if !slices.Equal[schema.Refs](eligible, state.EligibleConcerns) {
 		// display list of eligible concerns
 		if len(eligible) == 0 {
@@ -168,6 +162,9 @@ func (x proposalPolicy) Close(
 	args ...any,
 
 ) (policy.Report, notice.Notices) {
+
+	// update the policy state before closing the motion
+	x.Update(ctx, cloned, prop, policyNS)
 
 	// was the PR merged or not
 	isMerged := decision.IsAccept()
@@ -336,7 +333,7 @@ func (x proposalPolicy) AddRefFrom(
 		return nil, nil
 	}
 
-	if refType != pmp.ResolvesRefType {
+	if refType != pmp.ClaimsRefType {
 		return nil, nil
 	}
 
@@ -374,7 +371,7 @@ func (x proposalPolicy) RemoveRefFrom(
 		return nil, nil
 	}
 
-	if refType != pmp.ResolvesRefType {
+	if refType != pmp.ClaimsRefType {
 		return nil, nil
 	}
 

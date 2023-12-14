@@ -2,7 +2,6 @@ package ops
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/gov4git/gov4git/proto"
@@ -38,13 +37,8 @@ func CancelMotion_StageOnly(
 
 	t := cloned.Public.Tree()
 	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
-	fmt.Printf("MOTION in Cancel op: %v\n", motion)
 	must.Assertf(ctx, !motion.Closed, "motion %v already closed", motion.ID)
 	must.Assertf(ctx, !motion.Cancelled, "motion %v already cancelled", motion.ID)
-	motion.Closed = true
-	motion.Cancelled = true
-	motion.ClosedAt = time.Now()
-	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy)
@@ -56,6 +50,12 @@ func CancelMotion_StageOnly(
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
+
+	// commit cancellation
+	motion.Closed = true
+	motion.Cancelled = true
+	motion.ClosedAt = time.Now()
+	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// log
 	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{

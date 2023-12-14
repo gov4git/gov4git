@@ -17,28 +17,28 @@ func IsConcernProposalEligible(
 
 ) bool {
 
-	if refType != ResolvesRefType {
+	if refType != ClaimsRefType {
 		return false
 	}
 
-	conMot := ops.LookupMotion_Local(ctx, cloned, conID)
-	propMot := ops.LookupMotion_Local(ctx, cloned, propID)
+	con := ops.LookupMotion_Local(ctx, cloned, conID)
+	prop := ops.LookupMotion_Local(ctx, cloned, propID)
 
-	if !conMot.IsConcern() {
+	if !con.IsConcern() {
 		return false
 	}
 
-	if !propMot.IsProposal() {
+	if !prop.IsProposal() {
 		return false
 	}
 
-	if conMot.Closed {
+	if con.Closed {
 		return false
 	}
 
-	if propMot.Closed {
+	if prop.Closed {
 		return false
 	}
 
-	return propMot.Score.Attention > 0
+	return prop.Score.Attention > 0
 }

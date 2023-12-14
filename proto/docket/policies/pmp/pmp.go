@@ -15,7 +15,10 @@ var (
 	ConcernBallotChoice  = "rank"
 	ProposalBallotChoice = "rank"
 
-	ResolvesRefType = schema.RefType("resolves")
+	// We explicitly avoid using "resolves" as the keyword for referencing issues/PRs, as
+	// "resolves" triggers Github to automatically close resolved issues when a PR is closed, thereby
+	// not giving Gov4Git a chance to close them as part of the PR closure/clearance procedure.
+	ClaimsRefType = schema.RefType("claims")
 )
 
 func ConcernPollBallotName(id schema.MotionID) common.BallotName {

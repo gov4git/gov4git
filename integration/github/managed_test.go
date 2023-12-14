@@ -8,6 +8,7 @@ import (
 
 	govgh "github.com/gov4git/gov4git/github"
 	"github.com/gov4git/gov4git/proto/docket/ops"
+	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
@@ -47,7 +48,7 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(ms[0].RefBy) != 1 {
 		t.Errorf("expecting %v, got %v", 1, ms[0].RefBy)
 	}
-	ms0RefBy0 := schema.Ref{Type: "resolves", From: schema.MotionID("5"), To: schema.MotionID("1")}
+	ms0RefBy0 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("5"), To: schema.MotionID("1")}
 	if ms[0].RefBy[0] != ms0RefBy0 {
 		t.Errorf("expecting %v, got %v", ms0RefBy0, ms[0].RefBy[0])
 	}
@@ -63,8 +64,8 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(ms[1].RefBy) != 2 {
 		t.Errorf("expecting %v, got %v", 2, ms[1].RefBy)
 	}
-	ms1RefBy0 := schema.Ref{Type: "resolves", From: schema.MotionID("5"), To: schema.MotionID("2")}
-	ms1RefBy1 := schema.Ref{Type: "resolves", From: schema.MotionID("7"), To: schema.MotionID("2")}
+	ms1RefBy0 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("5"), To: schema.MotionID("2")}
+	ms1RefBy1 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("7"), To: schema.MotionID("2")}
 	if ms[1].RefBy[0] != ms1RefBy0 {
 		t.Errorf("expecting %v, got %v", ms1RefBy0, ms[1].RefBy[0])
 	}
@@ -83,8 +84,8 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(ms[2].RefTo) != 2 {
 		t.Errorf("expecting %v, got %v", 2, ms[2].RefTo)
 	}
-	ms2RefTo0 := schema.Ref{Type: "resolves", From: schema.MotionID("5"), To: schema.MotionID("1")}
-	ms2RefTo1 := schema.Ref{Type: "resolves", From: schema.MotionID("5"), To: schema.MotionID("2")}
+	ms2RefTo0 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("5"), To: schema.MotionID("1")}
+	ms2RefTo1 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("5"), To: schema.MotionID("2")}
 	if ms[2].RefTo[0] != ms2RefTo0 {
 		t.Errorf("expecting %v, got %v", ms2RefTo0, ms[2].RefTo[0])
 	}
@@ -103,7 +104,7 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(ms[3].RefTo) != 1 {
 		t.Errorf("expecting %v, got %v", 1, ms[3].RefTo)
 	}
-	ms3RefTo0 := schema.Ref{Type: "resolves", From: schema.MotionID("7"), To: schema.MotionID("2")}
+	ms3RefTo0 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("7"), To: schema.MotionID("2")}
 	if ms[3].RefTo[0] != ms3RefTo0 {
 		t.Errorf("expecting %v, got %v", ms3RefTo0, ms[3].RefTo[0])
 	}

@@ -2,7 +2,6 @@ package pmp
 
 import (
 	"context"
-	"fmt"
 	"math"
 	"testing"
 
@@ -14,11 +13,9 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp/concern"
 	"github.com/gov4git/gov4git/proto/docket/policies/pmp/proposal"
 	"github.com/gov4git/gov4git/proto/docket/schema"
-	"github.com/gov4git/gov4git/proto/history"
 	"github.com/gov4git/gov4git/runtime"
 	"github.com/gov4git/gov4git/test"
 	"github.com/gov4git/lib4git/base"
-	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/testutil"
 )
@@ -75,7 +72,7 @@ func testSetup(
 		cty.Organizer(),
 		testProposalID,
 		testConcernID,
-		pmp.ResolvesRefType,
+		pmp.ClaimsRefType,
 	)
 
 	// list
@@ -199,6 +196,7 @@ func TestOpenCloseProposalCancelConcern(t *testing.T) {
 	testSetup(t, ctx, cty)
 
 	ops.CloseMotion(ctx, cty.Organizer(), testProposalID, schema.Accept) // pr
+
 	err := must.Try(
 		func() {
 			ops.CancelMotion(ctx, cty.Organizer(), testConcernID)
@@ -209,14 +207,14 @@ func TestOpenCloseProposalCancelConcern(t *testing.T) {
 	}
 
 	// uncomment to view and adjust notices
-	conNotices := ops.LoadMotionNotices(ctx, cty.Gov(), testConcernID)
-	propNotices := ops.LoadMotionNotices(ctx, cty.Gov(), testProposalID)
-	fmt.Println("CONCERN:", form.SprintJSON(conNotices))
-	fmt.Println("PROPOSAL:", form.SprintJSON(propNotices))
+	// conNotices := ops.LoadMotionNotices(ctx, cty.Gov(), testConcernID)
+	// propNotices := ops.LoadMotionNotices(ctx, cty.Gov(), testProposalID)
+	// fmt.Println("CONCERN NOTICES:", form.SprintJSON(conNotices))
+	// fmt.Println("PROPOSAL NOTICES:", form.SprintJSON(propNotices))
 
 	// uncomment to view journal entries
-	h := history.List(ctx, cty.Gov())
-	fmt.Println("HISTORY:", form.SprintJSON(h))
+	// h := history.List(ctx, cty.Gov())
+	// fmt.Println("HISTORY:", form.SprintJSON(h))
 
 	// user accounts
 	u0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)

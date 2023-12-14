@@ -40,9 +40,6 @@ func CloseMotion_StageOnly(
 	t := cloned.Public.Tree()
 	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
 	must.Assert(ctx, !motion.Closed, schema.ErrMotionAlreadyClosed)
-	motion.Closed = true
-	motion.ClosedAt = time.Now()
-	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy)
@@ -55,6 +52,11 @@ func CloseMotion_StageOnly(
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
+
+	// commit closure
+	motion.Closed = true
+	motion.ClosedAt = time.Now()
+	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// log
 	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{

@@ -105,13 +105,7 @@ func (x concernPolicy) Update(
 
 	// update eligible proposals
 
-	eligible := schema.Refs{}
-	for _, ref := range con.RefBy {
-		if pmp.IsConcernProposalEligible(ctx, cloned.PublicClone(), con.ID, ref.From, ref.Type) {
-			eligible = append(eligible, ref)
-		}
-	}
-	eligible.Sort()
+	eligible := computeEligibleProposals(ctx, cloned.PublicClone(), con)
 	if !slices.Equal[schema.Refs](eligible, state.EligibleProposals) {
 		// display updated list of eligible proposals
 		if len(eligible) == 0 {
@@ -140,6 +134,17 @@ func (x concernPolicy) Update(
 
 	r0, n0 := x.updateFreeze(ctx, cloned, con, policyNS)
 	return r0, append(notices, n0...)
+}
+
+func computeEligibleProposals(ctx context.Context, cloned gov.Cloned, con schema.Motion) schema.Refs {
+	eligible := schema.Refs{}
+	for _, ref := range con.RefBy {
+		if pmp.IsConcernProposalEligible(ctx, cloned, con.ID, ref.From, ref.Type) {
+			eligible = append(eligible, ref)
+		}
+	}
+	eligible.Sort()
+	return eligible
 }
 
 func (x concernPolicy) updateFreeze(
@@ -190,6 +195,9 @@ func (x concernPolicy) Close(
 	must.Assertf(ctx, ok, "unrecognized account ID argument %v", args[0])
 	prop, ok := args[1].(schema.Motion)
 	must.Assertf(ctx, ok, "unrecognized proposal motion argument %v", args[1])
+
+	// update the policy state before closing the motion
+	x.Update(ctx, cloned, prop, policyNS)
 
 	// close the poll for the motion
 	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
@@ -268,7 +276,7 @@ func (x concernPolicy) AddRefTo(
 		return nil, nil
 	}
 
-	if refType != pmp.ResolvesRefType {
+	if refType != pmp.ClaimsRefType {
 		return nil, nil
 	}
 
@@ -306,7 +314,7 @@ func (x concernPolicy) RemoveRefTo(
 		return nil, nil
 	}
 
-	if refType != pmp.ResolvesRefType {
+	if refType != pmp.ClaimsRefType {
 		return nil, nil
 	}
 

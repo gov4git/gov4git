@@ -55,7 +55,7 @@ Check that issues #1 and #2:
 ### vote for pr #26
 
 ```sh
-gov4git --config testing-config.json ballot vote --name pmp/motion/approval_poll/27 --choices rank --strengths 10.0
+gov4git --config testing-config.json ballot vote --name pmp/motion/approval_poll/26 --choices rank --strengths 10.0
 ```
 
 Verify it shows up as eligible for issues #1 and #2, and vice-versa.

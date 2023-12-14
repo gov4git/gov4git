@@ -144,9 +144,12 @@ func SyncManagedIssues_StageOnly(
 						id,
 						notice.Noticef(
 							ctx,
-							"Reopening an issue or a PR [#%v](%v) is not allowed. Create a new one instead.",
+							"Reopening %s %s [#%v](%v) does not reopen the corresponding motion. Consider creating a new %s instead.",
+							motion.GithubArticle(),
+							motion.GithubType(),
 							id,
 							motion.TrackerURL,
+							motion.GithubType(),
 						),
 					)
 

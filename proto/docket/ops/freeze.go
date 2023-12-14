@@ -39,8 +39,6 @@ func FreezeMotion_StageOnly(
 	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
 	must.Assert(ctx, !motion.Closed, schema.ErrMotionAlreadyClosed)
 	must.Assert(ctx, !motion.Frozen, schema.ErrMotionAlreadyFrozen)
-	motion.Frozen = true
-	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy)
@@ -52,6 +50,10 @@ func FreezeMotion_StageOnly(
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
+
+	// commit freeze
+	motion.Frozen = true
+	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// log
 	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
@@ -92,8 +94,6 @@ func UnfreezeMotion_StageOnly(
 	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
 	must.Assert(ctx, !motion.Closed, schema.ErrMotionAlreadyClosed)
 	must.Assert(ctx, motion.Frozen, schema.ErrMotionNotFrozen)
-	motion.Frozen = false
-	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// apply policy
 	pcy := policy.Get(ctx, motion.Policy)
@@ -105,6 +105,10 @@ func UnfreezeMotion_StageOnly(
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
+
+	// commit unfreeze
+	motion.Frozen = false
+	schema.MotionKV.Set(ctx, schema.MotionNS, t, id, motion)
 
 	// log
 	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{

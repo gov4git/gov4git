@@ -14,7 +14,6 @@ import (
 	"github.com/gov4git/gov4git/proto/docket/schema"
 	"github.com/gov4git/gov4git/proto/gov"
 	"github.com/gov4git/gov4git/proto/member"
-	"github.com/gov4git/lib4git/base"
 )
 
 func loadResolvedConcerns(
@@ -24,25 +23,24 @@ func loadResolvedConcerns(
 
 ) schema.Motions {
 
+	eligible := computeEligibleConcerns(ctx, cloned.PublicClone(), prop)
 	resolved := schema.Motions{}
-	for _, ref := range prop.RefTo {
-		if ref.Type != pmp.ResolvesRefType {
-			continue
-		}
+	for _, ref := range eligible {
 		con := ops.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
-		if !con.IsConcern() {
-			continue
-		}
-		if con.ID == prop.ID {
-			base.Errorf("bug: concern and proposal with same id")
-			continue
-		}
-		if con.Closed {
-			continue
-		}
 		resolved = append(resolved, con)
 	}
 	return resolved
+}
+
+func computeEligibleConcerns(ctx context.Context, cloned gov.Cloned, prop schema.Motion) schema.Refs {
+	eligible := schema.Refs{}
+	for _, ref := range prop.RefTo {
+		if pmp.IsConcernProposalEligible(ctx, cloned, ref.To, prop.ID, ref.Type) {
+			eligible = append(eligible, ref)
+		}
+	}
+	eligible.Sort()
+	return eligible
 }
 
 func closeResolvedConcerns(

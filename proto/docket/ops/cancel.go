@@ -2,6 +2,7 @@ package ops
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/gov4git/gov4git/proto"
@@ -37,6 +38,7 @@ func CancelMotion_StageOnly(
 
 	t := cloned.Public.Tree()
 	motion := schema.MotionKV.Get(ctx, schema.MotionNS, t, id)
+	fmt.Printf("MOTION in Cancel op: %v\n", motion)
 	must.Assertf(ctx, !motion.Closed, "motion %v already closed", motion.ID)
 	must.Assertf(ctx, !motion.Cancelled, "motion %v already cancelled", motion.ID)
 	motion.Closed = true

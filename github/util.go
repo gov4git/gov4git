@@ -55,7 +55,7 @@ func replyAndCloseIssue(
 	payload string,
 ) {
 	replyToIssue(ctx, repo, ghc, issue.GetNumber(), subject, payload)
-	closeIssue(ctx, repo, ghc, issue)
+	closeIssue(ctx, repo, ghc, issue.GetNumber())
 }
 
 func replyToIssue(
@@ -90,12 +90,12 @@ func closeIssue(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	issue *github.Issue,
+	issueNumber int,
 ) {
 	req := &github.IssueRequest{
 		State: github.String("closed"),
 	}
-	_, _, err := ghc.Issues.Edit(ctx, repo.Owner, repo.Name, issue.GetNumber(), req)
+	_, _, err := ghc.Issues.Edit(ctx, repo.Owner, repo.Name, issueNumber, req)
 	must.NoError(ctx, err)
 }
 

@@ -55,7 +55,7 @@ func init() {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(cacheCmd)
 	rootCmd.AddCommand(githubCmd)
-	rootCmd.AddCommand(docketCmd)
+	rootCmd.AddCommand(motionCmd)
 	rootCmd.AddCommand(etcCmd)
 }
 

@@ -3,7 +3,7 @@ package gov
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/gov4git/v2/proto/id"
 )
 
 // Non-owner

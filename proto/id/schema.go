@@ -4,7 +4,7 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 
-	"github.com/gov4git/gov4git/proto"
+	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/lib4git/form"
 )
 

@@ -3,12 +3,12 @@ package zero
 import (
 	"testing"
 
-	"github.com/gov4git/gov4git/proto/account"
-	"github.com/gov4git/gov4git/proto/docket/ops"
-	"github.com/gov4git/gov4git/proto/docket/policies/zero"
-	"github.com/gov4git/gov4git/proto/docket/schema"
-	"github.com/gov4git/gov4git/runtime"
-	"github.com/gov4git/gov4git/test"
+	"github.com/gov4git/gov4git/v2/proto/account"
+	"github.com/gov4git/gov4git/v2/proto/docket/ops"
+	"github.com/gov4git/gov4git/v2/proto/docket/policies/zero"
+	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/runtime"
+	"github.com/gov4git/gov4git/v2/test"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/testutil"
 )

@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/gov4git/gov4git/proto/etc"
+	"github.com/gov4git/gov4git/v2/proto/etc"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
 	"github.com/spf13/cobra"

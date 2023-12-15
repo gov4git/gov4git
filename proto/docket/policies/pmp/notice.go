@@ -3,7 +3,7 @@ package pmp
 import (
 	"fmt"
 
-	"github.com/gov4git/gov4git/materials"
+	"github.com/gov4git/gov4git/v2/materials"
 )
 
 var Welcome = fmt.Sprintf(

@@ -5,10 +5,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/docket/policies/pmp"
-	"github.com/gov4git/gov4git/proto/docket/schema"
-	"github.com/gov4git/gov4git/proto/notice"
+	"github.com/gov4git/gov4git/v2/proto/ballot/common"
+	"github.com/gov4git/gov4git/v2/proto/docket/policies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/notice"
 )
 
 func cancelNotice(ctx context.Context, motion schema.Motion, outcome common.Outcome) notice.Notices {

@@ -3,9 +3,9 @@ package ops
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/proto/docket/schema"
-	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/notice"
+	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/notice"
 )
 
 func AppendMotionNotices_StageOnly(

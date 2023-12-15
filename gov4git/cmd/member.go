@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/spf13/cobra"
 )
 

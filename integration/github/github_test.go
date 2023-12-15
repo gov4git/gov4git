@@ -11,7 +11,7 @@ import (
 	"os"
 
 	"github.com/google/go-github/v55/github"
-	govgh "github.com/gov4git/gov4git/github"
+	govgh "github.com/gov4git/gov4git/v2/github"
 )
 
 var (

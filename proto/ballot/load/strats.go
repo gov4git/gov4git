@@ -3,9 +3,9 @@ package load
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/ballot/strategies/sv"
-	"github.com/gov4git/gov4git/proto/mod"
+	"github.com/gov4git/gov4git/v2/proto/ballot/common"
+	"github.com/gov4git/gov4git/v2/proto/ballot/strategies/sv"
+	"github.com/gov4git/gov4git/v2/proto/mod"
 	"github.com/gov4git/lib4git/git"
 )
 

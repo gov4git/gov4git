@@ -3,7 +3,7 @@ package ballot
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/proto/ballot/common"
+	"github.com/gov4git/gov4git/v2/proto/ballot/common"
 	"github.com/gov4git/lib4git/git"
 )
 

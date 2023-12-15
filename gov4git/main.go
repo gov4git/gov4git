@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gov4git/gov4git/gov4git/cmd"
-	_ "github.com/gov4git/gov4git/runtime"
+	"github.com/gov4git/gov4git/v2/gov4git/cmd"
+	_ "github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/must"
 )

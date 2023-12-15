@@ -1,5 +1,5 @@
-// Package gov4git_root provides protocol versioning.
-package gov4git_root
+// Package gov4git provides protocol versioning.
+package gov4git
 
 import (
 	_ "embed"

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/go-github/v55/github"
+	"github.com/gov4git/gov4git"
 	"github.com/gov4git/gov4git/materials"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/util"
@@ -68,11 +69,13 @@ func replyToIssue(
 ) {
 
 	header := fmt.Sprintf(
-		"## <a href=%q><img src=%q alt=\"This project is governed with Gov4Git.\" width=\"65\" /></a> %s\nOn `%s`\n\n",
+		"## <a href=%q><img src=%q alt=\"This project is governed with Gov4Git.\" width=\"65\" /></a> %s\n"+
+			"On `%s` by Gov4Git `%s`\n\n",
 		materials.Gov4GitWebsiteURL,
 		materials.Gov4GitAvatarURL,
 		subject,
 		time.Now().Format(time.RFC850),
+		gov4git.GetVersionInfo().Version,
 	)
 
 	comment := &github.IssueComment{

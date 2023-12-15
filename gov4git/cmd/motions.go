@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gov4git/gov4git/proto/docket/ops"
-	"github.com/gov4git/gov4git/proto/docket/policy"
-	"github.com/gov4git/gov4git/proto/docket/schema"
-	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/docket/ops"
+	"github.com/gov4git/gov4git/v2/proto/docket/policy"
+	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )

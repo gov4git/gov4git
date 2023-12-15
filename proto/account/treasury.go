@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gov4git/gov4git/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/gov"
 )
 
 var (

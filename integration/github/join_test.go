@@ -7,9 +7,9 @@ import (
 	"fmt"
 	"testing"
 
-	govgh "github.com/gov4git/gov4git/github"
-	"github.com/gov4git/gov4git/runtime"
-	"github.com/gov4git/gov4git/test"
+	govgh "github.com/gov4git/gov4git/v2/github"
+	"github.com/gov4git/gov4git/v2/runtime"
+	"github.com/gov4git/gov4git/v2/test"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/testutil"

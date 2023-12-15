@@ -4,10 +4,10 @@ import (
 	"context"
 	"slices"
 
-	"github.com/gov4git/gov4git/proto"
-	"github.com/gov4git/gov4git/proto/docket/schema"
-	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/v2/proto"
+	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )

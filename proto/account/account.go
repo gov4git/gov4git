@@ -3,10 +3,10 @@ package account
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/proto"
-	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/history"
-	"github.com/gov4git/gov4git/proto/kv"
+	"github.com/gov4git/gov4git/v2/proto"
+	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/kv"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"

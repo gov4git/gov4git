@@ -3,8 +3,8 @@ package mail
 import (
 	"sort"
 
-	"github.com/gov4git/gov4git/proto"
-	"github.com/gov4git/gov4git/proto/id"
+	"github.com/gov4git/gov4git/v2/proto"
+	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/ns"
 )

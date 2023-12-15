@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"runtime"
 
-	gov4git_root "github.com/gov4git/gov4git"
-	"github.com/gov4git/gov4git/github"
-	"github.com/gov4git/gov4git/gov4git/api"
-	_ "github.com/gov4git/gov4git/runtime"
+	gov4git "github.com/gov4git/gov4git/v2"
+	"github.com/gov4git/gov4git/v2/github"
+	"github.com/gov4git/gov4git/v2/gov4git/api"
+	_ "github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -65,7 +65,7 @@ func initAfterFlags() {
 	} else {
 		base.LogQuietly()
 	}
-	base.Infof("gov4git version: %v, os: %v, arch: %v", gov4git_root.Short(), runtime.GOOS, runtime.GOARCH)
+	base.Infof("gov4git version: %v, os: %v, arch: %v", gov4git.Short(), runtime.GOOS, runtime.GOARCH)
 }
 
 func LoadConfig() {

@@ -5,7 +5,7 @@ import (
 	_ "embed"
 	"math"
 
-	"github.com/gov4git/gov4git/proto/ballot/common"
+	"github.com/gov4git/gov4git/v2/proto/ballot/common"
 )
 
 type SV struct {

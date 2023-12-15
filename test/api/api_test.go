@@ -6,7 +6,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/gov4git/gov4git/gov4git/cmd"
+	"github.com/gov4git/gov4git/v2/gov4git/cmd"
 	"github.com/rogpeppe/go-internal/testscript"
 )
 

@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
-	"github.com/gov4git/gov4git/proto/mail"
-	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/ballot/common"
+	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/id"
+	"github.com/gov4git/gov4git/v2/proto/mail"
+	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 )

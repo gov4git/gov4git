@@ -4,7 +4,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/member"
 )
 
 type Tally struct {

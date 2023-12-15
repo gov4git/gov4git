@@ -1,8 +1,8 @@
 package history
 
 import (
-	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/journal"
+	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/journal"
 	"golang.org/x/net/context"
 )
 

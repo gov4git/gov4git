@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	govgh "github.com/gov4git/gov4git/github"
-	"github.com/gov4git/gov4git/github/deploy/tools"
+	govgh "github.com/gov4git/gov4git/v2/github"
+	"github.com/gov4git/gov4git/v2/github/deploy/tools"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/vendor4git/github"

@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/gov4git/gov4git/proto/id"
-	"github.com/gov4git/gov4git/runtime"
+	"github.com/gov4git/gov4git/v2/proto/id"
+	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/testutil"
 )

@@ -1,6 +1,6 @@
 package etc
 
-import "github.com/gov4git/gov4git/proto"
+import "github.com/gov4git/gov4git/v2/proto"
 
 var (
 	EtcNS      = proto.RootNS.Append("etc")

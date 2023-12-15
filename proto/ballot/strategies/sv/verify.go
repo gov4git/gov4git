@@ -3,10 +3,10 @@ package sv
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/proto/ballot/common"
-	"github.com/gov4git/gov4git/proto/gov"
-	"github.com/gov4git/gov4git/proto/id"
-	"github.com/gov4git/gov4git/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/ballot/common"
+	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/id"
+	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/lib4git/must"
 )
 

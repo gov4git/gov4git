@@ -1,9 +1,9 @@
 package schema
 
 import (
-	"github.com/gov4git/gov4git/proto"
-	"github.com/gov4git/gov4git/proto/account"
-	"github.com/gov4git/gov4git/proto/kv"
+	"github.com/gov4git/gov4git/v2/proto"
+	"github.com/gov4git/gov4git/v2/proto/account"
+	"github.com/gov4git/gov4git/v2/proto/kv"
 	"github.com/gov4git/lib4git/ns"
 )
 

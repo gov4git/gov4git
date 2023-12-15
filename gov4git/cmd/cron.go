@@ -5,9 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/gov4git/gov4git/github"
-	govgh "github.com/gov4git/gov4git/github"
-	"github.com/gov4git/gov4git/proto/cron"
+	"github.com/gov4git/gov4git/v2/github"
+	govgh "github.com/gov4git/gov4git/v2/github"
+	"github.com/gov4git/gov4git/v2/proto/cron"
 	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )

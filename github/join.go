@@ -246,8 +246,12 @@ func parseGithubRepoHTTPSURL(s string) (repo Repo, err error) {
 	}, nil
 }
 
+// silence CodeQL on missing anchors in the regex
+// lgtm[go/regex/missing-regexp-anchor]
 const githubRepoHTTPSURLRegexpSrc = `https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)`
 
+// silence CodeQL on missing anchors in the regex
+// lgtm[go/regex/missing-regexp-anchor]
 var githubRepoHTTPSURLRegexp = regexp.MustCompile(githubRepoHTTPSURLRegexpSrc)
 
 func parseJoinBody(body string) (publicURL git.URL, publicBranch git.Branch, err error) {

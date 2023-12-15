@@ -15,15 +15,15 @@ import (
 
 var (
 	motionCmd = &cobra.Command{
-		Use:   "concern",
-		Short: "Manage concerns",
+		Use:   "motion",
+		Short: "Manage motions (concerns and proposals)",
 		Long:  ``,
 		Run:   func(cmd *cobra.Command, args []string) {},
 	}
 
 	motionOpenCmd = &cobra.Command{
 		Use:   "open",
-		Short: "Open a new concern",
+		Short: "Open a new motion",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
@@ -45,7 +45,7 @@ var (
 
 	motionCloseCmd = &cobra.Command{
 		Use:   "close",
-		Short: "Close a concern",
+		Short: "Close a motion",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
@@ -67,7 +67,7 @@ var (
 
 	motionListCmd = &cobra.Command{
 		Use:   "list",
-		Short: "List concerns",
+		Short: "List motions",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
@@ -78,7 +78,7 @@ var (
 
 	motionShowCmd = &cobra.Command{
 		Use:   "show",
-		Short: "Show motion state",
+		Short: "Show motion state and associated objects",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
@@ -119,8 +119,6 @@ func init() {
 	motionCloseCmd.Flags().BoolVar(&motionAccept, "accept", false, "accept/reject")
 
 	motionCmd.AddCommand(motionListCmd)
-	motionListCmd.Flags().StringVar(&motionName, "name", "", "name of motion")
-	motionListCmd.MarkFlagRequired("name")
 
 	motionCmd.AddCommand(motionShowCmd)
 	motionShowCmd.Flags().StringVar(&motionName, "name", "", "name of motion")

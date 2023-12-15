@@ -1,6 +1,6 @@
 # Governance manual
 
-This manual is for you — the community organizer.
+This manual is for the community organizer.
 
 There is a short [playbook](GOVERN-PLAYBOOK.md) summarizing the main operations from this document.
 

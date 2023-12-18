@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/common"
 	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/history"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -31,6 +32,7 @@ func (qv SV) tally(
 	prior *common.Tally,
 	fetched map[member.User]common.Elections, // newly fetched votes from participating users
 	strict bool, // fail if any voter has insufficient funds
+
 ) git.Change[form.Map, common.Tally] {
 
 	oldVotesByUser, newVotesByUser := prior.AcceptedVotes, fetched
@@ -70,6 +72,22 @@ func (qv SV) tally(
 			rejectedVotes[u] = prior.RejectedVotes[u]
 			charges[u] = prior.Charges[u] + costDiff
 			votesByUser[u] = augmentedScore.Score
+
+			// metrics
+			history.Log_StageOnly(
+				ctx,
+				govCloned,
+				&history.Event{
+					Vote: &history.VoteEvent{
+						By: u.HistoryUser(),
+						Receipts: history.OneReceipt(
+							u.HistoryAccountID(),
+							history.ReceiptTypeCharge,
+							account.H(account.PluralAsset, costDiff).HistoryHolding(),
+						),
+					},
+				},
+			)
 		}
 	}
 

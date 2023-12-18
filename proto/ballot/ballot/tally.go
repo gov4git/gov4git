@@ -21,6 +21,7 @@ func Tally(
 	govAddr gov.OwnerAddress,
 	ballotName common.BallotName,
 	maxPar int,
+
 ) git.Change[form.Map, common.Tally] {
 
 	govOwner := gov.CloneOwner(ctx, govAddr)
@@ -39,6 +40,7 @@ func Tally_StageOnly(
 	govOwner gov.OwnerCloned,
 	ballotName common.BallotName,
 	maxPar int,
+
 ) (git.Change[form.Map, common.Tally], bool) {
 
 	communityTree := govOwner.Public.Tree()
@@ -57,6 +59,7 @@ func tallyVotersCloned_StageOnly(
 	ballotName common.BallotName,
 	voterAccounts map[member.User]member.UserProfile,
 	votersCloned map[member.User]git.Cloned,
+
 ) (git.Change[form.Map, common.Tally], bool) {
 
 	communityTree := cloned.Public.Tree()

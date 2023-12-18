@@ -22,6 +22,10 @@ func (u User) IsNone() bool {
 	return u == ""
 }
 
+func (u User) HistoryUser() history.User {
+	return history.User(u)
+}
+
 func (u User) HistoryAccountID() history.AccountID {
 	return history.AccountID(UserAccountID(u))
 }

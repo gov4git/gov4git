@@ -71,10 +71,8 @@ func AddUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User, profil
 
 	// log
 	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "user_add",
-			Args:   history.M{"name": name, "profile": profile},
-			Result: nil,
+		Join: &history.JoinEvent{
+			User: history.User(name),
 		},
 	})
 

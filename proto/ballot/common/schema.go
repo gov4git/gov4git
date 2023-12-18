@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/history"
 	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/lib4git/form"
@@ -180,6 +181,20 @@ type Outcome struct {
 	Scores       map[string]float64                          `json:"scores"`
 	ScoresByUser map[member.User]map[string]StrengthAndScore `json:"scores_by_user"`
 	Refunded     map[member.User]account.Holding             `json:"refunded"`
+}
+
+func (o Outcome) RefundedHistoryReceipts() history.Receipts {
+	r := history.Receipts{}
+	for user, h := range o.Refunded {
+		r = append(r,
+			history.Receipt{
+				To:     user.HistoryAccountID(),
+				Type:   history.ReceiptTypeRefund,
+				Amount: h.HistoryHolding(),
+			},
+		)
+	}
+	return r
 }
 
 func FlattenRefunds(m map[member.User]account.Holding) Refunds {

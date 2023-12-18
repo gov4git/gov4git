@@ -22,6 +22,10 @@ func (u User) IsNone() bool {
 	return u == ""
 }
 
+func (u User) HistoryAccountID() history.AccountID {
+	return history.AccountID(UserAccountID(u))
+}
+
 type Group string
 
 func AddMember(ctx context.Context, addr gov.Address, user User, group Group) {

@@ -15,6 +15,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/docket/policy"
 	"github.com/gov4git/gov4git/v2/proto/docket/schema"
 	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/history"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/form"
@@ -71,6 +72,16 @@ func (x proposalPolicy) Open(
 		[]string{pmp.ProposalBallotChoice},
 		member.Everybody,
 	)
+
+	// metrics
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Motion: &history.MotionEvent{
+			Open: &history.MotionOpen{
+				ID:   history.MotionID(prop.ID),
+				Type: "proposal",
+			},
+		},
+	})
 
 	return nil, notice.Noticef(ctx,
 		"Started managing this PR as Gov4Git proposal `%v` with initial __approval score__ of `%0.6f`."+
@@ -193,6 +204,10 @@ func (x proposalPolicy) Close(
 
 		// transfer bounty to author
 		var bountyDonated bool
+		bountyReceipt := history.Receipt{
+			Type:   history.ReceiptTypeBounty,
+			Amount: bounty.HistoryHolding(),
+		}
 		if prop.Author.IsNone() {
 			account.Transfer_StageOnly(
 				ctx,
@@ -203,6 +218,7 @@ func (x proposalPolicy) Close(
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
 			)
 			bountyDonated = true
+			bountyReceipt.To = pmp.MatchingPoolAccountID.HistoryAccountID()
 		} else {
 			account.Transfer_StageOnly(
 				ctx,
@@ -212,10 +228,22 @@ func (x proposalPolicy) Close(
 				bounty,
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
 			)
+			bountyReceipt.To = member.UserAccountID(prop.Author).HistoryAccountID()
 		}
 
 		// distribute rewards
 		rewards := disberseRewards(ctx, cloned, prop)
+
+		// metrics
+		history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+			Motion: &history.MotionEvent{
+				Close: &history.MotionClose{
+					ID:       history.MotionID(prop.ID),
+					Type:     "proposal",
+					Receipts: append(rewards.HistoryReceipts(), bountyReceipt),
+				},
+			},
+		})
 
 		return &CloseReport{
 			Accepted:            true,
@@ -238,6 +266,17 @@ func (x proposalPolicy) Close(
 			approvalPollName,
 		)
 
+		// metrics
+		history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+			Motion: &history.MotionEvent{
+				Close: &history.MotionClose{
+					ID:       history.MotionID(prop.ID),
+					Type:     "proposal",
+					Receipts: cancelApprovalPoll.Result.RefundedHistoryReceipts(),
+				},
+			},
+		})
+
 		return &CloseReport{
 			Accepted:            false,
 			ApprovalPollOutcome: cancelApprovalPoll.Result,
@@ -253,23 +292,34 @@ func (x proposalPolicy) Close(
 func (x proposalPolicy) Cancel(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion schema.Motion,
+	prop schema.Motion,
 	policyNS ns.NS,
 	args ...any,
 
 ) (policy.Report, notice.Notices) {
 
 	// cancel the referendum for the motion (and return credits to users)
-	referendumName := pmp.ProposalApprovalPollName(motion.ID)
+	referendumName := pmp.ProposalApprovalPollName(prop.ID)
 	chg := ballot.Cancel_StageOnly(
 		ctx,
 		cloned,
 		referendumName,
 	)
 
+	// metrics
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Motion: &history.MotionEvent{
+			Cancel: &history.MotionCancel{
+				ID:       history.MotionID(prop.ID),
+				Type:     "proposals",
+				Receipts: chg.Result.RefundedHistoryReceipts(),
+			},
+		},
+	})
+
 	return &CancelReport{
 		ApprovalPollOutcome: chg.Result,
-	}, notice.Noticef(ctx, "Cancelling management of this PR, managed as Gov4Git concern `%v`.", motion.ID)
+	}, notice.Noticef(ctx, "Cancelling management of this PR, managed as Gov4Git concern `%v`.", prop.ID)
 }
 
 type PolicyView struct {

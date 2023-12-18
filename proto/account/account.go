@@ -26,6 +26,10 @@ func (x AccountID) String() string {
 	return string(x)
 }
 
+func (x AccountID) HistoryAccountID() history.AccountID {
+	return history.AccountID(x)
+}
+
 type Account struct {
 	ID     AccountID     `json:"id"`
 	Owner  OwnerID       `json:"owner"`
@@ -216,6 +220,16 @@ func Transfer_StageOnly(
 			Result: nil,
 		},
 	})
+	// metrics
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Account: &history.AccountEvent{
+			Transfer: &history.AccountTransferEvent{
+				From:   fromID.HistoryAccountID(),
+				To:     toID.HistoryAccountID(),
+				Amount: amount.HistoryHolding(),
+			},
+		},
+	})
 }
 
 func TryTransfer_StageOnly(
@@ -270,6 +284,15 @@ func Issue_StageOnly(
 			Result: nil,
 		},
 	})
+	// metrics
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Account: &history.AccountEvent{
+			Issue: &history.AccountIssueEvent{
+				To:     toID.HistoryAccountID(),
+				Amount: amount.HistoryHolding(),
+			},
+		},
+	})
 }
 
 func Burn(
@@ -309,6 +332,15 @@ func Burn_StageOnly(
 			Note:   note,
 			Args:   history.M{"from": fromID, "to": BurnAccountID, "amount": amount},
 			Result: nil,
+		},
+	})
+	// metrics
+	history.Log_StageOnly(ctx, cloned, &history.Event{
+		Account: &history.AccountEvent{
+			Burn: &history.AccountBurnEvent{
+				From:   fromID.HistoryAccountID(),
+				Amount: amount.HistoryHolding(),
+			},
 		},
 	})
 }

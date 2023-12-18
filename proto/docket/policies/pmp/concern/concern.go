@@ -15,6 +15,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/docket/policy"
 	"github.com/gov4git/gov4git/v2/proto/docket/schema"
 	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/history"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/form"
@@ -33,14 +34,14 @@ type concernPolicy struct{}
 func (x concernPolicy) Open(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion schema.Motion,
+	con schema.Motion,
 	policyNS ns.NS,
 	args ...any,
 
 ) (policy.Report, notice.Notices) {
 
 	// initialize state
-	state := NewConcernState(motion.ID)
+	state := NewConcernState(con.ID)
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
 	// open a poll for the motion
@@ -49,14 +50,24 @@ func (x concernPolicy) Open(
 		load.QVStrategyName,
 		cloned,
 		state.PriorityPoll,
-		fmt.Sprintf("Prioritization poll for motion %v", motion.ID),
-		fmt.Sprintf("Up/down vote the priority for concern (issue) %v", motion.ID),
+		fmt.Sprintf("Prioritization poll for motion %v", con.ID),
+		fmt.Sprintf("Up/down vote the priority for concern (issue) %v", con.ID),
 		[]string{pmp.ConcernBallotChoice},
 		member.Everybody,
 	)
 
+	// metrics
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Motion: &history.MotionEvent{
+			Open: &history.MotionOpen{
+				ID:   history.MotionID(con.ID),
+				Type: "concern",
+			},
+		},
+	})
+
 	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v` with initial __priority score__ of `%0.6f`."+
-		pmp.Welcome, motion.ID, state.LatestPriorityScore)
+		pmp.Welcome, con.ID, state.LatestPriorityScore)
 }
 
 func (x concernPolicy) Score(
@@ -181,7 +192,7 @@ func (x concernPolicy) updateFreeze(
 func (x concernPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion schema.Motion,
+	con schema.Motion,
 	policyNS ns.NS,
 	decision schema.Decision,
 	args ...any,
@@ -200,7 +211,7 @@ func (x concernPolicy) Close(
 	x.Update(ctx, cloned, prop, policyNS)
 
 	// close the poll for the motion
-	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
+	priorityPollName := pmp.ConcernPollBallotName(con.ID)
 	chg := ballot.Close_StageOnly(
 		ctx,
 		cloned,
@@ -208,29 +219,51 @@ func (x concernPolicy) Close(
 		toID,
 	)
 
-	return &CloseReport{}, closeNotice(ctx, motion, chg.Result, prop)
+	// metrics
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Motion: &history.MotionEvent{
+			Close: &history.MotionClose{
+				ID:       history.MotionID(con.ID),
+				Type:     "concern",
+				Receipts: nil, // rewards are accounted for by the proposal
+			},
+		},
+	})
+
+	return &CloseReport{}, closeNotice(ctx, con, chg.Result, prop)
 }
 
 func (x concernPolicy) Cancel(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion schema.Motion,
+	con schema.Motion,
 	policyNS ns.NS,
 	args ...any,
 
 ) (policy.Report, notice.Notices) {
 
 	// cancel the poll for the motion (returning credits to users)
-	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
+	priorityPollName := pmp.ConcernPollBallotName(con.ID)
 	chg := ballot.Cancel_StageOnly(
 		ctx,
 		cloned,
 		priorityPollName,
 	)
 
+	// metrics
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Motion: &history.MotionEvent{
+			Cancel: &history.MotionCancel{
+				ID:       history.MotionID(con.ID),
+				Type:     "concern",
+				Receipts: nil, // refunds are accounted for by the proposal
+			},
+		},
+	})
+
 	return &CancelReport{
 		PriorityPollOutcome: chg.Result,
-	}, cancelNotice(ctx, motion, chg.Result)
+	}, cancelNotice(ctx, con, chg.Result)
 }
 
 type PolicyView struct {

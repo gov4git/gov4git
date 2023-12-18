@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/gov4git/gov4git/v2/proto/history"
 	"github.com/gov4git/lib4git/must"
 )
 
@@ -18,6 +19,13 @@ func H(a Asset, q float64) Holding {
 
 func (h Holding) String() string {
 	return fmt.Sprintf("%v:%v", h.Asset, h.Quantity)
+}
+
+func (h Holding) HistoryHolding() history.Holding {
+	return history.Holding{
+		Asset:    history.Asset(h.Asset),
+		Quantity: h.Quantity,
+	}
 }
 
 func ZeroHolding(asset Asset) Holding {

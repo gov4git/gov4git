@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"sort"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballot"
@@ -141,27 +140,4 @@ func disberseRewards(
 
 	rewards.Sort()
 	return rewards
-}
-
-type Reward struct {
-	To     member.User     `json:"to"`
-	Amount account.Holding `json:"amount"`
-}
-
-type Rewards []Reward
-
-func (x Rewards) Len() int {
-	return len(x)
-}
-
-func (x Rewards) Less(i, j int) bool {
-	return x[i].To < x[j].To
-}
-
-func (x Rewards) Swap(i, j int) {
-	x[i], x[j] = x[j], x[i]
-}
-
-func (x Rewards) Sort() {
-	sort.Sort(x)
 }

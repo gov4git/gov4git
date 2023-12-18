@@ -8,7 +8,11 @@ var (
 )
 
 type Event struct {
-	*Op `json:"op"`
+	Op      *Op           `json:"op"`
+	Join    *JoinEvent    `json:"join"`
+	Motion  *MotionEvent  `json:"motion"`
+	Account *AccountEvent `json:"account"`
+	Vote    *VoteEvent    `json:"vote"`
 }
 
 type Op struct {

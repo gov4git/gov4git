@@ -141,6 +141,10 @@ func parseIssueRefs(ctx context.Context, repo Repo, issue *github.Issue) []Impor
 	return refs
 }
 
+// silence CodeQL on missing anchors in the regex
+// lgtm[go/regex/missing-regexp-anchor]
 const refRegexpSrc = `([a-zA-Z0-9\-:_]+)\s+https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)/(issues|pull)/(\d+)`
 
+// silence CodeQL on missing anchors in the regex
+// lgtm[go/regex/missing-regexp-anchor]
 var refRegexp = regexp.MustCompile(refRegexpSrc)

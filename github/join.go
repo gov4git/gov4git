@@ -3,7 +3,6 @@ package github
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/google/go-github/v55/github"
@@ -231,28 +230,6 @@ func parseJoinRequest(authorLogin string, body string) (*JoinRequest, error) {
 		PublicBranch: publicBranch,
 	}, nil
 }
-
-func parseGithubRepoHTTPSURL(s string) (repo Repo, err error) {
-	m := githubRepoHTTPSURLRegexp.FindStringSubmatch(s)
-	if m == nil {
-		return Repo{}, fmt.Errorf("not a github https repo url")
-	}
-	if !strings.HasSuffix(m[2], ".git") {
-		return Repo{}, fmt.Errorf("not a github https repo url")
-	}
-	return Repo{
-		Owner: strings.ToLower(m[1]),
-		Name:  m[2][:len(m[2])-len(".git")],
-	}, nil
-}
-
-// silence CodeQL on missing anchors in the regex
-// lgtm[go/regex/missing-regexp-anchor]
-const githubRepoHTTPSURLRegexpSrc = `https://github\.com/([a-zA-Z0-9\-]+)/([a-zA-Z0-9\.\-]+)`
-
-// silence CodeQL on missing anchors in the regex
-// lgtm[go/regex/missing-regexp-anchor]
-var githubRepoHTTPSURLRegexp = regexp.MustCompile(githubRepoHTTPSURLRegexpSrc)
 
 func parseJoinBody(body string) (publicURL git.URL, publicBranch git.Branch, err error) {
 	lines := strings.Split(body, "\n")

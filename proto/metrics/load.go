@@ -25,3 +25,14 @@ func LoadHistorySince_Local(
 	}
 	return s
 }
+
+func ComputeMetrics_Local(
+	ctx context.Context,
+	cloned gov.Cloned,
+	since time.Time,
+
+) *Series {
+
+	entries := LoadHistorySince_Local(ctx, cloned, since)
+	return ComputeSeries(entries)
+}

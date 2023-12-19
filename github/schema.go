@@ -1,31 +1,13 @@
 package github
 
 import (
-	"context"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/common"
 	"github.com/gov4git/gov4git/v2/proto/docket/schema"
-	"github.com/gov4git/lib4git/must"
 )
-
-type Repo struct {
-	Owner string `json:"github_repo_owner"`
-	Name  string `json:"github_repo_name"`
-}
-
-func (x Repo) HTTPS() string {
-	return `https://github.com/` + x.Owner + `/` + x.Name
-}
-
-func ParseRepo(ctx context.Context, s string) Repo {
-	first, second, ok := strings.Cut(s, "/")
-	must.Assertf(ctx, ok, "not a github repo: %v", s)
-	return Repo{Owner: first, Name: second}
-}
 
 const (
 	// prioritizing issues by ballot
@@ -41,6 +23,9 @@ const (
 	// labels for issues that are managed
 	IssueIsManagedLabel = "gov4git:managed"
 
+	// the issue with this label will be used as a dashboard display
+	DashboardIssueLabel = "gov4git:dashboard"
+
 	// Github deploy environment
 	DeployEnvName = "gov4git:governance"
 )
@@ -49,6 +34,7 @@ var GovernanceLabels = []string{
 	PrioritizeIssueByGovernanceLabel,
 	DirectiveLabel,
 	IssueIsManagedLabel,
+	DashboardIssueLabel,
 }
 
 type ImportedIssue struct {

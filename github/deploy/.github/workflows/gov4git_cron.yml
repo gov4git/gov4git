@@ -12,8 +12,19 @@ jobs:
           permissions:
                contents: write
           steps:
+               # checkout governance repo to gain access to assets in .github directory
                - name: 'Checkout gov4git code'
                  uses: actions/checkout@v4
+               # 
+               # https://github.com/actions/setup-python?tab=readme-ov-file#caching-packages-dependencies
+               - name: 'Setup python'
+                 uses: actions/setup-python@v5
+                 with:
+                    python-version: '3.12'
+                    architecture: 'x64'
+                    cache: 'pip'
+               - run: pip install -r .github/python/requirements.txt
+               #
                - name: 'Install gov4git from release'
                  uses: jaxxstorm/action-install-gh-release@v1.10.0
                  with:

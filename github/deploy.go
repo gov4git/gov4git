@@ -113,6 +113,9 @@ var (
 
 	//go:embed deploy/.github/workflows/gov4git_cron.yml
 	cronYML string
+
+	//go:embed deploy/.github/python/requirements.txt
+	pythonRequirementsTXT string
 )
 
 func installGithubActions(
@@ -123,11 +126,10 @@ func installGithubActions(
 	govCloned := git.CloneOne(ctx, git.Address(govOwnerAddr.Public))
 	t := govCloned.Tree()
 
-	// helper scripts for github actions
+	// populate helper files for github actions
 	git.StringToFileStage(ctx, t, ns.NS{".github", "scripts", "gov4git_cron.sh"}, cronSH)
-
-	// github actions
 	git.StringToFileStage(ctx, t, ns.NS{".github", "workflows", "gov4git_cron.yml"}, cronYML)
+	git.StringToFileStage(ctx, t, ns.NS{".github", "python", "requirements.txt"}, pythonRequirementsTXT)
 
 	git.Commit(ctx, t, "install gov4git github actions")
 	govCloned.Push(ctx)

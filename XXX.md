@@ -4,7 +4,7 @@
 
 
 - metrics
-     - update the dashboard once a day (to save git space)
+     - update the dashboard with community syncs
 
 - dynamic ownership graph over account IDs
   - objects (like ballot, motion, etc) register themselves with the ownership system?

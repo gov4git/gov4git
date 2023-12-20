@@ -13,32 +13,34 @@ func (db DailyBuckets) Add(t time.Time, v float64) {
 	db[t] = u + v
 }
 
-func (db DailyBuckets) XY() (ds DailySeries) {
-
-	if len(db) == 0 {
-		return DailySeries{}
-	}
-
-	// compute first and last day
-	var earliest, latest time.Time
-	var earliestHave, latestHave bool
+func (db DailyBuckets) Earliest(anchor time.Time) time.Time {
+	earliest := anchor
 	for t := range db {
-		if earliestHave {
-			earliest = minTime(t, earliest)
-		} else {
-			earliest = t
-			earliestHave = true
-		}
-		if latestHave {
-			latest = maxTime(t, latest)
-		} else {
-			latest = t
-			latestHave = true
-		}
+		earliest = minTime(earliest, t)
 	}
+	return earliest
+}
+
+func (db DailyBuckets) Latest(anchor time.Time) time.Time {
+	latest := anchor
+	for t := range db {
+		latest = maxTime(latest, t)
+	}
+	return latest
+}
+
+func isNoEarlierThan(q, earliest time.Time) bool {
+	return !q.Before(earliest)
+}
+
+func isNoLaterThan(q, latest time.Time) bool {
+	return !q.After(latest)
+}
+
+func (db DailyBuckets) XY(earliest, latest time.Time) (ds DailySeries) {
 
 	// backfill missing days
-	for t := earliest; !t.After(latest); t.AddDate(0, 0, 1) {
+	for t := earliest; isNoLaterThan(t, latest); t.AddDate(0, 0, 1) {
 		if _, ok := db[t]; !ok {
 			db[t] = 0.0
 		}
@@ -47,17 +49,17 @@ func (db DailyBuckets) XY() (ds DailySeries) {
 	// order
 	sv := make(stampedValues, 0, len(db))
 	for t, v := range db {
-		sv = append(sv, stampedValue{Stamp: t, Value: v})
+		if isNoEarlierThan(t, earliest) && isNoLaterThan(t, latest) {
+			sv = append(sv, stampedValue{Stamp: t, Value: v})
+		}
 	}
 	sv.Sort()
 
 	// produce plot data
 	ds.X, ds.Y = make([]time.Time, len(sv)), make([]float64, len(sv))
-	ds.Total = 0.0
 	for i := range sv {
 		ds.X[i] = sv[i].Stamp
 		ds.Y[i] = sv[i].Value
-		ds.Total += sv[i].Value
 	}
 
 	return ds

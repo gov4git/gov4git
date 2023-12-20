@@ -8,33 +8,49 @@ import (
 )
 
 type Series struct {
-	DailyNumJoins          DailySeries
-	DailyNumMotionOpen     DailySeries
-	DailyNumMotionClose    DailySeries
-	DailyNumMotionCancel   DailySeries
-	DailyNumVotes          DailySeries
-	DailyCreditIssued      DailySeries
-	DailyCreditBurned      DailySeries
-	DailyCreditTransferred DailySeries
-	DailyCreditInBounties  DailySeries
-	DailyCreditInRewards   DailySeries
-	DailyCreditInRefunds   DailySeries
-	DailyCreditInVotes     DailySeries
+	DailyNumJoins DailySeries
+	//
+	DailyNumMotionOpen   DailySeries
+	DailyNumMotionClose  DailySeries
+	DailyNumMotionCancel DailySeries
+	//
+	DailyNumVotes DailySeries
+	//
+	DailyCreditsIssued      DailySeries
+	DailyCreditsBurned      DailySeries
+	DailyCreditsTransferred DailySeries
+	//
+	DailyClearedBounties DailySeries
+	DailyClearedRewards  DailySeries
+	DailyClearedRefunds  DailySeries
+	//
+	DailyVoteCharges DailySeries
 }
 
 type DailySeries struct {
-	X     []time.Time
-	Y     []float64
-	Total float64
+	X []time.Time
+	Y []float64
 }
 
 func (ds DailySeries) Len() int {
 	return len(ds.X)
 }
 
-func ComputeSeries(entries journal.Entries[*history.Event]) *Series {
+func (ds DailySeries) Total() float64 {
+	t := 0.0
+	for _, v := range ds.Y {
+		t += v
+	}
+	return t
+}
 
-	// counts
+func ComputeSeries(
+	entries journal.Entries[*history.Event],
+	earliest time.Time,
+	latest time.Time,
+
+) *Series {
+
 	dailyNumJoins := DailyBuckets{}
 	dailyNumMotionOpen := DailyBuckets{}
 	dailyNumMotionClose := DailyBuckets{}
@@ -99,19 +115,20 @@ func ComputeSeries(entries journal.Entries[*history.Event]) *Series {
 		}
 	}
 
+	// all daily series have the same x axis entries
 	s := &Series{
-		DailyNumJoins:          dailyNumJoins.XY(),
-		DailyNumMotionOpen:     dailyNumMotionOpen.XY(),
-		DailyNumMotionClose:    dailyNumMotionClose.XY(),
-		DailyNumMotionCancel:   dailyNumMotionCancel.XY(),
-		DailyNumVotes:          dailyNumVotes.XY(),
-		DailyCreditIssued:      dailyCreditIssued.XY(),
-		DailyCreditBurned:      dailyCreditBurned.XY(),
-		DailyCreditTransferred: dailyCreditTransferred.XY(),
-		DailyCreditInBounties:  dailyCreditInBounties.XY(),
-		DailyCreditInRewards:   dailyCreditInRewards.XY(),
-		DailyCreditInRefunds:   dailyCreditInRefunds.XY(),
-		DailyCreditInVotes:     dailyCreditInVotes.XY(),
+		DailyNumJoins:           dailyNumJoins.XY(earliest, latest),
+		DailyNumMotionOpen:      dailyNumMotionOpen.XY(earliest, latest),
+		DailyNumMotionClose:     dailyNumMotionClose.XY(earliest, latest),
+		DailyNumMotionCancel:    dailyNumMotionCancel.XY(earliest, latest),
+		DailyNumVotes:           dailyNumVotes.XY(earliest, latest),
+		DailyCreditsIssued:      dailyCreditIssued.XY(earliest, latest),
+		DailyCreditsBurned:      dailyCreditBurned.XY(earliest, latest),
+		DailyCreditsTransferred: dailyCreditTransferred.XY(earliest, latest),
+		DailyClearedBounties:    dailyCreditInBounties.XY(earliest, latest),
+		DailyClearedRewards:     dailyCreditInRewards.XY(earliest, latest),
+		DailyClearedRefunds:     dailyCreditInRefunds.XY(earliest, latest),
+		DailyVoteCharges:        dailyCreditInVotes.XY(earliest, latest),
 	}
 
 	return s

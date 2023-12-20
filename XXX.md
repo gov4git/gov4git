@@ -4,7 +4,10 @@
 
 
 - metrics
-     - update the dashboard with community syncs
+  - update the dashboard with community syncs
+  - add totals for the month
+  - add totals overall
+  - split vote count and vote spend to issues and prs
 
 - dynamic ownership graph over account IDs
   - objects (like ballot, motion, etc) register themselves with the ownership system?

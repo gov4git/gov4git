@@ -12,14 +12,15 @@ import (
 func LoadHistorySince_Local(
 	ctx context.Context,
 	cloned gov.Cloned,
-	since time.Time,
+	earliest time.Time,
+	latest time.Time,
 
 ) journal.Entries[*history.Event] {
 
 	all := history.List_Local(ctx, cloned)
 	s := journal.Entries[*history.Event]{}
 	for _, entry := range all {
-		if !since.After(entry.Stamp) {
+		if isNoEarlierThan(entry.Stamp, earliest) && isNoLaterThan(entry.Stamp, latest) {
 			s = append(s, entry)
 		}
 	}
@@ -29,10 +30,11 @@ func LoadHistorySince_Local(
 func ComputeMetrics_Local(
 	ctx context.Context,
 	cloned gov.Cloned,
-	since time.Time,
+	earliest time.Time,
+	latest time.Time,
 
 ) *Series {
 
-	entries := LoadHistorySince_Local(ctx, cloned, since)
-	return ComputeSeries(entries)
+	entries := LoadHistorySince_Local(ctx, cloned, earliest, latest)
+	return ComputeSeries(entries, earliest, latest)
 }

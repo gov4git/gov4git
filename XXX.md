@@ -2,10 +2,9 @@
   - vulnerability: community members must not be allowed to close issues to prevent them from closing before a pr is submitted
 - update GOVERN-PLAYBOOK.md
 
-
 - metrics
-  - add totals overall
   - split vote count and vote spend to issues and prs
+  - test integration of metrics
 
 - dynamic ownership graph over account IDs
   - objects (like ballot, motion, etc) register themselves with the ownership system?

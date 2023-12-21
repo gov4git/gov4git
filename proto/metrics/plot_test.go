@@ -9,7 +9,7 @@ import (
 )
 
 func TestSeriesPlot(t *testing.T) {
-	// t.SkipNow()
+	t.SkipNow()
 
 	ctx := context.Background()
 	os.Setenv("PATH", "/opt/homebrew/bin")

@@ -32,7 +32,7 @@ func (x AccountID) HistoryAccountID() history.AccountID {
 
 type Account struct {
 	ID     AccountID     `json:"id"`
-	Owner  OwnerID       `json:"owner"`
+	Owner  AccountID     `json:"owner"`
 	Assets AssetHoldings `json:"assets"`
 }
 
@@ -94,7 +94,7 @@ func (x AssetHoldings) Withdraw(ctx context.Context, h Holding) {
 	x.Deposit(ctx, NegHolding(h))
 }
 
-func NewAccount(id AccountID, owner OwnerID) *Account {
+func NewAccount(id AccountID, owner AccountID) *Account {
 	return &Account{
 		ID:     id,
 		Owner:  owner,
@@ -111,7 +111,7 @@ func Create(
 	ctx context.Context,
 	addr gov.Address,
 	id AccountID,
-	owner OwnerID,
+	owner AccountID,
 	note string,
 
 ) {
@@ -125,7 +125,7 @@ func Create_StageOnly(
 	ctx context.Context,
 	cloned gov.Cloned,
 	id AccountID,
-	owner OwnerID,
+	owner AccountID,
 	note string,
 
 ) {

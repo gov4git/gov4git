@@ -32,7 +32,3 @@ type UserProfile struct {
 func UserAccountID(user User) account.AccountID {
 	return account.AccountIDFromLine(account.Pair("user", string(user)))
 }
-
-func UserOwnerID(user User) account.OwnerID {
-	return account.OwnerIDFromLine(account.Pair("user", string(user)))
-}

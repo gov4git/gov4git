@@ -79,7 +79,8 @@ func (qv SV) tally(
 				govCloned,
 				&history.Event{
 					Vote: &history.VoteEvent{
-						By: u.HistoryUser(),
+						By:      u.HistoryUser(),
+						Context: history.VoteContext(""), // TODO: plumb concern/proposal context here
 						Receipts: history.OneReceipt(
 							u.HistoryAccountID(),
 							history.ReceiptTypeCharge,

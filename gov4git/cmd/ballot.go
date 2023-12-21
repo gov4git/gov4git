@@ -10,6 +10,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/common"
 	"github.com/gov4git/gov4git/v2/proto/ballot/load"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
 	"github.com/spf13/cobra"
@@ -34,6 +35,8 @@ var (
 				load.QVStrategyName,
 				setup.Organizer,
 				common.ParseBallotNameFromPath(ballotName),
+				account.NobodyAccountID,
+				purpose.Unspecified,
 				ballotTitle,
 				ballotDescription,
 				ballotChoices,

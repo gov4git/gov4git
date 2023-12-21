@@ -21,6 +21,24 @@ var (
 	ClaimsRefType = schema.RefType("claims")
 )
 
+func ConcernAccountID(id schema.MotionID) account.AccountID {
+	return account.AccountIDFromLine(
+		account.Cat(
+			account.Pair("motion", id.String()),
+			account.Term("pmp-concern"),
+		),
+	)
+}
+
+func ProposalAccountID(id schema.MotionID) account.AccountID {
+	return account.AccountIDFromLine(
+		account.Cat(
+			account.Pair("motion", id.String()),
+			account.Term("pmp-proposal"),
+		),
+	)
+}
+
 func ConcernPollBallotName(id schema.MotionID) common.BallotName {
 	return common.BallotName{"pmp", "motion", "priority_poll", id.String()}
 }

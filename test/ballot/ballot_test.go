@@ -11,6 +11,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/load"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/gov4git/v2/test"
 	"github.com/gov4git/lib4git/base"
@@ -30,7 +31,7 @@ func TestOpenClose(t *testing.T) {
 
 	// open
 	strat := load.QVStrategyName
-	ballot.Open(ctx, strat, cty.Organizer(), ballotName, "ballot_name", "ballot description", choices, member.Everybody)
+	ballot.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot_name", "ballot description", choices, member.Everybody)
 
 	// list
 	ads := ballot.List(ctx, cty.Gov())
@@ -80,7 +81,7 @@ func TestOpenCancel(t *testing.T) {
 
 	// open
 	strat := load.QVStrategyName
-	ballot.Open(ctx, strat, cty.Organizer(), ballotName, "ballot_name", "ballot description", choices, member.Everybody)
+	ballot.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot_name", "ballot description", choices, member.Everybody)
 
 	// list
 	ads := ballot.List(ctx, cty.Gov())
@@ -131,9 +132,9 @@ func TestTallyAll(t *testing.T) {
 
 	// open two ballots
 	strat := load.QVStrategyName
-	openChg0 := ballot.Open(ctx, strat, cty.Organizer(), ballotName0, "ballot_0", "ballot 0", choices, member.Everybody)
+	openChg0 := ballot.Open(ctx, strat, cty.Organizer(), ballotName0, account.NobodyAccountID, purpose.Unspecified, "ballot_0", "ballot 0", choices, member.Everybody)
 	fmt.Println("open 0: ", form.SprintJSON(openChg0))
-	openChg1 := ballot.Open(ctx, strat, cty.Organizer(), ballotName1, "ballot_1", "ballot 1", choices, member.Everybody)
+	openChg1 := ballot.Open(ctx, strat, cty.Organizer(), ballotName1, account.NobodyAccountID, purpose.Unspecified, "ballot_1", "ballot 1", choices, member.Everybody)
 	fmt.Println("open 1: ", form.SprintJSON(openChg1))
 
 	// give credits to users

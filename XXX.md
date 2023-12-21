@@ -4,6 +4,7 @@
 
 - metrics
   - split vote count and vote spend to issues and prs
+  - unit test dashboard report
   - test integration of metrics
 
 - dynamic ownership graph over account IDs

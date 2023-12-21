@@ -62,7 +62,7 @@ func ComputeSeries(
 	dailyCreditInBounties := DailyBuckets{}
 	dailyCreditInRewards := DailyBuckets{}
 	dailyCreditInRefunds := DailyBuckets{}
-	dailyCreditInVotes := DailyBuckets{}
+	dailyVoteCharges := DailyBuckets{}
 
 	for _, e := range entries {
 		if e.Payload.Account != nil {
@@ -107,7 +107,7 @@ func ComputeSeries(
 				switch r.Type {
 				case history.ReceiptTypeBounty:
 				case history.ReceiptTypeCharge:
-					dailyCreditInVotes.Add(e.Stamp, r.Amount.Quantity)
+					dailyVoteCharges.Add(e.Stamp, r.Amount.Quantity)
 				case history.ReceiptTypeRefund:
 				case history.ReceiptTypeReward:
 				}
@@ -128,7 +128,7 @@ func ComputeSeries(
 		DailyClearedBounties:    dailyCreditInBounties.XY(earliest, latest),
 		DailyClearedRewards:     dailyCreditInRewards.XY(earliest, latest),
 		DailyClearedRefunds:     dailyCreditInRefunds.XY(earliest, latest),
-		DailyVoteCharges:        dailyCreditInVotes.XY(earliest, latest),
+		DailyVoteCharges:        dailyVoteCharges.XY(earliest, latest),
 	}
 
 	return s

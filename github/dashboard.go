@@ -32,17 +32,14 @@ func PublishDashboard(
 	assetsRepo, err := ParseGithubRepoURL(string(assetsAddr.Repo))
 	must.NoError(ctx, err)
 
-	latest := time.Now()
-	earliest := latest.AddDate(0, -1, 0)
-
 	assets := metrics.AssembleReport_Local(
 		ctx,
 		cloned,
 		func(assetRepoPath string) (url string) {
 			return uploadedAssetURL(assetsRepo, string(assetsAddr.Branch), assetRepoPath)
 		},
-		earliest,
-		latest,
+		time.Time{},
+		time.Now(),
 	)
 
 	uploadAssets(ctx, assetsAddr, assets.Assets)

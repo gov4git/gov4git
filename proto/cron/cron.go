@@ -33,8 +33,8 @@ func Cron(
 	maxPar int, // parallelism for fetching community votes
 ) form.Map {
 
-	govCloned := gov.CloneOwner(ctx, govAddr)
-	govTree := govCloned.Public.Tree()
+	cloned := gov.CloneOwner(ctx, govAddr)
+	govTree := cloned.Public.Tree()
 
 	// use a separate branch for cron logs
 	cronAddr := git.Address(govAddr.Public)
@@ -61,19 +61,19 @@ func Cron(
 
 		// process issues and pull requests
 		base.Infof("CRON: syncing issues for prioritization")
-		report["processed_prioritization_issues"] = govgh.ImportIssuesForPrioritization_StageOnly(ctx, repo, ghc, govAddr, govCloned)
+		report["processed_prioritization_issues"] = govgh.ImportIssuesForPrioritization_StageOnly(ctx, repo, ghc, govAddr, cloned)
 
 		// process managed issues and pull requests
 		base.Infof("CRON: syncing managed issues and pull requests")
-		report["processed_managed_issues"] = govgh.SyncManagedIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned)
+		report["processed_managed_issues"] = govgh.SyncManagedIssues_StageOnly(ctx, repo, ghc, govAddr, cloned)
 
 		// process joins
 		base.Infof("CRON: processing join requests")
-		report["processed_joins"] = govgh.ProcessJoinRequestIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned, maintainers, false)
+		report["processed_joins"] = govgh.ProcessJoinRequestIssues_StageOnly(ctx, repo, ghc, govAddr, cloned, maintainers, false)
 
 		// process directives
 		base.Infof("CRON: processing directives")
-		report["processed_directives"] = govgh.ProcessDirectiveIssues_StageOnly(ctx, repo, ghc, govAddr, govCloned, maintainers)
+		report["processed_directives"] = govgh.ProcessDirectiveIssues_StageOnly(ctx, repo, ghc, govAddr, cloned, maintainers)
 
 		state.LastGithubImport = time.Now()
 	}
@@ -83,20 +83,27 @@ func Cron(
 
 		// tally votes for all ballots from all community members
 		base.Infof("CRON: tallying community votes")
-		report["tally"] = ballot.TallyAll_StageOnly(ctx, govCloned, maxPar).Result
+		report["tally"] = ballot.TallyAll_StageOnly(ctx, cloned, maxPar).Result
 
 		// rescore motions to capture updated tallies
 		base.Infof("CRON: scoring motions")
-		ops.ScoreMotions_StageOnly(ctx, govCloned)
+		ops.ScoreMotions_StageOnly(ctx, cloned)
 
 		state.LastCommunityTally = time.Now()
 	}
 
 	// update motion policies
-	ops.UpdateMotions_StageOnly(ctx, govCloned)
+	ops.UpdateMotions_StageOnly(ctx, cloned)
 
 	// display notices on github
-	govgh.DisplayNotices_StageOnly(ctx, repo, ghc, govCloned.PublicClone())
+	govgh.DisplayNotices_StageOnly(ctx, repo, ghc, cloned.PublicClone())
+
+	if shouldSyncCommunity {
+
+		// update community dashboard on github
+		base.Infof("CRON: publishing community dashboard")
+		govgh.PublishDashboard(ctx, repo, ghc, cloned.PublicClone())
+	}
 
 	// prepare commit message
 	report["cron"] = state
@@ -116,8 +123,8 @@ func Cron(
 	govStatus, err := govTree.Status()
 	must.NoError(ctx, err)
 	if !govStatus.IsClean() {
-		proto.Commit(ctx, govCloned.Public.Tree(), cronChg)
-		govCloned.Public.Push(ctx)
+		proto.Commit(ctx, cloned.Public.Tree(), cronChg)
+		cloned.Public.Push(ctx)
 	}
 
 	// push cron state

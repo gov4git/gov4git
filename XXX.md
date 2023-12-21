@@ -4,8 +4,6 @@
 
 
 - metrics
-  - update the dashboard with community syncs
-  - add totals for the month
   - add totals overall
   - split vote count and vote spend to issues and prs
 

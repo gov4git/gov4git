@@ -80,7 +80,7 @@ func (qv SV) tally(
 				&history.Event{
 					Vote: &history.VoteEvent{
 						By:      u.HistoryUser(),
-						Context: history.VoteContext(""), // TODO: plumb concern/proposal context here
+						Purpose: ad.Purpose.HistoryVotePurpose(),
 						Receipts: history.OneReceipt(
 							u.HistoryAccountID(),
 							history.ReceiptTypeCharge,

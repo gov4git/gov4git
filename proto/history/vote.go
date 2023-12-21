@@ -2,13 +2,14 @@ package history
 
 type VoteEvent struct {
 	By       User        `json:"by"`
-	Context  VoteContext `json:"context"`
+	Purpose  VotePurpose `json:"context"`
 	Receipts Receipts    `json:"receipts"`
 }
 
-type VoteContext string
+type VotePurpose string
 
 const (
-	VoteContextConcern  VoteContext = "concern"
-	VoteContextProposal VoteContext = "proposal"
+	VotePurposeUnspecified VotePurpose = "unspecified"
+	VotePurposeConcern     VotePurpose = "concern"
+	VotePurposeProposal    VotePurpose = "proposal"
 )

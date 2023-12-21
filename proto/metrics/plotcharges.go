@@ -27,26 +27,36 @@ import numpy as np
 from datetime import date
 
 x = `)
-	writePyDateArray(&w, series.DailyVoteCharges.X)
+	writePyDateArray(&w, series.DailyConcernVoteCharges.X)
 	fmt.Fprintln(&w)
 
 	w.WriteString(`y1 = np.array(`)
-	writePyIntArray(&w, series.DailyVoteCharges.Y)
+	writePyIntArray(&w, series.DailyConcernVoteCharges.Y)
+	fmt.Fprintln(&w, ")")
+
+	w.WriteString(`y2 = np.array(`)
+	writePyIntArray(&w, series.DailyProposalVoteCharges.Y)
+	fmt.Fprintln(&w, ")")
+
+	w.WriteString(`y3 = np.array(`)
+	writePyIntArray(&w, series.DailyOtherVoteCharges.Y)
 	fmt.Fprintln(&w, ")")
 
 	w.WriteString(
 		`fig, ax = plt.subplots(figsize=(9, 5))
 ax.bar(x, y1, color='#eebb88')
+ax.bar(x, y2, bottom=y1, color='#88eebb')
+ax.bar(x, y3, bottom=y1+y2, color='#eeeeee')
 `)
 
 	w.WriteString(
 		`ax.set_xlabel("Days")
 ax.set_ylabel("Credits")
-ax.legend(["Vote charges", ])
+ax.legend(["Issues", "PRs", "Other", ])
 ax.set_title("Daily vote charges")
 `)
 
-	n := series.DailyVoteCharges.Len()
+	n := series.DailyConcernVoteCharges.Len()
 	fmt.Fprintf(&w, "ax.set_xticks(x[0::%d])\n", xTickSkipDates(n))
 
 	fp := filepath.Join(os.TempDir(), generateRandomID()+".png")

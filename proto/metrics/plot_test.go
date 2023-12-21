@@ -9,7 +9,7 @@ import (
 )
 
 func TestSeriesPlot(t *testing.T) {
-	t.SkipNow()
+	// t.SkipNow()
 
 	ctx := context.Background()
 	os.Setenv("PATH", "/opt/homebrew/bin")
@@ -73,10 +73,6 @@ var (
 			X: testDates,
 			Y: testRandFloatArray(len(testDates)),
 		},
-		DailyNumVotes: DailySeries{
-			X: testDates,
-			Y: testRandFloatArray(len(testDates)),
-		},
 		DailyCreditsIssued: DailySeries{
 			X: testDates,
 			Y: testRandFloatArray(len(testDates)),
@@ -101,7 +97,27 @@ var (
 			X: testDates,
 			Y: testRandFloatArray(len(testDates)),
 		},
-		DailyVoteCharges: DailySeries{
+		DailyNumConcernVotes: DailySeries{
+			X: testDates,
+			Y: testRandFloatArray(len(testDates)),
+		},
+		DailyNumProposalVotes: DailySeries{
+			X: testDates,
+			Y: testRandFloatArray(len(testDates)),
+		},
+		DailyNumOtherVotes: DailySeries{
+			X: testDates,
+			Y: testRandFloatArray(len(testDates)),
+		},
+		DailyConcernVoteCharges: DailySeries{
+			X: testDates,
+			Y: testRandFloatArray(len(testDates)),
+		},
+		DailyProposalVoteCharges: DailySeries{
+			X: testDates,
+			Y: testRandFloatArray(len(testDates)),
+		},
+		DailyOtherVoteCharges: DailySeries{
 			X: testDates,
 			Y: testRandFloatArray(len(testDates)),
 		},

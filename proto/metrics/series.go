@@ -14,8 +14,6 @@ type Series struct {
 	DailyNumMotionClose  DailySeries
 	DailyNumMotionCancel DailySeries
 	//
-	DailyNumVotes DailySeries
-	//
 	DailyCreditsIssued      DailySeries
 	DailyCreditsBurned      DailySeries
 	DailyCreditsTransferred DailySeries
@@ -24,7 +22,13 @@ type Series struct {
 	DailyClearedRewards  DailySeries
 	DailyClearedRefunds  DailySeries
 	//
-	DailyVoteCharges DailySeries
+	DailyNumConcernVotes  DailySeries
+	DailyNumProposalVotes DailySeries
+	DailyNumOtherVotes    DailySeries
+	//
+	DailyConcernVoteCharges  DailySeries
+	DailyProposalVoteCharges DailySeries
+	DailyOtherVoteCharges    DailySeries
 }
 
 type DailySeries struct {
@@ -55,14 +59,18 @@ func ComputeSeries(
 	dailyNumMotionOpen := DailyBuckets{}
 	dailyNumMotionClose := DailyBuckets{}
 	dailyNumMotionCancel := DailyBuckets{}
-	dailyNumVotes := DailyBuckets{}
 	dailyCreditIssued := DailyBuckets{}
 	dailyCreditBurned := DailyBuckets{}
 	dailyCreditTransferred := DailyBuckets{}
 	dailyCreditInBounties := DailyBuckets{}
 	dailyCreditInRewards := DailyBuckets{}
 	dailyCreditInRefunds := DailyBuckets{}
-	dailyVoteCharges := DailyBuckets{}
+	dailyNumConcernVotes := DailyBuckets{}
+	dailyNumProposalVotes := DailyBuckets{}
+	dailyNumOtherVotes := DailyBuckets{}
+	dailyConcernVoteCharges := DailyBuckets{}
+	dailyProposalVoteCharges := DailyBuckets{}
+	dailyOtherVoteCharges := DailyBuckets{}
 
 	for _, e := range entries {
 		if e.Payload.Account != nil {
@@ -102,12 +110,26 @@ func ComputeSeries(
 			}
 		}
 		if e.Payload.Vote != nil {
-			dailyNumVotes.Add(e.Stamp, 1)
+			switch e.Payload.Vote.Purpose {
+			case history.VotePurposeConcern:
+				dailyNumConcernVotes.Add(e.Stamp, 1)
+			case history.VotePurposeProposal:
+				dailyNumProposalVotes.Add(e.Stamp, 1)
+			default:
+				dailyNumOtherVotes.Add(e.Stamp, 1)
+			}
 			for _, r := range e.Payload.Vote.Receipts {
 				switch r.Type {
 				case history.ReceiptTypeBounty:
 				case history.ReceiptTypeCharge:
-					dailyVoteCharges.Add(e.Stamp, r.Amount.Quantity)
+					switch e.Payload.Vote.Purpose {
+					case history.VotePurposeConcern:
+						dailyConcernVoteCharges.Add(e.Stamp, r.Amount.Quantity)
+					case history.VotePurposeProposal:
+						dailyProposalVoteCharges.Add(e.Stamp, r.Amount.Quantity)
+					default:
+						dailyOtherVoteCharges.Add(e.Stamp, r.Amount.Quantity)
+					}
 				case history.ReceiptTypeRefund:
 				case history.ReceiptTypeReward:
 				}
@@ -117,18 +139,22 @@ func ComputeSeries(
 
 	// all daily series have the same x axis entries
 	s := &Series{
-		DailyNumJoins:           dailyNumJoins.XY(earliest, latest),
-		DailyNumMotionOpen:      dailyNumMotionOpen.XY(earliest, latest),
-		DailyNumMotionClose:     dailyNumMotionClose.XY(earliest, latest),
-		DailyNumMotionCancel:    dailyNumMotionCancel.XY(earliest, latest),
-		DailyNumVotes:           dailyNumVotes.XY(earliest, latest),
-		DailyCreditsIssued:      dailyCreditIssued.XY(earliest, latest),
-		DailyCreditsBurned:      dailyCreditBurned.XY(earliest, latest),
-		DailyCreditsTransferred: dailyCreditTransferred.XY(earliest, latest),
-		DailyClearedBounties:    dailyCreditInBounties.XY(earliest, latest),
-		DailyClearedRewards:     dailyCreditInRewards.XY(earliest, latest),
-		DailyClearedRefunds:     dailyCreditInRefunds.XY(earliest, latest),
-		DailyVoteCharges:        dailyVoteCharges.XY(earliest, latest),
+		DailyNumJoins:            dailyNumJoins.XY(earliest, latest),
+		DailyNumMotionOpen:       dailyNumMotionOpen.XY(earliest, latest),
+		DailyNumMotionClose:      dailyNumMotionClose.XY(earliest, latest),
+		DailyNumMotionCancel:     dailyNumMotionCancel.XY(earliest, latest),
+		DailyCreditsIssued:       dailyCreditIssued.XY(earliest, latest),
+		DailyCreditsBurned:       dailyCreditBurned.XY(earliest, latest),
+		DailyCreditsTransferred:  dailyCreditTransferred.XY(earliest, latest),
+		DailyClearedBounties:     dailyCreditInBounties.XY(earliest, latest),
+		DailyClearedRewards:      dailyCreditInRewards.XY(earliest, latest),
+		DailyClearedRefunds:      dailyCreditInRefunds.XY(earliest, latest),
+		DailyNumConcernVotes:     dailyNumConcernVotes.XY(earliest, latest),
+		DailyNumProposalVotes:    dailyNumProposalVotes.XY(earliest, latest),
+		DailyNumOtherVotes:       dailyNumOtherVotes.XY(earliest, latest),
+		DailyConcernVoteCharges:  dailyConcernVoteCharges.XY(earliest, latest),
+		DailyProposalVoteCharges: dailyProposalVoteCharges.XY(earliest, latest),
+		DailyOtherVoteCharges:    dailyOtherVoteCharges.XY(earliest, latest),
 	}
 
 	return s

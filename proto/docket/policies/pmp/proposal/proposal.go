@@ -48,7 +48,7 @@ func (x proposalPolicy) Open(
 		ctx,
 		cloned.PublicClone(),
 		pmp.ProposalBountyAccountID(prop.ID),
-		schema.MotionOwnerID(prop.ID),
+		pmp.PMPAccountID,
 		fmt.Sprintf("bounty account for proposal %v", prop.ID),
 	)
 
@@ -57,7 +57,7 @@ func (x proposalPolicy) Open(
 		ctx,
 		cloned.PublicClone(),
 		pmp.ProposalRewardAccountID(prop.ID),
-		schema.MotionOwnerID(prop.ID),
+		pmp.PMPAccountID,
 		fmt.Sprintf("reward account for proposal %v", prop.ID),
 	)
 

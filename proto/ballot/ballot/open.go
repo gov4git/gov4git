@@ -64,7 +64,7 @@ func Open_StageOnly(
 	account.Create_StageOnly(
 		ctx, cloned.PublicClone(),
 		common.BallotEscrowAccountID(name),
-		common.BallotOwnerID(name),
+		account.NobodyAccountID,
 		fmt.Sprintf("opening ballot %v", name),
 	)
 

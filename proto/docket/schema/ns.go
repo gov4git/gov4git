@@ -20,7 +20,3 @@ func MotionNoticesNS(id MotionID) ns.NS {
 func MotionAccountID(motionID MotionID) account.AccountID {
 	return account.AccountIDFromLine(account.Pair("motion", motionID.String()))
 }
-
-func MotionOwnerID(motionID MotionID) account.OwnerID {
-	return account.OwnerIDFromLine(account.Pair("motion", motionID.String()))
-}

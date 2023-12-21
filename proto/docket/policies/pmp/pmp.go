@@ -48,7 +48,7 @@ func ProposalRewardAccountID(motionID schema.MotionID) account.AccountID {
 }
 
 var (
-	OwnerID = account.AccountIDFromLine(
+	PMPAccountID = account.AccountIDFromLine(
 		account.Term("pmp"),
 	)
 	BurnPoolAccountID = account.AccountIDFromLine(
@@ -78,7 +78,7 @@ func Boot_StageOnly(ctx context.Context, cloned gov.Cloned) {
 		ctx,
 		cloned,
 		BurnPoolAccountID,
-		account.OwnerID(OwnerID),
+		PMPAccountID,
 		fmt.Sprintf("burn account for PMP"),
 	)
 
@@ -87,7 +87,7 @@ func Boot_StageOnly(ctx context.Context, cloned gov.Cloned) {
 		ctx,
 		cloned,
 		TaxPoolAccountID,
-		account.OwnerID(OwnerID),
+		PMPAccountID,
 		fmt.Sprintf("tax account for PMP"),
 	)
 
@@ -96,7 +96,7 @@ func Boot_StageOnly(ctx context.Context, cloned gov.Cloned) {
 		ctx,
 		cloned,
 		MatchingPoolAccountID,
-		account.OwnerID(OwnerID),
+		PMPAccountID,
 		fmt.Sprintf("matching pool account for PMP"),
 	)
 

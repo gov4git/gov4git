@@ -8,10 +8,11 @@ import (
 )
 
 var (
-	TreasuryOwnerID = OwnerID(
-		AccountIDFromLine(
-			Term("treasury"),
-		),
+	NobodyAccountID = AccountIDFromLine(
+		Term("nobody"),
+	)
+	TreasuryAccountID = AccountIDFromLine(
+		Term("treasury"),
 	)
 	IssueAccountID = AccountIDFromLine(
 		Cat(
@@ -34,7 +35,7 @@ func Boot_StageOnly(ctx context.Context, cloned gov.Cloned) {
 		ctx,
 		cloned,
 		BurnAccountID,
-		TreasuryOwnerID,
+		TreasuryAccountID,
 		fmt.Sprintf("create burn account for treasury"),
 	)
 
@@ -43,7 +44,7 @@ func Boot_StageOnly(ctx context.Context, cloned gov.Cloned) {
 		ctx,
 		cloned,
 		IssueAccountID,
-		TreasuryOwnerID,
+		TreasuryAccountID,
 		fmt.Sprintf("create issue account for treasury"),
 	)
 

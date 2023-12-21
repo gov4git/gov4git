@@ -10,6 +10,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/load"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/gov4git/v2/test"
 	"github.com/gov4git/lib4git/base"
@@ -26,7 +27,7 @@ func TestReopen(t *testing.T) {
 
 	// open
 	strat := load.QVStrategyName
-	ballot.Open(ctx, strat, cty.Organizer(), ballotName, "ballot_name", "ballot description", choices, member.Everybody)
+	ballot.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot_name", "ballot description", choices, member.Everybody)
 
 	// give credits to user
 	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 4.0), "test")

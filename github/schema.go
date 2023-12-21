@@ -7,6 +7,7 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/common"
 	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/purpose"
 )
 
 const (
@@ -66,6 +67,13 @@ func (x ImportedIssue) Key() string {
 
 func (x ImportedIssue) MotionID() schema.MotionID {
 	return IssueNumberToMotionID(x.Number)
+}
+
+func (x ImportedIssue) Purpose() purpose.Purpose {
+	if x.PullRequest {
+		return purpose.Proposal
+	}
+	return purpose.Concern
 }
 
 func MotionIDToIssueNumber(id schema.MotionID) (int, error) {

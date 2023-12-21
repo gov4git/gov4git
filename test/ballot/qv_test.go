@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/common"
 	"github.com/gov4git/gov4git/v2/proto/ballot/load"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/gov4git/v2/test"
 	"github.com/gov4git/lib4git/form"
@@ -33,6 +34,8 @@ func TestQV(t *testing.T) {
 		strat,
 		cty.Organizer(),
 		ballotName,
+		account.NobodyAccountID,
+		purpose.Unspecified,
 		"ballot_name",
 		"ballot description",
 		choices,

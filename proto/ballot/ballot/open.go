@@ -11,6 +11,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -21,6 +22,8 @@ func Open(
 	strat common.StrategyName,
 	govAddr gov.OwnerAddress,
 	name common.BallotName,
+	owner account.AccountID,
+	purpose purpose.Purpose,
 	title string,
 	description string,
 	choices []string,
@@ -29,7 +32,7 @@ func Open(
 ) git.Change[form.Map, common.BallotAddress] {
 
 	govCloned := gov.CloneOwner(ctx, govAddr)
-	chg := Open_StageOnly(ctx, strat, govCloned, name, title, description, choices, participants)
+	chg := Open_StageOnly(ctx, strat, govCloned, name, owner, purpose, title, description, choices, participants)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
@@ -40,6 +43,8 @@ func Open_StageOnly(
 	strat common.StrategyName,
 	cloned gov.OwnerCloned,
 	name common.BallotName,
+	owner account.AccountID,
+	purpose purpose.Purpose,
 	title string,
 	description string,
 	choices []string,
@@ -72,6 +77,8 @@ func Open_StageOnly(
 	ad := common.Advertisement{
 		Gov:            cloned.GovAddress(),
 		Name:           name,
+		Owner:          owner,
+		Purpose:        purpose,
 		Title:          title,
 		Description:    description,
 		Choices:        choices,

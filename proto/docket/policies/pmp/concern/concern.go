@@ -18,6 +18,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/history"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/notice"
+	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
@@ -50,6 +51,8 @@ func (x concernPolicy) Open(
 		load.QVStrategyName,
 		cloned,
 		state.PriorityPoll,
+		pmp.ConcernAccountID(con.ID),
+		purpose.Concern,
 		fmt.Sprintf("Prioritization poll for motion %v", con.ID),
 		fmt.Sprintf("Up/down vote the priority for concern (issue) %v", con.ID),
 		[]string{pmp.ConcernBallotChoice},

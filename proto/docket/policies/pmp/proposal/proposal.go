@@ -18,6 +18,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/history"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/notice"
+	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/ns"
 )
@@ -48,7 +49,7 @@ func (x proposalPolicy) Open(
 		ctx,
 		cloned.PublicClone(),
 		pmp.ProposalBountyAccountID(prop.ID),
-		pmp.PMPAccountID,
+		pmp.ProposalAccountID(prop.ID),
 		fmt.Sprintf("bounty account for proposal %v", prop.ID),
 	)
 
@@ -57,7 +58,7 @@ func (x proposalPolicy) Open(
 		ctx,
 		cloned.PublicClone(),
 		pmp.ProposalRewardAccountID(prop.ID),
-		pmp.PMPAccountID,
+		pmp.ProposalAccountID(prop.ID),
 		fmt.Sprintf("reward account for proposal %v", prop.ID),
 	)
 
@@ -67,6 +68,8 @@ func (x proposalPolicy) Open(
 		load.QVStrategyName,
 		cloned,
 		state.ApprovalPoll,
+		pmp.ProposalAccountID(prop.ID),
+		purpose.Proposal,
 		fmt.Sprintf("Approval referendum for motion %v", prop.ID),
 		fmt.Sprintf("Up/down vote the approval vote for proposal (pull request) %v", prop.ID),
 		[]string{pmp.ProposalBallotChoice},

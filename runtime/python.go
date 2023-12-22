@@ -16,7 +16,7 @@ func RunPython(ctx context.Context, script string) ([]byte, error) {
 }
 
 func RunPythonWithPath(ctx context.Context, exepath, script string) ([]byte, error) {
-	base.Infof("running %s -c ...", exepath)
+	base.Infof("running %s -c <<EOF\n%s\nEOF", exepath, script)
 	cmd := exec.CommandContext(ctx, exepath, `-c`, script)
 	return cmd.CombinedOutput()
 }

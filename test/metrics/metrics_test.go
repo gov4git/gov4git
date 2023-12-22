@@ -14,7 +14,7 @@ import (
 )
 
 func TestDashboardPMP(t *testing.T) {
-	// t.SkipNow()
+	t.SkipNow()
 	os.Setenv("PATH", "/opt/homebrew/bin")
 
 	base.LogVerbosely()

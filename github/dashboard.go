@@ -38,8 +38,8 @@ func PublishDashboard(
 		func(assetRepoPath string) (url string) {
 			return uploadedAssetURL(assetsRepo, string(assetsAddr.Branch), assetRepoPath)
 		},
-		time.Time{},
-		time.Now(),
+		metrics.TimeDailyLowerBound,
+		metrics.Today(),
 	)
 
 	uploadAssets(ctx, assetsAddr, assets.Assets)

@@ -8,7 +8,7 @@ import (
 type DailyBuckets map[time.Time]float64
 
 func (db DailyBuckets) Add(t time.Time, v float64) {
-	t = truncateDay(t)
+	t = Dailify(t)
 	u, _ := db[t]
 	db[t] = u + v
 }
@@ -29,18 +29,18 @@ func (db DailyBuckets) Latest(anchor time.Time) time.Time {
 	return latest
 }
 
-func isNoEarlierThan(q, earliest time.Time) bool {
+func isNotBefore(q, earliest time.Time) bool {
 	return !q.Before(earliest)
 }
 
-func isNoLaterThan(q, latest time.Time) bool {
+func isNotAfter(q, latest time.Time) bool {
 	return !q.After(latest)
 }
 
 func (db DailyBuckets) XY(earliest, latest time.Time) (ds DailySeries) {
 
 	// backfill missing days
-	for t := earliest; isNoLaterThan(t, latest); t.AddDate(0, 0, 1) {
+	for t := earliest; isNotAfter(t, latest); t = t.AddDate(0, 0, 1) {
 		if _, ok := db[t]; !ok {
 			db[t] = 0.0
 		}
@@ -49,7 +49,7 @@ func (db DailyBuckets) XY(earliest, latest time.Time) (ds DailySeries) {
 	// order
 	sv := make(stampedValues, 0, len(db))
 	for t, v := range db {
-		if isNoEarlierThan(t, earliest) && isNoLaterThan(t, latest) {
+		if isNotBefore(t, earliest) && isNotAfter(t, latest) {
 			sv = append(sv, stampedValue{Stamp: t, Value: v})
 		}
 	}
@@ -63,10 +63,6 @@ func (db DailyBuckets) XY(earliest, latest time.Time) (ds DailySeries) {
 	}
 
 	return ds
-}
-
-func truncateDay(t time.Time) time.Time {
-	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 }
 
 func minTime(p, q time.Time) time.Time {

@@ -11,6 +11,19 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/journal"
 )
 
+func AssembleReport(
+	ctx context.Context,
+	addr gov.Address,
+	urlCalc AssetURLCalculator,
+	earliest time.Time,
+	latest time.Time,
+
+) *ReportAssets {
+
+	cloned := gov.Clone(ctx, addr)
+	return AssembleReport_Local(ctx, cloned, urlCalc, earliest, latest)
+}
+
 type ReportSeries struct {
 	Last30Days *Series
 	AllTime    *Series
@@ -93,6 +106,10 @@ func AssembleReport_Local(
 	fmt.Fprintf(&w, "| Credits transferred | %0.6f |\n", allTimeSeries.DailyCreditsTransferred.Total())
 
 	return &ReportAssets{
+		Series: &ReportSeries{
+			Last30Days: last30DaysSeries,
+			AllTime:    allTimeSeries,
+		},
 		ReportMD: w.String(),
 		Assets: map[string][]byte{
 			"daily_motions.png": plotDailyMotionsPNG(ctx, last30DaysSeries),
@@ -116,7 +133,7 @@ func loadHistory_Local(
 	all := history.List_Local(ctx, cloned)
 	s := journal.Entries[*history.Event]{}
 	for _, entry := range all {
-		if isNoEarlierThan(entry.Stamp, earliest) && isNoLaterThan(entry.Stamp, latest) {
+		if isNotBefore(entry.Stamp, earliest) && isNotAfter(entry.Stamp, latest) {
 			s = append(s, entry)
 		}
 	}

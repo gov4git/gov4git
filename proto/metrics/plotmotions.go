@@ -79,9 +79,20 @@ ax.set_title("Daily issue and PR open/close/cancel counts")
 }
 
 func xTickSkipDates(n int) int {
-	k := n / 5
-	if k < 1 {
+	switch {
+	case n > 31:
+		k := n / 5
+		if k < 1 {
+			return 1
+		}
+		return int(math.Log2(float64(k)) + 3)
+	case n >= 22:
+		return 6
+	case n >= 15:
+		return 3
+	case n >= 3:
+		return 2
+	default:
 		return 1
 	}
-	return int(math.Log2(float64(k)) + 1)
 }

@@ -5,19 +5,19 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballot"
-	"github.com/gov4git/gov4git/v2/proto/ballot/common"
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
-	"github.com/gov4git/gov4git/v2/proto/docket/policies/pmp"
-	"github.com/gov4git/gov4git/v2/proto/docket/policies/pmp/concern"
-	"github.com/gov4git/gov4git/v2/proto/docket/policies/pmp/proposal"
-	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp/concern"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp/proposal"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/test"
 )
 
 var (
-	testConcernID  = schema.MotionID("123")
-	testProposalID = schema.MotionID("456")
+	testConcernID  = motionproto.MotionID("123")
+	testProposalID = motionproto.MotionID("456")
 )
 
 const (
@@ -36,11 +36,11 @@ func SetupTest(
 ) {
 
 	// open concern
-	ops.OpenMotion(
+	motionapi.OpenMotion(
 		ctx,
 		cty.Organizer(),
 		testConcernID,
-		schema.MotionConcernType,
+		motionproto.MotionConcernType,
 		concern.ConcernPolicyName,
 		cty.MemberUser(0),
 		"concern #1",
@@ -49,11 +49,11 @@ func SetupTest(
 		nil)
 
 	// open proposal
-	ops.OpenMotion(
+	motionapi.OpenMotion(
 		ctx,
 		cty.Organizer(),
 		testProposalID,
-		schema.MotionProposalType,
+		motionproto.MotionProposalType,
 		proposal.ProposalPolicyName,
 		cty.MemberUser(1),
 		"proposal #2",
@@ -62,7 +62,7 @@ func SetupTest(
 		nil)
 
 	// link
-	ops.LinkMotions(
+	motionapi.LinkMotions(
 		ctx,
 		cty.Organizer(),
 		testProposalID,
@@ -71,7 +71,7 @@ func SetupTest(
 	)
 
 	// list
-	ms := ops.ListMotions(ctx, cty.Gov())
+	ms := motionapi.ListMotions(ctx, cty.Gov())
 	if len(ms) != 2 {
 		t.Errorf("expecting 2 motions, got %v", len(ms))
 	}
@@ -81,23 +81,23 @@ func SetupTest(
 	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, testUser1Credits), "test")
 
 	// cast votes
-	conEls := func(amt float64) common.Elections {
-		return common.OneElection(pmp.ConcernBallotChoice, amt)
+	conEls := func(amt float64) ballotproto.Elections {
+		return ballotproto.OneElection(pmp.ConcernBallotChoice, amt)
 	}
-	propEls := func(amt float64) common.Elections {
-		return common.OneElection(pmp.ProposalBallotChoice, amt)
+	propEls := func(amt float64) ballotproto.Elections {
+		return ballotproto.OneElection(pmp.ProposalBallotChoice, amt)
 	}
 
 	// concern votes
-	ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), pmp.ConcernPollBallotName(testConcernID), conEls(testUser0ConcernStrenth))
-	ballot.Vote(ctx, cty.MemberOwner(1), cty.Gov(), pmp.ConcernPollBallotName(testConcernID), conEls(testUser1ConcernStrength))
+	ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), pmp.ConcernPollBallotName(testConcernID), conEls(testUser0ConcernStrenth))
+	ballotapi.Vote(ctx, cty.MemberOwner(1), cty.Gov(), pmp.ConcernPollBallotName(testConcernID), conEls(testUser1ConcernStrength))
 
 	// proposal votes
-	ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), pmp.ProposalApprovalPollName(testProposalID), propEls(testUser0ProposalStrength))
-	ballot.Vote(ctx, cty.MemberOwner(1), cty.Gov(), pmp.ProposalApprovalPollName(testProposalID), propEls(testUser1ProposalStrength))
+	ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), pmp.ProposalApprovalPollName(testProposalID), propEls(testUser0ProposalStrength))
+	ballotapi.Vote(ctx, cty.MemberOwner(1), cty.Gov(), pmp.ProposalApprovalPollName(testProposalID), propEls(testUser1ProposalStrength))
 
-	ballot.TallyAll(ctx, cty.Organizer(), 3)
+	ballotapi.TallyAll(ctx, cty.Organizer(), 3)
 
-	ops.ScoreMotions(ctx, cty.Organizer())
-	ops.UpdateMotions(ctx, cty.Organizer())
+	motionapi.ScoreMotions(ctx, cty.Organizer())
+	motionapi.UpdateMotions(ctx, cty.Organizer())
 }

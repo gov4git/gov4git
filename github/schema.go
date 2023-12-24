@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gov4git/gov4git/v2/proto/ballot/common"
-	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 )
 
@@ -65,7 +65,7 @@ func (x ImportedIssue) Key() string {
 	return strconv.Itoa(int(x.Number))
 }
 
-func (x ImportedIssue) MotionID() schema.MotionID {
+func (x ImportedIssue) MotionID() motionproto.MotionID {
 	return IssueNumberToMotionID(x.Number)
 }
 
@@ -76,12 +76,12 @@ func (x ImportedIssue) Purpose() purpose.Purpose {
 	return purpose.Concern
 }
 
-func MotionIDToIssueNumber(id schema.MotionID) (int, error) {
+func MotionIDToIssueNumber(id motionproto.MotionID) (int, error) {
 	return strconv.Atoi(id.String())
 }
 
-func IssueNumberToMotionID(no int64) schema.MotionID {
-	return schema.MotionID(strconv.Itoa(int(no)))
+func IssueNumberToMotionID(no int64) motionproto.MotionID {
+	return motionproto.MotionID(strconv.Itoa(int(no)))
 }
 
 const (
@@ -90,19 +90,19 @@ const (
 	ImportedPullPrefix   = "pull"
 )
 
-func (x ImportedIssue) BallotName() common.BallotName {
+func (x ImportedIssue) BallotName() ballotproto.BallotName {
 	if x.PullRequest {
-		return common.BallotName{ImportedGithubPrefix, ImportedPullPrefix, x.Key()}
+		return ballotproto.BallotName{ImportedGithubPrefix, ImportedPullPrefix, x.Key()}
 	} else {
-		return common.BallotName{ImportedGithubPrefix, ImportedIssuePrefix, x.Key()}
+		return ballotproto.BallotName{ImportedGithubPrefix, ImportedIssuePrefix, x.Key()}
 	}
 }
 
-func (x ImportedIssue) MotionType() schema.MotionType {
+func (x ImportedIssue) MotionType() motionproto.MotionType {
 	if x.PullRequest {
-		return schema.MotionProposalType
+		return motionproto.MotionProposalType
 	} else {
-		return schema.MotionConcernType
+		return motionproto.MotionConcernType
 	}
 }
 

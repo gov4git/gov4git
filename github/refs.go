@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
-	"github.com/gov4git/gov4git/v2/proto/docket/schema"
 	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
 func syncRefs(
@@ -14,13 +14,13 @@ func syncRefs(
 	cloned gov.OwnerCloned,
 	chg *SyncManagedChanges,
 	issues map[string]ImportedIssue,
-	motions map[schema.MotionID]schema.Motion,
+	motions map[motionproto.MotionID]motionproto.Motion,
 
 ) {
 
-	motionRefs := schema.RefSet{} // index of current refs between motions
-	issueRefs := schema.RefSet{}  // index of current refs between issues, corresponding to existing motions
-	ids := schema.MotionIDSet{}   // index of existing motions
+	motionRefs := motionproto.RefSet{} // index of current refs between motions
+	issueRefs := motionproto.RefSet{}  // index of current refs between issues, corresponding to existing motions
+	ids := motionproto.MotionIDSet{}   // index of existing motions
 
 	// index motion refs (directed edges)
 	for id, motion := range motions {
@@ -37,10 +37,10 @@ func syncRefs(
 			to := IssueNumberToMotionID(importedRef.To)
 			// only include issue refs between existing motions
 			if ids[from] && ids[to] {
-				ref := schema.Ref{
+				ref := motionproto.Ref{
 					From: from,
 					To:   to,
-					Type: schema.RefType(strings.ToLower(importedRef.Type)),
+					Type: motionproto.RefType(strings.ToLower(importedRef.Type)),
 				}
 				issueRefs[ref] = true
 			}
@@ -52,7 +52,7 @@ func syncRefs(
 	// add refs in issues, not in motions
 	for issueRef := range issueRefs {
 		if !motionRefs[issueRef] {
-			ops.LinkMotions_StageOnly(ctx, cloned, issueRef.From, issueRef.To, issueRef.Type)
+			motionapi.LinkMotions_StageOnly(ctx, cloned, issueRef.From, issueRef.To, issueRef.Type)
 			chg.AddedRefs.Add(issueRef)
 		}
 	}
@@ -60,7 +60,7 @@ func syncRefs(
 	// remove refs in motions, not in issues
 	for motionRef := range motionRefs {
 		if !issueRefs[motionRef] {
-			ops.UnlinkMotions_StageOnly(ctx, cloned, motionRef.From, motionRef.To, motionRef.Type)
+			motionapi.UnlinkMotions_StageOnly(ctx, cloned, motionRef.From, motionRef.To, motionRef.Type)
 			chg.RemovedRefs.Add(motionRef)
 		}
 	}

@@ -3,9 +3,9 @@ package zero
 import (
 	"testing"
 
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
-	"github.com/gov4git/gov4git/v2/proto/docket/policies/zero"
-	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/zero"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/gov4git/v2/test"
 	"github.com/gov4git/lib4git/base"
@@ -17,14 +17,14 @@ func TestEdit(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	id := schema.MotionID("123")
+	id := motionproto.MotionID("123")
 
 	// open
-	ops.OpenMotion(
+	motionapi.OpenMotion(
 		ctx,
 		cty.Organizer(),
 		id,
-		schema.MotionConcernType,
+		motionproto.MotionConcernType,
 		zero.ZeroPolicyName,
 		cty.MemberUser(0),
 		"concern #1",
@@ -33,10 +33,10 @@ func TestEdit(t *testing.T) {
 		nil)
 
 	// edit
-	ops.EditMotion(ctx, cty.Organizer(), id, cty.MemberUser(0), "concern #2", "description #2", "https://2", nil)
+	motionapi.EditMotion(ctx, cty.Organizer(), id, cty.MemberUser(0), "concern #2", "description #2", "https://2", nil)
 
 	// verify state changed
-	m := ops.ShowMotion(ctx, cty.Gov(), id)
+	m := motionapi.ShowMotion(ctx, cty.Gov(), id)
 	if m.Motion.Title != "concern #2" {
 		t.Errorf("expecting %v, got %v", "concern #2", m.Motion.Title)
 	}

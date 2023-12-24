@@ -8,12 +8,12 @@ import (
 
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/v2/proto"
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
-	"github.com/gov4git/gov4git/v2/proto/docket/policies/pmp/concern"
-	"github.com/gov4git/gov4git/v2/proto/docket/policies/pmp/proposal"
-	"github.com/gov4git/gov4git/v2/proto/docket/schema"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp/concern"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp/proposal"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
@@ -41,28 +41,28 @@ func SyncManagedIssues(
 }
 
 type SyncManagedChanges struct {
-	IssuesCausingChange ImportedIssues     `json:"issues_causing_change"`
-	Updated             schema.MotionIDSet `json:"updated_motions"`
-	Opened              schema.MotionIDSet `json:"opened_motions"`
-	Closed              schema.MotionIDSet `json:"closed_motions"`
-	Cancelled           schema.MotionIDSet `json:"cancelled_motions"`
-	Froze               schema.MotionIDSet `json:"froze_motions"`
-	Unfroze             schema.MotionIDSet `json:"unfroze_motions"`
-	AddedRefs           schema.RefSet      `json:"added_refs"`
-	RemovedRefs         schema.RefSet      `json:"removed_refs"`
+	IssuesCausingChange ImportedIssues          `json:"issues_causing_change"`
+	Updated             motionproto.MotionIDSet `json:"updated_motions"`
+	Opened              motionproto.MotionIDSet `json:"opened_motions"`
+	Closed              motionproto.MotionIDSet `json:"closed_motions"`
+	Cancelled           motionproto.MotionIDSet `json:"cancelled_motions"`
+	Froze               motionproto.MotionIDSet `json:"froze_motions"`
+	Unfroze             motionproto.MotionIDSet `json:"unfroze_motions"`
+	AddedRefs           motionproto.RefSet      `json:"added_refs"`
+	RemovedRefs         motionproto.RefSet      `json:"removed_refs"`
 }
 
 func newSyncManagedChanges() *SyncManagedChanges {
 	return &SyncManagedChanges{
 		IssuesCausingChange: nil,
-		Updated:             schema.MotionIDSet{},
-		Opened:              schema.MotionIDSet{},
-		Closed:              schema.MotionIDSet{},
-		Cancelled:           schema.MotionIDSet{},
-		Froze:               schema.MotionIDSet{},
-		Unfroze:             schema.MotionIDSet{},
-		AddedRefs:           schema.RefSet{},
-		RemovedRefs:         schema.RefSet{},
+		Updated:             motionproto.MotionIDSet{},
+		Opened:              motionproto.MotionIDSet{},
+		Closed:              motionproto.MotionIDSet{},
+		Cancelled:           motionproto.MotionIDSet{},
+		Froze:               motionproto.MotionIDSet{},
+		Unfroze:             motionproto.MotionIDSet{},
+		AddedRefs:           motionproto.RefSet{},
+		RemovedRefs:         motionproto.RefSet{},
 	}
 }
 
@@ -80,7 +80,7 @@ func SyncManagedIssues_StageOnly(
 
 	// load github issues and governance motions, and
 	// index them under a common key space
-	motions := indexMotions(ops.ListMotions_Local(ctx, t))
+	motions := indexMotions(motionapi.ListMotions_Local(ctx, t))
 	loadPR := func(ctx context.Context,
 		repo Repo,
 		issue *github.Issue,
@@ -98,7 +98,7 @@ func SyncManagedIssues_StageOnly(
 
 	// ensure every issue has a corresponding up-to-date motion
 	for key, issue := range issues {
-		id := schema.MotionID(key)
+		id := motionproto.MotionID(key)
 		if issue.Managed {
 			if motion, ok := motions[id]; ok { // if motion for issue already exists, update it
 				changed := syncMeta(ctx, cloned, syncChanges, issue, motion)
@@ -109,14 +109,14 @@ func SyncManagedIssues_StageOnly(
 				case issue.Closed && !motion.Closed:
 					if motion.IsConcern() {
 						// manually closing an issue motion cancels it
-						ops.CancelMotion_StageOnly(ctx, cloned, id)
+						motionapi.CancelMotion_StageOnly(ctx, cloned, id)
 						syncChanges.Cancelled.Add(id)
 					} else if motion.IsProposal() {
 						// manually closing a proposal motion closes it
 						if issue.Merged {
-							ops.CloseMotion_StageOnly(ctx, cloned, id, schema.Accept)
+							motionapi.CloseMotion_StageOnly(ctx, cloned, id, motionproto.Accept)
 						} else {
-							ops.CloseMotion_StageOnly(ctx, cloned, id, schema.Reject)
+							motionapi.CloseMotion_StageOnly(ctx, cloned, id, motionproto.Reject)
 						}
 						syncChanges.Closed.Add(id)
 					} else {
@@ -134,7 +134,7 @@ func SyncManagedIssues_StageOnly(
 					if err != nil {
 						base.Infof("GitHub %s %v is open, while corresonding motion is closed. Failed to close GitHub issue (%v)",
 							motion.GithubType(), issue.Number, err)
-						ops.AppendMotionNotices_StageOnly(
+						motionapi.AppendMotionNotices_StageOnly(
 							ctx,
 							cloned.PublicClone(),
 							id,
@@ -146,7 +146,7 @@ func SyncManagedIssues_StageOnly(
 							),
 						)
 					} else {
-						ops.AppendMotionNotices_StageOnly(
+						motionapi.AppendMotionNotices_StageOnly(
 							ctx,
 							cloned.PublicClone(),
 							id,
@@ -181,13 +181,13 @@ func SyncManagedIssues_StageOnly(
 				// if motion frozen, do nothing
 				// otherwise, freeze motion
 				if !motion.Closed && !motion.Frozen {
-					ops.AppendMotionNotices_StageOnly(
+					motionapi.AppendMotionNotices_StageOnly(
 						ctx,
 						cloned.PublicClone(),
 						id,
 						notice.Noticef(ctx, "The Gov4Git motion for this no longer managed issue/PR has been frozen."),
 					)
-					ops.FreezeMotion_StageOnly(notice.Mute(ctx), cloned, id)
+					motionapi.FreezeMotion_StageOnly(notice.Mute(ctx), cloned, id)
 					syncChanges.Froze.Add(id)
 					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 				}
@@ -199,7 +199,7 @@ func SyncManagedIssues_StageOnly(
 	// don't touch motions that have no corresponding issue
 
 	// update references
-	matchingMotions := indexMotions(ops.ListMotions_Local(ctx, t))
+	matchingMotions := indexMotions(motionapi.ListMotions_Local(ctx, t))
 	syncRefs(ctx, cloned, syncChanges, issues, matchingMotions)
 
 	syncChanges.IssuesCausingChange.Sort()
@@ -211,7 +211,7 @@ func syncMeta(
 	cloned gov.OwnerCloned,
 	chg *SyncManagedChanges,
 	issue ImportedIssue,
-	motion schema.Motion,
+	motion motionproto.Motion,
 
 ) bool {
 
@@ -227,7 +227,7 @@ func syncMeta(
 		slices.Equal(motion.Labels, issue.Labels) {
 		return false
 	}
-	ops.EditMotionMeta_StageOnly(
+	motionapi.EditMotionMeta_StageOnly(
 		ctx,
 		cloned,
 		motion.ID,
@@ -246,7 +246,7 @@ const (
 	MotionPolicyForPR    = proposal.ProposalPolicyName
 )
 
-func motionPolicyForIssue(issue ImportedIssue) schema.PolicyName {
+func motionPolicyForIssue(issue ImportedIssue) motionproto.PolicyName {
 	if issue.PullRequest {
 		return MotionPolicyForPR
 	}
@@ -259,12 +259,12 @@ func syncCreateMotionForIssue(
 	cloned gov.OwnerCloned,
 	chg *SyncManagedChanges,
 	issue ImportedIssue,
-	id schema.MotionID,
+	id motionproto.MotionID,
 ) {
 
 	must.Assertf(ctx, !issue.Closed, "issue is closed")
 
-	ops.OpenMotion_StageOnly(
+	motionapi.OpenMotion_StageOnly(
 		ctx,
 		cloned,
 		id,
@@ -291,8 +291,8 @@ func findMemberForGithubLogin(ctx context.Context, cloned gov.Cloned, login stri
 	return user
 }
 
-func indexMotions(ms schema.Motions) map[schema.MotionID]schema.Motion {
-	x := map[schema.MotionID]schema.Motion{}
+func indexMotions(ms motionproto.Motions) map[motionproto.MotionID]motionproto.Motion {
+	x := map[motionproto.MotionID]motionproto.Motion{}
 	for _, m := range ms {
 		x[m.ID] = m
 	}

@@ -3,9 +3,12 @@
 - update GOVERN-PLAYBOOK.md
 
 - metrics
-  - split vote count and vote spend to issues and prs
-  - unit test dashboard report
   - test integration of metrics
+
+- voting on the client must support different versions of the motion strategy
+  - precompute js stakes functions and save in ballots
+
+- populate history with ballot, motion, account, user IDs
 
 - dynamic ownership graph over account IDs
   - objects (like ballot, motion, etc) register themselves with the ownership system?

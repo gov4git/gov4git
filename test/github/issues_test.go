@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/go-github/v55/github"
 	govgh "github.com/gov4git/gov4git/v2/github"
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballot"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/gov4git/v2/test"
 	"github.com/gov4git/lib4git/base"
@@ -164,7 +164,7 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 	fmt.Println("IMPORT#1", form.SprintJSON(chg1.Result))
 
 	// list #1
-	ads1 := ballot.List(ctx, cty.Gov())
+	ads1 := ballotapi.List(ctx, cty.Gov())
 	fmt.Println("ADS#1", form.SprintJSON(ads1))
 	if len(ads1) != 3 {
 		t.Errorf("expecting 3, got %v", len(ads1))
@@ -196,7 +196,7 @@ func TestImportIssuesForPrioritization(t *testing.T) {
 	fmt.Println("IMPORT#2", form.SprintJSON(chg2.Result))
 
 	// list #2
-	ads2 := ballot.List(ctx, cty.Gov())
+	ads2 := ballotapi.List(ctx, cty.Gov())
 	fmt.Println("ADS#2", form.SprintJSON(ads2))
 	if len(ads2) != 4 {
 		t.Errorf("expecting 4, got %v", len(ads2))

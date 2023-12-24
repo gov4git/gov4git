@@ -1,0 +1,127 @@
+package ballotapi
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/gov4git/gov4git/v2/proto"
+	"github.com/gov4git/gov4git/v2/proto/account"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
+	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/purpose"
+	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/lib4git/must"
+)
+
+func Open(
+	ctx context.Context,
+	strat ballotproto.StrategyName,
+	govAddr gov.OwnerAddress,
+	name ballotproto.BallotName,
+	owner account.AccountID,
+	purpose purpose.Purpose,
+	title string,
+	description string,
+	choices []string,
+	participants member.Group,
+
+) git.Change[form.Map, ballotproto.BallotAddress] {
+
+	govCloned := gov.CloneOwner(ctx, govAddr)
+	chg := Open_StageOnly(ctx, strat, govCloned, name, owner, purpose, title, description, choices, participants)
+	proto.Commit(ctx, govCloned.Public.Tree(), chg)
+	govCloned.Public.Push(ctx)
+	return chg
+}
+
+func Open_StageOnly(
+	ctx context.Context,
+	strat ballotproto.StrategyName,
+	cloned gov.OwnerCloned,
+	name ballotproto.BallotName,
+	owner account.AccountID,
+	purpose purpose.Purpose,
+	title string,
+	description string,
+	choices []string,
+	participants member.Group,
+
+) git.Change[form.Map, ballotproto.BallotAddress] {
+
+	s := ballotio.LookupStrategy(ctx, strat)
+
+	// check no open ballots by the same name
+	openAdNS := ballotproto.BallotPath(name).Append(ballotproto.AdFilebase)
+	if _, err := git.TreeStat(ctx, cloned.Public.Tree(), openAdNS); err == nil {
+		must.Errorf(ctx, "ballot already exists: %v", openAdNS.GitPath())
+	}
+
+	// verify group exists
+	if !member.IsGroup_Local(ctx, cloned.PublicClone(), participants) {
+		must.Errorf(ctx, "participant group %v does not exist", participants)
+	}
+
+	// create escrow account
+	account.Create_StageOnly(
+		ctx, cloned.PublicClone(),
+		ballotproto.BallotEscrowAccountID(name),
+		account.NobodyAccountID,
+		fmt.Sprintf("opening ballot %v", name),
+	)
+
+	// write ad
+	ad := ballotproto.Advertisement{
+		Gov:            cloned.GovAddress(),
+		Name:           name,
+		Owner:          owner,
+		Purpose:        purpose,
+		Title:          title,
+		Description:    description,
+		Choices:        choices,
+		Strategy:       strat,
+		StrategyCalcJS: s.CalcJS(ctx),
+		Participants:   participants,
+		Frozen:         false,
+		Closed:         false,
+		Cancelled:      false,
+		ParentCommit:   git.Head(ctx, cloned.Public.Repo()),
+	}
+	git.ToFileStage(ctx, cloned.Public.Tree(), openAdNS, ad)
+
+	// write initial tally
+	tally := ballotproto.Tally{
+		Ad:            ad,
+		Scores:        map[string]float64{},
+		ScoresByUser:  map[member.User]map[string]ballotproto.StrengthAndScore{},
+		AcceptedVotes: map[member.User]ballotproto.AcceptedElections{},
+		RejectedVotes: map[member.User]ballotproto.RejectedElections{},
+		Charges:       map[member.User]float64{},
+	}
+	openTallyNS := ballotproto.BallotPath(name).Append(ballotproto.TallyFilebase)
+	git.ToFileStage(ctx, cloned.Public.Tree(), openTallyNS, tally)
+
+	// log
+	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
+		Op: &history.Op{
+			Op:     "ballot_open",
+			Args:   history.M{"name": name},
+			Result: history.M{"ad": ad},
+		},
+	})
+
+	return git.NewChange(
+		fmt.Sprintf("Create ballot of type %v", strat),
+		"ballot_open",
+		form.Map{
+			"strategy":     strat,
+			"name":         name,
+			"participants": participants,
+		},
+		ballotproto.BallotAddress{Gov: cloned.GovAddress(), Name: name},
+		nil,
+	)
+}

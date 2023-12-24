@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
-	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/gov4git/v2/test"
 	"github.com/gov4git/lib4git/base"
@@ -21,8 +21,8 @@ func TestOpenCancelConcernCloseProposal(t *testing.T) {
 
 	SetupTest(t, ctx, cty)
 
-	ops.CancelMotion(ctx, cty.Organizer(), testConcernID)                // issue
-	ops.CloseMotion(ctx, cty.Organizer(), testProposalID, schema.Accept) // pr
+	motionapi.CancelMotion(ctx, cty.Organizer(), testConcernID)                     // issue
+	motionapi.CloseMotion(ctx, cty.Organizer(), testProposalID, motionproto.Accept) // pr
 
 	// uncomment to view and adjust notices
 	// conNotices := ops.LoadMotionNotices(ctx, cty.Gov(), testConcernID)
@@ -52,8 +52,8 @@ func TestOpenCancelConcernCancelProposal(t *testing.T) {
 
 	SetupTest(t, ctx, cty)
 
-	ops.CancelMotion(ctx, cty.Organizer(), testConcernID)        // issue
-	ops.CancelMotion(ctx, cty.Organizer(), testProposalID, true) // pr
+	motionapi.CancelMotion(ctx, cty.Organizer(), testConcernID)        // issue
+	motionapi.CancelMotion(ctx, cty.Organizer(), testProposalID, true) // pr
 
 	// user accounts
 	u0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
@@ -77,8 +77,8 @@ func TestOpenCancelProposalCancelConcern(t *testing.T) {
 
 	SetupTest(t, ctx, cty)
 
-	ops.CancelMotion(ctx, cty.Organizer(), testProposalID, true) // pr
-	ops.CancelMotion(ctx, cty.Organizer(), testConcernID)        // issue
+	motionapi.CancelMotion(ctx, cty.Organizer(), testProposalID, true) // pr
+	motionapi.CancelMotion(ctx, cty.Organizer(), testConcernID)        // issue
 
 	// user accounts
 	u0 := account.Get(ctx, cty.Gov(), cty.MemberAccountID(0)).Balance(account.PluralAsset)
@@ -102,11 +102,11 @@ func TestOpenCloseProposalCancelConcern(t *testing.T) {
 
 	SetupTest(t, ctx, cty)
 
-	ops.CloseMotion(ctx, cty.Organizer(), testProposalID, schema.Accept) // pr
+	motionapi.CloseMotion(ctx, cty.Organizer(), testProposalID, motionproto.Accept) // pr
 
 	err := must.Try(
 		func() {
-			ops.CancelMotion(ctx, cty.Organizer(), testConcernID)
+			motionapi.CancelMotion(ctx, cty.Organizer(), testConcernID)
 		},
 	) // issue
 	if err == nil {

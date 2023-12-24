@@ -9,9 +9,9 @@ import (
 	"github.com/google/go-github/v55/github"
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/account"
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -222,7 +222,7 @@ func processDirectiveIssue_StageOnly(
 		id := IssueNumberToMotionID(d.Freeze.IssueNumber)
 		err = must.Try(
 			func() {
-				ops.FreezeMotion_StageOnly(ctx, cloned, id)
+				motionapi.FreezeMotion_StageOnly(ctx, cloned, id)
 			},
 		)
 		if err != nil {
@@ -242,7 +242,7 @@ func processDirectiveIssue_StageOnly(
 		id := IssueNumberToMotionID(d.Unfreeze.IssueNumber)
 		err = must.Try(
 			func() {
-				ops.UnfreezeMotion_StageOnly(ctx, cloned, id)
+				motionapi.UnfreezeMotion_StageOnly(ctx, cloned, id)
 			},
 		)
 		if err != nil {

@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
-	"github.com/gov4git/gov4git/v2/proto/docket/policy"
-	"github.com/gov4git/gov4git/v2/proto/docket/schema"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )
@@ -27,12 +27,12 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			ops.OpenMotion(
+			motionapi.OpenMotion(
 				ctx,
 				setup.Organizer,
-				schema.MotionID(motionName),
-				schema.ParseMotionType(ctx, motionType),
-				schema.PolicyName(motionPolicy),
+				motionproto.MotionID(motionName),
+				motionproto.ParseMotionType(ctx, motionType),
+				motionproto.PolicyName(motionPolicy),
 				member.User(motionAuthor),
 				motionTitle,
 				motionDesc,
@@ -49,16 +49,16 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			var d schema.Decision
+			var d motionproto.Decision
 			if motionAccept {
-				d = schema.Accept
+				d = motionproto.Accept
 			} else {
-				d = schema.Reject
+				d = motionproto.Reject
 			}
-			ops.CloseMotion(
+			motionapi.CloseMotion(
 				ctx,
 				setup.Organizer,
-				schema.MotionID(motionName),
+				motionproto.MotionID(motionName),
 				d,
 			)
 			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -71,7 +71,7 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			l := ops.ListMotionViews(ctx, setup.Gov)
+			l := motionapi.ListMotionViews(ctx, setup.Gov)
 			fmt.Fprint(os.Stdout, form.SprintJSON(l))
 		},
 	}
@@ -82,7 +82,7 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			s := ops.ShowMotion(ctx, setup.Gov, schema.MotionID(motionName))
+			s := motionapi.ShowMotion(ctx, setup.Gov, motionproto.MotionID(motionName))
 			fmt.Fprint(os.Stdout, form.SprintJSON(s))
 		},
 	}
@@ -103,7 +103,7 @@ func init() {
 	motionCmd.AddCommand(motionOpenCmd)
 	motionOpenCmd.Flags().StringVar(&motionName, "name", "", "unique name for motion")
 	motionOpenCmd.MarkFlagRequired("name")
-	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(policy.InstalledMotionPolicies(), ", ")+")")
+	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(motionpolicy.InstalledMotionPolicies(), ", ")+")")
 	motionOpenCmd.MarkFlagRequired("policy")
 	motionOpenCmd.Flags().StringVar(&motionAuthor, "author", "", "author user name")
 	motionOpenCmd.MarkFlagRequired("author")

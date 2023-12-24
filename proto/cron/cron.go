@@ -9,9 +9,9 @@ import (
 	"github.com/google/go-github/v55/github"
 	govgh "github.com/gov4git/gov4git/v2/github"
 	"github.com/gov4git/gov4git/v2/proto"
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballot"
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -83,17 +83,17 @@ func Cron(
 
 		// tally votes for all ballots from all community members
 		base.Infof("CRON: tallying community votes")
-		report["tally"] = ballot.TallyAll_StageOnly(ctx, cloned, maxPar).Result
+		report["tally"] = ballotapi.TallyAll_StageOnly(ctx, cloned, maxPar).Result
 
 		// rescore motions to capture updated tallies
 		base.Infof("CRON: scoring motions")
-		ops.ScoreMotions_StageOnly(ctx, cloned)
+		motionapi.ScoreMotions_StageOnly(ctx, cloned)
 
 		state.LastCommunityTally = time.Now()
 	}
 
 	// update motion policies
-	ops.UpdateMotions_StageOnly(ctx, cloned)
+	motionapi.UpdateMotions_StageOnly(ctx, cloned)
 
 	// display notices on github
 	govgh.DisplayNotices_StageOnly(ctx, repo, ghc, cloned.PublicClone())

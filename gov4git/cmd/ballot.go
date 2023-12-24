@@ -6,9 +6,9 @@ import (
 	"os"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballot"
-	"github.com/gov4git/gov4git/v2/proto/ballot/common"
-	"github.com/gov4git/gov4git/v2/proto/ballot/load"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
@@ -30,11 +30,11 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := ballot.Open(
+			chg := ballotapi.Open(
 				ctx,
-				load.QVStrategyName,
+				ballotio.QVStrategyName,
 				setup.Organizer,
-				common.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotNameFromPath(ballotName),
 				account.NobodyAccountID,
 				purpose.Unspecified,
 				ballotTitle,
@@ -52,10 +52,10 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := ballot.Freeze(
+			chg := ballotapi.Freeze(
 				ctx,
 				setup.Organizer,
-				common.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotNameFromPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -67,10 +67,10 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := ballot.Unfreeze(
+			chg := ballotapi.Unfreeze(
 				ctx,
 				setup.Organizer,
-				common.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotNameFromPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -82,10 +82,10 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := ballot.Close(
+			chg := ballotapi.Close(
 				ctx,
 				setup.Organizer,
-				common.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotNameFromPath(ballotName),
 				account.AccountID(ballotEscrowTo),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -98,10 +98,10 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := ballot.Cancel(
+			chg := ballotapi.Cancel(
 				ctx,
 				setup.Organizer,
-				common.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotNameFromPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -113,10 +113,10 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			r := ballot.Show(
+			r := ballotapi.Show(
 				ctx,
 				setup.Gov,
-				common.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotNameFromPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(r))
 		},
@@ -128,7 +128,7 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			ads := ballot.ListFilter(
+			ads := ballotapi.ListFilter(
 				ctx,
 				setup.Gov,
 				ballotOnlyOpen,
@@ -137,7 +137,7 @@ var (
 				member.User(ballotWithParticipant),
 			)
 			if ballotOnlyNames {
-				for _, n := range common.AdsToBallotNames(ads) {
+				for _, n := range ballotproto.AdsToBallotNames(ads) {
 					fmt.Println(n)
 				}
 			} else {
@@ -152,10 +152,10 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := ballot.Tally(
+			chg := ballotapi.Tally(
 				ctx,
 				setup.Organizer,
-				common.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotNameFromPath(ballotName),
 				ballotFetchPar,
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -168,11 +168,11 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := ballot.Vote(
+			chg := ballotapi.Vote(
 				ctx,
 				setup.Member,
 				setup.Gov,
-				common.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotNameFromPath(ballotName),
 				parseElections(ctx, ballotElectionChoice, ballotElectionStrength),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -188,11 +188,11 @@ Rejected votes are associated with a reason, such as "ballot is frozen".
 Pending votes have not yet been processed by the community's governance.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			status := ballot.Track(
+			status := ballotapi.Track(
 				ctx,
 				setup.Member,
 				setup.Gov,
-				common.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotNameFromPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(status))
 		},
@@ -204,10 +204,10 @@ Pending votes have not yet been processed by the community's governance.`,
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			chg := ballot.Erase(
+			chg := ballotapi.Erase(
 				ctx,
 				setup.Organizer,
-				common.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotNameFromPath(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -307,13 +307,13 @@ func init() {
 	ballotEraseCmd.MarkFlagRequired("name")
 }
 
-func parseElections(ctx context.Context, choices []string, strengths []float64) common.Elections {
+func parseElections(ctx context.Context, choices []string, strengths []float64) ballotproto.Elections {
 	if len(choices) != len(strengths) {
 		must.Errorf(ctx, "elected choices must match elected strengths in count")
 	}
-	el := make(common.Elections, len(choices))
+	el := make(ballotproto.Elections, len(choices))
 	for i := range choices {
-		el[i] = common.NewElection(choices[i], strengths[i])
+		el[i] = ballotproto.NewElection(choices[i], strengths[i])
 	}
 	return el
 }

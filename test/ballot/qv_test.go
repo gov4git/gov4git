@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballot"
-	"github.com/gov4git/gov4git/v2/proto/ballot/common"
-	"github.com/gov4git/gov4git/v2/proto/ballot/load"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/gov4git/v2/runtime"
@@ -20,7 +20,7 @@ func TestQV(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := common.BallotName{"a", "b", "c"}
+	ballotName := ballotproto.BallotName{"a", "b", "c"}
 	choices := []string{"x", "y", "z"}
 
 	// give voter credits
@@ -28,8 +28,8 @@ func TestQV(t *testing.T) {
 	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 100.0), "test")
 
 	// open
-	strat := load.QVStrategyName
-	openChg := ballot.Open(
+	strat := ballotio.QVStrategyName
+	openChg := ballotapi.Open(
 		ctx,
 		strat,
 		cty.Organizer(),
@@ -44,24 +44,24 @@ func TestQV(t *testing.T) {
 	fmt.Println("open: ", form.SprintJSON(openChg))
 
 	// first round of votes
-	var elections0 [2]common.Elections
-	elections0[0] = common.Elections{
-		common.NewElection(choices[0], 2.0),
-		common.NewElection(choices[1], 3.0),
-		common.NewElection(choices[2], 5.0),
+	var elections0 [2]ballotproto.Elections
+	elections0[0] = ballotproto.Elections{
+		ballotproto.NewElection(choices[0], 2.0),
+		ballotproto.NewElection(choices[1], 3.0),
+		ballotproto.NewElection(choices[2], 5.0),
 	}
-	elections0[1] = common.Elections{
-		common.NewElection(choices[0], -6.0),
-		common.NewElection(choices[1], -4.0),
-		common.NewElection(choices[2], -2.0),
+	elections0[1] = ballotproto.Elections{
+		ballotproto.NewElection(choices[0], -6.0),
+		ballotproto.NewElection(choices[1], -4.0),
+		ballotproto.NewElection(choices[2], -2.0),
 	}
-	voteChg00 := ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections0[0])
+	voteChg00 := ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections0[0])
 	fmt.Println("vote 0/0: ", form.SprintJSON(voteChg00))
-	voteChg01 := ballot.Vote(ctx, cty.MemberOwner(1), cty.Gov(), ballotName, elections0[1])
+	voteChg01 := ballotapi.Vote(ctx, cty.MemberOwner(1), cty.Gov(), ballotName, elections0[1])
 	fmt.Println("vote 0/1: ", form.SprintJSON(voteChg01))
 
 	// first tally
-	tallyChg0 := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
+	tallyChg0 := ballotapi.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	fmt.Println("tally 0: ", form.SprintJSON(tallyChg0))
 	expScores0 := map[string]float64{
 		choices[0]: -1.0352761804100827,
@@ -76,24 +76,24 @@ func TestQV(t *testing.T) {
 	}
 
 	// second round of votes
-	var elections1 [2]common.Elections
-	elections1[0] = common.Elections{
+	var elections1 [2]ballotproto.Elections
+	elections1[0] = ballotproto.Elections{
 		{VoteChoice: choices[0], VoteStrengthChange: -1.0},
 		{VoteChoice: choices[1], VoteStrengthChange: -2.0},
 		{VoteChoice: choices[2], VoteStrengthChange: -4.0},
 	}
-	elections1[1] = common.Elections{
+	elections1[1] = ballotproto.Elections{
 		{VoteChoice: choices[0], VoteStrengthChange: 5.0},
 		{VoteChoice: choices[1], VoteStrengthChange: 3.0},
 		{VoteChoice: choices[2], VoteStrengthChange: 1.0},
 	}
-	voteChg10 := ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections1[0])
+	voteChg10 := ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections1[0])
 	fmt.Println("vote 1/0: ", form.SprintJSON(voteChg10))
-	voteChg11 := ballot.Vote(ctx, cty.MemberOwner(1), cty.Gov(), ballotName, elections1[1])
+	voteChg11 := ballotapi.Vote(ctx, cty.MemberOwner(1), cty.Gov(), ballotName, elections1[1])
 	fmt.Println("vote 1/1: ", form.SprintJSON(voteChg11))
 
 	// second tally
-	tallyChg1 := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
+	tallyChg1 := ballotapi.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	fmt.Println("tally 1: ", form.SprintJSON(tallyChg1))
 	expScores1 := map[string]float64{
 		choices[0]: 0.0,
@@ -108,7 +108,7 @@ func TestQV(t *testing.T) {
 	}
 
 	// close
-	closeChg := ballot.Close(ctx, cty.Organizer(), ballotName, account.BurnAccountID)
+	closeChg := ballotapi.Close(ctx, cty.Organizer(), ballotName, account.BurnAccountID)
 	fmt.Println("close: ", form.SprintJSON(closeChg))
 
 	// check the balances

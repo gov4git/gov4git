@@ -3,9 +3,9 @@ package zero
 import (
 	"testing"
 
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
-	"github.com/gov4git/gov4git/v2/proto/docket/policies/zero"
-	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/zero"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/gov4git/v2/test"
 	"github.com/gov4git/lib4git/base"
@@ -17,15 +17,15 @@ func TestLink(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	id1 := schema.MotionID("123")
-	id2 := schema.MotionID("456")
+	id1 := motionproto.MotionID("123")
+	id2 := motionproto.MotionID("456")
 
 	// open
-	ops.OpenMotion(
+	motionapi.OpenMotion(
 		ctx,
 		cty.Organizer(),
 		id1,
-		schema.MotionConcernType,
+		motionproto.MotionConcernType,
 		zero.ZeroPolicyName,
 		cty.MemberUser(0),
 		"concern #1",
@@ -33,11 +33,11 @@ func TestLink(t *testing.T) {
 		"https://1",
 		nil,
 	)
-	ops.OpenMotion(
+	motionapi.OpenMotion(
 		ctx,
 		cty.Organizer(),
 		id2,
-		schema.MotionProposalType,
+		motionproto.MotionProposalType,
 		zero.ZeroPolicyName,
 		cty.MemberUser(1),
 		"concern #2",
@@ -47,27 +47,27 @@ func TestLink(t *testing.T) {
 	)
 
 	// link
-	ops.LinkMotions(ctx, cty.Organizer(), id1, id2, "linkType")
+	motionapi.LinkMotions(ctx, cty.Organizer(), id1, id2, "linkType")
 
 	// verify state changed
-	m1 := ops.ShowMotion(ctx, cty.Gov(), id1)
+	m1 := motionapi.ShowMotion(ctx, cty.Gov(), id1)
 	if !m1.Motion.RefersTo(id2, "linkType") {
 		t.Errorf("to ref not found")
 	}
-	m2 := ops.ShowMotion(ctx, cty.Gov(), id2)
+	m2 := motionapi.ShowMotion(ctx, cty.Gov(), id2)
 	if !m2.Motion.ReferredBy(id1, "linkType") {
 		t.Errorf("from ref not found")
 	}
 
 	// unlink
-	ops.UnlinkMotions(ctx, cty.Organizer(), id1, id2, "linkType")
+	motionapi.UnlinkMotions(ctx, cty.Organizer(), id1, id2, "linkType")
 
 	// verify state changed
-	m1 = ops.ShowMotion(ctx, cty.Gov(), id1)
+	m1 = motionapi.ShowMotion(ctx, cty.Gov(), id1)
 	if m1.Motion.RefersTo(id2, "linkType") {
 		t.Errorf("to ref still found")
 	}
-	m2 = ops.ShowMotion(ctx, cty.Gov(), id2)
+	m2 = motionapi.ShowMotion(ctx, cty.Gov(), id2)
 	if m2.Motion.ReferredBy(id1, "linkType") {
 		t.Errorf("from ref still found")
 	}

@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/google/go-github/v55/github"
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
 	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/base"
 )
@@ -20,16 +20,16 @@ func DisplayNotices_StageOnly(
 ) {
 
 	t := cloned.Tree()
-	motions := ops.ListMotions_Local(ctx, t)
+	motions := motionapi.ListMotions_Local(ctx, t)
 	for _, motion := range motions {
 		issueNum, err := MotionIDToIssueNumber(motion.ID)
 		if err != nil {
 			base.Errorf("encountered motion %v whose id cannot be converted into a github issue number", motion.ID)
 			continue
 		}
-		queue := ops.LoadMotionNotices_Local(ctx, cloned, motion.ID)
+		queue := motionapi.LoadMotionNotices_Local(ctx, cloned, motion.ID)
 		flushNotices(ctx, repo, ghc, cloned, queue, issueNum)
-		ops.SaveMotionNotices_StageOnly(ctx, cloned, motion.ID, queue)
+		motionapi.SaveMotionNotices_StageOnly(ctx, cloned, motion.ID, queue)
 	}
 }
 

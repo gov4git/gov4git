@@ -3,7 +3,7 @@ package sync
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballot"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/bureau"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
@@ -18,7 +18,7 @@ func Sync(
 ) git.Change[form.Map, form.Map] {
 
 	// collect votes and tally all open ballots
-	tallyChg := ballot.TallyAll(ctx, govAddr, maxPar)
+	tallyChg := ballotapi.TallyAll(ctx, govAddr, maxPar)
 
 	// process bureau requests by users
 	bureauChg := bureau.Process(ctx, govAddr, member.Everybody)

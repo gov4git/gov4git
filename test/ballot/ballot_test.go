@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballot"
-	"github.com/gov4git/gov4git/v2/proto/ballot/common"
-	"github.com/gov4git/gov4git/v2/proto/ballot/load"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
@@ -26,15 +26,15 @@ func TestOpenClose(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := common.BallotName{"a", "b", "c"}
+	ballotName := ballotproto.BallotName{"a", "b", "c"}
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := load.QVStrategyName
-	ballot.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot_name", "ballot description", choices, member.Everybody)
+	strat := ballotio.QVStrategyName
+	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot_name", "ballot description", choices, member.Everybody)
 
 	// list
-	ads := ballot.List(ctx, cty.Gov())
+	ads := ballotapi.List(ctx, cty.Gov())
 	if len(ads) != 1 {
 		t.Errorf("expecting 1 ad, got %v", len(ads))
 	}
@@ -43,22 +43,22 @@ func TestOpenClose(t *testing.T) {
 	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0), "test")
 
 	// vote
-	elections := common.Elections{
-		common.NewElection(choices[0], 1.0),
+	elections := ballotproto.Elections{
+		ballotproto.NewElection(choices[0], 1.0),
 	}
-	ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections)
+	ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections)
 
 	// tally
-	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
+	tallyChg := ballotapi.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	if tallyChg.Result.Scores[choices[0]] != 1.0 {
 		t.Errorf("expecting %v vote, got %v", 1.0, tallyChg.Result.Scores[choices[0]])
 	}
 
 	// close
-	ballot.Close(ctx, cty.Organizer(), ballotName, account.BurnAccountID)
+	ballotapi.Close(ctx, cty.Organizer(), ballotName, account.BurnAccountID)
 
 	// verify state changed
-	ast := ballot.Show(ctx, gov.Address(cty.Organizer().Public), ballotName)
+	ast := ballotapi.Show(ctx, gov.Address(cty.Organizer().Public), ballotName)
 	if !ast.Ad.Closed {
 		t.Errorf("expecting closed flag")
 	}
@@ -76,15 +76,15 @@ func TestOpenCancel(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := common.BallotName{"a", "b", "c"}
+	ballotName := ballotproto.BallotName{"a", "b", "c"}
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := load.QVStrategyName
-	ballot.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot_name", "ballot description", choices, member.Everybody)
+	strat := ballotio.QVStrategyName
+	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot_name", "ballot description", choices, member.Everybody)
 
 	// list
-	ads := ballot.List(ctx, cty.Gov())
+	ads := ballotapi.List(ctx, cty.Gov())
 	if len(ads) != 1 {
 		t.Errorf("expecting 1 ad, got %v", len(ads))
 	}
@@ -93,22 +93,22 @@ func TestOpenCancel(t *testing.T) {
 	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 1.0), "test")
 
 	// vote
-	elections := common.Elections{
-		common.NewElection(choices[0], 1.0),
+	elections := ballotproto.Elections{
+		ballotproto.NewElection(choices[0], 1.0),
 	}
-	ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections)
+	ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName, elections)
 
 	// tally
-	tallyChg := ballot.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
+	tallyChg := ballotapi.Tally(ctx, cty.Organizer(), ballotName, testMaxPar)
 	if tallyChg.Result.Scores[choices[0]] != 1.0 {
 		t.Errorf("expecting %v vote, got %v", 1.0, tallyChg.Result.Scores[choices[0]])
 	}
 
 	// close
-	ballot.Cancel(ctx, cty.Organizer(), ballotName)
+	ballotapi.Cancel(ctx, cty.Organizer(), ballotName)
 
 	// verify state changed
-	ast := ballot.Show(ctx, gov.Address(cty.Organizer().Public), ballotName)
+	ast := ballotapi.Show(ctx, gov.Address(cty.Organizer().Public), ballotName)
 	if !ast.Ad.Closed || !ast.Ad.Cancelled {
 		t.Errorf("expecting closed and cancelled")
 	}
@@ -126,15 +126,15 @@ func TestTallyAll(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName0 := common.BallotName{"a", "b", "c"}
-	ballotName1 := common.BallotName{"d", "e", "f"}
+	ballotName0 := ballotproto.BallotName{"a", "b", "c"}
+	ballotName1 := ballotproto.BallotName{"d", "e", "f"}
 	choices := []string{"x", "y", "z"}
 
 	// open two ballots
-	strat := load.QVStrategyName
-	openChg0 := ballot.Open(ctx, strat, cty.Organizer(), ballotName0, account.NobodyAccountID, purpose.Unspecified, "ballot_0", "ballot 0", choices, member.Everybody)
+	strat := ballotio.QVStrategyName
+	openChg0 := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName0, account.NobodyAccountID, purpose.Unspecified, "ballot_0", "ballot 0", choices, member.Everybody)
 	fmt.Println("open 0: ", form.SprintJSON(openChg0))
-	openChg1 := ballot.Open(ctx, strat, cty.Organizer(), ballotName1, account.NobodyAccountID, purpose.Unspecified, "ballot_1", "ballot 1", choices, member.Everybody)
+	openChg1 := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName1, account.NobodyAccountID, purpose.Unspecified, "ballot_1", "ballot 1", choices, member.Everybody)
 	fmt.Println("open 1: ", form.SprintJSON(openChg1))
 
 	// give credits to users
@@ -142,23 +142,23 @@ func TestTallyAll(t *testing.T) {
 	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 5.0), "test")
 
 	// vote
-	elections0 := common.Elections{common.NewElection(choices[0], 5.0)}
-	elections1 := common.Elections{common.NewElection(choices[0], -5.0)}
-	voteChg0 := ballot.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName0, elections0)
+	elections0 := ballotproto.Elections{ballotproto.NewElection(choices[0], 5.0)}
+	elections1 := ballotproto.Elections{ballotproto.NewElection(choices[0], -5.0)}
+	voteChg0 := ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), ballotName0, elections0)
 	fmt.Println("vote 0: ", form.SprintJSON(voteChg0))
-	voteChg1 := ballot.Vote(ctx, cty.MemberOwner(1), cty.Gov(), ballotName1, elections1)
+	voteChg1 := ballotapi.Vote(ctx, cty.MemberOwner(1), cty.Gov(), ballotName1, elections1)
 	fmt.Println("vote 1: ", form.SprintJSON(voteChg1))
 
 	// tally
-	tallyChg := ballot.TallyAll(ctx, cty.Organizer(), 2)
+	tallyChg := ballotapi.TallyAll(ctx, cty.Organizer(), 2)
 	fmt.Println("tally: ", form.SprintJSON(tallyChg))
 
 	// verify tallies are correct
-	ast0 := ballot.Show(ctx, cty.Gov(), ballotName0)
+	ast0 := ballotapi.Show(ctx, cty.Gov(), ballotName0)
 	if ast0.Tally.Scores[choices[0]] != math.Sqrt(5.0) {
 		t.Errorf("expecting %v, got %v", math.Sqrt(5.0), ast0.Tally.Scores[choices[0]])
 	}
-	ast1 := ballot.Show(ctx, cty.Gov(), ballotName1)
+	ast1 := ballotapi.Show(ctx, cty.Gov(), ballotName1)
 	if ast1.Tally.Scores[choices[0]] != -math.Sqrt(5.0) {
 		t.Errorf("expecting %v, got %v", -math.Sqrt(5.0), ast1.Tally.Scores[choices[0]])
 	}

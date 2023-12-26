@@ -38,7 +38,7 @@ func Reopen_StageOnly(
 	must.Assertf(ctx, ad.Closed, "ballot is not closed")
 	must.Assertf(ctx, !ad.Cancelled, "ballot was cancelled")
 
-	tally := LoadTally(ctx, govTree, ballotName)
+	tally := loadTally_Local(ctx, govTree, ballotName)
 	chg := strat.Reopen(ctx, govCloned, &ad, &tally)
 
 	// remove prior outcome

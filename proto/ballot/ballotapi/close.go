@@ -23,10 +23,10 @@ func Close(
 
 ) git.Change[form.Map, ballotproto.Outcome] {
 
-	govCloned := gov.CloneOwner(ctx, govAddr)
-	chg := Close_StageOnly(ctx, govCloned, ballotName, escrowTo)
-	proto.Commit(ctx, govCloned.Public.Tree(), chg)
-	govCloned.Public.Push(ctx)
+	cloned := gov.CloneOwner(ctx, govAddr)
+	chg := Close_StageOnly(ctx, cloned, ballotName, escrowTo)
+	proto.Commit(ctx, cloned.Public.Tree(), chg)
+	cloned.Public.Push(ctx)
 	return chg
 }
 
@@ -44,7 +44,7 @@ func Close_StageOnly(
 	ad, strat := ballotio.LoadStrategy(ctx, t, ballotName)
 	must.Assertf(ctx, !ad.Closed, "ballot already closed")
 
-	tally := LoadTally(ctx, t, ballotName)
+	tally := loadTally_Local(ctx, t, ballotName)
 
 	var chg git.Change[map[string]form.Form, ballotproto.Outcome]
 	chg = strat.Close(ctx, cloned, &ad, &tally)

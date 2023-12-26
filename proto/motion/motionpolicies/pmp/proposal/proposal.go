@@ -14,9 +14,9 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/history"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
@@ -326,10 +326,11 @@ func (x proposalPolicy) Cancel(
 }
 
 type PolicyView struct {
-	State         *ProposalState      `json:"state"`
-	ApprovalPoll  ballotproto.AdTally `json:"approval_poll"`
-	BountyAccount account.AccountID   `json:"bounty_account"`
-	RewardAccount account.AccountID   `json:"reward_account"`
+	State          *ProposalState      `json:"state"`
+	ApprovalPoll   ballotproto.AdTally `json:"approval_poll"`
+	ApprovalMargin ballotproto.Margin  `json:"priority_margin"`
+	BountyAccount  account.AccountID   `json:"bounty_account"`
+	RewardAccount  account.AccountID   `json:"reward_account"`
 }
 
 func (x proposalPolicy) Show(
@@ -348,10 +349,11 @@ func (x proposalPolicy) Show(
 	approvalPoll := loadPropApprovalPollTally(ctx, cloned, motion)
 
 	return PolicyView{
-		State:         policyState,
-		ApprovalPoll:  approvalPoll,
-		BountyAccount: pmp.ProposalBountyAccountID(motion.ID),
-		RewardAccount: pmp.ProposalRewardAccountID(motion.ID),
+		State:          policyState,
+		ApprovalPoll:   approvalPoll,
+		ApprovalMargin: *ballotapi.GetMargin_Local(ctx, cloned, approvalPoll.Ad.Name),
+		BountyAccount:  pmp.ProposalBountyAccountID(motion.ID),
+		RewardAccount:  pmp.ProposalRewardAccountID(motion.ID),
 	}
 }
 

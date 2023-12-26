@@ -2,7 +2,6 @@ package sv
 
 import (
 	"context"
-	_ "embed"
 	"math"
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
@@ -12,16 +11,16 @@ type SV struct {
 	Kernel ScoreKernel
 }
 
+type ScoreKernel interface {
+	Score(ctx context.Context, el ballotproto.AcceptedElections) ScoredVotes
+	CalcJS(ctx context.Context) ballotproto.MarginCalcJS
+}
+
 func (x SV) GetScorer() ScoreKernel {
 	if x.Kernel == nil {
 		return QVScore{}
 	}
 	return x.Kernel
-}
-
-type ScoreKernel interface {
-	Score(ctx context.Context, el ballotproto.AcceptedElections) ScoredVotes
-	CalcJS(ctx context.Context) string
 }
 
 type ScoredVotes struct {
@@ -63,11 +62,6 @@ func qvScoreFromStrength(strength float64) float64 {
 	return sign * math.Sqrt(math.Abs(strength))
 }
 
-var (
-	//go:embed calc.js
-	calcJS string
-)
-
-func (QVScore) CalcJS(context.Context) string {
-	return calcJS
+func (QVScore) CalcJS(context.Context) ballotproto.MarginCalcJS {
+	return ballotproto.MarginCalcJS(qvMarginCalcJS)
 }

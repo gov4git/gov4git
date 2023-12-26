@@ -67,7 +67,7 @@ func tallyVotersCloned_StageOnly(
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 
 	// read current tally
-	currentTally := LoadTally(ctx, communityTree, ballotName)
+	currentTally := loadTally_Local(ctx, communityTree, ballotName)
 
 	var fetchedVotes FetchedVotes
 	var fetchVoteChanges []git.Change[form.Map, FetchedVotes]
@@ -140,7 +140,13 @@ func rejectFetchedVotes(fv FetchedVotes, rej map[member.User]ballotproto.Rejecte
 	}
 }
 
-func LoadTally(ctx context.Context, communityTree *git.Tree, ballotName ballotproto.BallotName) ballotproto.Tally {
+func loadTally_Local(
+	ctx context.Context,
+	communityTree *git.Tree,
+	ballotName ballotproto.BallotName,
+
+) ballotproto.Tally {
+
 	tallyNS := ballotproto.BallotPath(ballotName).Append(ballotproto.TallyFilebase)
 	return git.FromFile[ballotproto.Tally](ctx, communityTree, tallyNS)
 }

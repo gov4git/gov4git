@@ -102,7 +102,7 @@ func verifyElections(
 		}
 	}
 
-	tally := LoadTally(ctx, govCloned.Tree(), ad.Name)
+	tally := loadTally_Local(ctx, govCloned.Tree(), ad.Name)
 	strat.VerifyElections(ctx, voterAddr, govAddr, voterOwner, govCloned, &ad, &tally, elections)
 }
 

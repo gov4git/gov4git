@@ -19,9 +19,9 @@ import (
 var (
 	BallotNS         = proto.RootNS.Append("ballot")
 	AdFilebase       = "ballot_ad.json"
-	StrategyFilebase = "ballot_strategy.json"
 	TallyFilebase    = "ballot_tally.json"
 	OutcomeFilebase  = "ballot_outcome.json"
+	StrategyFilebase = "ballot_strategy.json" // strategy instance state
 
 	VoteLogNS = proto.RootNS.Append("votes") // namespace in voter's repo for recording votes
 )
@@ -65,10 +65,6 @@ func BallotPath(name BallotName) ns.NS {
 	return BallotNS.Join(name.NS())
 }
 
-func BallotStrategyPath(name BallotName) ns.NS {
-	return BallotPath(name).Append(StrategyFilebase)
-}
-
 type BallotName ns.NS
 
 func (x BallotName) OSPath() string {
@@ -81,6 +77,18 @@ func (x BallotName) GitPath() string {
 
 func (x BallotName) NS() ns.NS {
 	return ns.NS(x)
+}
+
+func (x BallotName) TallyNS() ns.NS {
+	return BallotPath(x).Append(TallyFilebase)
+}
+
+func (x BallotName) AdNS() ns.NS {
+	return BallotPath(x).Append(AdFilebase)
+}
+
+func (x BallotName) StrategyNS() ns.NS {
+	return BallotPath(x).Append(StrategyFilebase)
 }
 
 func ParseBallotNameFromPath(p string) BallotName {

@@ -14,9 +14,9 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/history"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
@@ -270,8 +270,9 @@ func (x concernPolicy) Cancel(
 }
 
 type PolicyView struct {
-	State        *ConcernState       `json:"state"`
-	PriorityPoll ballotproto.AdTally `json:"priority_poll"`
+	State          *ConcernState       `json:"state"`
+	PriorityPoll   ballotproto.AdTally `json:"priority_poll"`
+	PriorityMargin ballotproto.Margin  `json:"priority_margin"`
 }
 
 func (x concernPolicy) Show(
@@ -291,8 +292,9 @@ func (x concernPolicy) Show(
 	pollState := ballotapi.Show_Local(ctx, cloned.Tree(), priorityPollName)
 
 	return PolicyView{
-		State:        policyState,
-		PriorityPoll: pollState,
+		State:          policyState,
+		PriorityPoll:   pollState,
+		PriorityMargin: *ballotapi.GetMargin_Local(ctx, cloned, priorityPollName),
 	}
 }
 

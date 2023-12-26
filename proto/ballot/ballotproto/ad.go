@@ -11,20 +11,23 @@ import (
 )
 
 type Advertisement struct {
-	Gov            gov.Address       `json:"community"`
-	Name           BallotName        `json:"name"`
-	Owner          account.AccountID `json:"owner"`
-	Purpose        purpose.Purpose   `json:"purpose"`
-	Title          string            `json:"title"`
-	Description    string            `json:"description"`
-	Choices        []string          `json:"choices"`
-	Strategy       StrategyName      `json:"strategy"`
-	StrategyCalcJS string            `json:"strategy_calc_js"`
-	Participants   member.Group      `json:"participants_group"`
-	Frozen         bool              `json:"frozen"` // if frozen, the ballot is not accepting votes
-	Closed         bool              `json:"closed"` // closed ballots cannot be re-opened
-	Cancelled      bool              `json:"cancelled"`
-	ParentCommit   git.CommitHash    `json:"parent_commit"`
+	Gov     gov.Address       `json:"community"`
+	Name    BallotName        `json:"name"`
+	Owner   account.AccountID `json:"owner"`
+	Purpose purpose.Purpose   `json:"purpose"`
+	//
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	//
+	Choices      []string     `json:"choices"`
+	Strategy     StrategyName `json:"strategy"`
+	Participants member.Group `json:"participants_group"`
+	//
+	Frozen    bool `json:"frozen"` // if frozen, the ballot is not accepting votes
+	Closed    bool `json:"closed"` // closed ballots cannot be re-opened
+	Cancelled bool `json:"cancelled"`
+	//
+	ParentCommit git.CommitHash `json:"parent_commit"`
 }
 
 type Advertisements []Advertisement

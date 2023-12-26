@@ -40,7 +40,7 @@ func Open(
 
 func Open_StageOnly(
 	ctx context.Context,
-	strat ballotproto.StrategyName,
+	strategyName ballotproto.StrategyName,
 	cloned gov.OwnerCloned,
 	name ballotproto.BallotName,
 	owner account.AccountID,
@@ -52,12 +52,9 @@ func Open_StageOnly(
 
 ) git.Change[form.Map, ballotproto.BallotAddress] {
 
-	s := ballotio.LookupStrategy(ctx, strat)
-
 	// check no open ballots by the same name
-	openAdNS := ballotproto.BallotPath(name).Append(ballotproto.AdFilebase)
-	if _, err := git.TreeStat(ctx, cloned.Public.Tree(), openAdNS); err == nil {
-		must.Errorf(ctx, "ballot already exists: %v", openAdNS.GitPath())
+	if _, err := git.TreeStat(ctx, cloned.Public.Tree(), name.AdNS()); err == nil {
+		must.Errorf(ctx, "ballot already exists: %v", name.AdNS().GitPath())
 	}
 
 	// verify group exists
@@ -75,34 +72,30 @@ func Open_StageOnly(
 
 	// write ad
 	ad := ballotproto.Advertisement{
-		Gov:            cloned.GovAddress(),
-		Name:           name,
-		Owner:          owner,
-		Purpose:        purpose,
-		Title:          title,
-		Description:    description,
-		Choices:        choices,
-		Strategy:       strat,
-		StrategyCalcJS: s.CalcJS(ctx),
-		Participants:   participants,
-		Frozen:         false,
-		Closed:         false,
-		Cancelled:      false,
-		ParentCommit:   git.Head(ctx, cloned.Public.Repo()),
+		Gov:     cloned.GovAddress(),
+		Name:    name,
+		Owner:   owner,
+		Purpose: purpose,
+		//
+		Title:       title,
+		Description: description,
+		//
+		Choices:      choices,
+		Strategy:     strategyName,
+		Participants: participants,
+		//
+		Frozen:    false,
+		Closed:    false,
+		Cancelled: false,
+		//
+		ParentCommit: git.Head(ctx, cloned.Public.Repo()),
 	}
-	git.ToFileStage(ctx, cloned.Public.Tree(), openAdNS, ad)
+	git.ToFileStage(ctx, cloned.Public.Tree(), name.AdNS(), ad)
 
-	// write initial tally
-	tally := ballotproto.Tally{
-		Ad:            ad,
-		Scores:        map[string]float64{},
-		ScoresByUser:  map[member.User]map[string]ballotproto.StrengthAndScore{},
-		AcceptedVotes: map[member.User]ballotproto.AcceptedElections{},
-		RejectedVotes: map[member.User]ballotproto.RejectedElections{},
-		Charges:       map[member.User]float64{},
-	}
-	openTallyNS := ballotproto.BallotPath(name).Append(ballotproto.TallyFilebase)
-	git.ToFileStage(ctx, cloned.Public.Tree(), openTallyNS, tally)
+	// initialize tally
+	strategy := ballotio.LookupStrategy(ctx, strategyName)
+	tally := strategy.Open(ctx, cloned, &ad)
+	git.ToFileStage(ctx, cloned.Public.Tree(), name.TallyNS(), tally)
 
 	// log
 	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
@@ -114,10 +107,10 @@ func Open_StageOnly(
 	})
 
 	return git.NewChange(
-		fmt.Sprintf("Create ballot of type %v", strat),
+		fmt.Sprintf("Create ballot of type %v", strategyName),
 		"ballot_open",
 		form.Map{
-			"strategy":     strat,
+			"strategy":     strategyName,
 			"name":         name,
 			"participants": participants,
 		},

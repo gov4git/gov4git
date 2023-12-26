@@ -23,15 +23,19 @@ func init() {
 func LoadStrategy(
 	ctx context.Context,
 	t *git.Tree,
-	ballotName ballotproto.BallotName,
+	name ballotproto.BallotName,
+
 ) (ballotproto.Advertisement, ballotproto.Strategy) {
 
-	adNS := ballotproto.BallotPath(ballotName).Append(ballotproto.AdFilebase)
-	ad := git.FromFile[ballotproto.Advertisement](ctx, t, adNS)
-
+	ad := git.FromFile[ballotproto.Advertisement](ctx, t, name.AdNS())
 	return ad, strategyRegistry.Get(ctx, ad.Strategy)
 }
 
-func LookupStrategy(ctx context.Context, name ballotproto.StrategyName) ballotproto.Strategy {
+func LookupStrategy(
+	ctx context.Context,
+	name ballotproto.StrategyName,
+
+) ballotproto.Strategy {
+
 	return strategyRegistry.Get(ctx, name)
 }

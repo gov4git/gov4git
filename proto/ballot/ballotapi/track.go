@@ -38,7 +38,7 @@ func Track_StageOnly(
 	user := users[0]
 
 	// read the ballot tally
-	tally := LoadTally(ctx, govCloned.Tree(), ballotName)
+	tally := loadTally_Local(ctx, govCloned.Tree(), ballotName)
 
 	// read the voter's log
 	govCred := id.GetPublicCredentials(ctx, govCloned.Tree())

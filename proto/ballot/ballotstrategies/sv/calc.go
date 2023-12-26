@@ -1,12 +1,10 @@
 package sv
 
 import (
-	"context"
+	_ "embed"
 )
 
-func (qv SV) CalcJS(
-	ctx context.Context,
-) string {
-
-	return qv.Kernel.CalcJS(ctx)
-}
+var (
+	//go:embed qvcalc.js
+	qvMarginCalcJS string
+)

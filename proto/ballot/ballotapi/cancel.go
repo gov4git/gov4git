@@ -38,7 +38,7 @@ func Cancel_StageOnly(
 	ad, strat := ballotio.LoadStrategy(ctx, t, ballotName)
 	must.Assertf(ctx, !ad.Closed, "ballot already closed")
 
-	tally := LoadTally(ctx, t, ballotName)
+	tally := loadTally_Local(ctx, t, ballotName)
 
 	var chg git.Change[map[string]form.Form, ballotproto.Outcome]
 	chg = strat.Cancel(ctx, cloned, &ad, &tally)

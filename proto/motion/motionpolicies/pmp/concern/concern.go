@@ -63,8 +63,9 @@ func (x concernPolicy) Open(
 	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
 		Motion: &history.MotionEvent{
 			Open: &history.MotionOpen{
-				ID:   history.MotionID(con.ID),
-				Type: "concern",
+				ID:     history.MotionID(con.ID),
+				Type:   "concern",
+				Policy: history.MotionPolicyName(con.Policy),
 			},
 		},
 	})
@@ -228,6 +229,7 @@ func (x concernPolicy) Close(
 			Close: &history.MotionClose{
 				ID:       history.MotionID(con.ID),
 				Type:     "concern",
+				Policy:   history.MotionPolicyName(con.Policy),
 				Receipts: nil, // rewards are accounted for by the proposal
 			},
 		},
@@ -259,6 +261,7 @@ func (x concernPolicy) Cancel(
 			Cancel: &history.MotionCancel{
 				ID:       history.MotionID(con.ID),
 				Type:     "concern",
+				Policy:   history.MotionPolicyName(con.Policy),
 				Receipts: nil, // refunds are accounted for by the proposal
 			},
 		},

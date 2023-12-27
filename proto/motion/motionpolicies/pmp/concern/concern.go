@@ -53,6 +53,7 @@ func (x concernPolicy) Open(
 		state.PriorityPoll,
 		pmp.ConcernAccountID(con.ID),
 		purpose.Concern,
+		con.Policy,
 		fmt.Sprintf("Prioritization poll for motion %v", con.ID),
 		fmt.Sprintf("Up/down vote the priority for concern (issue) %v", con.ID),
 		[]string{pmp.ConcernBallotChoice},
@@ -65,7 +66,7 @@ func (x concernPolicy) Open(
 			Open: &metric.MotionOpen{
 				ID:     metric.MotionID(con.ID),
 				Type:   "concern",
-				Policy: metric.MotionPolicyName(con.Policy),
+				Policy: metric.MotionPolicy(con.Policy),
 			},
 		},
 	})
@@ -229,7 +230,7 @@ func (x concernPolicy) Close(
 			Close: &metric.MotionClose{
 				ID:       metric.MotionID(con.ID),
 				Type:     "concern",
-				Policy:   metric.MotionPolicyName(con.Policy),
+				Policy:   metric.MotionPolicy(con.Policy),
 				Receipts: nil, // rewards are accounted for by the proposal
 			},
 		},
@@ -261,7 +262,7 @@ func (x concernPolicy) Cancel(
 			Cancel: &metric.MotionCancel{
 				ID:       metric.MotionID(con.ID),
 				Type:     "concern",
-				Policy:   metric.MotionPolicyName(con.Policy),
+				Policy:   metric.MotionPolicy(con.Policy),
 				Receipts: nil, // refunds are accounted for by the proposal
 			},
 		},

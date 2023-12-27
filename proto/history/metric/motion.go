@@ -1,6 +1,6 @@
 package metric
 
-type MotionPolicyName string
+type MotionPolicy string
 
 type MotionEvent struct {
 	Open   *MotionOpen   `json:"open"`
@@ -11,21 +11,21 @@ type MotionEvent struct {
 type MotionID string
 
 type MotionOpen struct {
-	ID     MotionID         `json:"id"`
-	Type   string           `json:"type"`
-	Policy MotionPolicyName `json:"policy"`
+	ID     MotionID     `json:"id"`
+	Type   string       `json:"type"`
+	Policy MotionPolicy `json:"policy"`
 }
 
 type MotionClose struct {
-	ID       MotionID         `json:"id"`
-	Type     string           `json:"type"`
-	Policy   MotionPolicyName `json:"policy"`
-	Receipts Receipts         `json:"receipts"`
+	ID       MotionID     `json:"id"`
+	Type     string       `json:"type"`
+	Policy   MotionPolicy `json:"policy"`
+	Receipts Receipts     `json:"receipts"`
 }
 
 type MotionCancel struct {
-	ID       MotionID         `json:"id"`
-	Type     string           `json:"type"`
-	Policy   MotionPolicyName `json:"policy"`
-	Receipts Receipts         `json:"receipts"`
+	ID       MotionID     `json:"id"`
+	Type     string       `json:"type"`
+	Policy   MotionPolicy `json:"policy"`
+	Receipts Receipts     `json:"receipts"`
 }

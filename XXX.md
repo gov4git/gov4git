@@ -2,10 +2,9 @@
   - vulnerability: community members must not be allowed to close issues to prevent them from closing before a pr is submitted
 - update GOVERN-PLAYBOOK.md
 
-- [ ] test github integration of metrics
 
-- split history to metric and trace
-- VoteEvent add policy
+
+- [ ] test github integration of metrics
 
 - voting on the client must support different versions of the motion strategy
   - compute reward in margin calc

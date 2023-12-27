@@ -70,6 +70,7 @@ func (x proposalPolicy) Open(
 		state.ApprovalPoll,
 		pmp.ProposalAccountID(prop.ID),
 		purpose.Proposal,
+		prop.Policy,
 		fmt.Sprintf("Approval referendum for motion %v", prop.ID),
 		fmt.Sprintf("Up/down vote the approval vote for proposal (pull request) %v", prop.ID),
 		[]string{pmp.ProposalBallotChoice},
@@ -82,7 +83,7 @@ func (x proposalPolicy) Open(
 			Open: &metric.MotionOpen{
 				ID:     metric.MotionID(prop.ID),
 				Type:   "proposal",
-				Policy: metric.MotionPolicyName(prop.Policy),
+				Policy: metric.MotionPolicy(prop.Policy),
 			},
 		},
 	})
@@ -244,7 +245,7 @@ func (x proposalPolicy) Close(
 				Close: &metric.MotionClose{
 					ID:       metric.MotionID(prop.ID),
 					Type:     "proposal",
-					Policy:   metric.MotionPolicyName(prop.Policy),
+					Policy:   metric.MotionPolicy(prop.Policy),
 					Receipts: append(rewards.MetricReceipts(), bountyReceipt),
 				},
 			},
@@ -277,7 +278,7 @@ func (x proposalPolicy) Close(
 				Close: &metric.MotionClose{
 					ID:       metric.MotionID(prop.ID),
 					Type:     "proposal",
-					Policy:   metric.MotionPolicyName(prop.Policy),
+					Policy:   metric.MotionPolicy(prop.Policy),
 					Receipts: cancelApprovalPoll.Result.RefundedHistoryReceipts(),
 				},
 			},
@@ -318,7 +319,7 @@ func (x proposalPolicy) Cancel(
 			Cancel: &metric.MotionCancel{
 				ID:       metric.MotionID(prop.ID),
 				Type:     "proposals",
-				Policy:   metric.MotionPolicyName(prop.Policy),
+				Policy:   metric.MotionPolicy(prop.Policy),
 				Receipts: chg.Result.RefundedHistoryReceipts(),
 			},
 		},

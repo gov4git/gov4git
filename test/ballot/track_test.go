@@ -27,7 +27,7 @@ func TestTrack(t *testing.T) {
 	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 6.0), "test")
 
 	// open ballot
-	ballotapi.Open(ctx, ballotio.QVStrategyName, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot title", "ballot description", choices, member.Everybody)
+	ballotapi.Open(ctx, ballotio.QVStrategyName, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot title", "ballot description", choices, member.Everybody)
 
 	// vote 1: accepted vote
 	elections1 := ballotproto.Elections{ballotproto.NewElection(choices[0], 1.0)}

@@ -36,6 +36,7 @@ func TestQV(t *testing.T) {
 		ballotName,
 		account.NobodyAccountID,
 		purpose.Unspecified,
+		"",
 		"ballot_name",
 		"ballot description",
 		choices,

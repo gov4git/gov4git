@@ -37,6 +37,7 @@ var (
 				ballotproto.ParseBallotNameFromPath(ballotName),
 				account.NobodyAccountID,
 				purpose.Unspecified,
+				"",
 				ballotTitle,
 				ballotDescription,
 				ballotChoices,

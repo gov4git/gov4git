@@ -33,6 +33,7 @@ func TestInsufficientCredits(t *testing.T) {
 		ballotName,
 		account.NobodyAccountID,
 		purpose.Unspecified,
+		"",
 		"ballot title",
 		"ballot description",
 		choices,

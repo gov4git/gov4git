@@ -34,6 +34,7 @@ func TestVoteFreezeVote(t *testing.T) {
 		ballotName,
 		account.NobodyAccountID,
 		purpose.Unspecified,
+		"",
 		"ballot title",
 		"ballot description",
 		choices,
@@ -90,7 +91,7 @@ func TestVoteFreezeTally(t *testing.T) {
 
 	// open
 	strat := ballotio.QVStrategyName
-	openChg := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot title", "ballot description", choices, member.Everybody)
+	openChg := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot title", "ballot description", choices, member.Everybody)
 	fmt.Println("open: ", form.SprintJSON(openChg))
 
 	// give voter credits

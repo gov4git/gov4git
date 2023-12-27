@@ -11,6 +11,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -24,6 +25,7 @@ func Open(
 	name ballotproto.BallotName,
 	owner account.AccountID,
 	purpose purpose.Purpose,
+	motionPolicy motionproto.PolicyName,
 	title string,
 	description string,
 	choices []string,
@@ -32,7 +34,7 @@ func Open(
 ) git.Change[form.Map, ballotproto.BallotAddress] {
 
 	govCloned := gov.CloneOwner(ctx, govAddr)
-	chg := Open_StageOnly(ctx, strat, govCloned, name, owner, purpose, title, description, choices, participants)
+	chg := Open_StageOnly(ctx, strat, govCloned, name, owner, purpose, motionPolicy, title, description, choices, participants)
 	proto.Commit(ctx, govCloned.Public.Tree(), chg)
 	govCloned.Public.Push(ctx)
 	return chg
@@ -45,6 +47,7 @@ func Open_StageOnly(
 	name ballotproto.BallotName,
 	owner account.AccountID,
 	purpose purpose.Purpose,
+	motionPolicy motionproto.PolicyName,
 	title string,
 	description string,
 	choices []string,
@@ -72,10 +75,11 @@ func Open_StageOnly(
 
 	// write ad
 	ad := ballotproto.Advertisement{
-		Gov:     cloned.GovAddress(),
-		Name:    name,
-		Owner:   owner,
-		Purpose: purpose,
+		Gov:          cloned.GovAddress(),
+		Name:         name,
+		Owner:        owner,
+		Purpose:      purpose,
+		MotionPolicy: motionPolicy,
 		//
 		Title:       title,
 		Description: description,

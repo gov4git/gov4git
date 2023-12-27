@@ -31,7 +31,7 @@ func TestOpenClose(t *testing.T) {
 
 	// open
 	strat := ballotio.QVStrategyName
-	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot_name", "ballot description", choices, member.Everybody)
+	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot_name", "ballot description", choices, member.Everybody)
 
 	// list
 	ads := ballotapi.List(ctx, cty.Gov())
@@ -81,7 +81,7 @@ func TestOpenCancel(t *testing.T) {
 
 	// open
 	strat := ballotio.QVStrategyName
-	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "ballot_name", "ballot description", choices, member.Everybody)
+	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot_name", "ballot description", choices, member.Everybody)
 
 	// list
 	ads := ballotapi.List(ctx, cty.Gov())
@@ -132,9 +132,9 @@ func TestTallyAll(t *testing.T) {
 
 	// open two ballots
 	strat := ballotio.QVStrategyName
-	openChg0 := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName0, account.NobodyAccountID, purpose.Unspecified, "ballot_0", "ballot 0", choices, member.Everybody)
+	openChg0 := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName0, account.NobodyAccountID, purpose.Unspecified, "", "ballot_0", "ballot 0", choices, member.Everybody)
 	fmt.Println("open 0: ", form.SprintJSON(openChg0))
-	openChg1 := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName1, account.NobodyAccountID, purpose.Unspecified, "ballot_1", "ballot 1", choices, member.Everybody)
+	openChg1 := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName1, account.NobodyAccountID, purpose.Unspecified, "", "ballot_1", "ballot 1", choices, member.Everybody)
 	fmt.Println("open 1: ", form.SprintJSON(openChg1))
 
 	// give credits to users

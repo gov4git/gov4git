@@ -98,6 +98,7 @@ func ImportIssuesForPrioritization_StageOnly(
 					ghIssue.BallotName(),
 					account.NobodyAccountID,
 					ghIssue.Purpose(),
+					"",
 					ghIssue.Title,
 					ghIssue.Body,
 					[]string{PrioritizeBallotChoice},

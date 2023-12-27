@@ -79,8 +79,10 @@ func (qv SV) tally(
 				govCloned,
 				&metric.Event{
 					Vote: &metric.VoteEvent{
-						By:      u.MetricUser(),
-						Purpose: ad.Purpose.MetricVotePurpose(),
+						By:           u.MetricUser(),
+						Purpose:      ad.Purpose.MetricVotePurpose(),
+						MotionPolicy: metric.MotionPolicy(ad.MotionPolicy),
+						BallotPolicy: metric.BallotPolicy(ad.Strategy),
 						Receipts: metric.OneReceipt(
 							u.MetricAccountID(),
 							metric.ReceiptTypeCharge,

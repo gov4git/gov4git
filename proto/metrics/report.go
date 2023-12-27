@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/journal"
 )
 
@@ -128,10 +128,10 @@ func loadHistory_Local(
 	earliest time.Time,
 	latest time.Time,
 
-) journal.Entries[*history.Event] {
+) journal.Entries[*metric.Event] {
 
-	all := history.List_Local(ctx, cloned)
-	s := journal.Entries[*history.Event]{}
+	all := metric.List_Local(ctx, cloned)
+	s := journal.Entries[*metric.Event]{}
 	for _, entry := range all {
 		if isNotBefore(entry.Stamp, earliest) && isNotAfter(entry.Stamp, latest) {
 			s = append(s, entry)

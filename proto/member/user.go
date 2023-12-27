@@ -7,7 +7,8 @@ import (
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/metric"
+	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/gov4git/v2/proto/kv"
 	"github.com/gov4git/lib4git/form"
@@ -70,9 +71,9 @@ func AddUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User, profil
 	chg := setUser_StageOnly(ctx, cloned, name, profile)
 
 	// log
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Join: &history.JoinEvent{
-			User: history.User(name),
+	metric.Log_StageOnly(ctx, cloned, &metric.Event{
+		Join: &metric.JoinEvent{
+			User: metric.User(name),
 		},
 	})
 
@@ -97,12 +98,10 @@ func RemoveUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User) git
 	chg := git.NewChangeNoResult(fmt.Sprintf("Remove user %v", name), "member_remove_user")
 
 	// log
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "user_remove",
-			Args:   history.M{"name": name},
-			Result: nil,
-		},
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "user_remove",
+		Args:   trace.M{"name": name},
+		Result: nil,
 	})
 
 	return chg

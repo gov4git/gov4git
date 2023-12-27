@@ -3,7 +3,7 @@ package metrics
 import (
 	"time"
 
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/journal"
 )
 
@@ -32,7 +32,7 @@ type Series struct {
 }
 
 func ComputeSeries(
-	entries journal.Entries[*history.Event],
+	entries journal.Entries[*metric.Event],
 	earliest time.Time,
 	latest time.Time,
 
@@ -78,12 +78,12 @@ func ComputeSeries(
 				dailyNumMotionClose.Add(e.Stamp, 1)
 				for _, r := range e.Payload.Vote.Receipts {
 					switch r.Type {
-					case history.ReceiptTypeBounty:
+					case metric.ReceiptTypeBounty:
 						dailyCreditInBounties.Add(e.Stamp, r.Amount.Quantity)
-					case history.ReceiptTypeCharge:
-					case history.ReceiptTypeRefund:
+					case metric.ReceiptTypeCharge:
+					case metric.ReceiptTypeRefund:
 						dailyCreditInRefunds.Add(e.Stamp, r.Amount.Quantity)
-					case history.ReceiptTypeReward:
+					case metric.ReceiptTypeReward:
 						dailyCreditInRewards.Add(e.Stamp, r.Amount.Quantity)
 					}
 				}
@@ -94,27 +94,27 @@ func ComputeSeries(
 		}
 		if e.Payload.Vote != nil {
 			switch e.Payload.Vote.Purpose {
-			case history.VotePurposeConcern:
+			case metric.VotePurposeConcern:
 				dailyNumConcernVotes.Add(e.Stamp, 1)
-			case history.VotePurposeProposal:
+			case metric.VotePurposeProposal:
 				dailyNumProposalVotes.Add(e.Stamp, 1)
 			default:
 				dailyNumOtherVotes.Add(e.Stamp, 1)
 			}
 			for _, r := range e.Payload.Vote.Receipts {
 				switch r.Type {
-				case history.ReceiptTypeBounty:
-				case history.ReceiptTypeCharge:
+				case metric.ReceiptTypeBounty:
+				case metric.ReceiptTypeCharge:
 					switch e.Payload.Vote.Purpose {
-					case history.VotePurposeConcern:
+					case metric.VotePurposeConcern:
 						dailyConcernVoteCharges.Add(e.Stamp, r.Amount.Quantity)
-					case history.VotePurposeProposal:
+					case metric.VotePurposeProposal:
 						dailyProposalVoteCharges.Add(e.Stamp, r.Amount.Quantity)
 					default:
 						dailyOtherVoteCharges.Add(e.Stamp, r.Amount.Quantity)
 					}
-				case history.ReceiptTypeRefund:
-				case history.ReceiptTypeReward:
+				case metric.ReceiptTypeRefund:
+				case metric.ReceiptTypeReward:
 				}
 			}
 		}

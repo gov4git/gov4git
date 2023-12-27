@@ -7,7 +7,8 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/metric"
+	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
@@ -22,12 +23,12 @@ func (u User) IsNone() bool {
 	return u == ""
 }
 
-func (u User) HistoryUser() history.User {
-	return history.User(u)
+func (u User) MetricUser() metric.User {
+	return metric.User(u)
 }
 
-func (u User) HistoryAccountID() history.AccountID {
-	return history.AccountID(UserAccountID(u))
+func (u User) MetricAccountID() metric.AccountID {
+	return metric.AccountID(UserAccountID(u))
 }
 
 type Group string
@@ -44,12 +45,10 @@ func AddMember_StageOnly(ctx context.Context, cloned gov.Cloned, user User, grou
 	groupUsersKKV.Set(ctx, groupUsersNS, cloned.Tree(), group, user, true)
 
 	// log
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "add_user_to_group",
-			Args:   history.M{"user": user, "group": group},
-			Result: nil,
-		},
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "add_user_to_group",
+		Args:   trace.M{"user": user, "group": group},
+		Result: nil,
 	})
 
 	return git.NewChangeNoResult(fmt.Sprintf("Added user %v to group %v", user, group), "member_add_member")
@@ -82,12 +81,10 @@ func RemoveMember_StageOnly(ctx context.Context, cloned gov.Cloned, user User, g
 	groupUsersKKV.Remove(ctx, groupUsersNS, cloned.Tree(), group, user)
 
 	// log
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "remove_user_from_group",
-			Args:   history.M{"user": user, "group": group},
-			Result: nil,
-		},
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "remove_user_from_group",
+		Args:   trace.M{"user": user, "group": group},
+		Result: nil,
 	})
 
 	return git.NewChangeNoResult(fmt.Sprintf("Removed user %v from group %v", user, group), "member_remove_member")

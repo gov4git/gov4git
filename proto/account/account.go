@@ -5,7 +5,8 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/metric"
+	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/gov4git/v2/proto/kv"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -26,8 +27,8 @@ func (x AccountID) String() string {
 	return string(x)
 }
 
-func (x AccountID) HistoryAccountID() history.AccountID {
-	return history.AccountID(x)
+func (x AccountID) HistoryAccountID() metric.AccountID {
+	return metric.AccountID(x)
 }
 
 type Account struct {
@@ -131,13 +132,11 @@ func Create_StageOnly(
 ) {
 	must.Assertf(ctx, !Exists_Local(ctx, cloned, id), "account %v already exists", id)
 	set_StageOnly(ctx, cloned, id, NewAccount(id, owner))
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "account_create",
-			Note:   note,
-			Args:   history.M{"id": id, "owner": owner},
-			Result: nil,
-		},
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "account_create",
+		Note:   note,
+		Args:   trace.M{"id": id, "owner": owner},
+		Result: nil,
 	})
 }
 
@@ -212,21 +211,18 @@ func Transfer_StageOnly(
 	set_StageOnly(ctx, cloned, fromID, from)
 	set_StageOnly(ctx, cloned, toID, to)
 
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "account_transfer",
-			Note:   note,
-			Args:   history.M{"from": fromID, "to": toID, "amount": amount},
-			Result: nil,
-		},
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "account_transfer",
+		Note:   note,
+		Args:   trace.M{"from": fromID, "to": toID, "amount": amount},
+		Result: nil,
 	})
-	// metrics
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Account: &history.AccountEvent{
-			Transfer: &history.AccountTransferEvent{
+	metric.Log_StageOnly(ctx, cloned, &metric.Event{
+		Account: &metric.AccountEvent{
+			Transfer: &metric.AccountTransferEvent{
 				From:   fromID.HistoryAccountID(),
 				To:     toID.HistoryAccountID(),
-				Amount: amount.HistoryHolding(),
+				Amount: amount.MetricHolding(),
 			},
 		},
 	})
@@ -269,27 +265,24 @@ func Issue_StageOnly(
 ) {
 
 	TransferOverDraft_StageOnly(
-		history.Mute(ctx),
+		metric.Mute(ctx),
 		cloned,
 		IssueAccountID,
 		toID,
 		amount,
 		note,
 	)
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "account_issue",
-			Note:   note,
-			Args:   history.M{"from": IssueAccountID, "to": toID, "amount": amount},
-			Result: nil,
-		},
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "account_issue",
+		Note:   note,
+		Args:   trace.M{"from": IssueAccountID, "to": toID, "amount": amount},
+		Result: nil,
 	})
-	// metrics
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Account: &history.AccountEvent{
-			Issue: &history.AccountIssueEvent{
+	metric.Log_StageOnly(ctx, cloned, &metric.Event{
+		Account: &metric.AccountEvent{
+			Issue: &metric.AccountIssueEvent{
 				To:     toID.HistoryAccountID(),
-				Amount: amount.HistoryHolding(),
+				Amount: amount.MetricHolding(),
 			},
 		},
 	})
@@ -319,27 +312,24 @@ func Burn_StageOnly(
 
 ) {
 	TransferOverDraft_StageOnly(
-		history.Mute(ctx),
+		metric.Mute(ctx),
 		cloned,
 		fromID,
 		BurnAccountID,
 		amount,
 		note,
 	)
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "account_burn",
-			Note:   note,
-			Args:   history.M{"from": fromID, "to": BurnAccountID, "amount": amount},
-			Result: nil,
-		},
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "account_burn",
+		Note:   note,
+		Args:   trace.M{"from": fromID, "to": BurnAccountID, "amount": amount},
+		Result: nil,
 	})
-	// metrics
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Account: &history.AccountEvent{
-			Burn: &history.AccountBurnEvent{
+	metric.Log_StageOnly(ctx, cloned, &metric.Event{
+		Account: &metric.AccountEvent{
+			Burn: &metric.AccountBurnEvent{
 				From:   fromID.HistoryAccountID(),
-				Amount: amount.HistoryHolding(),
+				Amount: amount.MetricHolding(),
 			},
 		},
 	})
@@ -391,13 +381,11 @@ func TransferOverDraft_StageOnly(
 	set_StageOnly(ctx, cloned, fromID, from)
 	set_StageOnly(ctx, cloned, toID, to)
 
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "account_transfer_overdraft",
-			Note:   note,
-			Args:   history.M{"from": fromID, "to": toID, "amount": amount},
-			Result: nil,
-		},
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "account_transfer_overdraft",
+		Note:   note,
+		Args:   trace.M{"from": fromID, "to": toID, "amount": amount},
+		Result: nil,
 	})
 }
 

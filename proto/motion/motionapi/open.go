@@ -7,7 +7,7 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
@@ -84,12 +84,10 @@ func OpenMotion_StageOnly(
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
 
 	// log
-	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-		Op: &history.Op{
-			Op:     "motion_open",
-			Args:   history.M{"id": id},
-			Result: history.M{"motion": motion},
-		},
+	trace.Log_StageOnly(ctx, cloned.PublicClone(), &trace.Event{
+		Op:     "motion_open",
+		Args:   trace.M{"id": id},
+		Result: trace.M{"motion": motion},
 	})
 
 	return report, notices

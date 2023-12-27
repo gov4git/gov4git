@@ -1,4 +1,4 @@
-package history
+package metric
 
 type User string
 

@@ -1,4 +1,4 @@
-package history
+package metric
 
 type Receipt struct {
 	To     AccountID   `json:"account"`

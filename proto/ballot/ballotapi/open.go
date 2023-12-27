@@ -9,7 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
@@ -98,12 +98,10 @@ func Open_StageOnly(
 	git.ToFileStage(ctx, cloned.Public.Tree(), name.TallyNS(), tally)
 
 	// log
-	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-		Op: &history.Op{
-			Op:     "ballot_open",
-			Args:   history.M{"name": name},
-			Result: history.M{"ad": ad},
-		},
+	trace.Log_StageOnly(ctx, cloned.PublicClone(), &trace.Event{
+		Op:     "ballot_open",
+		Args:   trace.M{"name": name},
+		Result: trace.M{"ad": ad},
 	})
 
 	return git.NewChange(

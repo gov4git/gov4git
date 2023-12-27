@@ -9,7 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -78,12 +78,10 @@ func Close_StageOnly(
 	}
 
 	// log
-	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-		Op: &history.Op{
-			Op:     "ballot_close",
-			Args:   history.M{"name": ballotName},
-			Result: history.M{"ad": ad, "outcome": chg.Result},
-		},
+	trace.Log_StageOnly(ctx, cloned.PublicClone(), &trace.Event{
+		Op:     "ballot_close",
+		Args:   trace.M{"name": ballotName},
+		Result: trace.M{"ad": ad, "outcome": chg.Result},
 	})
 
 	return chg

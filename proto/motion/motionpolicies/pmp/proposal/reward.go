@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/member"
 )
 
@@ -13,11 +13,11 @@ type Reward struct {
 	Amount account.Holding `json:"amount"`
 }
 
-func (x Reward) HistoryReceipt() history.Receipt {
-	return history.Receipt{
-		To:     history.AccountID(member.UserAccountID(x.To)),
-		Type:   history.ReceiptTypeReward,
-		Amount: x.Amount.HistoryHolding(),
+func (x Reward) MetricReceipt() metric.Receipt {
+	return metric.Receipt{
+		To:     metric.AccountID(member.UserAccountID(x.To)),
+		Type:   metric.ReceiptTypeReward,
+		Amount: x.Amount.MetricHolding(),
 	}
 }
 
@@ -39,10 +39,10 @@ func (x Rewards) Sort() {
 	sort.Sort(x)
 }
 
-func (x Rewards) HistoryReceipts() history.Receipts {
-	r := make(history.Receipts, len(x))
+func (x Rewards) MetricReceipts() metric.Receipts {
+	r := make(metric.Receipts, len(x))
 	for i := range x {
-		r[i] = x[i].HistoryReceipt()
+		r[i] = x[i].MetricReceipt()
 	}
 	return r
 }

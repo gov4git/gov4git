@@ -9,7 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -112,12 +112,10 @@ func tallyVotersCloned_StageOnly(
 	git.ToFileStage(ctx, communityTree, openTallyNS, updatedTally)
 
 	// log
-	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-		Op: &history.Op{
-			Op:     "ballot_tally",
-			Args:   history.M{"ballot": ballotName},
-			Result: history.M{"ad": ad, "tally": updatedTally},
-		},
+	trace.Log_StageOnly(ctx, cloned.PublicClone(), &trace.Event{
+		Op:     "ballot_tally",
+		Args:   trace.M{"ballot": ballotName},
+		Result: trace.M{"ad": ad, "tally": updatedTally},
 	})
 
 	return git.NewChange(

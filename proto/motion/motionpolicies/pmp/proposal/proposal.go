@@ -80,8 +80,9 @@ func (x proposalPolicy) Open(
 	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
 		Motion: &history.MotionEvent{
 			Open: &history.MotionOpen{
-				ID:   history.MotionID(prop.ID),
-				Type: "proposal",
+				ID:     history.MotionID(prop.ID),
+				Type:   "proposal",
+				Policy: history.MotionPolicyName(prop.Policy),
 			},
 		},
 	})
@@ -243,6 +244,7 @@ func (x proposalPolicy) Close(
 				Close: &history.MotionClose{
 					ID:       history.MotionID(prop.ID),
 					Type:     "proposal",
+					Policy:   history.MotionPolicyName(prop.Policy),
 					Receipts: append(rewards.HistoryReceipts(), bountyReceipt),
 				},
 			},
@@ -275,6 +277,7 @@ func (x proposalPolicy) Close(
 				Close: &history.MotionClose{
 					ID:       history.MotionID(prop.ID),
 					Type:     "proposal",
+					Policy:   history.MotionPolicyName(prop.Policy),
 					Receipts: cancelApprovalPoll.Result.RefundedHistoryReceipts(),
 				},
 			},
@@ -315,6 +318,7 @@ func (x proposalPolicy) Cancel(
 			Cancel: &history.MotionCancel{
 				ID:       history.MotionID(prop.ID),
 				Type:     "proposals",
+				Policy:   history.MotionPolicyName(prop.Policy),
 				Receipts: chg.Result.RefundedHistoryReceipts(),
 			},
 		},

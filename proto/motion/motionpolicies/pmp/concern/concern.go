@@ -11,7 +11,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
@@ -60,12 +60,12 @@ func (x concernPolicy) Open(
 	)
 
 	// metrics
-	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-		Motion: &history.MotionEvent{
-			Open: &history.MotionOpen{
-				ID:     history.MotionID(con.ID),
+	metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{
+		Motion: &metric.MotionEvent{
+			Open: &metric.MotionOpen{
+				ID:     metric.MotionID(con.ID),
 				Type:   "concern",
-				Policy: history.MotionPolicyName(con.Policy),
+				Policy: metric.MotionPolicyName(con.Policy),
 			},
 		},
 	})
@@ -224,12 +224,12 @@ func (x concernPolicy) Close(
 	)
 
 	// metrics
-	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-		Motion: &history.MotionEvent{
-			Close: &history.MotionClose{
-				ID:       history.MotionID(con.ID),
+	metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{
+		Motion: &metric.MotionEvent{
+			Close: &metric.MotionClose{
+				ID:       metric.MotionID(con.ID),
 				Type:     "concern",
-				Policy:   history.MotionPolicyName(con.Policy),
+				Policy:   metric.MotionPolicyName(con.Policy),
 				Receipts: nil, // rewards are accounted for by the proposal
 			},
 		},
@@ -256,12 +256,12 @@ func (x concernPolicy) Cancel(
 	)
 
 	// metrics
-	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-		Motion: &history.MotionEvent{
-			Cancel: &history.MotionCancel{
-				ID:       history.MotionID(con.ID),
+	metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{
+		Motion: &metric.MotionEvent{
+			Cancel: &metric.MotionCancel{
+				ID:       metric.MotionID(con.ID),
 				Type:     "concern",
-				Policy:   history.MotionPolicyName(con.Policy),
+				Policy:   metric.MotionPolicyName(con.Policy),
 				Receipts: nil, // refunds are accounted for by the proposal
 			},
 		},

@@ -6,7 +6,7 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -46,12 +46,10 @@ func AddGroup_StageOnly(ctx context.Context, cloned gov.Cloned, name Group) git.
 	chg := SetGroup_StageOnly(ctx, cloned, name)
 
 	// log
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "group_add",
-			Args:   history.M{"name": name},
-			Result: nil,
-		},
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "group_add",
+		Args:   trace.M{"name": name},
+		Result: nil,
 	})
 
 	return chg
@@ -69,12 +67,10 @@ func RemoveGroup_StageOnly(ctx context.Context, cloned gov.Cloned, name Group) g
 	groupUsersKKV.RemovePrimary(ctx, groupUsersNS, cloned.Tree(), name) // remove memberships
 
 	// log
-	history.Log_StageOnly(ctx, cloned, &history.Event{
-		Op: &history.Op{
-			Op:     "group_remove",
-			Args:   history.M{"name": name},
-			Result: nil,
-		},
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "group_remove",
+		Args:   trace.M{"name": name},
+		Result: nil,
 	})
 
 	return git.NewChangeNoResult(fmt.Sprintf("Remove group %v", name), "member_remove_group")

@@ -11,7 +11,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
@@ -77,12 +77,12 @@ func (x proposalPolicy) Open(
 	)
 
 	// metrics
-	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-		Motion: &history.MotionEvent{
-			Open: &history.MotionOpen{
-				ID:     history.MotionID(prop.ID),
+	metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{
+		Motion: &metric.MotionEvent{
+			Open: &metric.MotionOpen{
+				ID:     metric.MotionID(prop.ID),
 				Type:   "proposal",
-				Policy: history.MotionPolicyName(prop.Policy),
+				Policy: metric.MotionPolicyName(prop.Policy),
 			},
 		},
 	})
@@ -208,9 +208,9 @@ func (x proposalPolicy) Close(
 
 		// transfer bounty to author
 		var bountyDonated bool
-		bountyReceipt := history.Receipt{
-			Type:   history.ReceiptTypeBounty,
-			Amount: bounty.HistoryHolding(),
+		bountyReceipt := metric.Receipt{
+			Type:   metric.ReceiptTypeBounty,
+			Amount: bounty.MetricHolding(),
 		}
 		if prop.Author.IsNone() {
 			account.Transfer_StageOnly(
@@ -239,13 +239,13 @@ func (x proposalPolicy) Close(
 		rewards := disberseRewards(ctx, cloned, prop)
 
 		// metrics
-		history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-			Motion: &history.MotionEvent{
-				Close: &history.MotionClose{
-					ID:       history.MotionID(prop.ID),
+		metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{
+			Motion: &metric.MotionEvent{
+				Close: &metric.MotionClose{
+					ID:       metric.MotionID(prop.ID),
 					Type:     "proposal",
-					Policy:   history.MotionPolicyName(prop.Policy),
-					Receipts: append(rewards.HistoryReceipts(), bountyReceipt),
+					Policy:   metric.MotionPolicyName(prop.Policy),
+					Receipts: append(rewards.MetricReceipts(), bountyReceipt),
 				},
 			},
 		})
@@ -272,12 +272,12 @@ func (x proposalPolicy) Close(
 		)
 
 		// metrics
-		history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-			Motion: &history.MotionEvent{
-				Close: &history.MotionClose{
-					ID:       history.MotionID(prop.ID),
+		metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{
+			Motion: &metric.MotionEvent{
+				Close: &metric.MotionClose{
+					ID:       metric.MotionID(prop.ID),
 					Type:     "proposal",
-					Policy:   history.MotionPolicyName(prop.Policy),
+					Policy:   metric.MotionPolicyName(prop.Policy),
 					Receipts: cancelApprovalPoll.Result.RefundedHistoryReceipts(),
 				},
 			},
@@ -313,12 +313,12 @@ func (x proposalPolicy) Cancel(
 	)
 
 	// metrics
-	history.Log_StageOnly(ctx, cloned.PublicClone(), &history.Event{
-		Motion: &history.MotionEvent{
-			Cancel: &history.MotionCancel{
-				ID:       history.MotionID(prop.ID),
+	metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{
+		Motion: &metric.MotionEvent{
+			Cancel: &metric.MotionCancel{
+				ID:       metric.MotionID(prop.ID),
 				Type:     "proposals",
-				Policy:   history.MotionPolicyName(prop.Policy),
+				Policy:   metric.MotionPolicyName(prop.Policy),
 				Receipts: chg.Result.RefundedHistoryReceipts(),
 			},
 		},

@@ -7,7 +7,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history"
+	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -74,17 +74,17 @@ func (qv SV) tally(
 			votesByUser[u] = augmentedScore.Score
 
 			// metrics
-			history.Log_StageOnly(
+			metric.Log_StageOnly(
 				ctx,
 				govCloned,
-				&history.Event{
-					Vote: &history.VoteEvent{
-						By:      u.HistoryUser(),
-						Purpose: ad.Purpose.HistoryVotePurpose(),
-						Receipts: history.OneReceipt(
-							u.HistoryAccountID(),
-							history.ReceiptTypeCharge,
-							account.H(account.PluralAsset, costDiff).HistoryHolding(),
+				&metric.Event{
+					Vote: &metric.VoteEvent{
+						By:      u.MetricUser(),
+						Purpose: ad.Purpose.MetricVotePurpose(),
+						Receipts: metric.OneReceipt(
+							u.MetricAccountID(),
+							metric.ReceiptTypeCharge,
+							account.H(account.PluralAsset, costDiff).MetricHolding(),
 						),
 					},
 				},

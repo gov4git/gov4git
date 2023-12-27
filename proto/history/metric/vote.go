@@ -1,4 +1,4 @@
-package history
+package metric
 
 type VoteEvent struct {
 	By       User        `json:"by"`

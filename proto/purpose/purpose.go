@@ -1,8 +1,6 @@
 package purpose
 
-import (
-	"github.com/gov4git/gov4git/v2/proto/history"
-)
+import "github.com/gov4git/gov4git/v2/proto/history/metric"
 
 type Purpose string
 
@@ -12,12 +10,12 @@ const (
 	Proposal    Purpose = "proposal"
 )
 
-func (p Purpose) HistoryVotePurpose() history.VotePurpose {
+func (p Purpose) MetricVotePurpose() metric.VotePurpose {
 	switch p {
 	case Concern:
-		return history.VotePurposeConcern
+		return metric.VotePurposeConcern
 	case Proposal:
-		return history.VotePurposeProposal
+		return metric.VotePurposeProposal
 	}
-	return history.VotePurposeUnspecified
+	return metric.VotePurposeUnspecified
 }

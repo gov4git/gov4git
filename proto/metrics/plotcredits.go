@@ -53,7 +53,7 @@ ax.bar(x, y3, bottom=y1+y2, color='#aabbcc')
 		`ax.set_xlabel("Days")
 ax.set_ylabel("Credits")
 ax.legend(["Issued", "Burned", "Transferred", ])
-ax.set_title("Daily credits issued/burned/transfered")
+ax.set_title("Daily credits issued/burned/transferred")
 `)
 
 	n := series.DailyCreditsIssued.Len()

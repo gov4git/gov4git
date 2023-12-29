@@ -1,13 +1,10 @@
 - [ ] test github integration of metrics
 
-- rename "reward" -> "winnings", "upside"?
-
 - upgrade ballot
   - flat string namespace (not path)
   - rename strategy to policy
   - ballotname to ballotid
 
-- what is adopt/abandon for ballot closure?
 
 
 
@@ -15,6 +12,8 @@
 - D0: update GOVERN.md with known subtleties:
   - vulnerability: community members must not be allowed to close issues to prevent them from closing before a pr is submitted
 - D0: update GOVERN-PLAYBOOK.md
+
+
 
 
 

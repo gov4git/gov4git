@@ -20,11 +20,7 @@ package ballotproto
 //				"description": "Cost of changing your vote",
 //				"value": cost,
 //			},
-//			"potentialReward" : {
-//				"label": "Potential reward",
-//				"description": "Potential reward",
-//				"value": possibleReward,
-//			},
+//			...
 //		}
 //	}
 type MarginCalcJS string

@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
+	"github.com/gov4git/gov4git/v2/proto/gov"
 )
 
 type SV struct {
@@ -12,15 +13,18 @@ type SV struct {
 }
 
 type ScoreKernel interface {
-	Score(ctx context.Context, el ballotproto.AcceptedElections) ScoredVotes
-	CalcJS(ctx context.Context) ballotproto.MarginCalcJS
-}
+	Score(
+		ctx context.Context,
+		cloned gov.Cloned,
+		ad *ballotproto.Advertisement,
+		el ballotproto.AcceptedElections,
+	) ScoredVotes
 
-func (x SV) GetScorer() ScoreKernel {
-	if x.Kernel == nil {
-		return QVScore{}
-	}
-	return x.Kernel
+	CalcJS(
+		ctx context.Context,
+		cloned gov.Cloned,
+		ad *ballotproto.Advertisement,
+	) ballotproto.MarginCalcJS
 }
 
 type ScoredVotes struct {
@@ -29,9 +33,23 @@ type ScoredVotes struct {
 	Cost  float64
 }
 
-type QVScore struct{}
+func (x SV) GetScorer() ScoreKernel {
+	if x.Kernel == nil {
+		return QVScoreKernel{}
+	}
+	return x.Kernel
+}
 
-func (QVScore) Score(ctx context.Context, el ballotproto.AcceptedElections) ScoredVotes {
+type QVScoreKernel struct{}
+
+func (QVScoreKernel) Score(
+	ctx context.Context,
+	cloned gov.Cloned,
+	ad *ballotproto.Advertisement,
+	el ballotproto.AcceptedElections,
+
+) ScoredVotes {
+
 	// aggregate voting strength on each choice
 	score := map[string]ballotproto.StrengthAndScore{}
 	for _, el := range el {
@@ -62,6 +80,12 @@ func qvScoreFromStrength(strength float64) float64 {
 	return sign * math.Sqrt(math.Abs(strength))
 }
 
-func (QVScore) CalcJS(context.Context) ballotproto.MarginCalcJS {
+func (QVScoreKernel) CalcJS(
+	context.Context,
+	gov.Cloned,
+	*ballotproto.Advertisement,
+
+) ballotproto.MarginCalcJS {
+
 	return ballotproto.MarginCalcJS(qvMarginCalcJS)
 }

@@ -230,6 +230,7 @@ func (x concernPolicy) Close(
 			Close: &metric.MotionClose{
 				ID:       metric.MotionID(con.ID),
 				Type:     "concern",
+				Decision: decision.MetricDecision(),
 				Policy:   metric.MotionPolicy(con.Policy),
 				Receipts: nil, // rewards are accounted for by the proposal
 			},

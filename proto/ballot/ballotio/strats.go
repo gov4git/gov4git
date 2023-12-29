@@ -17,7 +17,17 @@ const (
 
 func init() {
 	ctx := context.Background()
-	strategyRegistry.Set(ctx, QVStrategyName, sv.SV{Kernel: sv.QVScore{}})
+	Install(
+		ctx,
+		QVStrategyName,
+		sv.SV{
+			Kernel: sv.QVScoreKernel{},
+		},
+	)
+}
+
+func Install(ctx context.Context, name ballotproto.StrategyName, strategy ballotproto.Strategy) {
+	strategyRegistry.Set(ctx, name, strategy)
 }
 
 func LoadStrategy(

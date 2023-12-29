@@ -2,6 +2,8 @@ package metric
 
 type MotionPolicy string
 
+type MotionDecision string
+
 type MotionEvent struct {
 	Open   *MotionOpen   `json:"open"`
 	Close  *MotionClose  `json:"close"`
@@ -17,10 +19,11 @@ type MotionOpen struct {
 }
 
 type MotionClose struct {
-	ID       MotionID     `json:"id"`
-	Type     string       `json:"type"`
-	Policy   MotionPolicy `json:"policy"`
-	Receipts Receipts     `json:"receipts"`
+	ID       MotionID       `json:"id"`
+	Type     string         `json:"type"`
+	Policy   MotionPolicy   `json:"policy"`
+	Decision MotionDecision `json:"decision"`
+	Receipts Receipts       `json:"receipts"`
 }
 
 type MotionCancel struct {

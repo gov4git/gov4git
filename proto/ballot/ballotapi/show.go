@@ -10,19 +10,23 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func Show(ctx context.Context, govAddr gov.Address, ballotName ballotproto.BallotName) ballotproto.AdTally {
+func Show(
+	ctx context.Context,
+	addr gov.Address,
+	ballotName ballotproto.BallotName,
+) ballotproto.AdTally {
 
-	return Show_Local(ctx, gov.Clone(ctx, govAddr).Tree(), ballotName)
+	return Show_Local(ctx, gov.Clone(ctx, addr).Tree(), ballotName)
 }
 
 func Show_Local(
 	ctx context.Context,
-	govTree *git.Tree,
+	t *git.Tree,
 	ballotName ballotproto.BallotName,
 ) ballotproto.AdTally {
 
-	ad, _ := ballotio.LoadStrategy(ctx, govTree, ballotName)
+	ad, _ := ballotio.LoadStrategy(ctx, t, ballotName)
 	var tally ballotproto.Tally
-	must.Try(func() { tally = loadTally_Local(ctx, govTree, ballotName) })
+	must.Try(func() { tally = loadTally_Local(ctx, t, ballotName) })
 	return ballotproto.AdTally{Ad: ad, Tally: tally}
 }

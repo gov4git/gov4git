@@ -27,7 +27,10 @@ func init() {
 	motionpolicy.Install(context.Background(), ProposalPolicyName, proposalPolicy{})
 }
 
-const ProposalPolicyName = motionproto.PolicyName("pmp-proposal-policy")
+const (
+	ProposalPolicyName               motionproto.PolicyName   = "pmp-proposal"
+	ProposalApprovalPollStrategyName ballotproto.StrategyName = "pmp-proposal-approval"
+)
 
 type proposalPolicy struct{}
 
@@ -75,6 +78,15 @@ func (x proposalPolicy) Open(
 		fmt.Sprintf("Up/down vote the approval vote for proposal (pull request) %v", prop.ID),
 		[]string{pmp.ProposalBallotChoice},
 		member.Everybody,
+	)
+	zeroState := ScoreKernelState{
+		Bounty: 0.0,
+	}
+	ballotapi.SaveStrategyState_StageOnly[ScoreKernelState](
+		ctx,
+		cloned.PublicClone(),
+		state.ApprovalPoll,
+		zeroState,
 	)
 
 	// metrics
@@ -166,7 +178,38 @@ func (x proposalPolicy) Update(
 
 	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
+	// update ScoreKernelState
+	currentState := ScoreKernelState{
+		Bounty: calcBounty(
+			ctx,
+			cloned,
+			prop,
+			state,
+		),
+	}
+	ballotapi.SaveStrategyState_StageOnly[ScoreKernelState](
+		ctx,
+		cloned.PublicClone(),
+		state.ApprovalPoll,
+		currentState,
+	)
+
 	return nil, notices
+}
+
+func calcBounty(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	prop motionproto.Motion,
+	state *ProposalState,
+) float64 {
+
+	bounty := 0.0
+	for _, ref := range state.EligibleConcerns {
+		adt := ballotapi.Show_Local(ctx, cloned.PublicClone().Tree(), pmp.ConcernPollBallotName(ref.To))
+		bounty += adt.Tally.Capitalization()
+	}
+	return bounty
 }
 
 func (x proposalPolicy) Close(
@@ -246,6 +289,7 @@ func (x proposalPolicy) Close(
 					ID:       metric.MotionID(prop.ID),
 					Type:     "proposal",
 					Policy:   metric.MotionPolicy(prop.Policy),
+					Decision: decision.MetricDecision(),
 					Receipts: append(rewards.MetricReceipts(), bountyReceipt),
 				},
 			},
@@ -279,6 +323,7 @@ func (x proposalPolicy) Close(
 					ID:       metric.MotionID(prop.ID),
 					Type:     "proposal",
 					Policy:   metric.MotionPolicy(prop.Policy),
+					Decision: decision.MetricDecision(),
 					Receipts: cancelApprovalPoll.Result.RefundedHistoryReceipts(),
 				},
 			},

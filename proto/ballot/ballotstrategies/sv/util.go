@@ -5,19 +5,22 @@ import (
 	"time"
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
+	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
 )
 
 func augmentAndScoreUserVotes(
 	ctx context.Context,
+	cloned gov.Cloned,
+	ad *ballotproto.Advertisement,
 	kernel ScoreKernel,
 	oldVotes ballotproto.AcceptedElections,
 	newVotes ballotproto.Elections,
 ) (oldScore, augmentedScore ScoredVotes) {
 
-	oldScore = kernel.Score(ctx, oldVotes)
+	oldScore = kernel.Score(ctx, cloned, ad, oldVotes)
 	augmentedVotes := append(append(ballotproto.AcceptedElections{}, oldVotes...), acceptVotes(newVotes)...)
-	augmentedScore = kernel.Score(ctx, augmentedVotes)
+	augmentedScore = kernel.Score(ctx, cloned, ad, augmentedVotes)
 	return
 }
 

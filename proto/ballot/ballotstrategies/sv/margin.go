@@ -9,14 +9,14 @@ import (
 
 func (qv SV) Margin(
 	ctx context.Context,
-	owner gov.Cloned,
+	cloned gov.Cloned,
 	ad *ballotproto.Advertisement,
 	current *ballotproto.Tally,
 
 ) *ballotproto.Margin {
 
 	return &ballotproto.Margin{
-		CalcJS: qv.Kernel.CalcJS(ctx),
+		CalcJS: qv.Kernel.CalcJS(ctx, cloned, ad),
 	}
 
 }

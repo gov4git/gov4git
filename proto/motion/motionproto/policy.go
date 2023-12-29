@@ -1,5 +1,7 @@
 package motionproto
 
+import "github.com/gov4git/gov4git/v2/proto/history/metric"
+
 type PolicyName string
 
 func (x PolicyName) String() string {
@@ -18,6 +20,10 @@ func (x Decision) IsAccept() bool {
 
 func (x Decision) IsReject() bool {
 	return x == Reject
+}
+
+func (x Decision) MetricDecision() metric.MotionDecision {
+	return metric.MotionDecision(x)
 }
 
 var (

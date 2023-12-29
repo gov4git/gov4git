@@ -27,7 +27,7 @@ func (qv SV) Tally(
 
 func (qv SV) tally(
 	ctx context.Context,
-	govCloned gov.Cloned, // clone of the public gov repo
+	cloned gov.Cloned, // clone of the public gov repo
 	ad *ballotproto.Advertisement,
 	prior *ballotproto.Tally,
 	fetched map[member.User]ballotproto.Elections, // newly fetched votes from participating users
@@ -54,11 +54,11 @@ func (qv SV) tally(
 
 	for u := range users {
 		oldVotes, newVotes := oldVotesByUser[u], newVotesByUser[u]
-		oldScore, augmentedScore := augmentAndScoreUserVotes(ctx, qv.GetScorer(), oldVotes, newVotes)
+		oldScore, augmentedScore := augmentAndScoreUserVotes(ctx, cloned, ad, qv.GetScorer(), oldVotes, newVotes)
 		costDiff := augmentedScore.Cost - oldScore.Cost
 
 		// try charging the user for the new votes
-		err := chargeUser(ctx, govCloned, ad.Name, u, costDiff, fmt.Sprintf("vote charge for ballot %v", ad.Name))
+		err := chargeUser(ctx, cloned, ad.Name, u, costDiff, fmt.Sprintf("vote charge for ballot %v", ad.Name))
 		if strict {
 			must.NoError(ctx, err)
 		}
@@ -76,7 +76,7 @@ func (qv SV) tally(
 			// metrics
 			metric.Log_StageOnly(
 				ctx,
-				govCloned,
+				cloned,
 				&metric.Event{
 					Vote: &metric.VoteEvent{
 						By:           u.MetricUser(),

@@ -1,8 +1,18 @@
 
 function calcMargin(currentTally, voteUser, voteChoice, targetVote) {
 
-     var currentVote = currentTally.scores_by_user[voteUser][voteChoice].score;
-     var currentCharge = currentTally.scores_by_user[voteUser][voteChoice].strength;
+	var currentVote = 0.0;
+	var currentCharge = 0.0;
+
+	var currentScoresByUser = currentTally.scores_by_user[voteUser];
+	if (currentScoresByUser !== undefined) {
+		var currentChoiceByUser = currentScoresByUser[voteChoice];
+		if (currentChoiceByUser !== undefined) {
+			currentVote = currentChoiceByUser.score;
+			currentCharge = currentChoiceByUser.strength;
+		}
+	}
+
      var targetCharge = targetVote * targetVote;
      var cost = targetCharge - currentCharge;
 

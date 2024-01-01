@@ -35,19 +35,19 @@ func fetchedVotesToElections(fv FetchedVotes) map[member.User]ballotproto.Electi
 
 func fetchVotes(
 	ctx context.Context,
-	govOwner gov.OwnerCloned,
-	ballotName ballotproto.BallotName,
+	cloned gov.OwnerCloned,
+	id ballotproto.BallotID,
 	user member.User,
 	account member.UserProfile,
 ) git.Change[form.Map, FetchedVotes] {
 	userCloned := git.CloneOne(ctx, git.Address(account.PublicAddress))
-	return fetchVotesCloned(ctx, govOwner, ballotName, user, account, userCloned)
+	return fetchVotesCloned(ctx, cloned, id, user, account, userCloned)
 }
 
 func fetchVotesCloned(
 	ctx context.Context,
-	govOwner gov.OwnerCloned,
-	ballotName ballotproto.BallotName,
+	cloned gov.OwnerCloned,
+	id ballotproto.BallotID,
 	user member.User,
 	account member.UserProfile,
 	userCloned git.Cloned,
@@ -75,17 +75,17 @@ func fetchVotesCloned(
 	voterPublicTree := userCloned.Tree()
 	mail.Respond_StageOnly[ballotproto.VoteEnvelope, ballotproto.VoteEnvelope](
 		ctx,
-		govOwner.IDOwnerCloned(),
+		cloned.IDOwnerCloned(),
 		account.PublicAddress,
 		voterPublicTree,
-		ballotproto.BallotTopic(ballotName),
+		ballotproto.BallotTopic(id),
 		respond,
 	)
 
 	return git.NewChange(
-		fmt.Sprintf("Fetched votes from user %v on ballot %v", user, ballotName),
+		fmt.Sprintf("Fetched votes from user %v on ballot %v", user, id),
 		"ballot_fetch_votes",
-		form.Map{"ballot_name": ballotName, "user": user, "account": account},
+		form.Map{"id": id, "user": user, "account": account},
 		fetched,
 		nil,
 	)

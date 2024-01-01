@@ -58,7 +58,7 @@ func (qv SV) tally(
 		costDiff := augmentedScore.Cost - oldScore.Cost
 
 		// try charging the user for the new votes
-		err := chargeUser(ctx, cloned, ad.Name, u, costDiff, fmt.Sprintf("vote charge for ballot %v", ad.Name))
+		err := chargeUser(ctx, cloned, ad.ID, u, costDiff, fmt.Sprintf("vote charge for ballot %v", ad.ID))
 		if strict {
 			must.NoError(ctx, err)
 		}
@@ -103,9 +103,9 @@ func (qv SV) tally(
 		Charges:       charges,
 	}
 	return git.NewChange(
-		fmt.Sprintf("Tallied QV scores for ballot %v", ad.Name),
+		fmt.Sprintf("Tallied QV scores for ballot %v", ad.ID),
 		"ballot_qv_tally",
-		form.Map{"ballot_name": ad.Name},
+		form.Map{"id": ad.ID},
 		tally,
 		nil,
 	)
@@ -114,7 +114,7 @@ func (qv SV) tally(
 func chargeUser(
 	ctx context.Context,
 	govCloned gov.Cloned,
-	ballotName ballotproto.BallotName,
+	ballotName ballotproto.BallotID,
 	user member.User,
 	charge float64,
 	note string,

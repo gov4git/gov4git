@@ -4,7 +4,6 @@ import (
 	"sort"
 	"time"
 
-	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
@@ -16,21 +15,11 @@ import (
 	"github.com/gov4git/lib4git/util"
 )
 
-var (
-	BallotNS         = proto.RootNS.Append("ballot")
-	AdFilebase       = "ballot_ad.json"
-	TallyFilebase    = "ballot_tally.json"
-	OutcomeFilebase  = "ballot_outcome.json"
-	StrategyFilebase = "ballot_strategy.json" // strategy instance state
-
-	VoteLogNS = proto.RootNS.Append("votes") // namespace in voter's repo for recording votes
-)
-
 // VoteLog records the votes of a user to a ballot within a given governance.
 type VoteLog struct {
 	GovID         id.ID         `json:"governance_id"`
 	GovAddress    gov.Address   `json:"governance_address"`
-	Ballot        BallotName    `json:"ballot_name"`
+	BallotID      BallotID      `json:"ballot_id"`
 	VoteEnvelopes VoteEnvelopes `json:"vote_envelopes"` // in the order in which they were sent
 }
 
@@ -38,66 +27,32 @@ type VoteLog struct {
 type VoterStatus struct {
 	GovID         id.ID             `json:"governance_id"`
 	GovAddress    gov.Address       `json:"governance_address"`
-	BallotName    BallotName        `json:"ballot_name"`
+	BallotID      BallotID          `json:"ballot_id"`
 	AcceptedVotes AcceptedElections `json:"accepted_votes"`
 	RejectedVotes RejectedElections `json:"rejected_votes"`
 	PendingVotes  Elections         `json:"pending_votes"`
 }
 
-func VoteLogPath(govID id.ID, ballotName BallotName) ns.NS {
+func VoteLogPath(govID id.ID, ballotName BallotID) ns.NS {
 	return VoteLogNS.Append(
 		form.StringHashForFilename(string(govID)),
 		form.StringHashForFilename(BallotTopic(ballotName)),
 	)
 }
 
-func BallotEscrowAccountID(ballotName BallotName) account.AccountID {
+func BallotEscrowAccountID(ballotName BallotID) account.AccountID {
 	return account.AccountIDFromLine(account.Pair("ballot_escrow", ballotName.GitPath()))
 }
 
-func BallotTopic(ballotName BallotName) string {
+func BallotTopic(ballotName BallotID) string {
 	// BallotTopic must produce the same string on every OS.
 	// It is essential to use ballotName.GitPath, instead of ballotName.Path which is OS-specific.
 	return "ballot:" + ballotName.GitPath()
 }
 
-func BallotPath(name BallotName) ns.NS {
-	return BallotNS.Join(name.NS())
-}
-
-type BallotName ns.NS
-
-func (x BallotName) OSPath() string {
-	return ns.NS(x).OSPath()
-}
-
-func (x BallotName) GitPath() string {
-	return ns.NS(x).GitPath()
-}
-
-func (x BallotName) NS() ns.NS {
-	return ns.NS(x)
-}
-
-func (x BallotName) TallyNS() ns.NS {
-	return BallotPath(x).Append(TallyFilebase)
-}
-
-func (x BallotName) AdNS() ns.NS {
-	return BallotPath(x).Append(AdFilebase)
-}
-
-func (x BallotName) StrategyNS() ns.NS {
-	return BallotPath(x).Append(StrategyFilebase)
-}
-
-func ParseBallotNameFromPath(p string) BallotName {
-	return BallotName(ns.ParseFromGitPath(p))
-}
-
 type BallotAddress struct {
 	Gov  gov.Address
-	Name BallotName
+	Name BallotID
 }
 
 type Election struct {

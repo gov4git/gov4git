@@ -39,12 +39,12 @@ func ProposalAccountID(id motionproto.MotionID) account.AccountID {
 	)
 }
 
-func ConcernPollBallotName(id motionproto.MotionID) ballotproto.BallotName {
-	return ballotproto.BallotName{"pmp", "motion", "priority_poll", id.String()}
+func ConcernPollBallotName(id motionproto.MotionID) ballotproto.BallotID {
+	return ballotproto.BallotID("pmp/motion/priority_poll/" + id.String())
 }
 
-func ProposalApprovalPollName(id motionproto.MotionID) ballotproto.BallotName {
-	return ballotproto.BallotName{"pmp", "motion", "approval_poll", id.String()}
+func ProposalApprovalPollName(id motionproto.MotionID) ballotproto.BallotID {
+	return ballotproto.BallotID("pmp/motion/approval_poll/" + id.String())
 }
 
 func ProposalBountyAccountID(motionID motionproto.MotionID) account.AccountID {

@@ -47,7 +47,7 @@ func (sk ScoreKernel) CalcJS(
 
 ) ballotproto.MarginCalcJS {
 
-	state := ballotapi.LoadStrategyState_Local[ScoreKernelState](ctx, cloned, ad.Name)
+	state := ballotapi.LoadStrategyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
 	js := fmt.Sprintf(scoreKernelMarginJS, state.Bounty)
 	return ballotproto.MarginCalcJS(js)
 }

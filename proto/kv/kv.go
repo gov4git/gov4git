@@ -40,6 +40,19 @@ func (x KV[K, V]) Set(ctx context.Context, ns ns.NS, t *git.Tree, key K, value V
 	)
 }
 
+func (x KV[K, V]) Contains(ctx context.Context, ns ns.NS, t *git.Tree, key K) bool {
+	err := must.Try(
+		func() {
+			x.Get(ctx, ns, t, key)
+		},
+	)
+	if err == nil {
+		return true
+	}
+	// XXX
+	return false
+}
+
 func (x KV[K, V]) Get(ctx context.Context, ns ns.NS, t *git.Tree, key K) V {
 	return form.FromFile[V](ctx, t.Filesystem, x.KeyNS(ns, key).Append(valueFilebase))
 }

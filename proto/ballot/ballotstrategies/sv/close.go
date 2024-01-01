@@ -18,9 +18,9 @@ func (qv SV) Close(
 ) git.Change[form.Map, ballotproto.Outcome] {
 
 	return git.NewChange(
-		fmt.Sprintf("closed ballot %v", ad.Name),
+		fmt.Sprintf("closed ballot %v", ad.ID),
 		"ballot_qv_close",
-		form.Map{"ballot_name": ad.Name},
+		form.Map{"id": ad.ID},
 		ballotproto.Outcome{
 			Summary:      "closed",
 			Scores:       tally.Scores,

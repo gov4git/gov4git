@@ -14,43 +14,43 @@ import (
 
 func Reopen(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	ballotName ballotproto.BallotName,
+	addr gov.OwnerAddress,
+	id ballotproto.BallotID,
+
 ) git.Change[form.Map, form.None] {
 
-	govCloned := gov.CloneOwner(ctx, govAddr)
-	chg := Reopen_StageOnly(ctx, govCloned, ballotName)
-	proto.Commit(ctx, govCloned.Public.Tree(), chg)
-	govCloned.Public.Push(ctx)
+	cloned := gov.CloneOwner(ctx, addr)
+	chg := Reopen_StageOnly(ctx, cloned, id)
+	proto.Commit(ctx, cloned.Public.Tree(), chg)
+	cloned.Public.Push(ctx)
 	return chg
 }
 
 func Reopen_StageOnly(
 	ctx context.Context,
-	govCloned gov.OwnerCloned,
-	ballotName ballotproto.BallotName,
+	cloned gov.OwnerCloned,
+	id ballotproto.BallotID,
+
 ) git.Change[form.Map, form.None] {
 
-	govTree := govCloned.Public.Tree()
+	t := cloned.Public.Tree()
 
 	// verify ad and strategy are present
-	ad, strat := ballotio.LoadStrategy(ctx, govTree, ballotName)
+	ad, strat := ballotio.LoadStrategy(ctx, t, id)
 	must.Assertf(ctx, ad.Closed, "ballot is not closed")
 	must.Assertf(ctx, !ad.Cancelled, "ballot was cancelled")
 
-	tally := loadTally_Local(ctx, govTree, ballotName)
-	chg := strat.Reopen(ctx, govCloned, &ad, &tally)
+	tally := loadTally_Local(ctx, t, id)
+	chg := strat.Reopen(ctx, cloned, &ad, &tally)
 
 	// remove prior outcome
-	openOutcomeNS := ballotproto.BallotPath(ballotName).Append(ballotproto.OutcomeFilebase)
-	_, err := git.TreeRemove(ctx, govTree, openOutcomeNS)
+	_, err := git.TreeRemove(ctx, t, id.OutcomeNS())
 	must.NoError(ctx, err)
 
 	// write state
 	ad.Closed = false
 	ad.Cancelled = false
-	openAdNS := ballotproto.BallotPath(ballotName).Append(ballotproto.AdFilebase)
-	git.ToFileStage(ctx, govTree, openAdNS, ad)
+	git.ToFileStage(ctx, t, id.AdNS(), ad)
 
 	return chg
 }

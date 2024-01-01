@@ -11,23 +11,23 @@ import (
 func GetMargin(
 	ctx context.Context,
 	addr gov.Address,
-	name ballotproto.BallotName,
+	id ballotproto.BallotID,
 
 ) *ballotproto.Margin {
 
 	cloned := gov.Clone(ctx, addr)
-	return GetMargin_Local(ctx, cloned, name)
+	return GetMargin_Local(ctx, cloned, id)
 }
 
 func GetMargin_Local(
 	ctx context.Context,
 	cloned gov.Cloned,
-	name ballotproto.BallotName,
+	id ballotproto.BallotID,
 
 ) *ballotproto.Margin {
 
 	t := cloned.Tree()
-	ad, strategy := ballotio.LoadStrategy(ctx, t, name)
-	tally := loadTally_Local(ctx, t, name)
+	ad, strategy := ballotio.LoadStrategy(ctx, t, id)
+	tally := loadTally_Local(ctx, t, id)
 	return strategy.Margin(ctx, cloned, &ad, &tally)
 }

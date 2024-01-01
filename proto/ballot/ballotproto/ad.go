@@ -13,7 +13,7 @@ import (
 
 type Advertisement struct {
 	Gov          gov.Address            `json:"community"`
-	Name         BallotName             `json:"name"`
+	ID           BallotID               `json:"id"`
 	Owner        account.AccountID      `json:"owner"`
 	Purpose      purpose.Purpose        `json:"purpose"`
 	MotionPolicy motionproto.PolicyName `json:"motion_policy"`
@@ -39,7 +39,7 @@ func (x Advertisements) Len() int {
 }
 
 func (x Advertisements) Less(i, j int) bool {
-	return x[i].Name.GitPath() < x[j].Name.GitPath()
+	return x[i].ID.GitPath() < x[j].ID.GitPath()
 }
 
 func (x Advertisements) Swap(i, j int) {

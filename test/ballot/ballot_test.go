@@ -26,12 +26,12 @@ func TestOpenClose(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := ballotproto.BallotName{"a", "b", "c"}
+	ballotName := ballotproto.ParseBallotID("a/b/c")
 	choices := []string{"x", "y", "z"}
 
 	// open
 	strat := ballotio.QVStrategyName
-	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot_name", "ballot description", choices, member.Everybody)
+	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot_id", "ballot description", choices, member.Everybody)
 
 	// list
 	ads := ballotapi.List(ctx, cty.Gov())
@@ -76,12 +76,12 @@ func TestOpenCancel(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := ballotproto.BallotName{"a", "b", "c"}
+	ballotName := ballotproto.ParseBallotID("a/b/c")
 	choices := []string{"x", "y", "z"}
 
 	// open
 	strat := ballotio.QVStrategyName
-	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot_name", "ballot description", choices, member.Everybody)
+	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot_id", "ballot description", choices, member.Everybody)
 
 	// list
 	ads := ballotapi.List(ctx, cty.Gov())
@@ -126,8 +126,8 @@ func TestTallyAll(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName0 := ballotproto.BallotName{"a", "b", "c"}
-	ballotName1 := ballotproto.BallotName{"d", "e", "f"}
+	ballotName0 := ballotproto.ParseBallotID("a/b/c")
+	ballotName1 := ballotproto.ParseBallotID("d/e/f")
 	choices := []string{"x", "y", "z"}
 
 	// open two ballots

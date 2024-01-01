@@ -34,7 +34,7 @@ var (
 				ctx,
 				ballotio.QVStrategyName,
 				setup.Organizer,
-				ballotproto.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotID(ballotName),
 				account.NobodyAccountID,
 				purpose.Unspecified,
 				"",
@@ -56,7 +56,7 @@ var (
 			chg := ballotapi.Freeze(
 				ctx,
 				setup.Organizer,
-				ballotproto.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotID(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -71,7 +71,7 @@ var (
 			chg := ballotapi.Unfreeze(
 				ctx,
 				setup.Organizer,
-				ballotproto.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotID(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -86,7 +86,7 @@ var (
 			chg := ballotapi.Close(
 				ctx,
 				setup.Organizer,
-				ballotproto.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotID(ballotName),
 				account.AccountID(ballotEscrowTo),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -102,7 +102,7 @@ var (
 			chg := ballotapi.Cancel(
 				ctx,
 				setup.Organizer,
-				ballotproto.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotID(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
@@ -117,7 +117,7 @@ var (
 			r := ballotapi.Show(
 				ctx,
 				setup.Gov,
-				ballotproto.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotID(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(r))
 		},
@@ -156,7 +156,7 @@ var (
 			chg := ballotapi.Tally(
 				ctx,
 				setup.Organizer,
-				ballotproto.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotID(ballotName),
 				ballotFetchPar,
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -173,7 +173,7 @@ var (
 				ctx,
 				setup.Member,
 				setup.Gov,
-				ballotproto.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotID(ballotName),
 				parseElections(ctx, ballotElectionChoice, ballotElectionStrength),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
@@ -193,7 +193,7 @@ Pending votes have not yet been processed by the community's governance.`,
 				ctx,
 				setup.Member,
 				setup.Gov,
-				ballotproto.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotID(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(status))
 		},
@@ -208,7 +208,7 @@ Pending votes have not yet been processed by the community's governance.`,
 			chg := ballotapi.Erase(
 				ctx,
 				setup.Organizer,
-				ballotproto.ParseBallotNameFromPath(ballotName),
+				ballotproto.ParseBallotID(ballotName),
 			)
 			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},

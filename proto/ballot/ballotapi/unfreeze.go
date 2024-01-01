@@ -15,27 +15,29 @@ import (
 
 func Unfreeze(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	ballotName ballotproto.BallotName,
+	addr gov.OwnerAddress,
+	id ballotproto.BallotID,
+
 ) git.ChangeNoResult {
 
-	govCloned := gov.CloneOwner(ctx, govAddr)
-	chg := Unfreeze_StageOnly(ctx, govCloned, ballotName)
-	proto.Commit(ctx, govCloned.Public.Tree(), chg)
-	govCloned.Public.Push(ctx)
+	cloned := gov.CloneOwner(ctx, addr)
+	chg := Unfreeze_StageOnly(ctx, cloned, id)
+	proto.Commit(ctx, cloned.Public.Tree(), chg)
+	cloned.Public.Push(ctx)
 	return chg
 }
 
 func Unfreeze_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	ballotName ballotproto.BallotName,
+	id ballotproto.BallotID,
+
 ) git.ChangeNoResult {
 
-	govTree := cloned.Public.Tree()
+	t := cloned.Public.Tree()
 
 	// verify ad and strategy are present
-	ad, _ := ballotio.LoadStrategy(ctx, govTree, ballotName)
+	ad, _ := ballotio.LoadStrategy(ctx, t, id)
 
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 	must.Assertf(ctx, ad.Frozen, "ballot is not frozen")
@@ -43,14 +45,13 @@ func Unfreeze_StageOnly(
 	ad.Frozen = false
 
 	// write updated ad
-	adNS := ballotproto.BallotPath(ballotName).Append(ballotproto.AdFilebase)
-	git.ToFileStage(ctx, govTree, adNS, ad)
+	git.ToFileStage(ctx, t, id.AdNS(), ad)
 
 	trace.Log_StageOnly(ctx, cloned.PublicClone(), &trace.Event{
 		Op:     "ballot_freeze",
-		Args:   trace.M{"name": ballotName},
+		Args:   trace.M{"id": id},
 		Result: trace.M{"ad": ad},
 	})
 
-	return git.NewChangeNoResult(fmt.Sprintf("Unfreeze ballot %v", ballotName), "ballot_unfreeze")
+	return git.NewChangeNoResult(fmt.Sprintf("Unfreeze ballot %v", id), "ballot_unfreeze")
 }

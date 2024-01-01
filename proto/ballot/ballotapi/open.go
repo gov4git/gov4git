@@ -21,8 +21,8 @@ import (
 func Open(
 	ctx context.Context,
 	strat ballotproto.StrategyName,
-	govAddr gov.OwnerAddress,
-	name ballotproto.BallotName,
+	addr gov.OwnerAddress,
+	id ballotproto.BallotID,
 	owner account.AccountID,
 	purpose purpose.Purpose,
 	motionPolicy motionproto.PolicyName,
@@ -33,10 +33,22 @@ func Open(
 
 ) git.Change[form.Map, ballotproto.BallotAddress] {
 
-	govCloned := gov.CloneOwner(ctx, govAddr)
-	chg := Open_StageOnly(ctx, strat, govCloned, name, owner, purpose, motionPolicy, title, description, choices, participants)
-	proto.Commit(ctx, govCloned.Public.Tree(), chg)
-	govCloned.Public.Push(ctx)
+	cloned := gov.CloneOwner(ctx, addr)
+	chg := Open_StageOnly(
+		ctx,
+		strat,
+		cloned,
+		id,
+		owner,
+		purpose,
+		motionPolicy,
+		title,
+		description,
+		choices,
+		participants,
+	)
+	proto.Commit(ctx, cloned.Public.Tree(), chg)
+	cloned.Public.Push(ctx)
 	return chg
 }
 
@@ -44,7 +56,7 @@ func Open_StageOnly(
 	ctx context.Context,
 	strategyName ballotproto.StrategyName,
 	cloned gov.OwnerCloned,
-	name ballotproto.BallotName,
+	id ballotproto.BallotID,
 	owner account.AccountID,
 	purpose purpose.Purpose,
 	motionPolicy motionproto.PolicyName,
@@ -56,8 +68,8 @@ func Open_StageOnly(
 ) git.Change[form.Map, ballotproto.BallotAddress] {
 
 	// check no open ballots by the same name
-	if _, err := git.TreeStat(ctx, cloned.Public.Tree(), name.AdNS()); err == nil {
-		must.Errorf(ctx, "ballot already exists: %v", name.AdNS().GitPath())
+	if ballotproto.BallotKV.Contains(ctx, ballotproto.BallotNS, cloned.PublicClone().Tree(), id) {
+		must.Errorf(ctx, "ballot already exists: %v", id.AdNS().GitPath())
 	}
 
 	// verify group exists
@@ -68,15 +80,18 @@ func Open_StageOnly(
 	// create escrow account
 	account.Create_StageOnly(
 		ctx, cloned.PublicClone(),
-		ballotproto.BallotEscrowAccountID(name),
+		ballotproto.BallotEscrowAccountID(id),
 		account.NobodyAccountID,
-		fmt.Sprintf("opening ballot %v", name),
+		fmt.Sprintf("opening ballot %v", id),
 	)
+
+	// create ballot
+	ballotproto.BallotKV.Set(ctx, ballotproto.BallotNS, cloned.PublicClone().Tree(), id, struct{}{})
 
 	// write ad
 	ad := ballotproto.Advertisement{
 		Gov:          cloned.GovAddress(),
-		Name:         name,
+		ID:           id,
 		Owner:        owner,
 		Purpose:      purpose,
 		MotionPolicy: motionPolicy,
@@ -94,17 +109,17 @@ func Open_StageOnly(
 		//
 		ParentCommit: git.Head(ctx, cloned.Public.Repo()),
 	}
-	git.ToFileStage(ctx, cloned.Public.Tree(), name.AdNS(), ad)
+	git.ToFileStage(ctx, cloned.Public.Tree(), id.AdNS(), ad)
 
 	// initialize tally
 	strategy := ballotio.LookupStrategy(ctx, strategyName)
 	tally := strategy.Open(ctx, cloned, &ad)
-	git.ToFileStage(ctx, cloned.Public.Tree(), name.TallyNS(), tally)
+	git.ToFileStage(ctx, cloned.Public.Tree(), id.TallyNS(), tally)
 
 	// log
 	trace.Log_StageOnly(ctx, cloned.PublicClone(), &trace.Event{
 		Op:     "ballot_open",
-		Args:   trace.M{"name": name},
+		Args:   trace.M{"id": id},
 		Result: trace.M{"ad": ad},
 	})
 
@@ -113,10 +128,10 @@ func Open_StageOnly(
 		"ballot_open",
 		form.Map{
 			"strategy":     strategyName,
-			"name":         name,
+			"name":         id,
 			"participants": participants,
 		},
-		ballotproto.BallotAddress{Gov: cloned.GovAddress(), Name: name},
+		ballotproto.BallotAddress{Gov: cloned.GovAddress(), Name: id},
 		nil,
 	)
 }

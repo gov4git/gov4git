@@ -17,13 +17,13 @@ import (
 
 func TallyAll(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
+	addr gov.OwnerAddress,
 	maxPar int,
 ) git.Change[form.Map, []ballotproto.Tally] {
 
 	base.Infof("fetching and tallying community votes ...")
 
-	govOwner := gov.CloneOwner(ctx, govAddr)
+	govOwner := gov.CloneOwner(ctx, addr)
 	chg := TallyAll_StageOnly(ctx, govOwner, maxPar)
 	if len(chg.Result) == 0 {
 		return chg
@@ -64,7 +64,7 @@ func TallyAll_StageOnly(
 	tallyChanges := []git.Change[map[string]form.Form, ballotproto.Tally]{}
 	tallies := []ballotproto.Tally{}
 	for _, pv := range participatingVoters {
-		if tallyChg, changed := tallyVotersCloned_StageOnly(ctx, cloned, pv.Ad.Name, pv.VoterAccounts, pv.VoterClones); changed {
+		if tallyChg, changed := tallyVotersCloned_StageOnly(ctx, cloned, pv.Ad.ID, pv.VoterAccounts, pv.VoterClones); changed {
 			tallyChanges = append(tallyChanges, tallyChg)
 			tallies = append(tallies, tallyChg.Result)
 		}

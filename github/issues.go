@@ -17,7 +17,6 @@ import (
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func ImportIssuesForPrioritization(
@@ -45,7 +44,7 @@ func ImportIssuesForPrioritization_StageOnly(
 	repo Repo,
 	githubClient *github.Client, // if nil, a new client for repo will be created
 	govAddr gov.OwnerAddress,
-	govCloned gov.OwnerCloned,
+	cloned gov.OwnerCloned,
 ) ImportedIssues {
 
 	// load github issues and governance ballots, and
@@ -58,7 +57,7 @@ func ImportIssuesForPrioritization_StageOnly(
 		return false
 	}
 	_, issues := LoadIssues(ctx, githubClient, repo, loadPR)
-	ballots := filterIssuesForPrioritization(ballotapi.List_Local(ctx, govCloned.PublicClone()))
+	ballots := filterIssuesForPrioritization(ballotapi.List_Local(ctx, cloned.PublicClone()))
 
 	// ensure every issue has a corresponding up-to-date ballot
 	causedChange := ImportedIssues{}
@@ -66,25 +65,25 @@ func ImportIssuesForPrioritization_StageOnly(
 		if ghIssue.ForPrioritization {
 			if govBallot, ok := ballots[k]; ok { // ballot for issue already exists, update it
 
-				must.Assertf(ctx, ns.Equal(ghIssue.BallotName().NS(), govBallot.Name.NS()),
-					"issue ballot name %v and actual ballot name %v mismatch", ghIssue.BallotName(), govBallot.Name)
+				must.Assertf(ctx, ghIssue.BallotName() == govBallot.ID,
+					"issue ballot name %v and actual ballot name %v mismatch", ghIssue.BallotName(), govBallot.ID)
 
 				switch {
 				case ghIssue.Closed && govBallot.Closed:
 					// nothing to do
 				case ghIssue.Closed && !govBallot.Closed:
-					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-					ballotapi.Close_StageOnly(ctx, govCloned, ghIssue.BallotName(), account.BurnAccountID)
+					UpdateMeta_StageOnly(ctx, repo, govAddr, cloned, ghIssue, govBallot)
+					UpdateFrozen_StageOnly(ctx, repo, govAddr, cloned, ghIssue, govBallot)
+					ballotapi.Close_StageOnly(ctx, cloned, ghIssue.BallotName(), account.BurnAccountID)
 					causedChange = append(causedChange, ghIssue)
 				case !ghIssue.Closed && govBallot.Closed:
-					UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-					ballotapi.Reopen_StageOnly(ctx, govCloned, ghIssue.BallotName())
-					UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+					UpdateMeta_StageOnly(ctx, repo, govAddr, cloned, ghIssue, govBallot)
+					ballotapi.Reopen_StageOnly(ctx, cloned, ghIssue.BallotName())
+					UpdateFrozen_StageOnly(ctx, repo, govAddr, cloned, ghIssue, govBallot)
 					causedChange = append(causedChange, ghIssue)
 				case !ghIssue.Closed && !govBallot.Closed:
-					c1 := UpdateMeta_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
-					c2 := UpdateFrozen_StageOnly(ctx, repo, govAddr, govCloned, ghIssue, govBallot)
+					c1 := UpdateMeta_StageOnly(ctx, repo, govAddr, cloned, ghIssue, govBallot)
+					c2 := UpdateFrozen_StageOnly(ctx, repo, govAddr, cloned, ghIssue, govBallot)
 					if c1 || c2 {
 						causedChange = append(causedChange, ghIssue)
 					}
@@ -94,7 +93,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				ballotapi.Open_StageOnly(
 					ctx,
 					ballotio.QVStrategyName,
-					govCloned,
+					cloned,
 					ghIssue.BallotName(),
 					account.NobodyAccountID,
 					ghIssue.Purpose(),
@@ -105,10 +104,10 @@ func ImportIssuesForPrioritization_StageOnly(
 					member.Everybody,
 				)
 				if ghIssue.Locked {
-					ballotapi.Freeze_StageOnly(ctx, govCloned, ghIssue.BallotName())
+					ballotapi.Freeze_StageOnly(ctx, cloned, ghIssue.BallotName())
 				}
 				if ghIssue.Closed {
-					ballotapi.Close_StageOnly(ctx, govCloned, ghIssue.BallotName(), account.BurnAccountID)
+					ballotapi.Close_StageOnly(ctx, cloned, ghIssue.BallotName(), account.BurnAccountID)
 				}
 				causedChange = append(causedChange, ghIssue)
 			}
@@ -118,7 +117,7 @@ func ImportIssuesForPrioritization_StageOnly(
 				// if ballot frozen, do nothing
 				// otherwise, freeze ballot
 				if !govBallot.Closed && !govBallot.Frozen {
-					ballotapi.Freeze_StageOnly(ctx, govCloned, ghIssue.BallotName())
+					ballotapi.Freeze_StageOnly(ctx, cloned, ghIssue.BallotName())
 					causedChange = append(causedChange, ghIssue)
 				}
 			}
@@ -134,8 +133,11 @@ func ImportIssuesForPrioritization_StageOnly(
 func filterIssuesForPrioritization(ads []ballotproto.Advertisement) map[string]ballotproto.Advertisement {
 	filtered := map[string]ballotproto.Advertisement{}
 	for _, ad := range ads {
-		if len(ad.Name) == 3 && ad.Name[0] == ImportedGithubPrefix && (ad.Name[1] == ImportedIssuePrefix || ad.Name[1] == ImportedPullPrefix) {
-			key := ad.Name[2]
+		idNS := ad.ID.ToNS()
+		if len(idNS) == 3 &&
+			idNS[0] == ImportedGithubPrefix &&
+			(idNS[1] == ImportedIssuePrefix || idNS[1] == ImportedPullPrefix) {
+			key := idNS[2]
 			if _, err := strconv.Atoi(key); err == nil {
 				filtered[key] = ad
 			}

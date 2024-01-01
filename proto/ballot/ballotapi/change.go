@@ -14,39 +14,39 @@ import (
 
 func Change(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	name ballotproto.BallotName,
+	addr gov.OwnerAddress,
+	id ballotproto.BallotID,
 	title string,
 	description string,
+
 ) git.Change[form.Map, ballotproto.Advertisement] {
 
-	govCloned := gov.CloneOwner(ctx, govAddr)
+	cloned := gov.CloneOwner(ctx, addr)
 
-	chg := Change_StageOnly(ctx, govCloned, name, title, description)
-	proto.Commit(ctx, govCloned.Public.Tree(), chg)
-	govCloned.Public.Push(ctx)
+	chg := Change_StageOnly(ctx, cloned, id, title, description)
+	proto.Commit(ctx, cloned.Public.Tree(), chg)
+	cloned.Public.Push(ctx)
 	return chg
 }
 
 func Change_StageOnly(
 	ctx context.Context,
-	govCloned gov.OwnerCloned,
-	name ballotproto.BallotName,
+	cloned gov.OwnerCloned,
+	id ballotproto.BallotID,
 	title string,
 	description string,
+
 ) git.Change[form.Map, ballotproto.Advertisement] {
 
-	adNS := ballotproto.BallotPath(name).Append(ballotproto.AdFilebase)
-
-	ad, _ := ballotio.LoadStrategy(ctx, govCloned.Public.Tree(), name)
+	ad, _ := ballotio.LoadStrategy(ctx, cloned.Public.Tree(), id)
 	ad.Title = title
 	ad.Description = description
-	git.ToFileStage(ctx, govCloned.Public.Tree(), adNS, ad)
+	git.ToFileStage(ctx, cloned.Public.Tree(), id.AdNS(), ad)
 
 	return git.NewChange(
-		fmt.Sprintf("Change ballot %v info", name),
+		fmt.Sprintf("Change ballot %v info", id),
 		"ballot_change",
-		form.Map{"name": name, "title": title, "description": description},
+		form.Map{"name": id, "title": title, "description": description},
 		ad,
 		nil,
 	)

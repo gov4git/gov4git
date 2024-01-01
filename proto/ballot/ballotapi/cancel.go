@@ -15,48 +15,46 @@ import (
 
 func Cancel(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	ballotName ballotproto.BallotName,
+	addr gov.OwnerAddress,
+	id ballotproto.BallotID,
 ) git.Change[form.Map, ballotproto.Outcome] {
 
-	govCloned := gov.CloneOwner(ctx, govAddr)
-	chg := Cancel_StageOnly(ctx, govCloned, ballotName)
-	proto.Commit(ctx, govCloned.Public.Tree(), chg)
-	govCloned.Public.Push(ctx)
+	cloned := gov.CloneOwner(ctx, addr)
+	chg := Cancel_StageOnly(ctx, cloned, id)
+	proto.Commit(ctx, cloned.Public.Tree(), chg)
+	cloned.Public.Push(ctx)
 	return chg
 }
 
 func Cancel_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	ballotName ballotproto.BallotName,
+	id ballotproto.BallotID,
 ) git.Change[form.Map, ballotproto.Outcome] {
 
 	t := cloned.Public.Tree()
 
 	// verify ad and strategy are present
-	ad, strat := ballotio.LoadStrategy(ctx, t, ballotName)
+	ad, strat := ballotio.LoadStrategy(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot already closed")
 
-	tally := loadTally_Local(ctx, t, ballotName)
+	tally := loadTally_Local(ctx, t, id)
 
 	var chg git.Change[map[string]form.Form, ballotproto.Outcome]
 	chg = strat.Cancel(ctx, cloned, &ad, &tally)
 
 	// write outcome
-	openOutcomeNS := ballotproto.BallotPath(ballotName).Append(ballotproto.OutcomeFilebase)
-	git.ToFileStage(ctx, t, openOutcomeNS, chg.Result)
+	git.ToFileStage(ctx, t, id.OutcomeNS(), chg.Result)
 
 	// write state
 	ad.Closed = true
 	ad.Cancelled = true
-	openAdNS := ballotproto.BallotPath(ballotName).Append(ballotproto.AdFilebase)
-	git.ToFileStage(ctx, t, openAdNS, ad)
+	git.ToFileStage(ctx, t, id.AdNS(), ad)
 
 	// log
 	trace.Log_StageOnly(ctx, cloned.PublicClone(), &trace.Event{
 		Op:     "ballot_cancel",
-		Args:   trace.M{"name": ballotName},
+		Args:   trace.M{"id": id},
 		Result: trace.M{"ad": ad, "outcome": chg.Result},
 	})
 

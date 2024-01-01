@@ -11,42 +11,41 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
-	"github.com/gov4git/lib4git/must"
 )
 
 func Erase(
 	ctx context.Context,
 	govAddr gov.OwnerAddress,
-	ballotName ballotproto.BallotName,
+	ballotID ballotproto.BallotID,
+
 ) git.Change[form.Map, bool] {
 
-	govCloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
-	chg := Erase_StageOnly(ctx, govCloned, ballotName)
-	proto.Commit(ctx, govCloned.Public.Tree(), chg)
-	govCloned.Public.Push(ctx)
+	cloned := id.CloneOwner(ctx, id.OwnerAddress(govAddr))
+	chg := Erase_StageOnly(ctx, cloned, ballotID)
+	proto.Commit(ctx, cloned.Public.Tree(), chg)
+	cloned.Public.Push(ctx)
 	return chg
 }
 
 func Erase_StageOnly(
 	ctx context.Context,
-	govCloned id.OwnerCloned,
-	ballotName ballotproto.BallotName,
+	cloned id.OwnerCloned,
+	ballotID ballotproto.BallotID,
+
 ) git.Change[form.Map, bool] {
 
-	govTree := govCloned.Public.Tree()
+	t := cloned.Public.Tree()
 
 	// verify ad and strategy are present
-	ballotio.LoadStrategy(ctx, govTree, ballotName)
+	ballotio.LoadStrategy(ctx, t, ballotID)
 
-	// write outcome
-	ballotNS := ballotproto.BallotPath(ballotName)
-	_, err := git.TreeRemove(ctx, govTree, ballotNS)
-	must.NoError(ctx, err)
+	// erase
+	ballotproto.BallotKV.Remove(ctx, ballotproto.BallotNS, cloned.PublicClone().Tree(), ballotID)
 
 	return git.NewChange(
-		fmt.Sprintf("Erased ballot %v", ballotName),
+		fmt.Sprintf("Erased ballot %v", ballotID),
 		"ballot_erase",
-		form.Map{"name": ballotName},
+		form.Map{"name": ballotID},
 		true,
 		nil,
 	)

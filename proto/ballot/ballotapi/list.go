@@ -7,16 +7,15 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/lib4git/git"
-	"github.com/gov4git/lib4git/must"
 )
 
 func List(
 	ctx context.Context,
-	govAddr gov.Address,
+	addr gov.Address,
 
 ) ballotproto.Advertisements {
 
-	return List_Local(ctx, gov.Clone(ctx, govAddr))
+	return List_Local(ctx, gov.Clone(ctx, addr))
 }
 
 func List_Local(
@@ -25,25 +24,11 @@ func List_Local(
 
 ) ballotproto.Advertisements {
 
-	ballotsNS := ballotproto.BallotPath(ballotproto.BallotName{})
-
-	files, err := git.ListFilesRecursively(cloned.Tree(), ballotsNS)
-	must.NoError(ctx, err)
+	ids := ballotproto.BallotKV.ListKeys(ctx, ballotproto.BallotNS, cloned.Tree())
 
 	ads := ballotproto.Advertisements{}
-	for _, file := range files {
-		if file.Base() != ballotproto.AdFilebase {
-			continue
-		}
-		var ad ballotproto.Advertisement
-		err := must.Try(
-			func() {
-				ad = git.FromFile[ballotproto.Advertisement](ctx, cloned.Tree(), file)
-			},
-		)
-		if err != nil {
-			continue
-		}
+	for _, id := range ids {
+		ad := git.FromFile[ballotproto.Advertisement](ctx, cloned.Tree(), id.AdNS())
 		ads = append(ads, ad)
 	}
 
@@ -53,7 +38,7 @@ func List_Local(
 
 func ListFilter(
 	ctx context.Context,
-	govAddr gov.Address,
+	addr gov.Address,
 	onlyOpen bool,
 	onlyClosed bool,
 	onlyFrozen bool,
@@ -61,7 +46,7 @@ func ListFilter(
 
 ) ballotproto.Advertisements {
 
-	return ListFilter_Local(ctx, gov.Clone(ctx, govAddr), onlyOpen, onlyClosed, onlyFrozen, withParticipant)
+	return ListFilter_Local(ctx, gov.Clone(ctx, addr), onlyOpen, onlyClosed, onlyFrozen, withParticipant)
 }
 
 func ListFilter_Local(

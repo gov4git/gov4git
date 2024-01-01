@@ -3,6 +3,7 @@ package github
 import (
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
@@ -90,11 +91,19 @@ const (
 	ImportedPullPrefix   = "pull"
 )
 
-func (x ImportedIssue) BallotName() ballotproto.BallotName {
+func (x ImportedIssue) BallotName() ballotproto.BallotID {
 	if x.PullRequest {
-		return ballotproto.BallotName{ImportedGithubPrefix, ImportedPullPrefix, x.Key()}
+		return ballotproto.ParseBallotID(strings.Join([]string{
+			ImportedGithubPrefix,
+			ImportedPullPrefix,
+			x.Key(),
+		}, "/"))
 	} else {
-		return ballotproto.BallotName{ImportedGithubPrefix, ImportedIssuePrefix, x.Key()}
+		return ballotproto.ParseBallotID(strings.Join([]string{
+			ImportedGithubPrefix,
+			ImportedIssuePrefix,
+			x.Key(),
+		}, "/"))
 	}
 }
 

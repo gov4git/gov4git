@@ -22,8 +22,8 @@ func TestSync(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName0 := ballotproto.BallotName{"a", "b", "c"}
-	ballotName1 := ballotproto.BallotName{"d", "e", "f"}
+	ballotName0 := ballotproto.ParseBallotID("a/b/c")
+	ballotName1 := ballotproto.ParseBallotID("d/e/f")
 	choices := []string{"x", "y", "z"}
 
 	// open two ballots

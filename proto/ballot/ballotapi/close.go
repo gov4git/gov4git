@@ -17,14 +17,14 @@ import (
 
 func Close(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	ballotName ballotproto.BallotName,
+	addr gov.OwnerAddress,
+	id ballotproto.BallotID,
 	escrowTo account.AccountID,
 
 ) git.Change[form.Map, ballotproto.Outcome] {
 
-	cloned := gov.CloneOwner(ctx, govAddr)
-	chg := Close_StageOnly(ctx, cloned, ballotName, escrowTo)
+	cloned := gov.CloneOwner(ctx, addr)
+	chg := Close_StageOnly(ctx, cloned, id, escrowTo)
 	proto.Commit(ctx, cloned.Public.Tree(), chg)
 	cloned.Public.Push(ctx)
 	return chg
@@ -33,7 +33,7 @@ func Close(
 func Close_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	ballotName ballotproto.BallotName,
+	id ballotproto.BallotID,
 	escrowTo account.AccountID,
 
 ) git.Change[form.Map, ballotproto.Outcome] {
@@ -41,26 +41,24 @@ func Close_StageOnly(
 	t := cloned.Public.Tree()
 
 	// verify ad and strategy are present
-	ad, strat := ballotio.LoadStrategy(ctx, t, ballotName)
+	ad, strat := ballotio.LoadStrategy(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot already closed")
 
-	tally := loadTally_Local(ctx, t, ballotName)
+	tally := loadTally_Local(ctx, t, id)
 
 	var chg git.Change[map[string]form.Form, ballotproto.Outcome]
 	chg = strat.Close(ctx, cloned, &ad, &tally)
 
 	// write outcome
-	openOutcomeNS := ballotproto.BallotPath(ballotName).Append(ballotproto.OutcomeFilebase)
-	git.ToFileStage(ctx, t, openOutcomeNS, chg.Result)
+	git.ToFileStage(ctx, t, id.OutcomeNS(), chg.Result)
 
 	// write state
 	ad.Closed = true
 	ad.Cancelled = false
-	openAdNS := ballotproto.BallotPath(ballotName).Append(ballotproto.AdFilebase)
-	git.ToFileStage(ctx, t, openAdNS, ad)
+	git.ToFileStage(ctx, t, id.AdNS(), ad)
 
 	// transfer escrow
-	escrowAccountID := ballotproto.BallotEscrowAccountID(ballotName)
+	escrowAccountID := ballotproto.BallotEscrowAccountID(id)
 	escrowAssets := account.Get_Local(
 		ctx,
 		cloned.PublicClone(),
@@ -73,14 +71,14 @@ func Close_StageOnly(
 			escrowAccountID,
 			escrowTo,
 			holding,
-			fmt.Sprintf("closing ballot %v", ballotName),
+			fmt.Sprintf("closing ballot %v", id),
 		)
 	}
 
 	// log
 	trace.Log_StageOnly(ctx, cloned.PublicClone(), &trace.Event{
 		Op:     "ballot_close",
-		Args:   trace.M{"name": ballotName},
+		Args:   trace.M{"id": id},
 		Result: trace.M{"ad": ad, "outcome": chg.Result},
 	})
 

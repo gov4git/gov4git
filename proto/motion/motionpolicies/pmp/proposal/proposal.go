@@ -401,7 +401,7 @@ func (x proposalPolicy) Show(
 	return PolicyView{
 		State:          policyState,
 		ApprovalPoll:   approvalPoll,
-		ApprovalMargin: *ballotapi.GetMargin_Local(ctx, cloned, approvalPoll.Ad.Name),
+		ApprovalMargin: *ballotapi.GetMargin_Local(ctx, cloned, approvalPoll.Ad.ID),
 		BountyAccount:  pmp.ProposalBountyAccountID(motion.ID),
 		RewardAccount:  pmp.ProposalRewardAccountID(motion.ID),
 	}

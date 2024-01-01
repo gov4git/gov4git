@@ -5,9 +5,9 @@ import (
 )
 
 func TestBallotTopic(t *testing.T) {
-	testBallotName := BallotName{"a", "b", "c"}
+	testBallotID := ParseBallotID("a/b/c")
 	expBallotTopic := "ballot:a/b/c"
-	if BallotTopic(testBallotName) != expBallotTopic {
-		t.Errorf("expecting %v, got %v", expBallotTopic, BallotTopic(testBallotName))
+	if BallotTopic(testBallotID) != expBallotTopic {
+		t.Errorf("expecting %v, got %v", expBallotTopic, BallotTopic(testBallotID))
 	}
 }

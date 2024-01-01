@@ -26,18 +26,18 @@ func (qv SV) Cancel(
 		account.Transfer_StageOnly(
 			ctx,
 			govOwner.PublicClone(),
-			ballotproto.BallotEscrowAccountID(ad.Name),
+			ballotproto.BallotEscrowAccountID(ad.ID),
 			member.UserAccountID(user),
 			refund,
-			fmt.Sprintf("refund from cancelling ballot %v", ad.Name),
+			fmt.Sprintf("refund from cancelling ballot %v", ad.ID),
 		)
 		refunded[user] = refund
 	}
 
 	return git.NewChange(
-		fmt.Sprintf("cancelled ballot %v and refunded voters", ad.Name),
+		fmt.Sprintf("cancelled ballot %v and refunded voters", ad.ID),
 		"ballot_qv_cancel",
-		form.Map{"ballot_name": ad.Name},
+		form.Map{"id": ad.ID},
 		ballotproto.Outcome{
 			Summary:      "cancelled",
 			Scores:       tally.Scores,

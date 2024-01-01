@@ -15,35 +15,35 @@ import (
 func LoadStrategyState[SS form.Form](
 	ctx context.Context,
 	addr gov.Address,
-	name ballotproto.BallotName,
+	id ballotproto.BallotID,
 
 ) SS {
 
 	cloned := gov.Clone(ctx, addr)
-	return LoadStrategyState_Local[SS](ctx, cloned, name)
+	return LoadStrategyState_Local[SS](ctx, cloned, id)
 }
 
 func LoadStrategyState_Local[SS form.Form](
 	ctx context.Context,
 	cloned gov.Cloned,
-	name ballotproto.BallotName,
+	id ballotproto.BallotID,
 
 ) SS {
 
 	t := cloned.Tree()
-	return git.FromFile[SS](ctx, t, name.StrategyNS())
+	return git.FromFile[SS](ctx, t, id.StrategyNS())
 }
 
 func SaveStrategyState[SS form.Form](
 	ctx context.Context,
 	addr gov.Address,
-	name ballotproto.BallotName,
+	id ballotproto.BallotID,
 	strategyState SS,
 
 ) {
 
 	cloned := gov.Clone(ctx, addr)
-	SaveStrategyState_StageOnly[SS](ctx, cloned, name, strategyState)
+	SaveStrategyState_StageOnly[SS](ctx, cloned, id, strategyState)
 	proto.Commitf(ctx, cloned, "ballot_save_strategy_state", "update ballot strategy state")
 	cloned.Push(ctx)
 }
@@ -51,13 +51,13 @@ func SaveStrategyState[SS form.Form](
 func SaveStrategyState_StageOnly[SS form.Form](
 	ctx context.Context,
 	cloned gov.Cloned,
-	name ballotproto.BallotName,
+	id ballotproto.BallotID,
 	strategyState SS,
 
 ) {
 
 	t := cloned.Tree()
-	ad, _ := ballotio.LoadStrategy(ctx, t, name)
+	ad, _ := ballotio.LoadStrategy(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot already closed")
-	git.ToFileStage[SS](ctx, t, name.StrategyNS(), strategyState)
+	git.ToFileStage[SS](ctx, t, id.StrategyNS(), strategyState)
 }

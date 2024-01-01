@@ -18,61 +18,61 @@ import (
 
 func Tally(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	ballotName ballotproto.BallotName,
+	addr gov.OwnerAddress,
+	id ballotproto.BallotID,
 	maxPar int,
 
 ) git.Change[form.Map, ballotproto.Tally] {
 
-	govOwner := gov.CloneOwner(ctx, govAddr)
-	chg, changed := Tally_StageOnly(ctx, govAddr, govOwner, ballotName, maxPar)
+	cloned := gov.CloneOwner(ctx, addr)
+	chg, changed := Tally_StageOnly(ctx, addr, cloned, id, maxPar)
 	if !changed {
 		return chg
 	}
-	proto.Commit(ctx, govOwner.Public.Tree(), chg)
-	govOwner.Public.Push(ctx)
+	proto.Commit(ctx, cloned.Public.Tree(), chg)
+	cloned.Public.Push(ctx)
 	return chg
 }
 
 func Tally_StageOnly(
 	ctx context.Context,
-	govAddr gov.OwnerAddress,
-	govOwner gov.OwnerCloned,
-	ballotName ballotproto.BallotName,
+	addr gov.OwnerAddress,
+	cloned gov.OwnerCloned,
+	id ballotproto.BallotID,
 	maxPar int,
 
 ) (git.Change[form.Map, ballotproto.Tally], bool) {
 
-	communityTree := govOwner.Public.Tree()
-	ad, _ := ballotio.LoadStrategy(ctx, communityTree, ballotName)
+	t := cloned.Public.Tree()
+	ad, _ := ballotio.LoadStrategy(ctx, t, id)
 
-	pv := loadParticipatingVoters(ctx, govOwner.PublicClone(), ad)
+	pv := loadParticipatingVoters(ctx, cloned.PublicClone(), ad)
 	votersCloned := clonePar(ctx, pv.VoterAccounts, maxPar)
 	pv.attachVoterClones(ctx, votersCloned)
 
-	return tallyVotersCloned_StageOnly(ctx, govOwner, ballotName, pv.VoterAccounts, pv.VoterClones)
+	return tallyVotersCloned_StageOnly(ctx, cloned, id, pv.VoterAccounts, pv.VoterClones)
 }
 
 func tallyVotersCloned_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	ballotName ballotproto.BallotName,
+	id ballotproto.BallotID,
 	voterAccounts map[member.User]member.UserProfile,
 	votersCloned map[member.User]git.Cloned,
 
 ) (git.Change[form.Map, ballotproto.Tally], bool) {
 
-	communityTree := cloned.Public.Tree()
-	ad, strat := ballotio.LoadStrategy(ctx, communityTree, ballotName)
+	t := cloned.Public.Tree()
+	ad, strat := ballotio.LoadStrategy(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 
 	// read current tally
-	currentTally := loadTally_Local(ctx, communityTree, ballotName)
+	currentTally := loadTally_Local(ctx, t, id)
 
 	var fetchedVotes FetchedVotes
 	var fetchVoteChanges []git.Change[form.Map, FetchedVotes]
 	for user, account := range voterAccounts {
-		chg := fetchVotesCloned(ctx, cloned, ballotName, user, account, votersCloned[user])
+		chg := fetchVotesCloned(ctx, cloned, id, user, account, votersCloned[user])
 		fetchVoteChanges = append(fetchVoteChanges, chg)
 		fetchedVotes = append(fetchedVotes, chg.Result...)
 	}
@@ -82,7 +82,7 @@ func tallyVotersCloned_StageOnly(
 		return git.NewChange(
 			"No new votes",
 			"ballot_tally",
-			form.Map{"ballot_name": ballotName},
+			form.Map{"id": id},
 			currentTally,
 			nil,
 		), false
@@ -93,13 +93,12 @@ func tallyVotersCloned_StageOnly(
 		rejectFetchedVotes(fetchedVotes, currentTally.RejectedVotes)
 
 		// write updated tally
-		openTallyNS := ballotproto.BallotPath(ballotName).Append(ballotproto.TallyFilebase)
-		git.ToFileStage(ctx, communityTree, openTallyNS, currentTally)
+		git.ToFileStage(ctx, t, id.TallyNS(), currentTally)
 
 		return git.NewChange(
 			"Ballot is frozen, discarding pending votes",
 			"ballot_tally",
-			form.Map{"ballot_name": ballotName},
+			form.Map{"id": id},
 			currentTally,
 			form.ToForms(fetchVoteChanges),
 		), true
@@ -108,20 +107,19 @@ func tallyVotersCloned_StageOnly(
 	updatedTally := strat.Tally(ctx, cloned, &ad, &currentTally, fetchedVotesToElections(fetchedVotes)).Result
 
 	// write updated tally
-	openTallyNS := ballotproto.BallotPath(ballotName).Append(ballotproto.TallyFilebase)
-	git.ToFileStage(ctx, communityTree, openTallyNS, updatedTally)
+	git.ToFileStage(ctx, t, id.TallyNS(), updatedTally)
 
 	// log
 	trace.Log_StageOnly(ctx, cloned.PublicClone(), &trace.Event{
 		Op:     "ballot_tally",
-		Args:   trace.M{"ballot": ballotName},
+		Args:   trace.M{"ballot": id},
 		Result: trace.M{"ad": ad, "tally": updatedTally},
 	})
 
 	return git.NewChange(
-		fmt.Sprintf("Tally votes on ballot %v", ballotName),
+		fmt.Sprintf("Tally votes on ballot %v", id),
 		"ballot_tally",
-		form.Map{"ballot_name": ballotName},
+		form.Map{"id": id},
 		updatedTally,
 		form.ToForms(fetchVoteChanges),
 	), true
@@ -140,11 +138,10 @@ func rejectFetchedVotes(fv FetchedVotes, rej map[member.User]ballotproto.Rejecte
 
 func loadTally_Local(
 	ctx context.Context,
-	communityTree *git.Tree,
-	ballotName ballotproto.BallotName,
+	t *git.Tree,
+	id ballotproto.BallotID,
 
 ) ballotproto.Tally {
 
-	tallyNS := ballotproto.BallotPath(ballotName).Append(ballotproto.TallyFilebase)
-	return git.FromFile[ballotproto.Tally](ctx, communityTree, tallyNS)
+	return git.FromFile[ballotproto.Tally](ctx, t, id.TallyNS())
 }

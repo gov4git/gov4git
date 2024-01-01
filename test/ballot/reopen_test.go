@@ -22,12 +22,12 @@ func TestReopen(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := ballotproto.BallotName{"a", "b", "c"}
+	ballotName := ballotproto.ParseBallotID("a/b/c")
 	choices := []string{"x", "y", "z"}
 
 	// open
 	strat := ballotio.QVStrategyName
-	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot_name", "ballot description", choices, member.Everybody)
+	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot_id", "ballot description", choices, member.Everybody)
 
 	// give credits to user
 	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(0), account.H(account.PluralAsset, 4.0), "test")

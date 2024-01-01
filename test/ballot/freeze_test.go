@@ -22,7 +22,7 @@ func TestVoteFreezeVote(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := ballotproto.BallotName{"a", "b", "c"}
+	ballotName := ballotproto.ParseBallotID("a/b/c")
 	choices := []string{"x", "y", "z"}
 
 	// open
@@ -86,7 +86,7 @@ func TestVoteFreezeTally(t *testing.T) {
 	ctx := testutil.NewCtx(t, runtime.TestWithCache)
 	cty := test.NewTestCommunity(t, ctx, 2)
 
-	ballotName := ballotproto.BallotName{"a", "b", "c"}
+	ballotName := ballotproto.ParseBallotID("a/b/c")
 	choices := []string{"x", "y", "z"}
 
 	// open

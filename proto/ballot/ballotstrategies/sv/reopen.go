@@ -18,9 +18,9 @@ func (qv SV) Reopen(
 ) git.Change[form.Map, form.None] {
 
 	return git.NewChange(
-		fmt.Sprintf("reopened ballot %v", ad.Name),
+		fmt.Sprintf("reopened ballot %v", ad.ID),
 		"ballot_qv_reopen",
-		form.Map{"ballot_name": ad.Name},
+		form.Map{"id": ad.ID},
 		form.None{},
 		nil,
 	)

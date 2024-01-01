@@ -33,19 +33,19 @@ func Install(ctx context.Context, name ballotproto.StrategyName, strategy ballot
 func LoadStrategy(
 	ctx context.Context,
 	t *git.Tree,
-	name ballotproto.BallotName,
+	id ballotproto.BallotID,
 
 ) (ballotproto.Advertisement, ballotproto.Strategy) {
 
-	ad := git.FromFile[ballotproto.Advertisement](ctx, t, name.AdNS())
+	ad := git.FromFile[ballotproto.Advertisement](ctx, t, id.AdNS())
 	return ad, strategyRegistry.Get(ctx, ad.Strategy)
 }
 
 func LookupStrategy(
 	ctx context.Context,
-	name ballotproto.StrategyName,
+	id ballotproto.StrategyName,
 
 ) ballotproto.Strategy {
 
-	return strategyRegistry.Get(ctx, name)
+	return strategyRegistry.Get(ctx, id)
 }

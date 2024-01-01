@@ -14,35 +14,37 @@ import (
 func Track(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
-	govAddr gov.Address,
-	ballotName ballotproto.BallotName,
+	addr gov.Address,
+	ballotID ballotproto.BallotID,
+
 ) ballotproto.VoterStatus {
 
-	govCloned := gov.Clone(ctx, govAddr)
+	cloned := gov.Clone(ctx, addr)
 	voterOwner := id.CloneOwner(ctx, voterAddr)
-	return Track_StageOnly(ctx, voterAddr, voterOwner, govCloned, ballotName)
+	return Track_StageOnly(ctx, voterAddr, voterOwner, cloned, ballotID)
 }
 
 func Track_StageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
 	voterOwner id.OwnerCloned,
-	govCloned gov.Cloned,
-	ballotName ballotproto.BallotName,
+	cloned gov.Cloned,
+	ballotID ballotproto.BallotID,
+
 ) ballotproto.VoterStatus {
 
 	// determine the voter's username in the community
 	voterCred := id.GetPublicCredentials(ctx, voterOwner.Public.Tree())
-	users := member.LookupUserByID_Local(ctx, govCloned, voterCred.ID)
+	users := member.LookupUserByID_Local(ctx, cloned, voterCred.ID)
 	must.Assertf(ctx, len(users) > 0, "user not found in community")
 	user := users[0]
 
 	// read the ballot tally
-	tally := loadTally_Local(ctx, govCloned.Tree(), ballotName)
+	tally := loadTally_Local(ctx, cloned.Tree(), ballotID)
 
 	// read the voter's log
-	govCred := id.GetPublicCredentials(ctx, govCloned.Tree())
-	voteLogNS := ballotproto.VoteLogPath(govCred.ID, ballotName)
+	govCred := id.GetPublicCredentials(ctx, cloned.Tree())
+	voteLogNS := ballotproto.VoteLogPath(govCred.ID, ballotID)
 	voteLog := git.FromFile[ballotproto.VoteLog](ctx, voterOwner.Public.Tree(), voteLogNS)
 
 	// calculate pending votes
@@ -72,7 +74,7 @@ func Track_StageOnly(
 	return ballotproto.VoterStatus{
 		GovID:         voteLog.GovID,
 		GovAddress:    voteLog.GovAddress,
-		BallotName:    ballotName,
+		BallotID:      ballotID,
 		AcceptedVotes: tally.AcceptedVotes[user],
 		RejectedVotes: tally.RejectedVotes[user],
 		PendingVotes:  pending,

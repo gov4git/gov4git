@@ -10,7 +10,7 @@ import (
 func Capitalization_Local(
 	ctx context.Context,
 	govTree *git.Tree,
-	ballotName ballotproto.BallotName,
+	ballotName ballotproto.BallotID,
 ) float64 {
 
 	return Show_Local(ctx, govTree, ballotName).Tally.Capitalization()

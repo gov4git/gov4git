@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/journal"
+	"github.com/gov4git/lib4git/form"
 )
 
 func AssembleReport(
@@ -52,33 +53,41 @@ func AssembleReport_Local(
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
 	fmt.Fprintf(&w, "| Number of opened motions | %d |\n", int(last30DaysSeries.DailyNumMotionOpen.Total()))
 	fmt.Fprintf(&w, "| Number of closed motions | %d |\n", int(last30DaysSeries.DailyNumMotionClose.Total()))
-	fmt.Fprintf(&w, "| Number of cancelled motions | %d |\n", int(last30DaysSeries.DailyNumMotionCancel.Total()))
+	fmt.Fprintf(&w, "| Number of cancelled motions | %d |\n\n", int(last30DaysSeries.DailyNumMotionCancel.Total()))
+
+	fmt.Fprintf(&w, "| Indicator|  30-day aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
 	fmt.Fprintf(&w, "| Number of votes on issues | %d |\n", int(last30DaysSeries.DailyNumConcernVotes.Total()))
 	fmt.Fprintf(&w, "| Number of votes on PRs | %d |\n", int(last30DaysSeries.DailyNumProposalVotes.Total()))
 	fmt.Fprintf(&w, "| Number of votes on other | %d |\n", int(last30DaysSeries.DailyNumOtherVotes.Total()))
 	fmt.Fprintf(&w, "| Credits spent on issue votes | %0.6f |\n", last30DaysSeries.DailyConcernVoteCharges.Total())
 	fmt.Fprintf(&w, "| Credits spent on PR votes | %0.6f |\n", last30DaysSeries.DailyProposalVoteCharges.Total())
-	fmt.Fprintf(&w, "| Credits spent on other votes | %0.6f |\n", last30DaysSeries.DailyOtherVoteCharges.Total())
+	fmt.Fprintf(&w, "| Credits spent on other votes | %0.6f |\n\n", last30DaysSeries.DailyOtherVoteCharges.Total())
+
+	fmt.Fprintf(&w, "| Indicator|  30-day aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
 	fmt.Fprintf(&w, "| Credits cleared in bounties | %0.6f |\n", last30DaysSeries.DailyClearedBounties.Total())
 	fmt.Fprintf(&w, "| Credits cleared in rewards | %0.6f |\n", last30DaysSeries.DailyClearedRewards.Total())
-	fmt.Fprintf(&w, "| Credits cleared in refunds | %0.6f |\n", last30DaysSeries.DailyClearedRefunds.Total())
+	fmt.Fprintf(&w, "| Credits cleared in refunds | %0.6f |\n\n", last30DaysSeries.DailyClearedRefunds.Total())
+
+	fmt.Fprintf(&w, "| Indicator|  30-day aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
-	fmt.Fprintf(&w, "| Number of new members | %d |\n", int(last30DaysSeries.DailyNumJoins.Total()))
+	fmt.Fprintf(&w, "| Number of new members | %d |\n\n", int(last30DaysSeries.DailyNumJoins.Total()))
+
+	fmt.Fprintf(&w, "| Indicator|  30-day aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
 	fmt.Fprintf(&w, "| Credits issued | %0.6f |\n", last30DaysSeries.DailyCreditsIssued.Total())
 	fmt.Fprintf(&w, "| Credits burned | %0.6f |\n", last30DaysSeries.DailyCreditsBurned.Total())
-	fmt.Fprintf(&w, "| Credits transferred | %0.6f |\n", last30DaysSeries.DailyCreditsTransferred.Total())
+	fmt.Fprintf(&w, "| Credits transferred | %0.6f |\n\n", last30DaysSeries.DailyCreditsTransferred.Total())
 
-	fmt.Println("### Daily breakdown")
+	fmt.Printf("### Daily breakdown\n\n")
 
-	fmt.Fprintf(&w, "![%s](%s)\n<hr>\n", "Daily motions opened/closed/cancelled", urlCalc("daily_motions.png"))
-	fmt.Fprintf(&w, "![%s](%s)\n<hr>\n", "Daily vote counts", urlCalc("daily_votes.png"))
-	fmt.Fprintf(&w, "![%s](%s)\n<hr>\n", "Daily vote charges", urlCalc("daily_charges.png"))
-	fmt.Fprintf(&w, "![%s](%s)\n<hr>\n", "Daily credits cleared in bounties/rewards/refunds", urlCalc("daily_cleared.png"))
-	fmt.Fprintf(&w, "![%s](%s)\n<hr>\n", "Daily new community members", urlCalc("daily_joins.png"))
-	fmt.Fprintf(&w, "![%s](%s)\n<hr>\n", "Daily credits issued/burned/transferred", urlCalc("daily_credits.png"))
+	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily motions opened/closed/cancelled", urlCalc("daily_motions.png"))
+	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily vote counts", urlCalc("daily_votes.png"))
+	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily vote charges", urlCalc("daily_charges.png"))
+	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily credits cleared in bounties/rewards/refunds", urlCalc("daily_cleared.png"))
+	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily new community members", urlCalc("daily_joins.png"))
+	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily credits issued/burned/transferred", urlCalc("daily_credits.png"))
 
 	fmt.Fprintf(&w, "## All time\n\n")
 
@@ -86,24 +95,32 @@ func AssembleReport_Local(
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
 	fmt.Fprintf(&w, "| Number of opened motions | %d |\n", int(allTimeSeries.DailyNumMotionOpen.Total()))
 	fmt.Fprintf(&w, "| Number of closed motions | %d |\n", int(allTimeSeries.DailyNumMotionClose.Total()))
-	fmt.Fprintf(&w, "| Number of cancelled motions | %d |\n", int(allTimeSeries.DailyNumMotionCancel.Total()))
+	fmt.Fprintf(&w, "| Number of cancelled motions | %d |\n\n", int(allTimeSeries.DailyNumMotionCancel.Total()))
+
+	fmt.Fprintf(&w, "| Indicator|  All time aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
 	fmt.Fprintf(&w, "| Number of votes on issues | %d |\n", int(allTimeSeries.DailyNumConcernVotes.Total()))
 	fmt.Fprintf(&w, "| Number of votes on PRs | %d |\n", int(allTimeSeries.DailyNumProposalVotes.Total()))
 	fmt.Fprintf(&w, "| Number of votes on other | %d |\n", int(allTimeSeries.DailyNumOtherVotes.Total()))
 	fmt.Fprintf(&w, "| Credits spent on issue votes | %0.6f |\n", allTimeSeries.DailyConcernVoteCharges.Total())
 	fmt.Fprintf(&w, "| Credits spent on PR votes | %0.6f |\n", allTimeSeries.DailyProposalVoteCharges.Total())
-	fmt.Fprintf(&w, "| Credits spent on other votes | %0.6f |\n", allTimeSeries.DailyOtherVoteCharges.Total())
+	fmt.Fprintf(&w, "| Credits spent on other votes | %0.6f |\n\n", allTimeSeries.DailyOtherVoteCharges.Total())
+
+	fmt.Fprintf(&w, "| Indicator|  All time aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
 	fmt.Fprintf(&w, "| Credits cleared in bounties | %0.6f |\n", allTimeSeries.DailyClearedBounties.Total())
 	fmt.Fprintf(&w, "| Credits cleared in rewards | %0.6f |\n", allTimeSeries.DailyClearedRewards.Total())
-	fmt.Fprintf(&w, "| Credits cleared in refunds | %0.6f |\n", allTimeSeries.DailyClearedRefunds.Total())
+	fmt.Fprintf(&w, "| Credits cleared in refunds | %0.6f |\n\n", allTimeSeries.DailyClearedRefunds.Total())
+
+	fmt.Fprintf(&w, "| Indicator|  All time aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
-	fmt.Fprintf(&w, "| Number of new members | %d |\n", int(allTimeSeries.DailyNumJoins.Total()))
+	fmt.Fprintf(&w, "| Number of new members | %d |\n\n", int(allTimeSeries.DailyNumJoins.Total()))
+
+	fmt.Fprintf(&w, "| Indicator|  All time aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
 	fmt.Fprintf(&w, "| Credits issued | %0.6f |\n", allTimeSeries.DailyCreditsIssued.Total())
 	fmt.Fprintf(&w, "| Credits burned | %0.6f |\n", allTimeSeries.DailyCreditsBurned.Total())
-	fmt.Fprintf(&w, "| Credits transferred | %0.6f |\n", allTimeSeries.DailyCreditsTransferred.Total())
+	fmt.Fprintf(&w, "| Credits transferred | %0.6f |\n\n", allTimeSeries.DailyCreditsTransferred.Total())
 
 	return &ReportAssets{
 		Series: &ReportSeries{
@@ -133,8 +150,10 @@ func loadHistory_Local(
 	all := metric.List_Local(ctx, cloned)
 	s := journal.Entries[*metric.Event]{}
 	for _, entry := range all {
+		fmt.Println("METRIC ENTRY", form.SprintJSON(entry))
 		if isNotBefore(entry.Stamp, earliest) && isNotAfter(entry.Stamp, latest) {
 			s = append(s, entry)
+			fmt.Println("ENTRY ACCEPTED")
 		}
 	}
 	return s

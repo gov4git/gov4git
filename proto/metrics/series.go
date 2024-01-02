@@ -76,7 +76,7 @@ func ComputeSeries(
 			}
 			if e.Payload.Motion.Close != nil {
 				dailyNumMotionClose.Add(e.Stamp, 1)
-				for _, r := range e.Payload.Vote.Receipts {
+				for _, r := range e.Payload.Motion.Close.Receipts {
 					switch r.Type {
 					case metric.ReceiptTypeBounty:
 						dailyCreditInBounties.Add(e.Stamp, r.Amount.Quantity)
@@ -90,6 +90,17 @@ func ComputeSeries(
 			}
 			if e.Payload.Motion.Cancel != nil {
 				dailyNumMotionCancel.Add(e.Stamp, 1)
+				for _, r := range e.Payload.Motion.Cancel.Receipts {
+					switch r.Type {
+					case metric.ReceiptTypeBounty:
+						dailyCreditInBounties.Add(e.Stamp, r.Amount.Quantity)
+					case metric.ReceiptTypeCharge:
+					case metric.ReceiptTypeRefund:
+						dailyCreditInRefunds.Add(e.Stamp, r.Amount.Quantity)
+					case metric.ReceiptTypeReward:
+						dailyCreditInRewards.Add(e.Stamp, r.Amount.Quantity)
+					}
+				}
 			}
 		}
 		if e.Payload.Vote != nil {

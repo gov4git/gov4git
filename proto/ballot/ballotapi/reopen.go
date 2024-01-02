@@ -35,8 +35,8 @@ func Reopen_StageOnly(
 
 	t := cloned.Public.Tree()
 
-	// verify ad and strategy are present
-	ad, strat := ballotio.LoadStrategy(ctx, t, id)
+	// verify ad and policy are present
+	ad, strat := ballotio.LoadPolicy(ctx, t, id)
 	must.Assertf(ctx, ad.Closed, "ballot is not closed")
 	must.Assertf(ctx, !ad.Cancelled, "ballot was cancelled")
 

@@ -11,10 +11,10 @@ var (
 )
 
 var (
-	AdFilebase       = "ballot_ad.json"
-	TallyFilebase    = "ballot_tally.json"
-	OutcomeFilebase  = "ballot_outcome.json"
-	StrategyFilebase = "ballot_strategy.json" // strategy instance state
+	AdFilebase      = "ballot_ad.json"
+	TallyFilebase   = "ballot_tally.json"
+	OutcomeFilebase = "ballot_outcome.json"
+	PolicyFilebase  = "ballot_policy.json" // policy instance state
 )
 
 var (

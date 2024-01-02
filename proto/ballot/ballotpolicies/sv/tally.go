@@ -82,7 +82,7 @@ func (qv SV) tally(
 						By:           u.MetricUser(),
 						Purpose:      ad.Purpose.MetricVotePurpose(),
 						MotionPolicy: metric.MotionPolicy(ad.MotionPolicy),
-						BallotPolicy: metric.BallotPolicy(ad.Strategy),
+						BallotPolicy: metric.BallotPolicy(ad.Policy),
 						Receipts: metric.OneReceipt(
 							u.MetricAccountID(),
 							metric.ReceiptTypeCharge,

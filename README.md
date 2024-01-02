@@ -2,6 +2,26 @@
 
 ![Release](https://github.com/gov4git/gov4git/actions/workflows/release.yaml/badge.svg)
 
+## Install the desktop app
+
+All users (community organizers and community members) can use Gov4Git via our desktop application. Find the installation link for your OS below.
+
+**Windows**
+
+Install the latest release [here](https://github.com/gov4git/desktop-application/releases/latest/download/gov4git-desktop-app-setup.exe).
+
+**macOS**
+
+Install the latest release [here](https://github.com/gov4git/desktop-application/releases/latest/download/gov4git-desktop-app.dmg).
+
+**Linux**
+
+```bash
+curl -sSfLO https://github.com/gov4git/desktop-application/releases/latest/download/gov4git-desktop-app.AppImage
+sudo chmod +x ./gov4git-desktop-app.AppImage
+./gov4git-desktop-app.AppImage
+```
+
 ## Quick demo
 
 This video walks through the basics of using gov4git to govern a collaborative community on GitHub:

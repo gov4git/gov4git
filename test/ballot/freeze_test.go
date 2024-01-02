@@ -26,7 +26,7 @@ func TestVoteFreezeVote(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := ballotio.QVStrategyName
+	strat := ballotio.QVPolicyName
 	openChg := ballotapi.Open(
 		ctx,
 		strat,
@@ -90,7 +90,7 @@ func TestVoteFreezeTally(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := ballotio.QVStrategyName
+	strat := ballotio.QVPolicyName
 	openChg := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot title", "ballot description", choices, member.Everybody)
 	fmt.Println("open: ", form.SprintJSON(openChg))
 

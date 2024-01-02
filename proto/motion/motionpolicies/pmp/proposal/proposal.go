@@ -28,8 +28,8 @@ func init() {
 }
 
 const (
-	ProposalPolicyName               motionproto.PolicyName   = "pmp-proposal"
-	ProposalApprovalPollStrategyName ballotproto.StrategyName = "pmp-proposal-approval"
+	ProposalPolicyName             motionproto.PolicyName = "pmp-proposal"
+	ProposalApprovalPollPolicyName ballotproto.PolicyName = "pmp-proposal-approval"
 )
 
 type proposalPolicy struct{}
@@ -68,7 +68,7 @@ func (x proposalPolicy) Open(
 	// open a poll for the motion
 	ballotapi.Open_StageOnly(
 		ctx,
-		ballotio.QVStrategyName,
+		ballotio.QVPolicyName,
 		cloned,
 		state.ApprovalPoll,
 		pmp.ProposalAccountID(prop.ID),
@@ -82,7 +82,7 @@ func (x proposalPolicy) Open(
 	zeroState := ScoreKernelState{
 		Bounty: 0.0,
 	}
-	ballotapi.SaveStrategyState_StageOnly[ScoreKernelState](
+	ballotapi.SavePolicyState_StageOnly[ScoreKernelState](
 		ctx,
 		cloned.PublicClone(),
 		state.ApprovalPoll,
@@ -187,7 +187,7 @@ func (x proposalPolicy) Update(
 			state,
 		),
 	}
-	ballotapi.SaveStrategyState_StageOnly[ScoreKernelState](
+	ballotapi.SavePolicyState_StageOnly[ScoreKernelState](
 		ctx,
 		cloned.PublicClone(),
 		state.ApprovalPoll,

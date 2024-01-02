@@ -44,7 +44,7 @@ func Tally_StageOnly(
 ) (git.Change[form.Map, ballotproto.Tally], bool) {
 
 	t := cloned.Public.Tree()
-	ad, _ := ballotio.LoadStrategy(ctx, t, id)
+	ad, _ := ballotio.LoadPolicy(ctx, t, id)
 
 	pv := loadParticipatingVoters(ctx, cloned.PublicClone(), ad)
 	votersCloned := clonePar(ctx, pv.VoterAccounts, maxPar)
@@ -63,7 +63,7 @@ func tallyVotersCloned_StageOnly(
 ) (git.Change[form.Map, ballotproto.Tally], bool) {
 
 	t := cloned.Public.Tree()
-	ad, strat := ballotio.LoadStrategy(ctx, t, id)
+	ad, strat := ballotio.LoadPolicy(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 
 	// read current tally

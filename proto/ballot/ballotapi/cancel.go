@@ -34,14 +34,14 @@ func Cancel_StageOnly(
 
 	t := cloned.Public.Tree()
 
-	// verify ad and strategy are present
-	ad, strat := ballotio.LoadStrategy(ctx, t, id)
+	// verify ad and policy are present
+	ad, policy := ballotio.LoadPolicy(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot already closed")
 
 	tally := loadTally_Local(ctx, t, id)
 
 	var chg git.Change[map[string]form.Form, ballotproto.Outcome]
-	chg = strat.Cancel(ctx, cloned, &ad, &tally)
+	chg = policy.Cancel(ctx, cloned, &ad, &tally)
 
 	// write outcome
 	git.ToFileStage(ctx, t, id.OutcomeNS(), chg.Result)

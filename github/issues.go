@@ -92,7 +92,7 @@ func ImportIssuesForPrioritization_StageOnly(
 			} else { // no ballot for this issue, create it
 				ballotapi.Open_StageOnly(
 					ctx,
-					ballotio.QVStrategyName,
+					ballotio.QVPolicyName,
 					cloned,
 					ghIssue.BallotName(),
 					account.NobodyAccountID,

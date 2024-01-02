@@ -22,7 +22,7 @@ type Advertisement struct {
 	Description string `json:"description"`
 	//
 	Choices      []string     `json:"choices"`
-	Strategy     StrategyName `json:"strategy"`
+	Policy       PolicyName   `json:"policy"`
 	Participants member.Group `json:"participants_group"`
 	//
 	Frozen    bool `json:"frozen"` // if frozen, the ballot is not accepting votes

@@ -1,10 +1,5 @@
 - [ ] test github integration of metrics
 
-- upgrade ballot
-  - [√] flat string namespace (not path)
-  - [ ] rename strategy to policy
-  - [√] ballotname to ballotid
-  - [√] /ballot_name/ballot_id
 
 
 

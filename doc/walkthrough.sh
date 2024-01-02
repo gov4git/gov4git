@@ -126,7 +126,7 @@ gov4git balance add --user petar --key voting_credits --value 30.00
 # Ballots can be configured to use a variety of voting and tallying strategies, and
 # users can define their own.
 #
-# This example creates a new ballot using a simple default QV strategy.
+# This example creates a new ballot using a simple default QV policy.
 # The ballot has a name `issue/1`, a title `Issue ` and
 # an arbitrary description which points to a GitHub issue in this case.
 # This ballot has only one choice, named `i1` which voters can up/down vote.

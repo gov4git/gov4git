@@ -6,8 +6,8 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotpolicies/sv"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballotstrategies/sv"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 )
 
@@ -15,7 +15,7 @@ func init() {
 	ctx := context.Background()
 	ballotio.Install(
 		ctx,
-		ProposalApprovalPollStrategyName,
+		ProposalApprovalPollPolicyName,
 		sv.SV{
 			Kernel: ScoreKernel{},
 		},
@@ -47,7 +47,7 @@ func (sk ScoreKernel) CalcJS(
 
 ) ballotproto.MarginCalcJS {
 
-	state := ballotapi.LoadStrategyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
+	state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
 	js := fmt.Sprintf(scoreKernelMarginJS, state.Bounty)
 	return ballotproto.MarginCalcJS(js)
 }
@@ -101,6 +101,13 @@ function calcMargin(currentTally, voteUser, voteChoice, targetVote) {
 	}
 
      return {
+          "help": {
+               "label": "Help",
+               "description": "This ballot uses Quadratic Voting to determine the approval score of a PR. " +
+				"Accepted PRs reward the authors with the bounties accumulated in the resolved issues,
+				and reviewers with the proceeds of votes on the approval score. Rejected PRs refund voters.",
+               "value": null,
+          },
           "currentVote": {
                "label": "Current vote",
                "description": "Your current vote",

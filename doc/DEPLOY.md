@@ -54,7 +54,6 @@ To create the token:
      | contents | read-write |
      | environments | read-write |
      | issues | read-write |
-     | meta | read-only |
      | pull-requests | read-write |
      | secrets | read-write |
      | variables | read-write |

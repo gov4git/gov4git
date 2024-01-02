@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/go-github/v55/github"
+	"github.com/gov4git/gov4git/v2"
 	govgh "github.com/gov4git/gov4git/v2/github"
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
@@ -107,15 +108,23 @@ func Cron(
 
 	// prepare commit message
 	report["cron"] = state
-	cronChg := git.NewChange[form.Map, form.Map](
-		fmt.Sprintf("Cron job."),
+	ver := gov4git.GetVersionInfo()
+	latestChange := LatestChange{
+		Stamp:          now,
+		Gov4GitVersion: ver,
+	}
+
+	git.ToFileStage[LatestChange](ctx, cloned.PublicClone().Tree(), LatestChangeMetaNS, latestChange)
+
+	cronChg := git.NewChange[form.Map, LatestChange](
+		fmt.Sprintf("Gov4Git %s cron job.", ver.Version),
 		"cron",
-		form.Map{"time": now},
+		nil,
 		// We used to include the report in the commit message. However this causes a problem on GitHub.
 		// The report includes the bodies of the issues that were processed.
 		// It turns out GitHub scans the commit message for "resolves issue" text and automatically closes issues based on those.
 		// This triggers spurious closures.
-		nil,
+		latestChange,
 		nil,
 	)
 
@@ -133,6 +142,13 @@ func Cron(
 	cronCloned.Push(ctx)
 
 	return report
+}
+
+var LatestChangeMetaNS = ns.ParseFromGitPath("latest_change.json")
+
+type LatestChange struct {
+	Stamp          time.Time           `json:"change_stamp"`
+	Gov4GitVersion gov4git.VersionInfo `json:"gov4git_version"`
 }
 
 type CronState struct {

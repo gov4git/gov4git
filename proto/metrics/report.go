@@ -81,12 +81,12 @@ func AssembleReport_Local(
 
 	fmt.Printf("### Daily breakdown\n\n")
 
-	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily motions opened/closed/cancelled", urlCalc("daily_motions.png"))
-	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily vote counts", urlCalc("daily_votes.png"))
-	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily vote charges", urlCalc("daily_charges.png"))
-	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily credits cleared in bounties/rewards/refunds", urlCalc("daily_cleared.png"))
-	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily new community members", urlCalc("daily_joins.png"))
-	fmt.Fprintf(&w, "![%s](%s)\n\n", "Daily credits issued/burned/transferred", urlCalc("daily_credits.png"))
+	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily motions opened/closed/cancelled", urlCalc("daily_motions.png"))
+	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily vote counts", urlCalc("daily_votes.png"))
+	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily vote charges", urlCalc("daily_charges.png"))
+	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily credits cleared in bounties/rewards/refunds", urlCalc("daily_cleared.png"))
+	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily new community members", urlCalc("daily_joins.png"))
+	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily credits issued/burned/transferred", urlCalc("daily_credits.png"))
 
 	fmt.Fprintf(&w, "## All time\n\n")
 

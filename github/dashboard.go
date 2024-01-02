@@ -39,7 +39,7 @@ func PublishDashboard(
 			return uploadedAssetURL(assetsRepo, string(assetsAddr.Branch), assetRepoPath)
 		},
 		metrics.TimeDailyLowerBound,
-		metrics.Today(),
+		metrics.Today().AddDate(0, 0, 1),
 	)
 
 	uploadAssets(ctx, assetsAddr, assets.Assets)

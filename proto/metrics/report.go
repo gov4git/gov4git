@@ -9,7 +9,6 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/journal"
-	"github.com/gov4git/lib4git/form"
 )
 
 func AssembleReport(
@@ -150,10 +149,8 @@ func loadHistory_Local(
 	all := metric.List_Local(ctx, cloned)
 	s := journal.Entries[*metric.Event]{}
 	for _, entry := range all {
-		fmt.Println("METRIC ENTRY", form.SprintJSON(entry))
 		if isNotBefore(entry.Stamp, earliest) && isNotAfter(entry.Stamp, latest) {
 			s = append(s, entry)
-			fmt.Println("ENTRY ACCEPTED")
 		}
 	}
 	return s

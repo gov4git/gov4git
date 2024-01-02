@@ -20,7 +20,7 @@ import (
 
 func Open(
 	ctx context.Context,
-	strat ballotproto.StrategyName,
+	strat ballotproto.PolicyName,
 	addr gov.OwnerAddress,
 	id ballotproto.BallotID,
 	owner account.AccountID,
@@ -54,7 +54,7 @@ func Open(
 
 func Open_StageOnly(
 	ctx context.Context,
-	strategyName ballotproto.StrategyName,
+	policyName ballotproto.PolicyName,
 	cloned gov.OwnerCloned,
 	id ballotproto.BallotID,
 	owner account.AccountID,
@@ -100,7 +100,7 @@ func Open_StageOnly(
 		Description: description,
 		//
 		Choices:      choices,
-		Strategy:     strategyName,
+		Policy:       policyName,
 		Participants: participants,
 		//
 		Frozen:    false,
@@ -112,8 +112,8 @@ func Open_StageOnly(
 	git.ToFileStage(ctx, cloned.Public.Tree(), id.AdNS(), ad)
 
 	// initialize tally
-	strategy := ballotio.LookupStrategy(ctx, strategyName)
-	tally := strategy.Open(ctx, cloned, &ad)
+	policy := ballotio.LookupPolicy(ctx, policyName)
+	tally := policy.Open(ctx, cloned, &ad)
 	git.ToFileStage(ctx, cloned.Public.Tree(), id.TallyNS(), tally)
 
 	// log
@@ -124,11 +124,11 @@ func Open_StageOnly(
 	})
 
 	return git.NewChange(
-		fmt.Sprintf("Create ballot of type %v", strategyName),
+		fmt.Sprintf("Create ballot of type %v", policyName),
 		"ballot_open",
 		form.Map{
-			"strategy":     strategyName,
-			"name":         id,
+			"policy":       policyName,
+			"id":           id,
 			"participants": participants,
 		},
 		ballotproto.BallotAddress{Gov: cloned.GovAddress(), Name: id},

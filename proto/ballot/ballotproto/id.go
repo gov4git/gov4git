@@ -32,8 +32,8 @@ func (x BallotID) OutcomeNS() ns.NS {
 	return x.GitNS().Append(OutcomeFilebase)
 }
 
-func (x BallotID) StrategyNS() ns.NS {
-	return x.GitNS().Append(StrategyFilebase)
+func (x BallotID) PolicyNS() ns.NS {
+	return x.GitNS().Append(PolicyFilebase)
 }
 
 func (x BallotID) GitNS() ns.NS {

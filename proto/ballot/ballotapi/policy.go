@@ -12,52 +12,52 @@ import (
 	"github.com/gov4git/lib4git/must"
 )
 
-func LoadStrategyState[SS form.Form](
+func LoadPolicyState[PS form.Form](
 	ctx context.Context,
 	addr gov.Address,
 	id ballotproto.BallotID,
 
-) SS {
+) PS {
 
 	cloned := gov.Clone(ctx, addr)
-	return LoadStrategyState_Local[SS](ctx, cloned, id)
+	return LoadPolicyState_Local[PS](ctx, cloned, id)
 }
 
-func LoadStrategyState_Local[SS form.Form](
+func LoadPolicyState_Local[PS form.Form](
 	ctx context.Context,
 	cloned gov.Cloned,
 	id ballotproto.BallotID,
 
-) SS {
+) PS {
 
 	t := cloned.Tree()
-	return git.FromFile[SS](ctx, t, id.StrategyNS())
+	return git.FromFile[PS](ctx, t, id.PolicyNS())
 }
 
-func SaveStrategyState[SS form.Form](
+func SavePolicyState[PS form.Form](
 	ctx context.Context,
 	addr gov.Address,
 	id ballotproto.BallotID,
-	strategyState SS,
+	policyState PS,
 
 ) {
 
 	cloned := gov.Clone(ctx, addr)
-	SaveStrategyState_StageOnly[SS](ctx, cloned, id, strategyState)
-	proto.Commitf(ctx, cloned, "ballot_save_strategy_state", "update ballot strategy state")
+	SavePolicyState_StageOnly[PS](ctx, cloned, id, policyState)
+	proto.Commitf(ctx, cloned, "ballot_save_policy_state", "update ballot policy state")
 	cloned.Push(ctx)
 }
 
-func SaveStrategyState_StageOnly[SS form.Form](
+func SavePolicyState_StageOnly[PS form.Form](
 	ctx context.Context,
 	cloned gov.Cloned,
 	id ballotproto.BallotID,
-	strategyState SS,
+	policyState PS,
 
 ) {
 
 	t := cloned.Tree()
-	ad, _ := ballotio.LoadStrategy(ctx, t, id)
+	ad, _ := ballotio.LoadPolicy(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot already closed")
-	git.ToFileStage[SS](ctx, t, id.StrategyNS(), strategyState)
+	git.ToFileStage[PS](ctx, t, id.PolicyNS(), policyState)
 }

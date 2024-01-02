@@ -10,13 +10,13 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-type StrategyName string
+type PolicyName string
 
-func (x StrategyName) String() string {
+func (x PolicyName) String() string {
 	return string(x)
 }
 
-type Strategy interface {
+type Policy interface {
 	VerifyElections(
 		ctx context.Context,
 		voterAddr id.OwnerAddress,

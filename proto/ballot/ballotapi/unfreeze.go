@@ -36,8 +36,8 @@ func Unfreeze_StageOnly(
 
 	t := cloned.Public.Tree()
 
-	// verify ad and strategy are present
-	ad, _ := ballotio.LoadStrategy(ctx, t, id)
+	// verify ad and policy are present
+	ad, _ := ballotio.LoadPolicy(ctx, t, id)
 
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 	must.Assertf(ctx, ad.Frozen, "ballot is not frozen")

@@ -48,7 +48,7 @@ func (x concernPolicy) Open(
 	// open a poll for the motion
 	ballotapi.Open_StageOnly(
 		ctx,
-		ballotio.QVStrategyName,
+		ballotio.QVPolicyName,
 		cloned,
 		state.PriorityPoll,
 		pmp.ConcernAccountID(con.ID),

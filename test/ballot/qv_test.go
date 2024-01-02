@@ -28,7 +28,7 @@ func TestQV(t *testing.T) {
 	account.Issue(ctx, cty.Gov(), cty.MemberAccountID(1), account.H(account.PluralAsset, 100.0), "test")
 
 	// open
-	strat := ballotio.QVStrategyName
+	strat := ballotio.QVPolicyName
 	openChg := ballotapi.Open(
 		ctx,
 		strat,

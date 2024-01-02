@@ -27,7 +27,7 @@ func TestSync(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open two ballots
-	strat := ballotio.QVStrategyName
+	strat := ballotio.QVPolicyName
 	openChg0 := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName0, account.NobodyAccountID, purpose.Unspecified, "", "ballot_0", "ballot 0", choices, member.Everybody)
 	fmt.Println("open 0: ", form.SprintJSON(openChg0))
 	openChg1 := ballotapi.Open(ctx, strat, cty.Organizer(), ballotName1, account.NobodyAccountID, purpose.Unspecified, "", "ballot_1", "ballot 1", choices, member.Everybody)

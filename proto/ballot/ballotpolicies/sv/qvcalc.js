@@ -17,6 +17,11 @@ function calcMargin(currentTally, voteUser, voteChoice, targetVote) {
      var cost = targetCharge - currentCharge;
 
      return {
+          "help": {
+               "label": "Help",
+               "description": "This ballot uses a standard Quadratic Voting.",
+               "value": null,
+          },
           "currentVote": {
                "label": "Current vote",
                "description": "Your current vote",

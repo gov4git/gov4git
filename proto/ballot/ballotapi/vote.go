@@ -42,7 +42,7 @@ func Vote_StageOnly(
 
 ) git.Change[form.Map, mail.RequestEnvelope[ballotproto.VoteEnvelope]] {
 
-	ad, strat := ballotio.LoadStrategy(ctx, cloned.Tree(), ballotID)
+	ad, strat := ballotio.LoadPolicy(ctx, cloned.Tree(), ballotID)
 
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 	must.Assertf(ctx, !ad.Frozen, "ballot is frozen")
@@ -89,7 +89,7 @@ func Vote_StageOnly(
 
 func verifyElections(
 	ctx context.Context,
-	strat ballotproto.Strategy,
+	strat ballotproto.Policy,
 	voterAddr id.OwnerAddress,
 	addr gov.Address,
 	voterOwner id.OwnerCloned,

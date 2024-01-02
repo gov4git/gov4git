@@ -32,7 +32,7 @@ var (
 			LoadConfig()
 			chg := ballotapi.Open(
 				ctx,
-				ballotio.QVStrategyName,
+				ballotio.QVPolicyName,
 				setup.Organizer,
 				ballotproto.ParseBallotID(ballotName),
 				account.NobodyAccountID,

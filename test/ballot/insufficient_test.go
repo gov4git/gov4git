@@ -25,7 +25,7 @@ func TestInsufficientCredits(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := ballotio.QVStrategyName
+	strat := ballotio.QVPolicyName
 	openChg := ballotapi.Open(
 		ctx,
 		strat,

@@ -5,6 +5,11 @@ package ballotproto
 //	function calcMargin(currentTally, voteUser, voteChoice, voteTarget) {
 //		...
 //		return {
+//			"help": {
+//				"label": "Help",
+//				"description": "This ballot uses a standard Quadratic Voting.",
+//				"value": null,
+//			},
 //			"currentVote": {
 //				"label": "Current vote",
 //				"description": "Your current vote",

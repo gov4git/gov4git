@@ -26,7 +26,7 @@ func TestReopen(t *testing.T) {
 	choices := []string{"x", "y", "z"}
 
 	// open
-	strat := ballotio.QVStrategyName
+	strat := ballotio.QVPolicyName
 	ballotapi.Open(ctx, strat, cty.Organizer(), ballotName, account.NobodyAccountID, purpose.Unspecified, "", "ballot_id", "ballot description", choices, member.Everybody)
 
 	// give credits to user

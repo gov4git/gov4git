@@ -27,7 +27,7 @@ func Show_Local(
 
 ) ballotproto.AdTally {
 
-	ad, _ := ballotio.LoadStrategy(ctx, t, id)
+	ad, _ := ballotio.LoadPolicy(ctx, t, id)
 	var tally ballotproto.Tally
 	must.Try(func() { tally = loadTally_Local(ctx, t, id) })
 	return ballotproto.AdTally{Ad: ad, Tally: tally}

@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	govgh "github.com/gov4git/gov4git/v2/github"
-	"github.com/gov4git/gov4git/v2/proto/docket/ops"
-	"github.com/gov4git/gov4git/v2/proto/docket/policies/pmp"
-	"github.com/gov4git/gov4git/v2/proto/docket/schema"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/gov4git/v2/test"
 	"github.com/gov4git/lib4git/form"
@@ -31,11 +31,10 @@ func TestSyncManagedIssues(t *testing.T) {
 	// fmt.Println(form.SprintJSON(syncChanges))
 
 	// list motions
-	ms := ops.ListMotions(ctx, cty.Gov())
+	ms := motionapi.ListMotions(ctx, cty.Gov())
 	if len(ms) < 4 {
 		t.Errorf("expecting at least 4 got %v,\n%v", len(ms), form.SprintJSON(ms))
 	}
-	// fmt.Println(form.SprintJSON(ms))
 
 	// issue-1: open, not-frozen
 	if ms[0].ID != "1" {
@@ -48,7 +47,7 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(ms[0].RefBy) != 1 {
 		t.Errorf("expecting %v, got %v", 1, ms[0].RefBy)
 	}
-	ms0RefBy0 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("5"), To: schema.MotionID("1")}
+	ms0RefBy0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("1")}
 	if ms[0].RefBy[0] != ms0RefBy0 {
 		t.Errorf("expecting %v, got %v", ms0RefBy0, ms[0].RefBy[0])
 	}
@@ -57,15 +56,15 @@ func TestSyncManagedIssues(t *testing.T) {
 	if ms[1].ID != "2" {
 		t.Errorf("expecting 2, got %v", ms[1].ID)
 	}
-	if ms[1].Closed || !ms[1].Frozen {
-		t.Errorf("expecting open, frozen")
+	if ms[1].Closed || ms[1].Frozen {
+		t.Errorf("expecting (got): open (%v), frozen (%v)", ms[1].Closed, ms[1].Frozen)
 	}
 	// refs
 	if len(ms[1].RefBy) != 2 {
 		t.Errorf("expecting %v, got %v", 2, ms[1].RefBy)
 	}
-	ms1RefBy0 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("5"), To: schema.MotionID("2")}
-	ms1RefBy1 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("7"), To: schema.MotionID("2")}
+	ms1RefBy0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("2")}
+	ms1RefBy1 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("7"), To: motionproto.MotionID("2")}
 	if ms[1].RefBy[0] != ms1RefBy0 {
 		t.Errorf("expecting %v, got %v", ms1RefBy0, ms[1].RefBy[0])
 	}
@@ -84,8 +83,8 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(ms[2].RefTo) != 2 {
 		t.Errorf("expecting %v, got %v", 2, ms[2].RefTo)
 	}
-	ms2RefTo0 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("5"), To: schema.MotionID("1")}
-	ms2RefTo1 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("5"), To: schema.MotionID("2")}
+	ms2RefTo0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("1")}
+	ms2RefTo1 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("2")}
 	if ms[2].RefTo[0] != ms2RefTo0 {
 		t.Errorf("expecting %v, got %v", ms2RefTo0, ms[2].RefTo[0])
 	}
@@ -104,7 +103,7 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(ms[3].RefTo) != 1 {
 		t.Errorf("expecting %v, got %v", 1, ms[3].RefTo)
 	}
-	ms3RefTo0 := schema.Ref{Type: pmp.ResolvesRefType, From: schema.MotionID("7"), To: schema.MotionID("2")}
+	ms3RefTo0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("7"), To: motionproto.MotionID("2")}
 	if ms[3].RefTo[0] != ms3RefTo0 {
 		t.Errorf("expecting %v, got %v", ms3RefTo0, ms[3].RefTo[0])
 	}

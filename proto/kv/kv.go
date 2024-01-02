@@ -49,7 +49,6 @@ func (x KV[K, V]) Contains(ctx context.Context, ns ns.NS, t *git.Tree, key K) bo
 	if err == nil {
 		return true
 	}
-	// XXX
 	return false
 }
 

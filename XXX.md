@@ -1,5 +1,6 @@
 - [ ] test github integration of metrics
-
+     - issues 1/2 not closed after PR closure; closed on next cron run
+     - dashboard counts 0
 
 
 

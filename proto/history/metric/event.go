@@ -8,8 +8,8 @@ var (
 )
 
 type Event struct {
-	Join    *JoinEvent    `json:"join"`
-	Motion  *MotionEvent  `json:"motion"`
-	Account *AccountEvent `json:"account"`
-	Vote    *VoteEvent    `json:"vote"`
+	Join    *JoinEvent    `json:"join,omitempty"`
+	Motion  *MotionEvent  `json:"motion,omitempty"`
+	Account *AccountEvent `json:"account,omitempty"`
+	Vote    *VoteEvent    `json:"vote,omitempty"`
 }

@@ -20,7 +20,7 @@ jobs:
                - name: 'Setup python'
                  uses: actions/setup-python@v5
                  with:
-                    python-version: '3.12'
+                    python-version: '3.11'
                     architecture: 'x64'
                     cache: 'pip'
                - run: pip install -r .github/python/requirements.txt

@@ -52,18 +52,20 @@ Check that issues #1 and #2:
 
 [ Reopen pr #5 through the UI, for the next experiment. ]
 
-### vote for pr #26
+### vote for pr #30
 
 ```sh
-gov4git --config testing-config.json ballot vote --name pmp/motion/approval_poll/26 --choices rank --strengths 10.0
+gov4git --config testing-config.json ballot vote --name pmp/motion/approval_poll/30 --choices rank --strengths 10.0
 ```
 
 Verify it shows up as eligible for issues #1 and #2, and vice-versa.
 
-Merge pr #27.
+### merge pr #30
 
 Verify issues #1 and #2 closed.
 
 Verify bounty and reward disbursed.
 
 [ Revert pull request and re-open. ]
+
+### create a dashboard issue

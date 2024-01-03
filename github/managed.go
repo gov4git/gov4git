@@ -69,9 +69,10 @@ func newSyncManagedChanges() *SyncManagedChanges {
 func SyncManagedIssues_StageOnly(
 	ctx context.Context,
 	repo Repo,
-	githubClient *github.Client,
-	govAddr gov.OwnerAddress,
+	ghc *github.Client,
+	addr gov.OwnerAddress,
 	cloned gov.OwnerCloned,
+
 ) (syncChanges *SyncManagedChanges) {
 
 	syncChanges = newSyncManagedChanges()
@@ -80,130 +81,193 @@ func SyncManagedIssues_StageOnly(
 
 	// load github issues and governance motions, and
 	// index them under a common key space
-	motions := indexMotions(motionapi.ListMotions_Local(ctx, t))
+
+	ms0 := indexMotions(motionapi.ListMotions_Local(ctx, t))
 	loadPR := func(ctx context.Context,
 		repo Repo,
 		issue *github.Issue,
 	) bool {
 
 		id := IssueNumberToMotionID(int64(issue.GetNumber()))
-		m, motionExists := motions[id]
+		m, motionExists := ms0[id]
 
 		return IsIssueManaged(issue) && // merged state not relevant if issue is not managed
 			issue.GetState() == "closed" && // merged state is not relevant for open prs
 			(!motionExists || !m.Closed) // merged state is relevant, when no corresponding motion exists or motion is open
 	}
 
-	_, issues := LoadIssues(ctx, githubClient, repo, loadPR)
+	_, issues := LoadIssues(ctx, ghc, repo, loadPR)
 
-	// ensure every issue has a corresponding up-to-date motion
+	// sync motions with issues
+	syncMotionsWithIssues(
+		ctx,
+		repo,
+		ghc,
+		addr,
+		cloned,
+		syncChanges,
+		ms0,
+		issues,
+	)
+
+	// update references
+	ms0Refs := indexMotions(motionapi.ListMotions_Local(ctx, t))
+	syncRefs(ctx, cloned, syncChanges, issues, ms0Refs)
+
+	// motions have changed
+	ms1 := indexMotions(motionapi.ListMotions_Local(ctx, t))
+
+	// resync with GitHub to flush changes to GitHub issues
+	syncMotionsWithIssues(
+		ctx,
+		repo,
+		ghc,
+		addr,
+		cloned,
+		syncChanges,
+		ms1,
+		issues,
+	)
+
+	syncChanges.IssuesCausingChange.Sort()
+	return
+}
+
+func syncMotionsWithIssues(
+	ctx context.Context,
+	repo Repo,
+	ghc *github.Client,
+	addr gov.OwnerAddress,
+	cloned gov.OwnerCloned,
+	syncChanges *SyncManagedChanges,
+	motions map[motionproto.MotionID]motionproto.Motion,
+	issues map[string]ImportedIssue,
+) {
+
 	for key, issue := range issues {
 		id := motionproto.MotionID(key)
-		if issue.Managed {
-			if motion, ok := motions[id]; ok { // if motion for issue already exists, update it
-				changed := syncMeta(ctx, cloned, syncChanges, issue, motion)
-				switch {
+		syncMotion(
+			ctx,
+			repo,
+			ghc,
+			addr,
+			cloned,
+			syncChanges,
+			motions,
+			id,
+			issue,
+		)
+	}
+	// don't touch motions that have no corresponding issue
+}
 
-				case issue.Closed && motion.Closed:
+func syncMotion(
+	ctx context.Context,
+	repo Repo,
+	ghc *github.Client,
+	addr gov.OwnerAddress,
+	cloned gov.OwnerCloned,
+	syncChanges *SyncManagedChanges,
+	motions map[motionproto.MotionID]motionproto.Motion,
+	id motionproto.MotionID,
+	issue ImportedIssue,
+) {
 
-				case issue.Closed && !motion.Closed:
-					if motion.IsConcern() {
-						// manually closing an issue motion cancels it
-						motionapi.CancelMotion_StageOnly(ctx, cloned, id)
-						syncChanges.Cancelled.Add(id)
-					} else if motion.IsProposal() {
-						// manually closing a proposal motion closes it
-						if issue.Merged {
-							motionapi.CloseMotion_StageOnly(ctx, cloned, id, motionproto.Accept)
-						} else {
-							motionapi.CloseMotion_StageOnly(ctx, cloned, id, motionproto.Reject)
-						}
-						syncChanges.Closed.Add(id)
+	if issue.Managed {
+		if motion, ok := motions[id]; ok { // if motion for issue already exists, update it
+			changed := syncMeta(ctx, cloned, syncChanges, issue, motion)
+			switch {
+
+			case issue.Closed && motion.Closed:
+
+			case issue.Closed && !motion.Closed:
+				if motion.IsConcern() {
+					// manually closing an issue motion cancels it
+					motionapi.CancelMotion_StageOnly(ctx, cloned, id)
+					syncChanges.Cancelled.Add(id)
+				} else if motion.IsProposal() {
+					// manually closing a proposal motion closes it
+					if issue.Merged {
+						motionapi.CloseMotion_StageOnly(ctx, cloned, id, motionproto.Accept)
 					} else {
-						must.Errorf(ctx, "motion is neither a concern nor a proposal")
+						motionapi.CloseMotion_StageOnly(ctx, cloned, id, motionproto.Reject)
 					}
-					changed = true
-
-				case !issue.Closed && motion.Closed:
-
-					err := must.Try(
-						func() {
-							closeIssue(ctx, repo, githubClient, int(issue.Number))
-						},
-					)
-					if err != nil {
-						base.Infof("GitHub %s %v is open, while corresonding motion is closed. Failed to close GitHub issue (%v)",
-							motion.GithubType(), issue.Number, err)
-						motionapi.AppendMotionNotices_StageOnly(
-							ctx,
-							cloned.PublicClone(),
-							id,
-							notice.Noticef(
-								ctx,
-								"This %s must now be closed, as the corresponding Gov4Git motion has closed. Consider creating a new %s, if you want to revive it.",
-								motion.GithubType(),
-								motion.GithubType(),
-							),
-						)
-					} else {
-						motionapi.AppendMotionNotices_StageOnly(
-							ctx,
-							cloned.PublicClone(),
-							id,
-							notice.Noticef(
-								ctx,
-								"Gov4Git closed this issue, as the corresponding governance motion `%v` has now been closed.",
-								id,
-							),
-						)
-					}
-
-				case !issue.Closed && !motion.Closed:
-
+					syncChanges.Closed.Add(id)
+				} else {
+					must.Errorf(ctx, "motion is neither a concern nor a proposal")
 				}
-				if changed {
-					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
-				}
+				changed = true
 
-			} else { // otherwise, no motion for this issue exists, so create one
+			case !issue.Closed && motion.Closed:
 
-				if !issue.Closed {
-					syncCreateMotionForIssue(ctx, govAddr, cloned, syncChanges, issue, id)
-					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
-				}
-
-			}
-
-		} else { // issue is not governed, freeze motion if it exists and is open
-
-			if motion, ok := motions[id]; ok { // motion for issue already exists, update it
-				// if motion closed, do nothing
-				// if motion frozen, do nothing
-				// otherwise, freeze motion
-				if !motion.Closed && !motion.Frozen {
+				err := must.Try(
+					func() {
+						closeIssue(ctx, repo, ghc, int(issue.Number))
+					},
+				)
+				if err != nil {
+					base.Infof("GitHub %s %v is open, while corresonding motion is closed. Failed to close GitHub issue (%v)",
+						motion.GithubType(), issue.Number, err)
 					motionapi.AppendMotionNotices_StageOnly(
 						ctx,
 						cloned.PublicClone(),
 						id,
-						notice.Noticef(ctx, "The Gov4Git motion for this no longer managed issue/PR has been frozen."),
+						notice.Noticef(
+							ctx,
+							"This %s must now be closed, as the corresponding Gov4Git motion has closed. Consider creating a new %s, if you want to revive it.",
+							motion.GithubType(),
+							motion.GithubType(),
+						),
 					)
-					motionapi.FreezeMotion_StageOnly(notice.Mute(ctx), cloned, id)
-					syncChanges.Froze.Add(id)
-					syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
+				} else {
+					motionapi.AppendMotionNotices_StageOnly(
+						ctx,
+						cloned.PublicClone(),
+						id,
+						notice.Noticef(
+							ctx,
+							"Gov4Git closed this issue, as the corresponding governance motion `%v` has now been closed.",
+							id,
+						),
+					)
 				}
+
+			case !issue.Closed && !motion.Closed:
+
+			}
+			if changed {
+				syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
+			}
+
+		} else { // otherwise, no motion for this issue exists, so create one
+
+			if !issue.Closed {
+				syncCreateMotionForIssue(ctx, addr, cloned, syncChanges, issue, id)
+				syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
 			}
 
 		}
+
+	} else { // issue is not governed, freeze motion if it exists and is open
+
+		if motion, ok := motions[id]; ok { // motion for issue already exists, update it
+			// if motion closed, do nothing
+			// if motion frozen, do nothing
+			// otherwise, freeze motion
+			if !motion.Closed && !motion.Frozen {
+				motionapi.AppendMotionNotices_StageOnly(
+					ctx,
+					cloned.PublicClone(),
+					id,
+					notice.Noticef(ctx, "The Gov4Git motion for this no longer managed issue/PR has been frozen."),
+				)
+				motionapi.FreezeMotion_StageOnly(notice.Mute(ctx), cloned, id)
+				syncChanges.Froze.Add(id)
+				syncChanges.IssuesCausingChange = append(syncChanges.IssuesCausingChange, issue)
+			}
+		}
+
 	}
-
-	// don't touch motions that have no corresponding issue
-
-	// update references
-	matchingMotions := indexMotions(motionapi.ListMotions_Local(ctx, t))
-	syncRefs(ctx, cloned, syncChanges, issues, matchingMotions)
-
-	syncChanges.IssuesCausingChange.Sort()
-	return
 }
 
 func syncMeta(

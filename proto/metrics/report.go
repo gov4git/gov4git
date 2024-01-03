@@ -50,9 +50,9 @@ func AssembleReport_Local(
 
 	fmt.Fprintf(&w, "| Indicator|  30-day aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
-	fmt.Fprintf(&w, "| Number of opened motions | %d |\n", int(last30DaysSeries.DailyNumMotionOpen.Total()))
-	fmt.Fprintf(&w, "| Number of closed motions | %d |\n", int(last30DaysSeries.DailyNumMotionClose.Total()))
-	fmt.Fprintf(&w, "| Number of cancelled motions | %d |\n\n", int(last30DaysSeries.DailyNumMotionCancel.Total()))
+	fmt.Fprintf(&w, "| Number of opened issues/PRs | %d |\n", int(last30DaysSeries.DailyNumMotionOpen.Total()))
+	fmt.Fprintf(&w, "| Number of closed issues/PRs | %d |\n", int(last30DaysSeries.DailyNumMotionClose.Total()))
+	fmt.Fprintf(&w, "| Number of cancelled issues/PRs | %d |\n\n", int(last30DaysSeries.DailyNumMotionCancel.Total()))
 
 	fmt.Fprintf(&w, "| Indicator|  30-day aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
@@ -81,7 +81,7 @@ func AssembleReport_Local(
 
 	fmt.Printf("### Daily breakdown\n\n")
 
-	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily motions opened/closed/cancelled", urlCalc("daily_motions.png"))
+	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily issues/PRs opened/closed/cancelled", urlCalc("daily_motions.png"))
 	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily vote counts", urlCalc("daily_votes.png"))
 	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily vote charges", urlCalc("daily_charges.png"))
 	fmt.Fprintf(&w, "<img alt=%q src=%s width=650 />\n\n", "Daily credits cleared in bounties/rewards/refunds", urlCalc("daily_cleared.png"))
@@ -92,9 +92,9 @@ func AssembleReport_Local(
 
 	fmt.Fprintf(&w, "| Indicator|  All time aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")
-	fmt.Fprintf(&w, "| Number of opened motions | %d |\n", int(allTimeSeries.DailyNumMotionOpen.Total()))
-	fmt.Fprintf(&w, "| Number of closed motions | %d |\n", int(allTimeSeries.DailyNumMotionClose.Total()))
-	fmt.Fprintf(&w, "| Number of cancelled motions | %d |\n\n", int(allTimeSeries.DailyNumMotionCancel.Total()))
+	fmt.Fprintf(&w, "| Number of opened issues/PRs | %d |\n", int(allTimeSeries.DailyNumMotionOpen.Total()))
+	fmt.Fprintf(&w, "| Number of closed issues/PRs | %d |\n", int(allTimeSeries.DailyNumMotionClose.Total()))
+	fmt.Fprintf(&w, "| Number of cancelled issues/PRs | %d |\n\n", int(allTimeSeries.DailyNumMotionCancel.Total()))
 
 	fmt.Fprintf(&w, "| Indicator|  All time aggregate |\n")
 	fmt.Fprintf(&w, "|  ---:|  :--- |\n")

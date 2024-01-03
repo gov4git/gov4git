@@ -3,8 +3,6 @@
 - D0: update GOVERN-PLAYBOOK.md
 
 
-- [ ] run cron loop twice
-- [ ] retire issue prioritization
 - [ ] reward nay-voters on rejected PRs
 
 

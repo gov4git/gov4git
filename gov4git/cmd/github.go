@@ -20,26 +20,6 @@ var (
 		Run:   func(cmd *cobra.Command, args []string) {},
 	}
 
-	githubImportCmd = &cobra.Command{
-		Use:   "import",
-		Short: "Import GitHub artifacts for governance",
-		Long: `Import GitHub issues and pull requests. Example usage:
-
-	gov4git github import --token=GITHUB_ACCESS_TOKEN --project=PROJECT_OWNER/PROJECT_REPO
-
-You must be the organizer of the community to run this command. In particular, both public and private repos of
-the community must be present in your local config file, as well as their respective access tokens.
-`,
-		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			repo := govgh.ParseRepo(ctx, githubProject)
-			govgh.SetTokenSource(ctx, repo, govgh.MakeStaticTokenSource(ctx, githubToken))
-			ghc := govgh.GetGithubClient(ctx, repo)
-			importedIssues := govgh.Import(ctx, repo, ghc, setup.Organizer)
-			fmt.Fprint(os.Stdout, form.SprintJSON(importedIssues))
-		},
-	}
-
 	githubDeployCmd = &cobra.Command{
 		Use:   "deploy",
 		Short: "Deploy governance for a GitHub project repo",
@@ -149,12 +129,6 @@ var (
 )
 
 func init() {
-	githubCmd.AddCommand(githubImportCmd)
-	githubImportCmd.Flags().StringVar(&githubToken, "token", "", "GitHub access token")
-	githubImportCmd.Flags().StringVar(&githubProject, "project", "", "GitHub project owner/repo")
-	githubImportCmd.MarkFlagRequired("token")
-	githubImportCmd.MarkFlagRequired("project")
-
 	githubCmd.AddCommand(githubDeployCmd)
 	githubDeployCmd.Flags().StringVar(&githubToken, "token", "", "GitHub access token")
 	githubDeployCmd.Flags().StringVar(&githubProject, "project", "", "GitHub project owner/repo")

@@ -121,6 +121,15 @@ func (m *Motion) RemoveRef(unref Ref) {
 
 type Motions []Motion
 
+func (x Motions) FindID(id MotionID) (Motion, bool) {
+	for _, m := range x {
+		if m.ID == id {
+			return m, true
+		}
+	}
+	return Motion{}, false
+}
+
 func (x Motions) Sort() { sort.Sort(x) }
 
 func (x Motions) Len() int { return len(x) }

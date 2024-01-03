@@ -60,10 +60,6 @@ func Cron(
 		maintainers := govgh.FetchRepoMaintainers(ctx, repo, ghc)
 		base.Infof("maintainers for %v are %v", repo, form.SprintJSON(maintainers))
 
-		// process issues and pull requests
-		base.Infof("CRON: syncing issues for prioritization")
-		report["processed_prioritization_issues"] = govgh.ImportIssuesForPrioritization_StageOnly(ctx, repo, ghc, govAddr, cloned)
-
 		// process managed issues and pull requests
 		base.Infof("CRON: syncing managed issues and pull requests")
 		report["processed_managed_issues"] = govgh.SyncManagedIssues_StageOnly(ctx, repo, ghc, govAddr, cloned)

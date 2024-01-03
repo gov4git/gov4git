@@ -3,9 +3,9 @@
 - D0: update GOVERN-PLAYBOOK.md
 
 
-- run cron loop twice
-- retire issue prioritization
-- reward nay-voters on rejected PRs
+- [ ] run cron loop twice
+- [ ] retire issue prioritization
+- [ ] reward nay-voters on rejected PRs
 
 
 - P1: dynamic ownership graph over account IDs

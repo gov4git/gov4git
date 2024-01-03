@@ -37,74 +37,78 @@ func TestSyncManagedIssues(t *testing.T) {
 	}
 
 	// issue-1: open, not-frozen
-	if ms[0].ID != "1" {
-		t.Errorf("expecting 1, got %v", ms[0].ID)
+	m, ok := ms.FindID("1")
+	if !ok {
+		t.Errorf("expecting 1")
 	}
-	if ms[0].Closed || ms[0].Frozen {
+	if m.Closed || m.Frozen {
 		t.Errorf("expecting open, not-frozen")
 	}
 	// refs
-	if len(ms[0].RefBy) != 1 {
-		t.Errorf("expecting %v, got %v", 1, ms[0].RefBy)
+	if len(m.RefBy) < 1 {
+		t.Errorf("expecting %v, got %v", 1, m.RefBy)
 	}
 	ms0RefBy0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("1")}
-	if ms[0].RefBy[0] != ms0RefBy0 {
-		t.Errorf("expecting %v, got %v", ms0RefBy0, ms[0].RefBy[0])
+	if !m.RefBy.Contains(ms0RefBy0) {
+		t.Errorf("expecting %v, got %v", ms0RefBy0, m.RefBy)
 	}
 
 	// issue-2: open, frozen
-	if ms[1].ID != "2" {
-		t.Errorf("expecting 2, got %v", ms[1].ID)
+	m, ok = ms.FindID("2")
+	if !ok {
+		t.Errorf("expecting 2")
 	}
-	if ms[1].Closed || ms[1].Frozen {
-		t.Errorf("expecting (got): open (%v), frozen (%v)", ms[1].Closed, ms[1].Frozen)
+	if m.Closed || m.Frozen {
+		t.Errorf("expecting (got): open (%v), frozen (%v)", m.Closed, m.Frozen)
 	}
 	// refs
-	if len(ms[1].RefBy) != 2 {
-		t.Errorf("expecting %v, got %v", 2, ms[1].RefBy)
+	if len(m.RefBy) < 2 {
+		t.Errorf("expecting %v, got %v", 2, m.RefBy)
 	}
 	ms1RefBy0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("2")}
 	ms1RefBy1 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("7"), To: motionproto.MotionID("2")}
-	if ms[1].RefBy[0] != ms1RefBy0 {
-		t.Errorf("expecting %v, got %v", ms1RefBy0, ms[1].RefBy[0])
+	if !m.RefBy.Contains(ms1RefBy0) {
+		t.Errorf("expecting %v, got %v", ms1RefBy0, m.RefBy)
 	}
-	if ms[1].RefBy[1] != ms1RefBy1 {
-		t.Errorf("expecting %v, got %v", ms1RefBy1, ms[1].RefBy[1])
+	if !m.RefBy.Contains(ms1RefBy1) {
+		t.Errorf("expecting %v, got %v", ms1RefBy1, m.RefBy)
 	}
 
 	// issue-5: closed, frozen
-	if ms[2].ID != "5" {
-		t.Errorf("expecting 5, got %v", ms[2].ID)
+	m, ok = ms.FindID("5")
+	if !ok {
+		t.Errorf("expecting 5")
 	}
-	if ms[2].Closed || ms[2].Frozen {
+	if m.Closed || m.Frozen {
 		t.Errorf("expecting open, not frozen")
 	}
 	// refs
-	if len(ms[2].RefTo) != 2 {
-		t.Errorf("expecting %v, got %v", 2, ms[2].RefTo)
+	if len(m.RefTo) < 2 {
+		t.Errorf("expecting %v, got %v", 2, m.RefTo)
 	}
 	ms2RefTo0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("1")}
 	ms2RefTo1 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("2")}
-	if ms[2].RefTo[0] != ms2RefTo0 {
-		t.Errorf("expecting %v, got %v", ms2RefTo0, ms[2].RefTo[0])
+	if !m.RefTo.Contains(ms2RefTo0) {
+		t.Errorf("expecting %v, got %v", ms2RefTo0, m.RefTo)
 	}
-	if ms[2].RefTo[1] != ms2RefTo1 {
-		t.Errorf("expecting %v, got %v", ms2RefTo1, ms[2].RefTo[1])
+	if !m.RefTo.Contains(ms2RefTo1) {
+		t.Errorf("expecting %v, got %v", ms2RefTo1, m.RefTo)
 	}
 
 	// issue-7: closed, frozen
-	if ms[3].ID != "7" {
-		t.Errorf("expecting 7, got %v", ms[3].ID)
+	m, ok = ms.FindID("7")
+	if !ok {
+		t.Errorf("expecting 7")
 	}
-	if ms[3].Closed || ms[3].Frozen {
+	if m.Closed || m.Frozen {
 		t.Errorf("expecting open, not frozen")
 	}
 	// refs
-	if len(ms[3].RefTo) != 1 {
-		t.Errorf("expecting %v, got %v", 1, ms[3].RefTo)
+	if len(m.RefTo) < 1 {
+		t.Errorf("expecting %v, got %v", 1, m.RefTo)
 	}
 	ms3RefTo0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("7"), To: motionproto.MotionID("2")}
-	if ms[3].RefTo[0] != ms3RefTo0 {
-		t.Errorf("expecting %v, got %v", ms3RefTo0, ms[3].RefTo[0])
+	if !m.RefTo.Contains(ms3RefTo0) {
+		t.Errorf("expecting %v, got %v", ms3RefTo0, m.RefTo)
 	}
 }

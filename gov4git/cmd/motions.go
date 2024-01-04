@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
@@ -32,7 +32,7 @@ var (
 				setup.Organizer,
 				motionproto.MotionID(motionName),
 				motionproto.ParseMotionType(ctx, motionType),
-				motionproto.PolicyName(motionPolicy),
+				motion.PolicyName(motionPolicy),
 				member.User(motionAuthor),
 				motionTitle,
 				motionDesc,
@@ -103,7 +103,7 @@ func init() {
 	motionCmd.AddCommand(motionOpenCmd)
 	motionOpenCmd.Flags().StringVar(&motionName, "name", "", "unique name for motion")
 	motionOpenCmd.MarkFlagRequired("name")
-	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(motionpolicy.InstalledMotionPolicies(), ", ")+")")
+	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(motionproto.InstalledMotionPolicies(), ", ")+")")
 	motionOpenCmd.MarkFlagRequired("policy")
 	motionOpenCmd.Flags().StringVar(&motionAuthor, "author", "", "author user name")
 	motionOpenCmd.MarkFlagRequired("author")

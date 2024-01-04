@@ -5,7 +5,7 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 )
 
@@ -14,7 +14,7 @@ func UpdateMotions(
 	addr gov.OwnerAddress,
 	args ...any,
 
-) ([]motionpolicy.Report, []notice.Notices) {
+) ([]motionproto.Report, []notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
 	report, notices := UpdateMotions_StageOnly(ctx, cloned, args...)
@@ -27,23 +27,23 @@ func UpdateMotions_StageOnly(
 	cloned gov.OwnerCloned,
 	args ...any,
 
-) ([]motionpolicy.Report, []notice.Notices) {
+) ([]motionproto.Report, []notice.Notices) {
 
 	t := cloned.Public.Tree()
 	motions := ListMotions_Local(ctx, t)
-	reportList := []motionpolicy.Report{}
+	reportList := []motionproto.Report{}
 	noticesList := []notice.Notices{}
 	for i, motion := range motions {
 		// only update open motions
 		if motion.Closed {
 			continue
 		}
-		p := motionpolicy.GetMotionPolicy(ctx, motion)
+		p := motionproto.GetMotionPolicy(ctx, motion)
 		report, notices := p.Update(
 			ctx,
 			cloned,
 			motion,
-			motionpolicy.MotionPolicyNS(motions[i].ID),
+			motionproto.MotionPolicyNS(motions[i].ID),
 			args...,
 		)
 		reportList = append(reportList, report)

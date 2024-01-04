@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/lib4git/must"
 )
 
@@ -32,10 +33,10 @@ type Motion struct {
 	OpenedAt time.Time `json:"opened_at"`
 	ClosedAt time.Time `json:"closed_at"`
 	// instance, immutable
-	ID     MotionID    `json:"id"`
-	Type   MotionType  `json:"type"`
-	Policy PolicyName  `json:"policy"`
-	Author member.User `json:"author"` // community user or empty string
+	ID     MotionID          `json:"id"`
+	Type   MotionType        `json:"type"`
+	Policy motion.PolicyName `json:"policy"`
+	Author member.User       `json:"author"` // community user or empty string
 	// meta, mutable
 	TrackerURL string   `json:"tracker_url"` // link to concern on an external concern tracker, such as a GitHub issue
 	Title      string   `json:"title"`

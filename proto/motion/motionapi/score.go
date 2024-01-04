@@ -6,7 +6,6 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -38,13 +37,13 @@ func ScoreMotions_StageOnly(
 		if motion.Closed {
 			continue
 		}
-		p := motionpolicy.GetMotionPolicy(ctx, motion)
+		p := motionproto.GetMotionPolicy(ctx, motion)
 		// NOTE: motion structure may change during scoring (if Score calls motion methods)
 		score, notices := p.Score(
 			ctx,
 			cloned,
 			motion,
-			motionpolicy.MotionPolicyNS(motions[i].ID),
+			motionproto.MotionPolicyNS(motions[i].ID),
 			args...,
 		)
 		AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), motions[i].ID, notices)

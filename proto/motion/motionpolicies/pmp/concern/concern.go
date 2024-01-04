@@ -13,9 +13,9 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
@@ -25,10 +25,10 @@ import (
 )
 
 func init() {
-	motionpolicy.Install(context.Background(), ConcernPolicyName, concernPolicy{})
+	motionproto.Install(context.Background(), ConcernPolicyName, concernPolicy{})
 }
 
-const ConcernPolicyName = motionproto.PolicyName("pmp-concern-policy")
+const ConcernPolicyName = motion.PolicyName("pmp-concern-policy")
 
 type concernPolicy struct{}
 
@@ -39,7 +39,7 @@ func (x concernPolicy) Open(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	// initialize state
 	state := NewConcernState(con.ID)
@@ -102,7 +102,7 @@ func (x concernPolicy) Update(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	notices := notice.Notices{}
 	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
@@ -170,7 +170,7 @@ func (x concernPolicy) updateFreeze(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	toState := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
 
@@ -204,7 +204,7 @@ func (x concernPolicy) Close(
 	// args[0]=toID account.AccountID
 	// args[1]=prop schema.Motion
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	must.Assertf(ctx, len(args) == 2, "issue closure requires two arguments, got %v", args)
 	toID, ok := args[0].(account.AccountID)
@@ -247,7 +247,7 @@ func (x concernPolicy) Cancel(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	// cancel the poll for the motion (returning credits to users)
 	priorityPollName := pmp.ConcernPollBallotName(con.ID)
@@ -287,7 +287,7 @@ func (x concernPolicy) Show(
 	policyNS ns.NS,
 	args ...any,
 
-) form.Form {
+) (form.Form, motionproto.MotionBallots) {
 
 	// retrieve policy state
 	policyState := LoadState_Local(ctx, cloned.Tree(), policyNS)
@@ -297,10 +297,16 @@ func (x concernPolicy) Show(
 	pollState := ballotapi.Show_Local(ctx, cloned.Tree(), priorityPollName)
 
 	return PolicyView{
-		State:          policyState,
-		PriorityPoll:   pollState,
-		PriorityMargin: *ballotapi.GetMargin_Local(ctx, cloned, priorityPollName),
-	}
+			State:          policyState,
+			PriorityPoll:   pollState,
+			PriorityMargin: *ballotapi.GetMargin_Local(ctx, cloned, priorityPollName),
+		}, motionproto.MotionBallots{
+			motionproto.MotionBallot{
+				Label:         "priority_poll",
+				BallotID:      policyState.PriorityPoll,
+				BallotChoices: pollState.Ad.Choices,
+			},
+		}
 }
 
 func (x concernPolicy) AddRefTo(
@@ -313,7 +319,7 @@ func (x concernPolicy) AddRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	if !from.IsProposal() {
 		return nil, nil
@@ -336,7 +342,7 @@ func (x concernPolicy) AddRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, nil
 }
@@ -351,7 +357,7 @@ func (x concernPolicy) RemoveRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	if !from.IsProposal() {
 		return nil, nil
@@ -374,7 +380,7 @@ func (x concernPolicy) RemoveRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, nil
 }
@@ -386,7 +392,7 @@ func (x concernPolicy) Freeze(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	// freeze priority poll, if not already frozen
 	priorityPoll := pmp.ConcernPollBallotName(motion.ID)
@@ -405,7 +411,7 @@ func (x concernPolicy) Unfreeze(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	// unfreeze the priority poll ballot, if frozen
 	priorityPoll := pmp.ConcernPollBallotName(motion.ID)

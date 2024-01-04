@@ -5,7 +5,6 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 )
@@ -18,7 +17,7 @@ func UnlinkMotions(
 	typ motionproto.RefType,
 	args ...any,
 
-) (fromReport motionpolicy.Report, fromNotices notice.Notices, toReport motionpolicy.Report, toNotices notice.Notices) {
+) (fromReport motionproto.Report, fromNotices notice.Notices, toReport motionproto.Report, toNotices notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
 	ft, fn, tr, tn := UnlinkMotions_StageOnly(ctx, cloned, fromID, toID, typ, args...)
@@ -34,7 +33,7 @@ func UnlinkMotions_StageOnly(
 	typ motionproto.RefType,
 	args ...any,
 
-) (fromReport motionpolicy.Report, fromNotices notice.Notices, toReport motionpolicy.Report, toNotices notice.Notices) {
+) (fromReport motionproto.Report, fromNotices notice.Notices, toReport motionproto.Report, toNotices notice.Notices) {
 
 	t := cloned.Public.Tree()
 
@@ -53,8 +52,8 @@ func UnlinkMotions_StageOnly(
 	motionproto.MotionKV.Set(ctx, motionproto.MotionNS, t, toID, to)
 
 	// apply policies
-	fromPolicy := motionpolicy.Get(ctx, from.Policy)
-	toPolicy := motionpolicy.Get(ctx, to.Policy)
+	fromPolicy := motionproto.Get(ctx, from.Policy)
+	toPolicy := motionproto.Get(ctx, to.Policy)
 	// RemoveRefs are called in the opposite order of AddRefs
 	reportTo, noticesTo := toPolicy.RemoveRefTo(
 		ctx,
@@ -62,8 +61,8 @@ func UnlinkMotions_StageOnly(
 		unref.Type,
 		from,
 		to,
-		motionpolicy.MotionPolicyNS(fromID),
-		motionpolicy.MotionPolicyNS(toID),
+		motionproto.MotionPolicyNS(fromID),
+		motionproto.MotionPolicyNS(toID),
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), toID, noticesTo)
@@ -73,8 +72,8 @@ func UnlinkMotions_StageOnly(
 		unref.Type,
 		from,
 		to,
-		motionpolicy.MotionPolicyNS(fromID),
-		motionpolicy.MotionPolicyNS(toID),
+		motionproto.MotionPolicyNS(fromID),
+		motionproto.MotionPolicyNS(toID),
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), fromID, noticesFrom)

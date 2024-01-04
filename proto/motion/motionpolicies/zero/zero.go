@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/form"
@@ -12,10 +12,10 @@ import (
 )
 
 func init() {
-	motionpolicy.Install(context.Background(), ZeroPolicyName, zeroPolicy{})
+	motionproto.Install(context.Background(), ZeroPolicyName, zeroPolicy{})
 }
 
-const ZeroPolicyName = motionproto.PolicyName("zero-policy")
+const ZeroPolicyName = motion.PolicyName("zero-policy")
 
 type zeroPolicy struct{}
 
@@ -26,7 +26,7 @@ func (x zeroPolicy) Open(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "open motion #%v", motion.ID)
 }
@@ -50,7 +50,7 @@ func (x zeroPolicy) Update(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "update motion #%v", motion.ID)
 }
@@ -63,7 +63,7 @@ func (x zeroPolicy) Close(
 	decision motionproto.Decision,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "close motion #%v", motion.ID)
 }
@@ -75,7 +75,7 @@ func (x zeroPolicy) Cancel(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "cancel motion #%v", motion.ID)
 }
@@ -87,9 +87,9 @@ func (x zeroPolicy) Show(
 	policyNS ns.NS,
 	args ...any,
 
-) form.Form {
+) (form.Form, motionproto.MotionBallots) {
 
-	return nil
+	return nil, nil
 }
 
 func (x zeroPolicy) AddRefTo(
@@ -102,7 +102,7 @@ func (x zeroPolicy) AddRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "add %v ref to motion #%v, from motion #%v", refType, to.ID, from.ID)
 }
@@ -117,7 +117,7 @@ func (x zeroPolicy) AddRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "add %v ref from motion #%v, to motion #%v", refType, from.ID, to.ID)
 }
@@ -132,7 +132,7 @@ func (x zeroPolicy) RemoveRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "remove %v ref to motion #%v, from motion #%v", refType, to.ID, from.ID)
 }
@@ -147,7 +147,7 @@ func (x zeroPolicy) RemoveRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "remove %v ref from motion #%v, to motion #%v", refType, from.ID, to.ID)
 }
@@ -159,7 +159,7 @@ func (x zeroPolicy) Freeze(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "freeze motion #%v", motion.ID)
 }
@@ -171,7 +171,7 @@ func (x zeroPolicy) Unfreeze(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "unfreeze motion #%v", motion.ID)
 }

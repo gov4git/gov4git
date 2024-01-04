@@ -7,7 +7,6 @@ import (
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/trace"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/must"
@@ -20,7 +19,7 @@ func CloseMotion(
 	decision motionproto.Decision,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
 	report, notices := CloseMotion_StageOnly(ctx, cloned, id, decision, args...)
@@ -35,19 +34,19 @@ func CloseMotion_StageOnly(
 	decision motionproto.Decision,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	t := cloned.Public.Tree()
 	motion := motionproto.MotionKV.Get(ctx, motionproto.MotionNS, t, id)
 	must.Assert(ctx, !motion.Closed, motionproto.ErrMotionAlreadyClosed)
 
 	// apply policy
-	pcy := motionpolicy.Get(ctx, motion.Policy)
+	pcy := motionproto.Get(ctx, motion.Policy)
 	report, notices := pcy.Close(
 		ctx,
 		cloned,
 		motion,
-		motionpolicy.MotionPolicyNS(id),
+		motionproto.MotionPolicyNS(id),
 		decision,
 		args...,
 	)

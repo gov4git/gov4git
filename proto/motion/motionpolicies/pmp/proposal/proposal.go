@@ -13,9 +13,9 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
@@ -24,11 +24,11 @@ import (
 )
 
 func init() {
-	motionpolicy.Install(context.Background(), ProposalPolicyName, proposalPolicy{})
+	motionproto.Install(context.Background(), ProposalPolicyName, proposalPolicy{})
 }
 
 const (
-	ProposalPolicyName             motionproto.PolicyName = "pmp-proposal"
+	ProposalPolicyName             motion.PolicyName      = "pmp-proposal"
 	ProposalApprovalPollPolicyName ballotproto.PolicyName = "pmp-proposal-approval"
 )
 
@@ -41,7 +41,7 @@ func (x proposalPolicy) Open(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	// initialize state
 	state := NewProposalState(prop.ID)
@@ -132,7 +132,7 @@ func (x proposalPolicy) Update(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	notices := notice.Notices{}
 	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
@@ -220,7 +220,7 @@ func (x proposalPolicy) Close(
 	decision motionproto.Decision,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	// update the policy state before closing the motion
 	x.Update(ctx, cloned, prop, policyNS)
@@ -348,7 +348,7 @@ func (x proposalPolicy) Cancel(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	// cancel the referendum for the motion (and return credits to users)
 	referendumName := pmp.ProposalApprovalPollName(prop.ID)
@@ -390,7 +390,7 @@ func (x proposalPolicy) Show(
 	policyNS ns.NS,
 	args ...any,
 
-) form.Form {
+) (form.Form, motionproto.MotionBallots) {
 
 	// retrieve policy state
 	policyState := LoadState_Local(ctx, cloned.Tree(), policyNS)
@@ -399,12 +399,18 @@ func (x proposalPolicy) Show(
 	approvalPoll := loadPropApprovalPollTally(ctx, cloned, motion)
 
 	return PolicyView{
-		State:          policyState,
-		ApprovalPoll:   approvalPoll,
-		ApprovalMargin: *ballotapi.GetMargin_Local(ctx, cloned, approvalPoll.Ad.ID),
-		BountyAccount:  pmp.ProposalBountyAccountID(motion.ID),
-		RewardAccount:  pmp.ProposalRewardAccountID(motion.ID),
-	}
+			State:          policyState,
+			ApprovalPoll:   approvalPoll,
+			ApprovalMargin: *ballotapi.GetMargin_Local(ctx, cloned, approvalPoll.Ad.ID),
+			BountyAccount:  pmp.ProposalBountyAccountID(motion.ID),
+			RewardAccount:  pmp.ProposalRewardAccountID(motion.ID),
+		}, motionproto.MotionBallots{
+			motionproto.MotionBallot{
+				Label:         "approval_poll",
+				BallotID:      policyState.ApprovalPoll,
+				BallotChoices: approvalPoll.Ad.Choices,
+			},
+		}
 }
 
 func (x proposalPolicy) AddRefTo(
@@ -417,7 +423,7 @@ func (x proposalPolicy) AddRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, nil
 }
@@ -432,7 +438,7 @@ func (x proposalPolicy) AddRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	if !to.IsConcern() {
 		return nil, nil
@@ -455,7 +461,7 @@ func (x proposalPolicy) RemoveRefTo(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, nil
 }
@@ -470,7 +476,7 @@ func (x proposalPolicy) RemoveRefFrom(
 	toPolicyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	if !to.IsConcern() {
 		return nil, nil
@@ -490,7 +496,7 @@ func (x proposalPolicy) Freeze(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "This PR, managed by Gov4Git proposal `%v`, has been frozen ❄️", motion.ID)
 }
@@ -502,7 +508,7 @@ func (x proposalPolicy) Unfreeze(
 	policyNS ns.NS,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	return nil, notice.Noticef(ctx, "This PR, managed by Gov4Git proposal `%v`, has been unfrozen 🌤️", motion.ID)
 }

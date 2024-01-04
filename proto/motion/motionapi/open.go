@@ -9,7 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/gov4git/v2/proto/member"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/must"
@@ -20,14 +20,14 @@ func OpenMotion(
 	addr gov.OwnerAddress,
 	id motionproto.MotionID,
 	typ motionproto.MotionType,
-	policy motionproto.PolicyName,
+	policy motion.PolicyName,
 	author member.User,
 	title string,
 	desc string,
 	trackerURL string,
 	labels []string,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
 	report, notices := OpenMotion_StageOnly(ctx, cloned, id, typ, policy, author, title, desc, trackerURL, labels)
@@ -40,7 +40,7 @@ func OpenMotion_StageOnly(
 	cloned gov.OwnerCloned,
 	id motionproto.MotionID,
 	typ motionproto.MotionType,
-	policyName motionproto.PolicyName,
+	policyName motion.PolicyName,
 	author member.User,
 	title string,
 	desc string,
@@ -48,7 +48,7 @@ func OpenMotion_StageOnly(
 	labels []string,
 	args ...any,
 
-) (motionpolicy.Report, notice.Notices) {
+) (motionproto.Report, notice.Notices) {
 
 	t := cloned.Public.Tree()
 	labels = slices.Clone(labels)
@@ -73,12 +73,12 @@ func OpenMotion_StageOnly(
 	motionproto.MotionKV.Set(ctx, motionproto.MotionNS, t, id, motion)
 
 	// apply policy
-	pcy := motionpolicy.Get(ctx, policyName)
+	pcy := motionproto.Get(ctx, policyName)
 	report, notices := pcy.Open(
 		ctx,
 		cloned,
 		motion,
-		motionpolicy.MotionPolicyNS(id),
+		motionproto.MotionPolicyNS(id),
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)

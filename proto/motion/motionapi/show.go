@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicy"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
@@ -29,11 +28,12 @@ func ShowMotion_Local(
 	t := cloned.Tree()
 	m := motionproto.MotionKV.Get(ctx, motionproto.MotionNS, t, id)
 
-	p := motionpolicy.Get(ctx, m.Policy)
-	pv := p.Show(ctx, cloned, m, motionpolicy.MotionPolicyNS(id), args...)
+	p := motionproto.Get(ctx, m.Policy)
+	pv, pb := p.Show(ctx, cloned, m, motionproto.MotionPolicyNS(id), args...)
 
 	return motionproto.MotionView{
-		Motion: m,
-		Policy: pv,
+		Motion:  m,
+		Ballots: pb,
+		Policy:  pv,
 	}
 }

@@ -6,17 +6,17 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/git"
 )
 
 type Advertisement struct {
-	Gov          gov.Address            `json:"community"`
-	ID           BallotID               `json:"id"`
-	Owner        account.AccountID      `json:"owner"`
-	Purpose      purpose.Purpose        `json:"purpose"`
-	MotionPolicy motionproto.PolicyName `json:"motion_policy"`
+	Gov          gov.Address       `json:"community"`
+	ID           BallotID          `json:"id"`
+	Owner        account.AccountID `json:"owner"`
+	Purpose      purpose.Purpose   `json:"purpose"`
+	MotionPolicy motion.PolicyName `json:"motion_policy"`
 	//
 	Title       string `json:"title"`
 	Description string `json:"description"`

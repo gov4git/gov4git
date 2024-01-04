@@ -11,7 +11,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/gov4git/v2/proto/member"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -25,7 +25,7 @@ func Open(
 	id ballotproto.BallotID,
 	owner account.AccountID,
 	purpose purpose.Purpose,
-	motionPolicy motionproto.PolicyName,
+	motionPolicy motion.PolicyName,
 	title string,
 	description string,
 	choices []string,
@@ -59,7 +59,7 @@ func Open_StageOnly(
 	id ballotproto.BallotID,
 	owner account.AccountID,
 	purpose purpose.Purpose,
-	motionPolicy motionproto.PolicyName,
+	motionPolicy motion.PolicyName,
 	title string,
 	description string,
 	choices []string,

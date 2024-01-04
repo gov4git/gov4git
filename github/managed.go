@@ -10,6 +10,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp/concern"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp/proposal"
@@ -310,7 +311,7 @@ const (
 	MotionPolicyForPR    = proposal.ProposalPolicyName
 )
 
-func motionPolicyForIssue(issue ImportedIssue) motionproto.PolicyName {
+func motionPolicyForIssue(issue ImportedIssue) motion.PolicyName {
 	if issue.PullRequest {
 		return MotionPolicyForPR
 	}

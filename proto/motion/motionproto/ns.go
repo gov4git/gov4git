@@ -8,8 +8,7 @@ import (
 )
 
 var (
-	DocketNS = proto.RootNS.Append("docket")
-	MotionNS = DocketNS.Append("motion")
+	MotionNS = proto.RootNS.Append("motion")
 	MotionKV = kv.KV[MotionID, Motion]{}
 )
 

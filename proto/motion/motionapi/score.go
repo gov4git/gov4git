@@ -58,7 +58,7 @@ func ScoreMotions_StageOnly(
 
 	return git.NewChange(
 		fmt.Sprintf("Score all %d motions", len(motions)),
-		"docket_score_motions",
+		"motion_score_all",
 		form.Map{},
 		motions,
 		form.Forms{},

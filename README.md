@@ -26,7 +26,7 @@ sudo chmod +x ./gov4git-desktop-app.AppImage
 
 This video walks through the basics of using gov4git to govern a collaborative community on GitHub:
 
-[![gov4git walkthrough](https://img.youtube.com/vi/l0Cz-2xaajY/maxresdefault.jpg)](https://www.youtube.com/watch?v=l0Cz-2xaajY)
+[![gov4git walkthrough](https://img.youtube.com/vi/5lByGoNT2cQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=5lByGoNT2cQ)
 
 ## Introduction
 
@@ -46,5 +46,5 @@ Historical project documentation, including talks, white papers, long-term visio
 
 ## Communications
 
-- [@gov4git](https://twitter.com/gov4git) on Twitter
+- [@gov4git](https://x.com/gov4git) on Twitter/X
 - [gov4git](https://discord.gg/FqweERMB) on Discord

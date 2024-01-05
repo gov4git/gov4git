@@ -1,6 +1,6 @@
-- D0: update GOVERN.md with known subtleties:
-  - vulnerability: community members must not be allowed to close issues to prevent them from closing before a pr is submitted
-- D0: update GOVERN-PLAYBOOK.md
+- update GOVERN.md with known subtleties:
+  - community members must not be allowed to close issues (only maintainers), to prevent them from closing an issue and refunding bounties right before a pr is accepted
+- update GOVERN-PLAYBOOK.md
 
 
 - [ ] reward nay-voters on rejected PRs

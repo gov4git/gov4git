@@ -3,13 +3,15 @@ package motionproto
 import (
 	"sort"
 
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/lib4git/form"
 )
 
 type MotionView struct {
-	Motion  Motion        `json:"motion"`
-	Ballots MotionBallots `json:"ballots"`
-	Policy  form.Form     `json:"policy"`
+	Motion  Motion                   `json:"motion"`
+	Ballots MotionBallots            `json:"ballots"`
+	Policy  form.Form                `json:"policy"`
+	Voter   *ballotproto.VoterStatus `json:"voter_status,omitempty"`
 }
 
 type MotionViews []MotionView

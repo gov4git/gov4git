@@ -71,8 +71,13 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			l := motionapi.ListMotionViews(ctx, setup.Gov)
-			fmt.Fprint(os.Stdout, form.SprintJSON(l))
+			if motionTrack {
+				mvs := motionapi.TrackMotionBatch(ctx, setup.Gov, setup.Member)
+				fmt.Fprint(os.Stdout, form.SprintJSON(mvs))
+			} else {
+				l := motionapi.ListMotionViews(ctx, setup.Gov)
+				fmt.Fprint(os.Stdout, form.SprintJSON(l))
+			}
 		},
 	}
 
@@ -97,6 +102,7 @@ var (
 	motionType       string
 	motionTrackerURL string
 	motionAccept     bool
+	motionTrack      bool
 )
 
 func init() {
@@ -119,6 +125,7 @@ func init() {
 	motionCloseCmd.Flags().BoolVar(&motionAccept, "accept", false, "accept/reject")
 
 	motionCmd.AddCommand(motionListCmd)
+	motionListCmd.Flags().BoolVar(&motionTrack, "track", false, "include this voter's tracking info with every motion")
 
 	motionCmd.AddCommand(motionShowCmd)
 	motionShowCmd.Flags().StringVar(&motionName, "name", "", "name of motion")

@@ -45,7 +45,18 @@ func Track_StageOnly(
 	// read the voter's log
 	govCred := id.GetPublicCredentials(ctx, cloned.Tree())
 	voteLogNS := ballotproto.VoteLogPath(govCred.ID, ballotID)
-	voteLog := git.FromFile[ballotproto.VoteLog](ctx, voterOwner.Public.Tree(), voteLogNS)
+	voteLog, err := git.TryFromFile[ballotproto.VoteLog](ctx, voterOwner.Public.Tree(), voteLogNS)
+	if git.IsNotExist(err) {
+		return ballotproto.VoterStatus{
+			GovID:         govCred.ID,
+			GovAddress:    cloned.Address(),
+			BallotID:      ballotID,
+			AcceptedVotes: nil,
+			RejectedVotes: nil,
+			PendingVotes:  nil,
+		}
+	}
+	must.NoError(ctx, err)
 
 	// calculate pending votes
 	pendingVotes := map[id.ID]bool{}

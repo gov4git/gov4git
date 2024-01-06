@@ -24,6 +24,20 @@ func Track(
 	return Track_StageOnly(ctx, voterAddr, voterOwner, cloned, ballotID)
 }
 
+func FindVoterUser_Local(
+	ctx context.Context,
+	voterAddr id.OwnerAddress,
+	voterOwner id.OwnerCloned,
+	cloned gov.Cloned,
+
+) member.User {
+
+	voterCred := id.GetPublicCredentials(ctx, voterOwner.Public.Tree())
+	users := member.LookupUserByID_Local(ctx, cloned, voterCred.ID)
+	must.Assertf(ctx, len(users) > 0, "user not found in community")
+	return users[0]
+}
+
 func Track_StageOnly(
 	ctx context.Context,
 	voterAddr id.OwnerAddress,
@@ -34,10 +48,7 @@ func Track_StageOnly(
 ) ballotproto.VoterStatus {
 
 	// determine the voter's username in the community
-	voterCred := id.GetPublicCredentials(ctx, voterOwner.Public.Tree())
-	users := member.LookupUserByID_Local(ctx, cloned, voterCred.ID)
-	must.Assertf(ctx, len(users) > 0, "user not found in community")
-	user := users[0]
+	user := member.FindClonedUser_Local(ctx, cloned, voterOwner)
 
 	// read the ballot tally
 	tally := loadTally_Local(ctx, cloned.Tree(), ballotID)

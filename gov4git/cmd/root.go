@@ -57,6 +57,7 @@ func init() {
 	rootCmd.AddCommand(githubCmd)
 	rootCmd.AddCommand(motionCmd)
 	rootCmd.AddCommand(etcCmd)
+	rootCmd.AddCommand(panoramaCmd)
 }
 
 func initAfterFlags() {

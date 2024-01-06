@@ -50,10 +50,10 @@ func Tally_StageOnly(
 	votersCloned := clonePar(ctx, pv.VoterAccounts, maxPar)
 	pv.attachVoterClones(ctx, votersCloned)
 
-	return tallyVotersCloned_StageOnly(ctx, cloned, id, pv.VoterAccounts, pv.VoterClones)
+	return TallyVotersCloned_StageOnly(ctx, cloned, id, pv.VoterAccounts, pv.VoterClones)
 }
 
-func tallyVotersCloned_StageOnly(
+func TallyVotersCloned_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	id ballotproto.BallotID,
@@ -62,20 +62,33 @@ func tallyVotersCloned_StageOnly(
 
 ) (git.Change[form.Map, ballotproto.Tally], bool) {
 
-	t := cloned.Public.Tree()
+	var fetchedVotes FetchedVotes
+	for user, account := range voterAccounts {
+		chg := fetchVotesCloned(ctx, cloned, id, user, account, votersCloned[user])
+		fetchedVotes = append(fetchedVotes, chg.Result...)
+	}
+
+	return TallyFetchedVotes_StageOnly(
+		ctx,
+		cloned.PublicClone(),
+		id,
+		fetchedVotes,
+	)
+}
+
+func TallyFetchedVotes_StageOnly(
+	ctx context.Context,
+	cloned gov.Cloned,
+	id ballotproto.BallotID,
+	fetchedVotes FetchedVotes,
+
+) (git.Change[form.Map, ballotproto.Tally], bool) {
+
+	t := cloned.Tree()
 	ad, strat := ballotio.LoadPolicy(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 
-	// read current tally
 	currentTally := loadTally_Local(ctx, t, id)
-
-	var fetchedVotes FetchedVotes
-	var fetchVoteChanges []git.Change[form.Map, FetchedVotes]
-	for user, account := range voterAccounts {
-		chg := fetchVotesCloned(ctx, cloned, id, user, account, votersCloned[user])
-		fetchVoteChanges = append(fetchVoteChanges, chg)
-		fetchedVotes = append(fetchedVotes, chg.Result...)
-	}
 
 	// if no votes are received, no change in tally occurs
 	if len(fetchedVotes) == 0 {
@@ -100,7 +113,7 @@ func tallyVotersCloned_StageOnly(
 			"ballot_tally",
 			form.Map{"id": id},
 			currentTally,
-			form.ToForms(fetchVoteChanges),
+			nil,
 		), true
 	}
 
@@ -110,7 +123,7 @@ func tallyVotersCloned_StageOnly(
 	git.ToFileStage(ctx, t, id.TallyNS(), updatedTally)
 
 	// log
-	trace.Log_StageOnly(ctx, cloned.PublicClone(), &trace.Event{
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
 		Op:     "ballot_tally",
 		Args:   trace.M{"ballot": id},
 		Result: trace.M{"ad": ad, "tally": updatedTally},
@@ -121,7 +134,7 @@ func tallyVotersCloned_StageOnly(
 		"ballot_tally",
 		form.Map{"id": id},
 		updatedTally,
-		form.ToForms(fetchVoteChanges),
+		nil,
 	), true
 }
 

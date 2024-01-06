@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/gov4git/v2/proto/member"
@@ -36,22 +37,40 @@ func Panorama_Local(
 
 ) *Panoramic {
 
-	u := member.FindClonedUser_Local(ctx, cloned, voterOwner)
-	accountID := member.UserAccountID(u)
-	a := account.Get_Local(
-		ctx,
-		cloned,
-		account.AccountID(accountID),
-	)
-	real := a.Balance(account.PluralAsset).Quantity
+	voterUser := member.FindClonedUser_Local(ctx, cloned, voterOwner)
+	voterAccountID := member.UserAccountID(voterUser)
+	voterAccount := account.Get_Local(ctx, cloned, account.AccountID(voterAccountID))
+	real := voterAccount.Balance(account.PluralAsset).Quantity
 
 	mvs := motionapi.TrackMotionBatch_Local(ctx, cloned, voterAddr, voterOwner)
 
-	// eff := XXX
+	// apply pending votes to governance
+	for _, ad := range ballotapi.List_Local(ctx, cloned) {
+		vs := ballotapi.Track_StageOnly(
+			ctx,
+			voterAddr,
+			voterOwner,
+			cloned,
+			ad.ID,
+		)
+		fetchedVote := ballotapi.FetchedVote{
+			Voter:     voterUser,
+			Address:   voterAddr.Public,
+			Elections: vs.PendingVotes,
+		}
+		ballotapi.TallyFetchedVotes_StageOnly(
+			ctx,
+			cloned,
+			ad.ID,
+			ballotapi.FetchedVotes{fetchedVote},
+		)
+	}
+
+	eff := voterAccount.Balance(account.PluralAsset).Quantity
 
 	return &Panoramic{
-		RealBalance: real,
-		// EffectiveBalance: eff,
-		Motions: mvs,
+		RealBalance:      real,
+		EffectiveBalance: eff,
+		Motions:          mvs,
 	}
 }

@@ -16,13 +16,13 @@ import (
 
 func (qv SV) Tally(
 	ctx context.Context,
-	owner gov.OwnerCloned,
+	cloned gov.Cloned,
 	ad *ballotproto.Advertisement,
 	prior *ballotproto.Tally,
 	fetched map[member.User]ballotproto.Elections, // newly fetched votes from participating users
 ) git.Change[form.Map, ballotproto.Tally] {
 
-	return qv.tally(ctx, owner.PublicClone(), ad, prior, fetched, false)
+	return qv.tally(ctx, cloned, ad, prior, fetched, false)
 }
 
 func (qv SV) tally(

@@ -30,7 +30,7 @@ type Policy interface {
 
 	Tally(
 		ctx context.Context,
-		cloned gov.OwnerCloned,
+		cloned gov.Cloned,
 		ad *Advertisement,
 		current *Tally,
 		fetched map[member.User]Elections,

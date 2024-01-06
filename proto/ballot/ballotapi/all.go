@@ -64,7 +64,7 @@ func TallyAll_StageOnly(
 	tallyChanges := []git.Change[map[string]form.Form, ballotproto.Tally]{}
 	tallies := []ballotproto.Tally{}
 	for _, pv := range participatingVoters {
-		if tallyChg, changed := tallyVotersCloned_StageOnly(ctx, cloned, pv.Ad.ID, pv.VoterAccounts, pv.VoterClones); changed {
+		if tallyChg, changed := TallyVotersCloned_StageOnly(ctx, cloned, pv.Ad.ID, pv.VoterAccounts, pv.VoterClones); changed {
 			tallyChanges = append(tallyChanges, tallyChg)
 			tallies = append(tallies, tallyChg.Result)
 		}

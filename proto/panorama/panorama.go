@@ -15,7 +15,7 @@ import (
 
 type Panoramic struct {
 	RealBalance      float64                 `json:"real_balance"`
-	EffectiveBalance float64                 `json:"effective_balance"`
+	ProjectedBalance float64                 `json:"projected_balance"`
 	Motions          motionproto.MotionViews `json:"motions"`
 }
 
@@ -75,7 +75,7 @@ func Panorama_Local(
 
 	return &Panoramic{
 		RealBalance:      real,
-		EffectiveBalance: eff,
+		ProjectedBalance: eff,
 		Motions:          mvs,
 	}
 }

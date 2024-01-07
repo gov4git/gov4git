@@ -2,7 +2,6 @@ package panorama
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
@@ -50,7 +49,6 @@ func Panorama_Local(
 		if ad.Closed {
 			continue
 		}
-		fmt.Println("SIM", ad.ID)
 		vs := ballotapi.Track_StageOnly(
 			ctx,
 			voterAddr,

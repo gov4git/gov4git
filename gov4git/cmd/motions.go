@@ -87,8 +87,13 @@ var (
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 			LoadConfig()
-			s := motionapi.ShowMotion(ctx, setup.Gov, motionproto.MotionID(motionName))
-			fmt.Fprint(os.Stdout, form.SprintJSON(s))
+			if motionTrack {
+				s := motionapi.TrackMotion(ctx, setup.Gov, setup.Member, motionproto.MotionID(motionName))
+				fmt.Fprint(os.Stdout, form.SprintJSON(s))
+			} else {
+				mv := motionapi.ShowMotion(ctx, setup.Gov, motionproto.MotionID(motionName))
+				fmt.Fprint(os.Stdout, form.SprintJSON(mv))
+			}
 		},
 	}
 )
@@ -130,4 +135,5 @@ func init() {
 	motionCmd.AddCommand(motionShowCmd)
 	motionShowCmd.Flags().StringVar(&motionName, "name", "", "name of motion")
 	motionShowCmd.MarkFlagRequired("name")
+	motionShowCmd.Flags().BoolVar(&motionTrack, "track", false, "include this voter's tracking info")
 }

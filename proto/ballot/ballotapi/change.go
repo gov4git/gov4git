@@ -19,7 +19,7 @@ func Change(
 	title string,
 	description string,
 
-) git.Change[form.Map, ballotproto.Advertisement] {
+) git.Change[form.Map, ballotproto.Ad] {
 
 	cloned := gov.CloneOwner(ctx, addr)
 
@@ -36,7 +36,7 @@ func Change_StageOnly(
 	title string,
 	description string,
 
-) git.Change[form.Map, ballotproto.Advertisement] {
+) git.Change[form.Map, ballotproto.Ad] {
 
 	ad, _ := ballotio.LoadPolicy(ctx, cloned.Public.Tree(), id)
 	ad.Title = title

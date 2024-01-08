@@ -11,7 +11,7 @@ import (
 	"github.com/gov4git/lib4git/git"
 )
 
-type Advertisement struct {
+type Ad struct {
 	Gov          gov.Address       `json:"community"`
 	ID           BallotID          `json:"id"`
 	Owner        account.AccountID `json:"owner"`
@@ -32,7 +32,7 @@ type Advertisement struct {
 	ParentCommit git.CommitHash `json:"parent_commit"`
 }
 
-type Advertisements []Advertisement
+type Advertisements []Ad
 
 func (x Advertisements) Len() int {
 	return len(x)

@@ -10,7 +10,7 @@ import (
 func (qv SV) Margin(
 	ctx context.Context,
 	cloned gov.Cloned,
-	ad *ballotproto.Advertisement,
+	ad *ballotproto.Ad,
 	current *ballotproto.Tally,
 
 ) *ballotproto.Margin {

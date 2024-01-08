@@ -31,7 +31,7 @@ type ScoreKernelState struct {
 func (sk ScoreKernel) Score(
 	ctx context.Context,
 	cloned gov.Cloned,
-	ad *ballotproto.Advertisement,
+	ad *ballotproto.Ad,
 	el ballotproto.AcceptedElections,
 
 ) sv.ScoredVotes {
@@ -43,7 +43,7 @@ func (sk ScoreKernel) Score(
 func (sk ScoreKernel) CalcJS(
 	ctx context.Context,
 	cloned gov.Cloned,
-	ad *ballotproto.Advertisement,
+	ad *ballotproto.Ad,
 
 ) ballotproto.MarginCalcJS {
 

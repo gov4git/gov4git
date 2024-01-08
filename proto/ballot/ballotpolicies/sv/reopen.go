@@ -13,7 +13,7 @@ import (
 func (qv SV) Reopen(
 	ctx context.Context,
 	govOwner gov.OwnerCloned,
-	ad *ballotproto.Advertisement,
+	ad *ballotproto.Ad,
 	tally *ballotproto.Tally,
 ) git.Change[form.Map, form.None] {
 

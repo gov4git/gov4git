@@ -12,7 +12,7 @@ import (
 func augmentAndScoreUserVotes(
 	ctx context.Context,
 	cloned gov.Cloned,
-	ad *ballotproto.Advertisement,
+	ad *ballotproto.Ad,
 	kernel ScoreKernel,
 	oldVotes ballotproto.AcceptedElections,
 	newVotes ballotproto.Elections,

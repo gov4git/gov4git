@@ -15,7 +15,8 @@ import (
 type Panoramic struct {
 	RealBalance      float64                 `json:"real_balance"`
 	ProjectedBalance float64                 `json:"projected_balance"`
-	Motions          motionproto.MotionViews `json:"motions"`
+	RealMotions      motionproto.MotionViews `json:"real_motions"`
+	ProjectedMotions motionproto.MotionViews `json:"projected_motions"`
 }
 
 func Panorama(
@@ -38,14 +39,26 @@ func Panorama_Local(
 ) *Panoramic {
 
 	voterUser := member.FindClonedUser_Local(ctx, cloned, voterOwner)
+	// voterProfile := member.GetUser_Local(ctx, cloned, voterUser)
 	voterAccountID := member.UserAccountID(voterUser)
 
-	real := account.Get_Local(ctx, cloned, account.AccountID(voterAccountID)).Balance(account.PluralAsset).Quantity
+	realBalance := account.Get_Local(ctx, cloned, account.AccountID(voterAccountID)).Balance(account.PluralAsset).Quantity
 
-	mvs := motionapi.TrackMotionBatch_Local(ctx, cloned, voterAddr, voterOwner)
+	realMVS := motionapi.TrackMotionBatch_Local(ctx, cloned, voterAddr, voterOwner)
 
 	// apply pending votes to governance
 	for _, ad := range ballotapi.List_Local(ctx, cloned) {
+		// TODO: simulates votes by directly processing the vote mail (rather than the vote log).
+		// will require processing the mail without using the private repo for credentials (i.e. without verifying).
+		//
+		// ballotapi.TallyVoterCloned_StageOnly(
+		// 	ctx,
+		// 	gov.LiftCloned(ctx, cloned),
+		// 	ad.ID,
+		// 	voterUser,
+		// 	voterProfile,
+		// 	voterOwner.PublicClone(),
+		// )
 		if ad.Closed {
 			continue
 		}
@@ -69,11 +82,18 @@ func Panorama_Local(
 		)
 	}
 
-	eff := account.Get_Local(ctx, cloned, account.AccountID(voterAccountID)).Balance(account.PluralAsset).Quantity
+	projMVS := motionapi.TrackMotionBatch_Local(ctx, cloned, voterAddr, voterOwner)
+	// TODO: fully simulate tallying by processing voter's mail (see above)
+	for i := range projMVS {
+		projMVS[i].Voter = nil
+	}
+
+	projBalance := account.Get_Local(ctx, cloned, account.AccountID(voterAccountID)).Balance(account.PluralAsset).Quantity
 
 	return &Panoramic{
-		RealBalance:      real,
-		ProjectedBalance: eff,
-		Motions:          mvs,
+		RealBalance:      realBalance,
+		ProjectedBalance: projBalance,
+		RealMotions:      realMVS,
+		ProjectedMotions: projMVS,
 	}
 }

@@ -17,7 +17,7 @@ import (
 func (qv SV) Tally(
 	ctx context.Context,
 	cloned gov.Cloned,
-	ad *ballotproto.Advertisement,
+	ad *ballotproto.Ad,
 	prior *ballotproto.Tally,
 	fetched map[member.User]ballotproto.Elections, // newly fetched votes from participating users
 ) git.Change[form.Map, ballotproto.Tally] {
@@ -28,7 +28,7 @@ func (qv SV) Tally(
 func (qv SV) tally(
 	ctx context.Context,
 	cloned gov.Cloned, // clone of the public gov repo
-	ad *ballotproto.Advertisement,
+	ad *ballotproto.Ad,
 	prior *ballotproto.Tally,
 	fetched map[member.User]ballotproto.Elections, // newly fetched votes from participating users
 	strict bool, // fail if any voter has insufficient funds

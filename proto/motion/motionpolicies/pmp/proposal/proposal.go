@@ -409,6 +409,8 @@ func (x proposalPolicy) Show(
 				Label:         "approval_poll",
 				BallotID:      policyState.ApprovalPoll,
 				BallotChoices: approvalPoll.Ad.Choices,
+				BallotAd:      approvalPoll.Ad,
+				BallotTally:   approvalPoll.Tally,
 			},
 		}
 }

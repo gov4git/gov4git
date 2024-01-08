@@ -10,6 +10,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/trace"
+	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -51,6 +52,25 @@ func Tally_StageOnly(
 	pv.attachVoterClones(ctx, votersCloned)
 
 	return TallyVotersCloned_StageOnly(ctx, cloned, id, pv.VoterAccounts, pv.VoterClones)
+}
+
+func TallyVoterCloned_StageOnly(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	id ballotproto.BallotID,
+	voterUser member.User,
+	voterProfile member.UserProfile,
+	voterClone id.Cloned,
+
+) (git.Change[form.Map, ballotproto.Tally], bool) {
+
+	return TallyVotersCloned_StageOnly(
+		ctx,
+		cloned,
+		id,
+		map[member.User]member.UserProfile{voterUser: voterProfile},
+		map[member.User]git.Cloned{voterUser: voterClone},
+	)
 }
 
 func TallyVotersCloned_StageOnly(

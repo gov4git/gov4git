@@ -35,9 +35,9 @@ func LoadPolicy(
 	t *git.Tree,
 	id ballotproto.BallotID,
 
-) (ballotproto.Advertisement, ballotproto.Policy) {
+) (ballotproto.Ad, ballotproto.Policy) {
 
-	ad := git.FromFile[ballotproto.Advertisement](ctx, t, id.AdNS())
+	ad := git.FromFile[ballotproto.Ad](ctx, t, id.AdNS())
 	return ad, policyRegistry.Get(ctx, ad.Policy)
 }
 

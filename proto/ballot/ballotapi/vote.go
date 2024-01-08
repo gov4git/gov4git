@@ -94,7 +94,7 @@ func verifyElections(
 	addr gov.Address,
 	voterOwner id.OwnerCloned,
 	cloned gov.Cloned,
-	ad ballotproto.Advertisement,
+	ad ballotproto.Ad,
 	elections ballotproto.Elections,
 
 ) {

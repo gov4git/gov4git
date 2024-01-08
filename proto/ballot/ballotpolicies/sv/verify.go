@@ -16,7 +16,7 @@ func (qv SV) VerifyElections(
 	govAddr gov.Address,
 	voterCloned id.OwnerCloned,
 	govCloned gov.Cloned,
-	ad *ballotproto.Advertisement,
+	ad *ballotproto.Ad,
 	prior *ballotproto.Tally,
 	elections ballotproto.Elections,
 ) {

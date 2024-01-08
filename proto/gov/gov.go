@@ -4,11 +4,16 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/v2/proto/id"
+	"github.com/gov4git/lib4git/git"
 )
 
 // Non-owner
 
 type Address id.PublicAddress
+
+func (a Address) Git() git.Address {
+	return id.PublicAddress(a).Git()
+}
 
 func Clone(ctx context.Context, addr Address) Cloned {
 	return Cloned(id.Clone(ctx, id.PublicAddress(addr)))
@@ -26,6 +31,10 @@ type OwnerAddress id.OwnerAddress
 
 func CloneOwner(ctx context.Context, addr OwnerAddress) OwnerCloned {
 	return OwnerCloned(id.CloneOwner(ctx, id.OwnerAddress(addr)))
+}
+
+func LiftCloned(ctx context.Context, cloned Cloned) OwnerCloned {
+	return OwnerCloned(id.LiftCloned(ctx, id.Cloned(cloned)))
 }
 
 type OwnerCloned id.OwnerCloned

@@ -9,6 +9,41 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
+func TrackMotion(
+	ctx context.Context,
+	addr gov.Address,
+	voterAddr id.OwnerAddress,
+	mid motionproto.MotionID,
+
+) motionproto.MotionView {
+
+	voterOwner := id.CloneOwner(ctx, voterAddr)
+	return TrackMotion_Local(ctx, gov.Clone(ctx, addr), voterAddr, voterOwner, mid)
+}
+
+func TrackMotion_Local(
+	ctx context.Context,
+	cloned gov.Cloned,
+	voterAddr id.OwnerAddress,
+	voterOwner id.OwnerCloned,
+	mid motionproto.MotionID,
+
+) motionproto.MotionView {
+
+	mv := ShowMotion_Local(ctx, cloned, mid)
+	if len(mv.Ballots) > 0 {
+		vs := ballotapi.Track_StageOnly(
+			ctx,
+			voterAddr,
+			voterOwner,
+			cloned,
+			mv.Ballots[0].BallotID,
+		)
+		mv.Voter = &vs
+	}
+	return mv
+}
+
 func TrackMotionBatch(
 	ctx context.Context,
 	addr gov.Address,
@@ -28,21 +63,10 @@ func TrackMotionBatch_Local(
 
 ) motionproto.MotionViews {
 
-	t := cloned.Tree()
-	ids := motionproto.MotionKV.ListKeys(ctx, motionproto.MotionNS, t)
-	mvs := make(motionproto.MotionViews, len(ids))
-	for i, id := range ids {
-		mvs[i] = ShowMotion_Local(ctx, cloned, id)
-		if len(mvs[i].Ballots) > 0 {
-			vs := ballotapi.Track_StageOnly(
-				ctx,
-				voterAddr,
-				voterOwner,
-				cloned,
-				mvs[i].Ballots[0].BallotID,
-			)
-			mvs[i].Voter = &vs
-		}
+	mids := motionproto.MotionKV.ListKeys(ctx, motionproto.MotionNS, cloned.Tree())
+	mvs := make(motionproto.MotionViews, len(mids))
+	for i, mid := range mids {
+		mvs[i] = TrackMotion_Local(ctx, cloned, voterAddr, voterOwner, mid)
 	}
 	mvs.Sort()
 	return mvs

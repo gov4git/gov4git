@@ -11,13 +11,13 @@ import (
 )
 
 type participatingVoters struct {
-	Ad            ballotproto.Advertisement
+	Ad            ballotproto.Ad
 	Voters        []member.User
 	VoterAccounts map[member.User]member.UserProfile
 	VoterClones   map[member.User]git.Cloned
 }
 
-func loadParticipatingVoters(ctx context.Context, cloned gov.Cloned, ad ballotproto.Advertisement) *participatingVoters {
+func loadParticipatingVoters(ctx context.Context, cloned gov.Cloned, ad ballotproto.Ad) *participatingVoters {
 	pv := &participatingVoters{}
 	pv.Ad = ad
 	pv.VoterAccounts = map[member.User]member.UserProfile{}

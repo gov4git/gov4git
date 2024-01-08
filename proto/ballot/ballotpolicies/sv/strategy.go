@@ -16,14 +16,14 @@ type ScoreKernel interface {
 	Score(
 		ctx context.Context,
 		cloned gov.Cloned,
-		ad *ballotproto.Advertisement,
+		ad *ballotproto.Ad,
 		el ballotproto.AcceptedElections,
 	) ScoredVotes
 
 	CalcJS(
 		ctx context.Context,
 		cloned gov.Cloned,
-		ad *ballotproto.Advertisement,
+		ad *ballotproto.Ad,
 	) ballotproto.MarginCalcJS
 }
 
@@ -45,7 +45,7 @@ type QVScoreKernel struct{}
 func (QVScoreKernel) Score(
 	ctx context.Context,
 	cloned gov.Cloned,
-	ad *ballotproto.Advertisement,
+	ad *ballotproto.Ad,
 	el ballotproto.AcceptedElections,
 
 ) ScoredVotes {
@@ -83,7 +83,7 @@ func qvScoreFromStrength(strength float64) float64 {
 func (QVScoreKernel) CalcJS(
 	context.Context,
 	gov.Cloned,
-	*ballotproto.Advertisement,
+	*ballotproto.Ad,
 
 ) ballotproto.MarginCalcJS {
 

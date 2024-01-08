@@ -305,6 +305,8 @@ func (x concernPolicy) Show(
 				Label:         "priority_poll",
 				BallotID:      policyState.PriorityPoll,
 				BallotChoices: pollState.Ad.Choices,
+				BallotAd:      pollState.Ad,
+				BallotTally:   pollState.Tally,
 			},
 		}
 }

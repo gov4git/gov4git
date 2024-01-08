@@ -89,7 +89,7 @@ func Open_StageOnly(
 	ballotproto.BallotKV.Set(ctx, ballotproto.BallotNS, cloned.PublicClone().Tree(), id, struct{}{})
 
 	// write ad
-	ad := ballotproto.Advertisement{
+	ad := ballotproto.Ad{
 		Gov:          cloned.GovAddress(),
 		ID:           id,
 		Owner:        owner,

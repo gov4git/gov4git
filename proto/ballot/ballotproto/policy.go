@@ -23,7 +23,7 @@ type Policy interface {
 		govAddr gov.Address,
 		voterCloned id.OwnerCloned,
 		govCloned gov.Cloned,
-		ad *Advertisement,
+		ad *Ad,
 		prior *Tally,
 		elections Elections,
 	)
@@ -31,7 +31,7 @@ type Policy interface {
 	Tally(
 		ctx context.Context,
 		cloned gov.Cloned,
-		ad *Advertisement,
+		ad *Ad,
 		current *Tally,
 		fetched map[member.User]Elections,
 
@@ -40,7 +40,7 @@ type Policy interface {
 	Margin(
 		ctx context.Context,
 		cloned gov.Cloned,
-		ad *Advertisement,
+		ad *Ad,
 		current *Tally,
 
 	) *Margin
@@ -48,14 +48,14 @@ type Policy interface {
 	Open(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
-		ad *Advertisement,
+		ad *Ad,
 
 	) *Tally
 
 	Close(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
-		ad *Advertisement,
+		ad *Ad,
 		tally *Tally,
 
 	) git.Change[form.Map, Outcome]
@@ -63,7 +63,7 @@ type Policy interface {
 	Cancel(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
-		ad *Advertisement,
+		ad *Ad,
 		tally *Tally,
 
 	) git.Change[form.Map, Outcome]
@@ -71,7 +71,7 @@ type Policy interface {
 	Reopen(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
-		ad *Advertisement,
+		ad *Ad,
 		tally *Tally,
 
 	) git.Change[form.Map, form.None]

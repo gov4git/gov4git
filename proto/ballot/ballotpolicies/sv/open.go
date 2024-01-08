@@ -11,7 +11,7 @@ import (
 func (qv SV) Open(
 	ctx context.Context,
 	owner gov.OwnerCloned,
-	ad *ballotproto.Advertisement,
+	ad *ballotproto.Ad,
 
 ) *ballotproto.Tally {
 

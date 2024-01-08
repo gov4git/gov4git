@@ -21,6 +21,6 @@ type BallotAddress struct {
 }
 
 type AdTally struct {
-	Ad    Advertisement `json:"ballot_advertisement"`
-	Tally Tally         `json:"ballot_tally"`
+	Ad    Ad    `json:"ballot_advertisement"`
+	Tally Tally `json:"ballot_tally"`
 }

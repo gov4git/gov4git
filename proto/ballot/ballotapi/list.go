@@ -28,7 +28,7 @@ func List_Local(
 
 	ads := ballotproto.Advertisements{}
 	for _, id := range ids {
-		ad := git.FromFile[ballotproto.Advertisement](ctx, cloned.Tree(), id.AdNS())
+		ad := git.FromFile[ballotproto.Ad](ctx, cloned.Tree(), id.AdNS())
 		ads = append(ads, ad)
 	}
 

@@ -141,6 +141,8 @@ type MotionBallot struct {
 	Label         string               `json:"ballot_label"`
 	BallotID      ballotproto.BallotID `json:"ballot_id"`
 	BallotChoices []string             `json:"ballot_choices"`
+	BallotAd      ballotproto.Ad       `json:"ballot_ad"`
+	BallotTally   ballotproto.Tally    `json:"ballot_tally"`
 }
 
 type MotionBallots []MotionBallot

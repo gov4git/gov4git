@@ -8,7 +8,7 @@ import (
 )
 
 type Tally struct {
-	Ad            Advertisement                               `json:"advertisement"`
+	Ad            Ad                                          `json:"advertisement"`
 	Scores        map[string]float64                          `json:"scores"`         // choice -> score
 	ScoresByUser  map[member.User]map[string]StrengthAndScore `json:"scores_by_user"` // user -> choice -> signed voting credits spent on the choice by the user
 	AcceptedVotes map[member.User]AcceptedElections           `json:"accepted_votes"`

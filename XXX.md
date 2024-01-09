@@ -1,6 +1,9 @@
 # M2
 
-- 
+- refactor:
+  - score -> impact
+  - split panorama into identical real and projected substructures
+  - rename panorama to projection?
 
 - reward nay-voters on rejected PRs
 

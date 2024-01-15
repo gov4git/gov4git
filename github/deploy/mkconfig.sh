@@ -20,16 +20,16 @@ CONFIG_JSON=$(
                "auth" : {
                     ($gov_pub_repo): { "access_token": $gov_auth_token },
                     ($gov_priv_repo): { "access_token": $gov_auth_token },
-                    "git@github.com:petar/gov4git.public.git": { "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa" },
-                    "git@github.com:petar/gov4git.private.git": { "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa" }
+                    "git@github.com:petar/gov4git-identity-public.git": { "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa" },
+                    "git@github.com:petar/gov4git-identity-private.git": { "ssh_private_keys_file": "/Users/petar/.ssh/id_rsa" }
                },
                "gov_public_url": $gov_pub_repo,
                "gov_public_branch": "main",
                "gov_private_url": $gov_priv_repo,
                "gov_private_branch": "main",
-               "member_public_url": "git@github.com:petar/gov4git.public.git",
+               "member_public_url": "git@github.com:petar/gov4git-identity-public.git",
                "member_public_branch": "main",
-               "member_private_url": "git@github.com:petar/gov4git.private.git",
+               "member_private_url": "git@github.com:petar/gov4git-identity-private.git",
                "member_private_branch": "main"
           }'
 )

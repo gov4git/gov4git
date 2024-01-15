@@ -118,6 +118,21 @@ var (
 			fmt.Fprint(os.Stdout, form.SprintJSON(v.Balance(account.Asset(accountAsset)).Quantity))
 		},
 	}
+
+	accountRemoveCmd = &cobra.Command{
+		Use:   "remove",
+		Short: "Remove an account",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			LoadConfig()
+			account.Remove(
+				ctx,
+				setup.Gov,
+				account.AccountID(accountID),
+				accountNote,
+			)
+		},
+	}
 )
 
 var (
@@ -138,7 +153,7 @@ func init() {
 	accountIssueCmd.MarkFlagRequired("asset")
 	accountIssueCmd.Flags().Float64VarP(&accountQuantity, "quantity", "q", 0.0, "quantity")
 	accountIssueCmd.MarkFlagRequired("quantity")
-	accountIssueCmd.Flags().StringVarP(&accountNote, "Note", "n", "manual", "note")
+	accountIssueCmd.Flags().StringVarP(&accountNote, "note", "n", "manual", "note")
 	// burn
 	accountCmd.AddCommand(accountBurnCmd)
 	accountBurnCmd.Flags().StringVar(&accountFromID, "from", "", "from account id")
@@ -147,7 +162,7 @@ func init() {
 	accountBurnCmd.MarkFlagRequired("asset")
 	accountBurnCmd.Flags().Float64VarP(&accountQuantity, "quantity", "q", 0.0, "quantity")
 	accountBurnCmd.MarkFlagRequired("quantity")
-	accountBurnCmd.Flags().StringVarP(&accountNote, "Note", "n", "manual", "note")
+	accountBurnCmd.Flags().StringVarP(&accountNote, "note", "n", "manual", "note")
 	// transfer
 	accountCmd.AddCommand(accountTransferCmd)
 	accountTransferCmd.Flags().StringVar(&accountFromID, "from", "", "from account id")
@@ -158,7 +173,7 @@ func init() {
 	accountTransferCmd.MarkFlagRequired("asset")
 	accountTransferCmd.Flags().Float64VarP(&accountQuantity, "quantity", "q", 0.0, "quantity")
 	accountTransferCmd.MarkFlagRequired("quantity")
-	accountTransferCmd.Flags().StringVarP(&accountNote, "Note", "n", "manual", "note")
+	accountTransferCmd.Flags().StringVarP(&accountNote, "note", "n", "manual", "note")
 	// list
 	accountCmd.AddCommand(accountListCmd)
 	// show
@@ -171,4 +186,9 @@ func init() {
 	accountBalanceCmd.MarkFlagRequired("id")
 	accountBalanceCmd.Flags().StringVarP(&accountAsset, "asset", "a", "", "asset")
 	accountBalanceCmd.MarkFlagRequired("asset")
+	// remove
+	accountCmd.AddCommand(accountRemoveCmd)
+	accountRemoveCmd.Flags().StringVar(&accountID, "id", "", "account id")
+	accountRemoveCmd.MarkFlagRequired("id")
+	accountRemoveCmd.Flags().StringVarP(&accountNote, "note", "n", "manual", "note")
 }

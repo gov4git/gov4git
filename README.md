@@ -2,6 +2,14 @@
 
 ![Release](https://github.com/gov4git/gov4git/actions/workflows/release.yaml/badge.svg)
 
+## Introduction
+
+*gov4git* is a decentralized protocol for governing open-source communities based on git.
+
+It is a wholistic framework for lifelong governance of open-source projects, which is secure, flexible, transparent, and pluralistic.
+
+*gov4git* is designed to be practical and accessible. It requires git hosting as the only persistent infrastructure. It is easy (and continuously getting easier) to deploy by non-technical users, using an accompanying command-line client or a desktop app.
+
 ## Install the desktop app
 
 All users (community organizers and community members) can use Gov4Git via our desktop application. Find the installation link for your OS below.
@@ -32,13 +40,6 @@ This video walks through the basics of using gov4git to govern a collaborative c
 
 [![gov4git walkthrough](https://img.youtube.com/vi/5lByGoNT2cQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=5lByGoNT2cQ)
 
-## Introduction
-
-*gov4git* is a decentralized protocol for governing open-source communities based on git.
-
-It is a wholistic framework for lifelong governance of open-source projects, which is secure, flexible, transparent, and pluralistic.
-
-*gov4git* is designed to be practical and accessible. It requires git hosting as the only persistent infrastructure. It is easy (and continuously getting easier) to deploy by non-technical users, using an accompanying command-line client or a desktop app.
 
 ## Documentation
 

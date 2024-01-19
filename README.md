@@ -32,7 +32,7 @@ sudo chmod +x ./gov4git-desktop-app.AppImage
 
 ## How it works
 
-![Gov4Git user flow.](https://raw.githubusercontent.com/gov4git/materials/main/User%20Story/G4G%20User%20Story%20Option%201%20portrait.png?token=GHSAT0AAAAAACJXYWJLEKURAQMAHEUL4ESCZNK7IUQ)
+![Gov4Git user flow.](doc/images/how-it-works.png)
 
 ## Quick demo
 

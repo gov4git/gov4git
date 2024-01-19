@@ -24,7 +24,7 @@ sudo chmod +x ./gov4git-desktop-app.AppImage
 
 ## How it works
 
-<a href="https://gov4git.org"><img src="https://raw.githubusercontent.com/gov4git/materials/main/User%20Story/G4G%20User%20Story%20Option%201%20portrait.png?token=GHSAT0AAAAAACJXYWJLEKURAQMAHEUL4ESCZNK7IUQ" alt="Gov4Git user flow." width="650" /></a>
+![Gov4Git user flow.](https://raw.githubusercontent.com/gov4git/materials/main/User%20Story/G4G%20User%20Story%20Option%201%20portrait.png?token=GHSAT0AAAAAACJXYWJLEKURAQMAHEUL4ESCZNK7IUQ)
 
 ## Quick demo
 

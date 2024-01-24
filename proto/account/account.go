@@ -140,6 +140,37 @@ func Create_StageOnly(
 	})
 }
 
+func Remove(
+	ctx context.Context,
+	addr gov.Address,
+	id AccountID,
+	note string,
+
+) {
+	cloned := gov.Clone(ctx, addr)
+	Remove_StageOnly(ctx, cloned, id, note)
+	proto.Commitf(ctx, cloned, "account_remove", "remove account %v (%v)", id, note)
+	cloned.Push(ctx)
+}
+
+func Remove_StageOnly(
+	ctx context.Context,
+	cloned gov.Cloned,
+	id AccountID,
+	note string,
+
+) {
+	must.Assertf(ctx, Exists_Local(ctx, cloned, id), "account %v does not exists", id)
+	BurnAccount_StageOnly(ctx, cloned, id, note)
+	remove_StageOnly(ctx, cloned, id)
+	trace.Log_StageOnly(ctx, cloned, &trace.Event{
+		Op:     "account_remove",
+		Note:   note,
+		Args:   trace.M{"id": id},
+		Result: nil,
+	})
+}
+
 func Exists_Local(
 	ctx context.Context,
 	cloned gov.Cloned,
@@ -335,6 +366,20 @@ func Burn_StageOnly(
 	})
 }
 
+func BurnAccount_StageOnly(
+	ctx context.Context,
+	cloned gov.Cloned,
+	id AccountID,
+	note string,
+
+) {
+
+	a := Get_Local(ctx, cloned, id)
+	for _, h := range a.Assets {
+		Burn_StageOnly(ctx, cloned, id, h, note)
+	}
+}
+
 func set_StageOnly(
 	ctx context.Context,
 	cloned gov.Cloned,
@@ -343,6 +388,15 @@ func set_StageOnly(
 
 ) {
 	accountKV.Set(ctx, accountNS, cloned.Tree(), id, account)
+}
+
+func remove_StageOnly(
+	ctx context.Context,
+	cloned gov.Cloned,
+	id AccountID,
+
+) {
+	accountKV.Remove(ctx, accountNS, cloned.Tree(), id)
 }
 
 func List(

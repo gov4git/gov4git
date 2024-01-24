@@ -89,10 +89,15 @@ func RemoveUser(ctx context.Context, addr gov.Address, name User) {
 
 func RemoveUser_StageOnly(ctx context.Context, cloned gov.Cloned, name User) git.ChangeNoResult {
 	must.Assertf(ctx, IsUser_Local(ctx, cloned, name), "%v is not a name", name)
+
+	// burn user's balance and remove user account
+	account.Remove_StageOnly(ctx, cloned, UserAccountID(name), "removing user")
+
 	// remove all group memberships of the user
 	for _, g := range ListUserGroups_Local(ctx, cloned, name) {
 		RemoveMember_StageOnly(ctx, cloned, name, g)
 	}
+
 	// remove user record
 	usersKV.Remove(ctx, usersNS, cloned.Tree(), name)
 	chg := git.NewChangeNoResult(fmt.Sprintf("Remove user %v", name), "member_remove_user")

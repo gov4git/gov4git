@@ -2,7 +2,7 @@ package proposal
 
 import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
@@ -16,6 +16,6 @@ type ProposalState struct {
 
 func NewProposalState(id motionproto.MotionID) *ProposalState {
 	return &ProposalState{
-		ApprovalPoll: pmp.ProposalApprovalPollName(id),
+		ApprovalPoll: pmp_0.ProposalApprovalPollName(id),
 	}
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
@@ -51,12 +51,12 @@ func (x concernPolicy) Open(
 		ballotio.QVPolicyName,
 		cloned,
 		state.PriorityPoll,
-		pmp.ConcernAccountID(con.ID),
+		pmp_0.ConcernAccountID(con.ID),
 		purpose.Concern,
 		con.Policy,
 		fmt.Sprintf("Prioritization poll for motion %v", con.ID),
 		fmt.Sprintf("Up/down vote the priority for concern (issue) %v", con.ID),
-		[]string{pmp.ConcernBallotChoice},
+		[]string{pmp_0.ConcernBallotChoice},
 		member.Everybody,
 	)
 
@@ -72,7 +72,7 @@ func (x concernPolicy) Open(
 	})
 
 	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v` with initial __priority score__ of `%0.6f`."+
-		pmp.Welcome, con.ID, state.LatestPriorityScore)
+		pmp_0.Welcome, con.ID, state.LatestPriorityScore)
 }
 
 func (x concernPolicy) Score(
@@ -110,7 +110,7 @@ func (x concernPolicy) Update(
 	// update priority score
 
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
-	latestPriorityScore := ads.Tally.Scores[pmp.ConcernBallotChoice]
+	latestPriorityScore := ads.Tally.Scores[pmp_0.ConcernBallotChoice]
 	if latestPriorityScore != state.LatestPriorityScore {
 		notices = append(
 			notices,
@@ -155,7 +155,7 @@ func (x concernPolicy) Update(
 func computeEligibleProposals(ctx context.Context, cloned gov.Cloned, con motionproto.Motion) motionproto.Refs {
 	eligible := motionproto.Refs{}
 	for _, ref := range con.RefBy {
-		if pmp.IsConcernProposalEligible(ctx, cloned, con.ID, ref.From, ref.Type) {
+		if pmp_0.IsConcernProposalEligible(ctx, cloned, con.ID, ref.From, ref.Type) {
 			eligible = append(eligible, ref)
 		}
 	}
@@ -216,7 +216,7 @@ func (x concernPolicy) Close(
 	x.Update(ctx, cloned, con, policyNS)
 
 	// close the poll for the motion
-	priorityPollName := pmp.ConcernPollBallotName(con.ID)
+	priorityPollName := pmp_0.ConcernPollBallotName(con.ID)
 	chg := ballotapi.Close_StageOnly(
 		ctx,
 		cloned,
@@ -250,7 +250,7 @@ func (x concernPolicy) Cancel(
 ) (motionproto.Report, notice.Notices) {
 
 	// cancel the poll for the motion (returning credits to users)
-	priorityPollName := pmp.ConcernPollBallotName(con.ID)
+	priorityPollName := pmp_0.ConcernPollBallotName(con.ID)
 	chg := ballotapi.Cancel_StageOnly(
 		ctx,
 		cloned,
@@ -293,7 +293,7 @@ func (x concernPolicy) Show(
 	policyState := LoadState_Local(ctx, cloned.Tree(), policyNS)
 
 	// retrieve poll state
-	priorityPollName := pmp.ConcernPollBallotName(motion.ID)
+	priorityPollName := pmp_0.ConcernPollBallotName(motion.ID)
 	pollState := ballotapi.Show_Local(ctx, cloned.Tree(), priorityPollName)
 
 	return PolicyView{
@@ -327,7 +327,7 @@ func (x concernPolicy) AddRefTo(
 		return nil, nil
 	}
 
-	if refType != pmp.ClaimsRefType {
+	if refType != pmp_0.ClaimsRefType {
 		return nil, nil
 	}
 
@@ -365,7 +365,7 @@ func (x concernPolicy) RemoveRefTo(
 		return nil, nil
 	}
 
-	if refType != pmp.ClaimsRefType {
+	if refType != pmp_0.ClaimsRefType {
 		return nil, nil
 	}
 
@@ -397,7 +397,7 @@ func (x concernPolicy) Freeze(
 ) (motionproto.Report, notice.Notices) {
 
 	// freeze priority poll, if not already frozen
-	priorityPoll := pmp.ConcernPollBallotName(motion.ID)
+	priorityPoll := pmp_0.ConcernPollBallotName(motion.ID)
 	if ballotapi.IsFrozen_Local(ctx, cloned.PublicClone(), priorityPoll) {
 		return nil, nil
 	}
@@ -416,7 +416,7 @@ func (x concernPolicy) Unfreeze(
 ) (motionproto.Report, notice.Notices) {
 
 	// unfreeze the priority poll ballot, if frozen
-	priorityPoll := pmp.ConcernPollBallotName(motion.ID)
+	priorityPoll := pmp_0.ConcernPollBallotName(motion.ID)
 	if !ballotapi.IsFrozen_Local(ctx, cloned.PublicClone(), priorityPoll) {
 		return nil, nil
 	}

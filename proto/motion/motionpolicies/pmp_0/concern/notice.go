@@ -7,7 +7,7 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 )
 
@@ -17,7 +17,7 @@ func cancelNotice(ctx context.Context, motion motionproto.Motion, outcome ballot
 
 	fmt.Fprintf(&w, "This issue, managed as Gov4Git proposal `%v`, has been cancelled 🌂\n\n", motion.ID)
 
-	fmt.Fprintf(&w, "The issue priority tally was `%0.6f`.\n\n", outcome.Scores[pmp.ConcernBallotChoice])
+	fmt.Fprintf(&w, "The issue priority tally was `%0.6f`.\n\n", outcome.Scores[pmp_0.ConcernBallotChoice])
 
 	// refunded
 	fmt.Fprintf(&w, "Refunds issued:\n")
@@ -29,7 +29,7 @@ func cancelNotice(ctx context.Context, motion motionproto.Motion, outcome ballot
 	// tally by user
 	fmt.Fprintf(&w, "Tally breakdown by user:\n")
 	for user, ss := range outcome.ScoresByUser {
-		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp.ConcernBallotChoice].Vote())
+		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp_0.ConcernBallotChoice].Vote())
 	}
 
 	return notice.NewNotice(ctx, w.String())
@@ -47,7 +47,7 @@ func closeNotice(
 
 	fmt.Fprintf(&w, "This issue, managed as Gov4Git proposal `%v`, has been closed 🎉\n\n", con.ID)
 
-	fmt.Fprintf(&w, "The issue priority tally was `%0.6f`.\n\n", outcome.Scores[pmp.ConcernBallotChoice])
+	fmt.Fprintf(&w, "The issue priority tally was `%0.6f`.\n\n", outcome.Scores[pmp_0.ConcernBallotChoice])
 
 	// resolved by PR
 	fmt.Fprintf(&w, "Ths issue was resolved by [PR #%v](%v):\n\n", prop.ID, prop.TrackerURL)
@@ -55,7 +55,7 @@ func closeNotice(
 	// tally by user
 	fmt.Fprintf(&w, "Tally breakdown by user:\n")
 	for user, ss := range outcome.ScoresByUser {
-		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp.ConcernBallotChoice].Vote())
+		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp_0.ConcernBallotChoice].Vote())
 	}
 
 	return notice.NewNotice(ctx, w.String())

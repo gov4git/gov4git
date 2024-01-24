@@ -2,7 +2,7 @@ package concern
 
 import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
@@ -16,6 +16,6 @@ type ConcernState struct {
 
 func NewConcernState(id motionproto.MotionID) *ConcernState {
 	return &ConcernState{
-		PriorityPoll: pmp.ConcernPollBallotName(id),
+		PriorityPoll: pmp_0.ConcernPollBallotName(id),
 	}
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 )
 
@@ -27,7 +27,7 @@ func cancelNotice(
 		fmt.Fprintf(&w, "⚠️ Note that the PR was cancelled against the popular vote.\n\n")
 	}
 
-	fmt.Fprintf(&w, "The PR approval tally was `%0.6f`.\n\n", outcome.Scores[pmp.ProposalBallotChoice])
+	fmt.Fprintf(&w, "The PR approval tally was `%0.6f`.\n\n", outcome.Scores[pmp_0.ProposalBallotChoice])
 
 	// refunded
 	fmt.Fprintf(&w, "Refunds issued:\n")
@@ -39,7 +39,7 @@ func cancelNotice(
 	// tally by user
 	fmt.Fprintf(&w, "Tally breakdown by user:\n")
 	for user, ss := range outcome.ScoresByUser {
-		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp.ProposalBallotChoice].Vote())
+		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp_0.ProposalBallotChoice].Vote())
 	}
 
 	return notice.NewNotice(ctx, w.String())
@@ -65,7 +65,7 @@ func closeNotice(
 		fmt.Fprintf(&w, "⚠️ Note that the PR was merged against the popular vote.\n\n")
 	}
 
-	fmt.Fprintf(&w, "The PR approval tally was `%0.6f`.\n\n", outcome.Scores[pmp.ProposalBallotChoice])
+	fmt.Fprintf(&w, "The PR approval tally was `%0.6f`.\n\n", outcome.Scores[pmp_0.ProposalBallotChoice])
 
 	// bounty
 	if bountyDonated {
@@ -91,7 +91,7 @@ func closeNotice(
 	// tally by user
 	fmt.Fprintf(&w, "Tally breakdown by user:\n")
 	for user, ss := range outcome.ScoresByUser {
-		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp.ProposalBallotChoice].Vote())
+		fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[pmp_0.ProposalBallotChoice].Vote())
 	}
 
 	return notice.NewNotice(ctx, w.String())

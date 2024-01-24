@@ -1,5 +1,5 @@
 // Package pmp implements the Plural Management Protocol.
-package pmp
+package pmp_0
 
 import (
 	"context"

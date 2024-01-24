@@ -8,9 +8,9 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp/concern"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp/proposal"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/concern"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/proposal"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/test"
 )
@@ -67,7 +67,7 @@ func SetupTest(
 		cty.Organizer(),
 		testProposalID,
 		testConcernID,
-		pmp.ClaimsRefType,
+		pmp_0.ClaimsRefType,
 	)
 
 	// list
@@ -82,19 +82,19 @@ func SetupTest(
 
 	// cast votes
 	conEls := func(amt float64) ballotproto.Elections {
-		return ballotproto.OneElection(pmp.ConcernBallotChoice, amt)
+		return ballotproto.OneElection(pmp_0.ConcernBallotChoice, amt)
 	}
 	propEls := func(amt float64) ballotproto.Elections {
-		return ballotproto.OneElection(pmp.ProposalBallotChoice, amt)
+		return ballotproto.OneElection(pmp_0.ProposalBallotChoice, amt)
 	}
 
 	// concern votes
-	ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), pmp.ConcernPollBallotName(testConcernID), conEls(testUser0ConcernStrenth))
-	ballotapi.Vote(ctx, cty.MemberOwner(1), cty.Gov(), pmp.ConcernPollBallotName(testConcernID), conEls(testUser1ConcernStrength))
+	ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), pmp_0.ConcernPollBallotName(testConcernID), conEls(testUser0ConcernStrenth))
+	ballotapi.Vote(ctx, cty.MemberOwner(1), cty.Gov(), pmp_0.ConcernPollBallotName(testConcernID), conEls(testUser1ConcernStrength))
 
 	// proposal votes
-	ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), pmp.ProposalApprovalPollName(testProposalID), propEls(testUser0ProposalStrength))
-	ballotapi.Vote(ctx, cty.MemberOwner(1), cty.Gov(), pmp.ProposalApprovalPollName(testProposalID), propEls(testUser1ProposalStrength))
+	ballotapi.Vote(ctx, cty.MemberOwner(0), cty.Gov(), pmp_0.ProposalApprovalPollName(testProposalID), propEls(testUser0ProposalStrength))
+	ballotapi.Vote(ctx, cty.MemberOwner(1), cty.Gov(), pmp_0.ProposalApprovalPollName(testProposalID), propEls(testUser1ProposalStrength))
 
 	ballotapi.TallyAll(ctx, cty.Organizer(), 3)
 

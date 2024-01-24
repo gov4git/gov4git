@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/gov4git/v2/proto/member"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 )
@@ -40,7 +40,7 @@ func Boot_Local(
 	account.Boot_StageOnly(ctx, ownerCloned.PublicClone())
 
 	// create PMP accounts
-	pmp.Boot_StageOnly(ctx, ownerCloned.PublicClone())
+	pmp_0.Boot_StageOnly(ctx, ownerCloned.PublicClone())
 
 	proto.Commit(ctx, ownerCloned.Public.Tree(), chg2)
 	return chg

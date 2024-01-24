@@ -14,7 +14,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
@@ -50,8 +50,8 @@ func (x proposalPolicy) Open(
 	account.Create_StageOnly(
 		ctx,
 		cloned.PublicClone(),
-		pmp.ProposalBountyAccountID(prop.ID),
-		pmp.ProposalAccountID(prop.ID),
+		pmp_0.ProposalBountyAccountID(prop.ID),
+		pmp_0.ProposalAccountID(prop.ID),
 		fmt.Sprintf("bounty account for proposal %v", prop.ID),
 	)
 
@@ -59,8 +59,8 @@ func (x proposalPolicy) Open(
 	account.Create_StageOnly(
 		ctx,
 		cloned.PublicClone(),
-		pmp.ProposalRewardAccountID(prop.ID),
-		pmp.ProposalAccountID(prop.ID),
+		pmp_0.ProposalRewardAccountID(prop.ID),
+		pmp_0.ProposalAccountID(prop.ID),
 		fmt.Sprintf("reward account for proposal %v", prop.ID),
 	)
 
@@ -70,12 +70,12 @@ func (x proposalPolicy) Open(
 		ProposalApprovalPollPolicyName,
 		cloned,
 		state.ApprovalPoll,
-		pmp.ProposalAccountID(prop.ID),
+		pmp_0.ProposalAccountID(prop.ID),
 		purpose.Proposal,
 		prop.Policy,
 		fmt.Sprintf("Approval referendum for motion %v", prop.ID),
 		fmt.Sprintf("Up/down vote the approval vote for proposal (pull request) %v", prop.ID),
-		[]string{pmp.ProposalBallotChoice},
+		[]string{pmp_0.ProposalBallotChoice},
 		member.Everybody,
 	)
 	zeroState := ScoreKernelState{
@@ -101,7 +101,7 @@ func (x proposalPolicy) Open(
 
 	return nil, notice.Noticef(ctx,
 		"Started managing this PR as Gov4Git proposal `%v` with initial __approval score__ of `%0.6f`."+
-			pmp.Welcome, prop.ID, state.LatestApprovalScore)
+			pmp_0.Welcome, prop.ID, state.LatestApprovalScore)
 }
 
 func (x proposalPolicy) Score(
@@ -139,7 +139,7 @@ func (x proposalPolicy) Update(
 	// update approval score
 
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.ApprovalPoll)
-	latestApprovalScore := ads.Tally.Scores[pmp.ProposalBallotChoice]
+	latestApprovalScore := ads.Tally.Scores[pmp_0.ProposalBallotChoice]
 	if latestApprovalScore != state.LatestApprovalScore {
 		notices = append(
 			notices,
@@ -205,7 +205,7 @@ func calcBounty(
 
 	bounty := 0.0
 	for _, ref := range state.EligibleConcerns {
-		adt := ballotapi.Show_Local(ctx, cloned.PublicClone().Tree(), pmp.ConcernPollBallotName(ref.To))
+		adt := ballotapi.Show_Local(ctx, cloned.PublicClone().Tree(), pmp_0.ConcernPollBallotName(ref.To))
 		bounty += adt.Tally.Capitalization()
 	}
 	return bounty
@@ -227,21 +227,21 @@ func (x proposalPolicy) Close(
 	// was the PR merged or not
 	isMerged := decision.IsAccept()
 
-	approvalPollName := pmp.ProposalApprovalPollName(prop.ID)
+	approvalPollName := pmp_0.ProposalApprovalPollName(prop.ID)
 	adt := loadPropApprovalPollTally(ctx, cloned.PublicClone(), prop)
 
 	if isMerged {
 
 		// accepting a proposal against the popular vote?
-		againstPopular := adt.Tally.Scores[pmp.ProposalBallotChoice] < 0
+		againstPopular := adt.Tally.Scores[pmp_0.ProposalBallotChoice] < 0
 
 		// close the referendum for the motion
-		approvalPollName := pmp.ProposalApprovalPollName(prop.ID)
+		approvalPollName := pmp_0.ProposalApprovalPollName(prop.ID)
 		closeApprovalPoll := ballotapi.Close_StageOnly(
 			ctx,
 			cloned,
 			approvalPollName,
-			pmp.ProposalRewardAccountID(prop.ID),
+			pmp_0.ProposalRewardAccountID(prop.ID),
 		)
 
 		// close all concerns resolved by the motion, and
@@ -259,18 +259,18 @@ func (x proposalPolicy) Close(
 			account.Transfer_StageOnly(
 				ctx,
 				cloned.PublicClone(),
-				pmp.ProposalBountyAccountID(prop.ID),
-				pmp.MatchingPoolAccountID,
+				pmp_0.ProposalBountyAccountID(prop.ID),
+				pmp_0.MatchingPoolAccountID,
 				bounty,
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
 			)
 			bountyDonated = true
-			bountyReceipt.To = pmp.MatchingPoolAccountID.HistoryAccountID()
+			bountyReceipt.To = pmp_0.MatchingPoolAccountID.HistoryAccountID()
 		} else {
 			account.Transfer_StageOnly(
 				ctx,
 				cloned.PublicClone(),
-				pmp.ProposalBountyAccountID(prop.ID),
+				pmp_0.ProposalBountyAccountID(prop.ID),
 				member.UserAccountID(prop.Author),
 				bounty,
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
@@ -306,7 +306,7 @@ func (x proposalPolicy) Close(
 	} else {
 
 		// rejecting a proposal against the popular vote?
-		againstPopular := adt.Tally.Scores[pmp.ProposalBallotChoice] > 0
+		againstPopular := adt.Tally.Scores[pmp_0.ProposalBallotChoice] > 0
 
 		// cancel the referendum for the motion (refunds voters)
 		cancelApprovalPoll := ballotapi.Cancel_StageOnly(
@@ -350,7 +350,7 @@ func (x proposalPolicy) Cancel(
 ) (motionproto.Report, notice.Notices) {
 
 	// cancel the referendum for the motion (and return credits to users)
-	referendumName := pmp.ProposalApprovalPollName(prop.ID)
+	referendumName := pmp_0.ProposalApprovalPollName(prop.ID)
 	chg := ballotapi.Cancel_StageOnly(
 		ctx,
 		cloned,
@@ -401,8 +401,8 @@ func (x proposalPolicy) Show(
 			State:          policyState,
 			ApprovalPoll:   approvalPoll,
 			ApprovalMargin: *ballotapi.GetMargin_Local(ctx, cloned, approvalPoll.Ad.ID),
-			BountyAccount:  pmp.ProposalBountyAccountID(motion.ID),
-			RewardAccount:  pmp.ProposalRewardAccountID(motion.ID),
+			BountyAccount:  pmp_0.ProposalBountyAccountID(motion.ID),
+			RewardAccount:  pmp_0.ProposalRewardAccountID(motion.ID),
 		}, motionproto.MotionBallots{
 			motionproto.MotionBallot{
 				Label:         "approval_poll",
@@ -445,7 +445,7 @@ func (x proposalPolicy) AddRefFrom(
 		return nil, nil
 	}
 
-	if refType != pmp.ClaimsRefType {
+	if refType != pmp_0.ClaimsRefType {
 		return nil, nil
 	}
 
@@ -483,7 +483,7 @@ func (x proposalPolicy) RemoveRefFrom(
 		return nil, nil
 	}
 
-	if refType != pmp.ClaimsRefType {
+	if refType != pmp_0.ClaimsRefType {
 		return nil, nil
 	}
 

@@ -12,7 +12,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 )
 
 func loadResolvedConcerns(
@@ -34,7 +34,7 @@ func loadResolvedConcerns(
 func computeEligibleConcerns(ctx context.Context, cloned gov.Cloned, prop motionproto.Motion) motionproto.Refs {
 	eligible := motionproto.Refs{}
 	for _, ref := range prop.RefTo {
-		if pmp.IsConcernProposalEligible(ctx, cloned, ref.To, prop.ID, ref.Type) {
+		if pmp_0.IsConcernProposalEligible(ctx, cloned, ref.To, prop.ID, ref.Type) {
 			eligible = append(eligible, ref)
 		}
 	}
@@ -57,7 +57,7 @@ func closeResolvedConcerns(
 			cloned,
 			con.ID,
 			motionproto.Accept,
-			pmp.ProposalBountyAccountID(prop.ID), // account to send bounty to
+			pmp_0.ProposalBountyAccountID(prop.ID), // account to send bounty to
 			prop,                                 // proposal that resolves the issue
 		)
 	}
@@ -65,7 +65,7 @@ func closeResolvedConcerns(
 	return account.Get_Local(
 		ctx,
 		cloned.PublicClone(),
-		pmp.ProposalBountyAccountID(prop.ID),
+		pmp_0.ProposalBountyAccountID(prop.ID),
 	).Assets.Balance(account.PluralAsset)
 }
 
@@ -76,7 +76,7 @@ func loadPropApprovalPollTally(
 
 ) ballotproto.AdTally {
 
-	pollName := pmp.ProposalApprovalPollName(prop.ID)
+	pollName := pmp_0.ProposalApprovalPollName(prop.ID)
 	return ballotapi.Show_Local(ctx, cloned.Tree(), pollName)
 }
 
@@ -102,7 +102,7 @@ func disberseRewards(
 	totalCut := 0.0                        // sum of all positive votes
 	winnerCut := map[member.User]float64{} // positive votes per user
 	for user, choices := range adt.Tally.ScoresByUser {
-		ss := choices[pmp.ProposalBallotChoice]
+		ss := choices[pmp_0.ProposalBallotChoice]
 		if ss.Score <= 0.0 {
 			// compute total credits spent on negative votes
 			rewardFund += math.Abs(ss.Strength)
@@ -114,7 +114,7 @@ func disberseRewards(
 
 	// payout winnings
 	for user, choices := range adt.Tally.ScoresByUser {
-		ss := choices[pmp.ProposalBallotChoice]
+		ss := choices[pmp_0.ProposalBallotChoice]
 		if ss.Score > 0.0 {
 			payout := account.H(
 				account.PluralAsset,
@@ -130,7 +130,7 @@ func disberseRewards(
 			account.Transfer_StageOnly(
 				ctx,
 				cloned.PublicClone(),
-				pmp.ProposalRewardAccountID(prop.ID),
+				pmp_0.ProposalRewardAccountID(prop.ID),
 				member.UserAccountID(user),
 				payout,
 				fmt.Sprintf("reward for proposal %v", prop.ID),

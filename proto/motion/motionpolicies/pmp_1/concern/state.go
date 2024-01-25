@@ -12,12 +12,16 @@ type ConcernState struct {
 	PriorityPoll      ballotproto.BallotID `json:"priority_poll"`
 	EligibleProposals motionproto.Refs     `json:"eligible_proposals"`
 	//
-	LatestIQFDeficit    float64 `json:"iqf_deficit"` // idealized quadratic funding deficit
-	LatestPriorityScore float64 `json:"latest_priority_score"`
+	IQDeficit     float64 `json:"iq_deficit"` // idealized quadratic funding deficit
+	PriorityScore float64 `json:"priority_score"`
 }
 
 func NewConcernState(id motionproto.MotionID) *ConcernState {
 	return &ConcernState{
 		PriorityPoll: pmp_1.ConcernPollBallotName(id),
 	}
+}
+
+type PolicyState struct {
+	MatchDeficit float64 `json:"match_deficit"` //XXX
 }

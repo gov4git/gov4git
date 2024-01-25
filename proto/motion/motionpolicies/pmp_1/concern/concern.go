@@ -15,6 +15,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
@@ -72,7 +73,7 @@ func (x concernPolicy) Open(
 	})
 
 	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v` with initial __priority score__ of `%0.6f`."+
-		pmp_1.Welcome, con.ID, state.LatestPriorityScore)
+		pmp_1.Welcome, con.ID, state.PriorityScore)
 }
 
 func (x concernPolicy) Score(
@@ -86,7 +87,7 @@ func (x concernPolicy) Score(
 
 	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
 	return motionproto.Score{
-		Attention: state.LatestPriorityScore,
+		Attention: state.PriorityScore,
 	}, nil
 }
 
@@ -99,25 +100,35 @@ func (x concernPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
+	// outputs
 	notices := notice.Notices{}
-	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+
+	// inputs
+	policyState := LoadPolicyState_Local(ctx, cloned)
+	instanceState := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), instanceState.PriorityPoll)
+
+	// update idealized quadratic funding deficit
+	capFunding := capitalistFunding(&ads.Tally)
+	iqFunding := idealizedQuadraticFunding(&ads.Tally)
+	iqDeficit := iqFunding - capFunding
+	instanceState.IQDeficit = iqDeficit
 
 	// update priority score
-
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
-	latestPriorityScore := priorityOfConcern(&ads.Tally) //XXX
-	if latestPriorityScore != state.LatestPriorityScore {
+	matchFunds := pmp_0.GetMatchFundBalance_Local(ctx, cloned.PublicClone())
+	latestPriorityScore := capFunding + matchRatio(matchFunds, policyState.MatchDeficit)*iqDeficit
+	if latestPriorityScore != instanceState.PriorityScore {
 		notices = append(
 			notices,
 			notice.Noticef(ctx, "This issue's __priority score__ was updated to `%0.6f`.", latestPriorityScore)...,
 		)
 	}
-	state.LatestPriorityScore = latestPriorityScore
+	instanceState.PriorityScore = latestPriorityScore
 
 	// update eligible proposals
 
 	eligible := computeEligibleProposals(ctx, cloned.PublicClone(), con)
-	if !slices.Equal[motionproto.Refs](eligible, state.EligibleProposals) {
+	if !slices.Equal[motionproto.Refs](eligible, instanceState.EligibleProposals) {
 		// display updated list of eligible proposals
 		if len(eligible) == 0 {
 			notices = append(
@@ -137,11 +148,11 @@ func (x concernPolicy) Update(
 			)
 		}
 	}
-	state.EligibleProposals = eligible
+	instanceState.EligibleProposals = eligible
 
 	//
 
-	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, instanceState)
 
 	r0, n0 := x.updateFreeze(ctx, cloned, con, policyNS)
 	return r0, append(notices, n0...)
@@ -194,7 +205,25 @@ func (x concernPolicy) Aggregate(
 	cloned gov.OwnerCloned,
 	motion motionproto.Motions,
 	instancePolicyNS []ns.NS,
+
 ) {
+
+	// load all motion policy states
+	concernPolicyStates := make([]*ConcernState, len(motion))
+	for i := range motion {
+		concernPolicyStates[i] = LoadState_Local(ctx, cloned.PublicClone().Tree(), instancePolicyNS[i])
+	}
+
+	// aggregate match deficit
+	matchDeficit := 0.0
+	for _, concernPolicyState := range concernPolicyStates {
+		matchDeficit += concernPolicyState.IQDeficit
+	}
+
+	// update policy state
+	policyState := LoadPolicyState_Local(ctx, cloned)
+	policyState.MatchDeficit = matchDeficit
+	SavePolicyState_StageOnly(ctx, cloned, policyState)
 }
 
 func (x concernPolicy) Close(

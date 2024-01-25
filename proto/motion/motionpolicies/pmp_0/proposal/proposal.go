@@ -211,6 +211,14 @@ func calcBounty(
 	return bounty
 }
 
+func (x proposalPolicy) Aggregate(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion motionproto.Motions,
+	instancePolicyNS []ns.NS,
+) {
+}
+
 func (x proposalPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

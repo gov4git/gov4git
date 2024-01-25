@@ -89,8 +89,11 @@ func Cron(
 		state.LastCommunityTally = time.Now()
 	}
 
-	// update motion policies
-	motionapi.UpdateMotions_StageOnly(ctx, cloned)
+	// update and aggregate motion policies
+	for i := 0; i < 2; i++ {
+		motionapi.UpdateMotions_StageOnly(ctx, cloned)
+		motionapi.AggregateMotions_StageOnly(ctx, cloned)
+	}
 
 	// display notices on github
 	govgh.DisplayNotices_StageOnly(ctx, repo, ghc, cloned.PublicClone())

@@ -1,3 +1,8 @@
+# PMP
+
+- directive for contributions to matching fund
+- display matching fund size in notices
+
 # M3
 
 - dynamic ownership graph over account IDs

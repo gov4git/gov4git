@@ -194,6 +194,14 @@ func (x concernPolicy) updateFreeze(
 	return nil, notices
 }
 
+func (x concernPolicy) Aggregate(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion motionproto.Motions,
+	instancePolicyNS []ns.NS,
+) {
+}
+
 func (x concernPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

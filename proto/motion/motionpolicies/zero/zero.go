@@ -55,6 +55,14 @@ func (x zeroPolicy) Update(
 	return nil, notice.Noticef(ctx, "update motion #%v", motion.ID)
 }
 
+func (x zeroPolicy) Aggregate(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion motionproto.Motions,
+	instancePolicyNS []ns.NS,
+) {
+}
+
 func (x zeroPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

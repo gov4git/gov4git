@@ -40,7 +40,7 @@ type Election struct {
 	VoteID             id.ID     `json:"vote_id"`
 	VoteTime           time.Time `json:"vote_time"`
 	VoteChoice         string    `json:"vote_choice"`
-	VoteStrengthChange float64   `json:"vote_strength_change"`
+	VoteStrengthChange float64   `json:"vote_strength_change"` // this is the voter's payment with a sign to indicate direction of vote
 }
 
 func NewElection(choice string, strength float64) Election {

@@ -36,7 +36,7 @@ func (x Tally) Attention() float64 {
 
 type StrengthAndScore struct {
 	Strength float64 `json:"strength"` // signed number of voting credits spent by the user
-	Score    float64 `json:"score"`    // qv score, based on the voting strength (above)
+	Score    float64 `json:"score"`    // vote impact, based on the voting strength (above)
 }
 
 func (ss StrengthAndScore) Vote() float64 {

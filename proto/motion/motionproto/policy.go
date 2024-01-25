@@ -23,7 +23,7 @@ type Policy interface {
 		args ...any,
 	) (Report, notice.Notices)
 
-	// Score is invoked only on open motions.
+	// Score is invoked, on all open motions.
 	Score(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
@@ -32,7 +32,7 @@ type Policy interface {
 		args ...any,
 	) (Score, notice.Notices)
 
-	// Update is invoked only on open motions, after rescoring all motions.
+	// Update is invoked after Score, on all open motions.
 	Update(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
@@ -40,6 +40,14 @@ type Policy interface {
 		instancePolicyNS ns.NS,
 		args ...any,
 	) (Report, notice.Notices)
+
+	// Aggregate is invoked after Update, over all open motions.
+	Aggregate(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		motion Motions,
+		instancePolicyNS []ns.NS,
+	)
 
 	Close(
 		ctx context.Context,
@@ -170,7 +178,11 @@ func namesToStrings(ns []motion.PolicyName) []string {
 }
 
 func GetMotionPolicy(ctx context.Context, m Motion) Policy {
-	return Get(ctx, m.Policy)
+	return GetMotionPolicyByName(ctx, m.Policy)
+}
+
+func GetMotionPolicyByName(ctx context.Context, pn motion.PolicyName) Policy {
+	return Get(ctx, pn)
 }
 
 // MotionPolicyNS returns the private policy namespace for a given motion instance.

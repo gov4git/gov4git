@@ -28,7 +28,7 @@ func init() {
 	motionproto.Install(context.Background(), ConcernPolicyName, concernPolicy{})
 }
 
-const ConcernPolicyName = motion.PolicyName("pmp-concern-policy")
+const ConcernPolicyName = motion.PolicyName("pmp-concern-policy-v1")
 
 type concernPolicy struct{}
 
@@ -65,7 +65,7 @@ func (x concernPolicy) Open(
 		Motion: &metric.MotionEvent{
 			Open: &metric.MotionOpen{
 				ID:     metric.MotionID(con.ID),
-				Type:   "concern",
+				Type:   "concern-v1",
 				Policy: metric.MotionPolicy(con.Policy),
 			},
 		},
@@ -85,13 +85,8 @@ func (x concernPolicy) Score(
 ) (motionproto.Score, notice.Notices) {
 
 	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
-
-	// compute motion score from the priority poll ballot
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
-	attention := ads.Tally.Attention()
-
 	return motionproto.Score{
-		Attention: attention,
+		Attention: state.LatestPriorityScore,
 	}, nil
 }
 
@@ -110,7 +105,7 @@ func (x concernPolicy) Update(
 	// update priority score
 
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
-	latestPriorityScore := ads.Tally.Scores[pmp_1.ConcernBallotChoice]
+	latestPriorityScore := priorityOfConcern(&ads.Tally) //XXX
 	if latestPriorityScore != state.LatestPriorityScore {
 		notices = append(
 			notices,
@@ -194,6 +189,14 @@ func (x concernPolicy) updateFreeze(
 	return nil, notices
 }
 
+func (x concernPolicy) Aggregate(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion motionproto.Motions,
+	instancePolicyNS []ns.NS,
+) {
+}
+
 func (x concernPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
@@ -229,7 +232,7 @@ func (x concernPolicy) Close(
 		Motion: &metric.MotionEvent{
 			Close: &metric.MotionClose{
 				ID:       metric.MotionID(con.ID),
-				Type:     "concern",
+				Type:     "concern-v1",
 				Decision: decision.MetricDecision(),
 				Policy:   metric.MotionPolicy(con.Policy),
 				Receipts: nil, // rewards are accounted for by the proposal
@@ -262,7 +265,7 @@ func (x concernPolicy) Cancel(
 		Motion: &metric.MotionEvent{
 			Cancel: &metric.MotionCancel{
 				ID:       metric.MotionID(con.ID),
-				Type:     "concern",
+				Type:     "concern-v1",
 				Policy:   metric.MotionPolicy(con.Policy),
 				Receipts: nil, // refunds are accounted for by the proposal
 			},

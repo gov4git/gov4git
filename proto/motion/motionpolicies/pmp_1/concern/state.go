@@ -9,9 +9,11 @@ import (
 const StateFilebase = "state.json"
 
 type ConcernState struct {
-	PriorityPoll        ballotproto.BallotID `json:"priority_poll"`
-	LatestPriorityScore float64              `json:"latest_priority_score"`
-	EligibleProposals   motionproto.Refs     `json:"eligible_proposals"`
+	PriorityPoll      ballotproto.BallotID `json:"priority_poll"`
+	EligibleProposals motionproto.Refs     `json:"eligible_proposals"`
+	//
+	LatestIQFDeficit    float64 `json:"iqf_deficit"` // idealized quadratic funding deficit
+	LatestPriorityScore float64 `json:"latest_priority_score"`
 }
 
 func NewConcernState(id motionproto.MotionID) *ConcernState {

@@ -4,6 +4,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/kv"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -18,4 +19,13 @@ func MotionNoticesNS(id MotionID) ns.NS {
 
 func MotionAccountID(motionID MotionID) account.AccountID {
 	return account.AccountIDFromLine(account.Pair("motion", motionID.String()))
+}
+
+var (
+	// PoliciesNS is a namespace for holding individual policy type namespaces.
+	PoliciesNS = MotionNS.Append("policy")
+)
+
+func PolicyNS(policyName motion.PolicyName) ns.NS {
+	return PoliciesNS.Append(policyName.String())
 }

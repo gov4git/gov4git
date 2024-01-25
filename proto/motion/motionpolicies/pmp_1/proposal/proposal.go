@@ -15,6 +15,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
@@ -269,12 +270,12 @@ func (x proposalPolicy) Close(
 				ctx,
 				cloned.PublicClone(),
 				pmp_1.ProposalBountyAccountID(prop.ID),
-				pmp_1.MatchingPoolAccountID,
+				pmp_0.MatchingPoolAccountID,
 				bounty,
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
 			)
 			bountyDonated = true
-			bountyReceipt.To = pmp_1.MatchingPoolAccountID.HistoryAccountID()
+			bountyReceipt.To = pmp_0.MatchingPoolAccountID.HistoryAccountID()
 		} else {
 			account.Transfer_StageOnly(
 				ctx,

@@ -226,7 +226,6 @@ func (x concernPolicy) Aggregate(
 	SavePolicyState_StageOnly(ctx, cloned, policyState)
 }
 
-// XXX
 func (x concernPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

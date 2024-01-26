@@ -1,7 +1,7 @@
 # PMP
 
-- directive for contributions to matching fund
-- display matching fund size in notices
+- labels gov4git:pmp-v0 and gov4git:pmp-v1
+- display matching fund size in notices and dashboard
 
 # M3
 

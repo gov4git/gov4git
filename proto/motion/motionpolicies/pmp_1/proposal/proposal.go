@@ -29,8 +29,8 @@ func init() {
 }
 
 const (
-	ProposalPolicyName             motion.PolicyName      = "pmp-proposal"
-	ProposalApprovalPollPolicyName ballotproto.PolicyName = "pmp-proposal-approval"
+	ProposalPolicyName             motion.PolicyName      = "pmp-proposal-v1"
+	ProposalApprovalPollPolicyName ballotproto.PolicyName = "pmp-proposal-approval-v1"
 )
 
 type proposalPolicy struct{}

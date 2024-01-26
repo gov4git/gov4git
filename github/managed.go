@@ -12,8 +12,12 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/concern"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/proposal"
+
+	pmpv0_concern "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/concern"
+	pmpv0_proposal "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/proposal"
+	pmpv1_concern "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/concern"
+	pmpv1_proposal "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/proposal"
+
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/base"
@@ -174,7 +178,8 @@ func syncMotion(
 	issue ImportedIssue,
 ) {
 
-	if issue.Managed {
+	//XXX
+	if issue.IsManaged() {
 		if motion, ok := motions[id]; ok { // if motion for issue already exists, update it
 			changed := syncMeta(ctx, cloned, syncChanges, issue, motion)
 			switch {
@@ -306,16 +311,24 @@ func syncMeta(
 	return true
 }
 
-const (
-	MotionPolicyForIssue = concern.ConcernPolicyName
-	MotionPolicyForPR    = proposal.ProposalPolicyName
-)
-
 func motionPolicyForIssue(issue ImportedIssue) motion.PolicyName {
-	if issue.PullRequest {
-		return MotionPolicyForPR
+
+	switch {
+
+	case issue.ManagedByPMPv0:
+		if issue.PullRequest {
+			return pmpv0_proposal.ProposalPolicyName
+		}
+		return pmpv0_concern.ConcernPolicyName
+
+	case issue.ManagedByPMPv1:
+		if issue.PullRequest {
+			return pmpv1_proposal.ProposalPolicyName
+		}
+		return pmpv1_concern.ConcernPolicyName
+
 	}
-	return MotionPolicyForIssue
+	panic("issue is not managed by a known protocol")
 }
 
 func syncCreateMotionForIssue(

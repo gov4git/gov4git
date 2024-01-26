@@ -64,12 +64,27 @@ func LabelsToStrings(labels []*github.Label) []string {
 	return labelStrings
 }
 
-func IsIssueForPrioritization(issue *github.Issue) bool {
-	return util.IsIn(PrioritizeIssueByGovernanceLabel, LabelsToStrings(issue.Labels)...)
+func IsIssueManaged(issue *github.Issue) bool {
+	labels := LabelsToStrings(issue.Labels)
+	return areLabelsManagedByPMPv0(labels) || areLabelsManagedByPMPv1(labels)
 }
 
-func IsIssueManaged(issue *github.Issue) bool {
-	return util.IsIn(IssueIsManagedLabel, LabelsToStrings(issue.Labels)...)
+func IsIssueManagedByPMPv0(issue *github.Issue) bool {
+	labels := LabelsToStrings(issue.Labels)
+	return areLabelsManagedByPMPv0(labels)
+}
+
+func IsIssueManagedByPMPv1(issue *github.Issue) bool {
+	labels := LabelsToStrings(issue.Labels)
+	return areLabelsManagedByPMPv1(labels)
+}
+
+func areLabelsManagedByPMPv0(labels []string) bool {
+	return util.IsIn(IssueIsManagedLabel, labels...) || util.IsIn(IssueIsManagedByPMPv0Label, labels...)
+}
+
+func areLabelsManagedByPMPv1(labels []string) bool {
+	return util.IsIn(IssueIsManagedByPMPv1Label, labels...)
 }
 
 type LoadPRFunc func(
@@ -95,22 +110,22 @@ func TransformIssue(
 		must.NoError(ctx, err)
 	}
 	return ImportedIssue{
-		Managed:           IsIssueManaged(issue),
-		ForPrioritization: IsIssueForPrioritization(issue),
-		URL:               issue.GetHTMLURL(),
-		Author:            author,
-		Number:            int64(issue.GetNumber()),
-		Title:             issue.GetTitle(),
-		Body:              issue.GetBody(),
-		Labels:            LabelsToStrings(issue.Labels),
-		ClosedAt:          unwrapTimestamp(issue.ClosedAt),
-		CreatedAt:         unwrapTimestamp(issue.CreatedAt),
-		UpdatedAt:         unwrapTimestamp(issue.UpdatedAt),
-		Refs:              parseIssueRefs(ctx, repo, issue),
-		Locked:            issue.GetLocked(),
-		Closed:            issue.GetState() == "closed",
-		PullRequest:       issue.IsPullRequest(),
-		Merged:            pr != nil && pr.GetMerged(),
+		ManagedByPMPv0: IsIssueManagedByPMPv0(issue),
+		ManagedByPMPv1: IsIssueManagedByPMPv1(issue),
+		URL:            issue.GetHTMLURL(),
+		Author:         author,
+		Number:         int64(issue.GetNumber()),
+		Title:          issue.GetTitle(),
+		Body:           issue.GetBody(),
+		Labels:         LabelsToStrings(issue.Labels),
+		ClosedAt:       unwrapTimestamp(issue.ClosedAt),
+		CreatedAt:      unwrapTimestamp(issue.CreatedAt),
+		UpdatedAt:      unwrapTimestamp(issue.UpdatedAt),
+		Refs:           parseIssueRefs(ctx, repo, issue),
+		Locked:         issue.GetLocked(),
+		Closed:         issue.GetState() == "closed",
+		PullRequest:    issue.IsPullRequest(),
+		Merged:         pr != nil && pr.GetMerged(),
 	}
 }
 

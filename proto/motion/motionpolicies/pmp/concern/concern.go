@@ -213,7 +213,7 @@ func (x concernPolicy) Close(
 	must.Assertf(ctx, ok, "unrecognized proposal motion argument %v", args[1])
 
 	// update the policy state before closing the motion
-	x.Update(ctx, cloned, prop, policyNS)
+	x.Update(ctx, cloned, con, policyNS)
 
 	// close the poll for the motion
 	priorityPollName := pmp.ConcernPollBallotName(con.ID)

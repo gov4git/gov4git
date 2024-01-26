@@ -15,6 +15,8 @@ import (
 type Report = any
 
 type Policy interface {
+	gov.PostCloner
+
 	Open(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
@@ -159,6 +161,7 @@ var policyRegistry = mod.NewModuleRegistry[motion.PolicyName, Policy]()
 
 func Install(ctx context.Context, name motion.PolicyName, policy Policy) {
 	policyRegistry.Set(ctx, name, policy)
+	gov.InstallPostClone(ctx, "motion-policy-"+string(name), policy)
 }
 
 func Get(ctx context.Context, key motion.PolicyName) Policy {
@@ -166,7 +169,7 @@ func Get(ctx context.Context, key motion.PolicyName) Policy {
 }
 
 func InstalledMotionPolicies() []string {
-	return namesToStrings(policyRegistry.List())
+	return namesToStrings(policyRegistry.ListKeys())
 }
 
 func namesToStrings(ns []motion.PolicyName) []string {

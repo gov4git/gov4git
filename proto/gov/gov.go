@@ -30,12 +30,16 @@ func (x Cloned) Address() Address {
 type OwnerAddress id.OwnerAddress
 
 func CloneOwner(ctx context.Context, addr OwnerAddress) OwnerCloned {
-	return OwnerCloned(id.CloneOwner(ctx, id.OwnerAddress(addr)))
+	cloned := OwnerCloned(id.CloneOwner(ctx, id.OwnerAddress(addr)))
+	invokePostCloners(ctx, cloned)
+	return cloned
 }
 
 func LiftCloned(ctx context.Context, cloned Cloned) OwnerCloned {
 	return OwnerCloned(id.LiftCloned(ctx, id.Cloned(cloned)))
 }
+
+// OwnerCloned
 
 type OwnerCloned id.OwnerCloned
 

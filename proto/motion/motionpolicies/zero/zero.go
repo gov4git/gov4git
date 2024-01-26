@@ -19,6 +19,12 @@ const ZeroPolicyName = motion.PolicyName("zero-policy")
 
 type zeroPolicy struct{}
 
+func (x zeroPolicy) PostClone(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+) {
+}
+
 func (x zeroPolicy) Open(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

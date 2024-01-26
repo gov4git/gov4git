@@ -19,7 +19,7 @@ func NewModuleRegistry[N ~string, M any]() *ModuleRegistry[N, M] {
 	}
 }
 
-func (r *ModuleRegistry[N, M]) List() []N {
+func (r *ModuleRegistry[N, M]) ListKeys() []N {
 	r.lk.Lock()
 	defer r.lk.Unlock()
 	ns := []N{}
@@ -28,6 +28,21 @@ func (r *ModuleRegistry[N, M]) List() []N {
 	}
 	slices.Sort[[]N](ns)
 	return ns
+}
+
+func (r *ModuleRegistry[N, M]) List() ([]N, []M) {
+	r.lk.Lock()
+	defer r.lk.Unlock()
+	ns := []N{}
+	for k := range r.mods {
+		ns = append(ns, k)
+	}
+	slices.Sort[[]N](ns)
+	ms := []M{}
+	for _, k := range ns {
+		ms = append(ms, r.mods[k])
+	}
+	return ns, ms
 }
 
 func (r *ModuleRegistry[N, M]) Set(ctx context.Context, key N, module M) {

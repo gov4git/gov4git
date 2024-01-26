@@ -23,7 +23,9 @@ const (
 	DirectiveLabel = "gov4git:directive"
 
 	// labels for issues that are managed
-	IssueIsManagedLabel = "gov4git:managed"
+	IssueIsManagedLabel        = "gov4git:managed"
+	IssueIsManagedByPMPv0Label = "gov4git:pmp-v0"
+	IssueIsManagedByPMPv1Label = "gov4git:pmp-v1"
 
 	// the issue with this label will be used as a dashboard display
 	DashboardIssueLabel = "gov4git:dashboard"
@@ -36,6 +38,8 @@ var GovernanceLabels = []string{
 	PrioritizeIssueByGovernanceLabel,
 	DirectiveLabel,
 	IssueIsManagedLabel,
+	IssueIsManagedByPMPv0Label,
+	IssueIsManagedByPMPv1Label,
 	DashboardIssueLabel,
 }
 
@@ -58,8 +62,13 @@ type ImportedIssue struct {
 	Closed            bool `json:"closed"`
 	PullRequest       bool `json:"pull_request"`
 	Merged            bool `json:"merged"`
-	Managed           bool `json:"managed"`
+	ManagedByPMPv0    bool `json:"managed_by_pmp_v0,omitempty"`
+	ManagedByPMPv1    bool `json:"managed_by_pmp_v1,omitempty"`
 	ForPrioritization bool `json:"for_prioritization"`
+}
+
+func (x ImportedIssue) IsManaged() bool {
+	return x.ManagedByPMPv0 || x.ManagedByPMPv1
 }
 
 func (x ImportedIssue) Key() string {

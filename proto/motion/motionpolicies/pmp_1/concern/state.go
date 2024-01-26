@@ -23,5 +23,5 @@ func NewConcernState(id motionproto.MotionID) *ConcernState {
 }
 
 type PolicyState struct {
-	MatchDeficit float64 `json:"match_deficit"` //XXX
+	MatchDeficit float64 `json:"match_deficit"`
 }

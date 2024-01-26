@@ -12,6 +12,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
@@ -32,6 +33,7 @@ type DirectiveIssue struct {
 	TransferVotingCredits *TransferVotingCreditsDirective `json:"transfer_voting_credits,omitempty"`
 	Freeze                *FreezeDirective                `json:"freeze,omitempty"`
 	Unfreeze              *UnfreezeDirective              `json:"unfreeze,omitempty"`
+	GiveToMatchingFund    *GiveToMatchingFund             `json:"fund_matching_pool,omitempty"`
 }
 
 type IssueVotingCreditsDirective struct {
@@ -55,6 +57,11 @@ type UnfreezeDirective struct {
 	IssueNumber int64  `json:"issue_number"`
 }
 
+type GiveToMatchingFund struct {
+	From   string  `json:"from_user"`
+	Amount float64 `json:"amount"`
+}
+
 func ProcessDirectiveIssuesByMaintainer(
 	ctx context.Context,
 	repo Repo,
@@ -73,12 +80,12 @@ func ProcessDirectiveIssues(
 	repo Repo,
 	ghc *github.Client,
 	govAddr gov.OwnerAddress,
-	approverGitHubUsers []string,
+	maintainers []string,
 
 ) git.Change[form.Map, ProcessDirectiveIssueReports] {
 
 	cloned := gov.CloneOwner(ctx, govAddr)
-	report := ProcessDirectiveIssues_StageOnly(ctx, repo, ghc, govAddr, cloned, approverGitHubUsers)
+	report := ProcessDirectiveIssues_StageOnly(ctx, repo, ghc, govAddr, cloned, maintainers)
 	chg := git.NewChange[form.Map, ProcessDirectiveIssueReports](
 		fmt.Sprintf("Process %d organizer directives", len(report)),
 		"github_directive_issues",
@@ -151,8 +158,14 @@ func processDirectiveIssue_StageOnly(
 		replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject, "The GitHub login of the issue's author is not available.")
 		return DirectiveIssue{}, fmt.Errorf("user of issue author is not available")
 	}
+	if !util.IsIn[string](login, maintainers...) {
+		base.Infof("directive author %q is not a maintainer", login)
+		replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject,
+			fmt.Sprintf("directive author @%s is not a maintainer", login))
+		return DirectiveIssue{}, fmt.Errorf("directive author is not a maintainer")
+	}
 
-	d, err := parseDirective(issue.GetBody())
+	d, err := parseDirective(login, issue.GetBody())
 	if err != nil {
 		base.Infof("directive cannot be parsed (%v): %q", err, issue.GetBody())
 		replyAndCloseIssue(ctx, repo, ghc, issue, FollowUpSubject, "Your directive cannot be parsed.")
@@ -258,6 +271,35 @@ func processDirectiveIssue_StageOnly(
 		)
 		return d, nil
 
+	case d.GiveToMatchingFund != nil:
+		err = must.Try(
+			func() {
+				account.Transfer_StageOnly(
+					ctx,
+					cloned.PublicClone(),
+					member.UserAccountID(member.User(d.GiveToMatchingFund.From)),
+					pmp_0.MatchingPoolAccountID,
+					account.H(account.PluralAsset, d.GiveToMatchingFund.Amount),
+					fmt.Sprintf("directive from GitHub issue #%v", issue.GetNumber()),
+				)
+			},
+		)
+		if err != nil {
+			base.Infof("could not transfer %v credits from member %v to member %v (%v)",
+				d.GiveToMatchingFund.Amount, d.GiveToMatchingFund.From, pmp_0.MatchingPoolAccountID, err)
+			replyAndCloseIssue(
+				ctx, repo, ghc, issue,
+				FollowUpSubject,
+				fmt.Sprintf("Could not transfer `%v` credits from member @%v to member @%v. Reopen the issue to retry.\n\nBecause: `%v`",
+					d.GiveToMatchingFund.Amount, d.GiveToMatchingFund.From, pmp_0.MatchingPoolAccountID, err))
+			return DirectiveIssue{}, err
+		}
+		replyAndCloseIssue(ctx, repo, ghc, issue,
+			FollowUpSubject,
+			fmt.Sprintf("Transferred `%v` credits from member @%v to member @%v.",
+				d.GiveToMatchingFund.Amount, d.GiveToMatchingFund.From, pmp_0.MatchingPoolAccountID))
+		return d, nil
+
 	}
 	panic("unknown directive")
 }
@@ -266,7 +308,8 @@ func processDirectiveIssue_StageOnly(
 //
 //	"issue 30 credits to @user"
 //	"transfer 20 credits from @user1 to @user2"
-func parseDirective(body string) (DirectiveIssue, error) {
+//	"give 10 credits to matching fund"
+func parseDirective(author, body string) (DirectiveIssue, error) {
 	body = strings.ToLower(body)
 	body = strings.ReplaceAll(body, "\n", " ")
 	body = strings.ReplaceAll(body, "\r", " ")
@@ -292,6 +335,9 @@ func parseDirective(body string) (DirectiveIssue, error) {
 	}
 
 	if d, err := parseUnfreezeIssueDirective(words); err == nil {
+		return d, nil
+	}
+	if d, err := parseGiveToMatchingFundDirective(author, words); err == nil {
 		return d, nil
 	}
 
@@ -343,6 +389,26 @@ func parseTransferCreditsDirective(words []string) (DirectiveIssue, error) {
 		}, nil
 	}
 	return DirectiveIssue{}, fmt.Errorf("cannot parse transfer credits directive")
+}
+
+// "give 20 credits to matching fund"
+func parseGiveToMatchingFundDirective(author string, words []string) (DirectiveIssue, error) {
+	if len(words) == 6 &&
+		words[0] == "give" &&
+		util.IsIn(words[2], "credit", "credits", "token", "tokens") &&
+		words[3] == "to" &&
+		words[4] == "matching" &&
+		words[5] == "fund" {
+
+		amount, err := strconv.ParseFloat(words[1], 64)
+		if err != nil {
+			return DirectiveIssue{}, fmt.Errorf("cannot parse amount of credits")
+		}
+		return DirectiveIssue{
+			GiveToMatchingFund: &GiveToMatchingFund{From: author, Amount: amount},
+		}, nil
+	}
+	return DirectiveIssue{}, fmt.Errorf("cannot parse give credits directive")
 }
 
 // "freeze issueURL"

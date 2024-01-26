@@ -32,6 +32,12 @@ const ConcernPolicyName = motion.PolicyName("pmp-concern-policy")
 
 type concernPolicy struct{}
 
+func (x concernPolicy) PostClone(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+) {
+}
+
 func (x concernPolicy) Open(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

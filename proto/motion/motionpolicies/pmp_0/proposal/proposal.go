@@ -33,6 +33,12 @@ const (
 
 type proposalPolicy struct{}
 
+func (x proposalPolicy) PostClone(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+) {
+}
+
 func (x proposalPolicy) Open(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

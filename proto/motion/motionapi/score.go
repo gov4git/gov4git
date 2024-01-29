@@ -43,7 +43,6 @@ func ScoreMotions_StageOnly(
 			ctx,
 			cloned,
 			motion,
-			motionproto.MotionPolicyNS(motions[i].ID),
 			args...,
 		)
 		AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), motions[i].ID, notices)

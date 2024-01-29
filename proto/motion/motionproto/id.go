@@ -2,9 +2,15 @@ package motionproto
 
 import (
 	"sort"
+
+	"github.com/gov4git/lib4git/ns"
 )
 
 type MotionID string
+
+func (x MotionID) PolicyNS() ns.NS {
+	return MotionPolicyNS(x)
+}
 
 func (x MotionID) String() string {
 	return string(x)

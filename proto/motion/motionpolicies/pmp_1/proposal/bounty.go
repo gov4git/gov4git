@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/concern"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
@@ -18,11 +19,7 @@ func sumClaimedConcernEscrows(
 
 	escrow := 0.0
 	for _, ref := range eligible {
-		conState := concern.LoadMotionPolicyState_Local(
-			ctx,
-			cloned.PublicClone().Tree(),
-			motionproto.MotionPolicyNS(ref.To),
-		)
+		conState := motionapi.LoadPolicyState_Local[*concern.ConcernState](ctx, cloned.PublicClone(), ref.To)
 		escrow += conState.PriorityScore // equals concern escrow
 	}
 

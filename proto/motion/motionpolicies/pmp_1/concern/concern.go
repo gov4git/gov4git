@@ -23,7 +23,6 @@ import (
 	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func init() {
@@ -53,14 +52,13 @@ func (x concernPolicy) Open(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	con motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
 
 	// initialize state
 	state := NewConcernState(con.ID)
-	SaveMotionPolicyState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+	motionapi.SavePolicyState_StageOnly[*ConcernState](ctx, cloned.PublicClone(), con.ID, state)
 
 	// open a poll for the motion
 	ballotapi.Open_StageOnly(
@@ -95,13 +93,12 @@ func (x concernPolicy) Open(
 func (x concernPolicy) Score(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion motionproto.Motion,
-	policyNS ns.NS,
+	con motionproto.Motion,
 	args ...any,
 
 ) (motionproto.Score, notice.Notices) {
 
-	state := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
+	state := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
 	return motionproto.Score{
 		Attention: state.PriorityScore,
 	}, nil
@@ -111,7 +108,6 @@ func (x concernPolicy) Update(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	con motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -121,7 +117,7 @@ func (x concernPolicy) Update(
 
 	// inputs
 	policyState := LoadPolicyState_Local(ctx, cloned)
-	conState := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
+	conState := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), conState.PriorityPoll)
 
 	// update idealized quadratic funding deficit
@@ -168,9 +164,9 @@ func (x concernPolicy) Update(
 
 	//
 
-	SaveMotionPolicyState_StageOnly(ctx, cloned.Public.Tree(), policyNS, conState)
+	motionapi.SavePolicyState_StageOnly[*ConcernState](ctx, cloned.PublicClone(), con.ID, conState)
 
-	r0, n0 := x.updateFreeze(ctx, cloned, con, policyNS)
+	r0, n0 := x.updateFreeze(ctx, cloned, con)
 	return r0, append(notices, n0...)
 }
 
@@ -188,17 +184,16 @@ func computeEligibleProposals(ctx context.Context, cloned gov.Cloned, con motion
 func (x concernPolicy) updateFreeze(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion motionproto.Motion,
-	policyNS ns.NS,
+	con motionproto.Motion,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
 
-	toState := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
+	toState := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
 
 	notices := notice.Notices{}
-	if toState.EligibleProposals.Len() > 0 && !motion.Frozen {
-		motionapi.FreezeMotion_StageOnly(notice.Mute(ctx), cloned, motion.ID)
+	if toState.EligibleProposals.Len() > 0 && !con.Frozen {
+		motionapi.FreezeMotion_StageOnly(notice.Mute(ctx), cloned, con.ID)
 
 		var w bytes.Buffer
 		fmt.Fprintf(&w, "Freezing ❄️ this issue as there are eligible PRs addressing it:\n")
@@ -208,8 +203,8 @@ func (x concernPolicy) updateFreeze(
 		}
 		notices = append(notices, notice.Noticef(ctx, w.String())...)
 	}
-	if toState.EligibleProposals.Len() == 0 && motion.Frozen {
-		motionapi.UnfreezeMotion_StageOnly(notice.Mute(ctx), cloned, motion.ID)
+	if toState.EligibleProposals.Len() == 0 && con.Frozen {
+		motionapi.UnfreezeMotion_StageOnly(notice.Mute(ctx), cloned, con.ID)
 		notices = append(notices, notice.Noticef(ctx, "Unfreezing 🌤️ issue as there are no eligible PRs addressing it.")...)
 	}
 
@@ -220,14 +215,13 @@ func (x concernPolicy) Aggregate(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motions,
-	instancePolicyNS []ns.NS,
 
 ) {
 
 	// load all motion policy states
 	concernPolicyStates := make([]*ConcernState, len(motion))
-	for i := range motion {
-		concernPolicyStates[i] = LoadMotionPolicyState_Local(ctx, cloned.PublicClone().Tree(), instancePolicyNS[i])
+	for i, mot := range motion {
+		concernPolicyStates[i] = motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), mot.ID)
 	}
 
 	// aggregate match deficit
@@ -246,7 +240,6 @@ func (x concernPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	con motionproto.Motion,
-	policyNS ns.NS,
 	decision motionproto.Decision,
 	args ...any,
 	// args[0]=toID account.AccountID
@@ -261,7 +254,7 @@ func (x concernPolicy) Close(
 	must.Assertf(ctx, ok, "unrecognized proposal motion argument %v", args[1])
 
 	// update the policy state before closing the motion
-	x.Update(ctx, cloned, con, policyNS)
+	x.Update(ctx, cloned, con)
 
 	// close the poll for the motion
 	priorityPollName := pmp_1.ConcernPollBallotName(con.ID)
@@ -292,7 +285,6 @@ func (x concernPolicy) Cancel(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	con motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -331,17 +323,16 @@ type PolicyView struct {
 func (x concernPolicy) Show(
 	ctx context.Context,
 	cloned gov.Cloned,
-	motion motionproto.Motion,
-	policyNS ns.NS,
+	con motionproto.Motion,
 	args ...any,
 
 ) (form.Form, motionproto.MotionBallots) {
 
 	// retrieve policy state
-	policyState := LoadMotionPolicyState_Local(ctx, cloned.Tree(), policyNS)
+	policyState := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned, con.ID)
 
 	// retrieve poll state
-	priorityPollName := pmp_1.ConcernPollBallotName(motion.ID)
+	priorityPollName := pmp_1.ConcernPollBallotName(con.ID)
 	pollState := ballotapi.Show_Local(ctx, cloned.Tree(), priorityPollName)
 
 	return PolicyView{
@@ -365,8 +356,6 @@ func (x concernPolicy) AddRefTo(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -388,8 +377,6 @@ func (x concernPolicy) AddRefFrom(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -403,8 +390,6 @@ func (x concernPolicy) RemoveRefTo(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -426,8 +411,6 @@ func (x concernPolicy) RemoveRefFrom(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -439,7 +422,6 @@ func (x concernPolicy) Freeze(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -458,7 +440,6 @@ func (x concernPolicy) Unfreeze(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {

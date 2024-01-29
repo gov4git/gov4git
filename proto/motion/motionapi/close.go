@@ -46,7 +46,6 @@ func CloseMotion_StageOnly(
 		ctx,
 		cloned,
 		motion,
-		motionproto.MotionPolicyNS(id),
 		decision,
 		args...,
 	)

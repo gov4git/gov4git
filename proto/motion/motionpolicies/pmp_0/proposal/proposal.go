@@ -19,7 +19,6 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func init() {
@@ -43,14 +42,13 @@ func (x proposalPolicy) Open(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
 
 	// initialize state
 	state := NewProposalState(prop.ID)
-	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+	motionapi.SavePolicyState_StageOnly[*ProposalState](ctx, cloned.PublicClone(), prop.ID, state)
 
 	// create a bounty account for the proposal
 	account.Create_StageOnly(
@@ -113,13 +111,12 @@ func (x proposalPolicy) Open(
 func (x proposalPolicy) Score(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion motionproto.Motion,
-	policyNS ns.NS,
+	prop motionproto.Motion,
 	args ...any,
 
 ) (motionproto.Score, notice.Notices) {
 
-	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+	state := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
 
 	// compute score
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.ApprovalPoll)
@@ -134,13 +131,12 @@ func (x proposalPolicy) Update(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
 
 	notices := notice.Notices{}
-	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+	state := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
 
 	// update approval score
 
@@ -181,7 +177,7 @@ func (x proposalPolicy) Update(
 
 	//
 
-	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+	motionapi.SavePolicyState_StageOnly[*ProposalState](ctx, cloned.PublicClone(), prop.ID, state)
 
 	// update ScoreKernelState
 	currentState := ScoreKernelState{
@@ -221,7 +217,6 @@ func (x proposalPolicy) Aggregate(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motions,
-	instancePolicyNS []ns.NS,
 ) {
 }
 
@@ -229,14 +224,13 @@ func (x proposalPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
-	policyNS ns.NS,
 	decision motionproto.Decision,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
 
 	// update the policy state before closing the motion
-	x.Update(ctx, cloned, prop, policyNS)
+	x.Update(ctx, cloned, prop)
 
 	// was the PR merged or not
 	isMerged := decision.IsAccept()
@@ -358,7 +352,6 @@ func (x proposalPolicy) Cancel(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -399,24 +392,23 @@ type PolicyView struct {
 func (x proposalPolicy) Show(
 	ctx context.Context,
 	cloned gov.Cloned,
-	motion motionproto.Motion,
-	policyNS ns.NS,
+	prop motionproto.Motion,
 	args ...any,
 
 ) (form.Form, motionproto.MotionBallots) {
 
 	// retrieve policy state
-	policyState := LoadState_Local(ctx, cloned.Tree(), policyNS)
+	policyState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned, prop.ID)
 
 	// retrieve approval poll
-	approvalPoll := loadPropApprovalPollTally(ctx, cloned, motion)
+	approvalPoll := loadPropApprovalPollTally(ctx, cloned, prop)
 
 	return PolicyView{
 			State:          policyState,
 			ApprovalPoll:   approvalPoll,
 			ApprovalMargin: *ballotapi.GetMargin_Local(ctx, cloned, approvalPoll.Ad.ID),
-			BountyAccount:  pmp_0.ProposalBountyAccountID(motion.ID),
-			RewardAccount:  pmp_0.ProposalRewardAccountID(motion.ID),
+			BountyAccount:  pmp_0.ProposalBountyAccountID(prop.ID),
+			RewardAccount:  pmp_0.ProposalRewardAccountID(prop.ID),
 		}, motionproto.MotionBallots{
 			motionproto.MotionBallot{
 				Label:         "approval_poll",
@@ -434,8 +426,6 @@ func (x proposalPolicy) AddRefTo(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -449,8 +439,6 @@ func (x proposalPolicy) AddRefFrom(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -472,8 +460,6 @@ func (x proposalPolicy) RemoveRefTo(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -487,8 +473,6 @@ func (x proposalPolicy) RemoveRefFrom(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -507,23 +491,21 @@ func (x proposalPolicy) RemoveRefFrom(
 func (x proposalPolicy) Freeze(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion motionproto.Motion,
-	policyNS ns.NS,
+	prop motionproto.Motion,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
 
-	return nil, notice.Noticef(ctx, "This PR, managed by Gov4Git proposal `%v`, has been frozen ❄️", motion.ID)
+	return nil, notice.Noticef(ctx, "This PR, managed by Gov4Git proposal `%v`, has been frozen ❄️", prop.ID)
 }
 
 func (x proposalPolicy) Unfreeze(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion motionproto.Motion,
-	policyNS ns.NS,
+	prop motionproto.Motion,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
 
-	return nil, notice.Noticef(ctx, "This PR, managed by Gov4Git proposal `%v`, has been unfrozen 🌤️", motion.ID)
+	return nil, notice.Noticef(ctx, "This PR, managed by Gov4Git proposal `%v`, has been unfrozen 🌤️", prop.ID)
 }

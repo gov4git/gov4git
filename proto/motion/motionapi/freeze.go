@@ -45,7 +45,6 @@ func FreezeMotion_StageOnly(
 		ctx,
 		cloned,
 		motion,
-		motionproto.MotionPolicyNS(id),
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)
@@ -98,7 +97,6 @@ func UnfreezeMotion_StageOnly(
 		ctx,
 		cloned,
 		motion,
-		motionproto.MotionPolicyNS(id),
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)

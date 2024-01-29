@@ -45,7 +45,6 @@ func CancelMotion_StageOnly(
 		ctx,
 		cloned,
 		motion,
-		motionproto.MotionPolicyNS(id),
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), id, notices)

@@ -7,7 +7,6 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func AggregateMotions(
@@ -45,10 +44,6 @@ func AggregateMotions_StageOnly(
 	for policyName, policyMotions := range policyMotions {
 		policy := motionproto.GetMotionPolicyByName(ctx, policyName)
 		policyMotions.Sort()
-		instanceNS := make([]ns.NS, len(policyMotions))
-		for i := range policyMotions {
-			instanceNS[i] = motionproto.MotionPolicyNS(policyMotions[i].ID)
-		}
-		policy.Aggregate(ctx, cloned, policyMotions, instanceNS)
+		policy.Aggregate(ctx, cloned, policyMotions)
 	}
 }

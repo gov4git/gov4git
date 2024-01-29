@@ -8,7 +8,6 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/form"
-	"github.com/gov4git/lib4git/ns"
 )
 
 func init() {
@@ -29,7 +28,6 @@ func (x zeroPolicy) Open(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -41,7 +39,6 @@ func (x zeroPolicy) Score(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Score, notice.Notices) {
@@ -53,7 +50,6 @@ func (x zeroPolicy) Update(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -65,7 +61,6 @@ func (x zeroPolicy) Aggregate(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motions,
-	instancePolicyNS []ns.NS,
 ) {
 }
 
@@ -73,7 +68,6 @@ func (x zeroPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motion,
-	policyNS ns.NS,
 	decision motionproto.Decision,
 	args ...any,
 
@@ -86,7 +80,6 @@ func (x zeroPolicy) Cancel(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -98,7 +91,6 @@ func (x zeroPolicy) Show(
 	ctx context.Context,
 	cloned gov.Cloned,
 	motion motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (form.Form, motionproto.MotionBallots) {
@@ -112,8 +104,6 @@ func (x zeroPolicy) AddRefTo(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -127,8 +117,6 @@ func (x zeroPolicy) AddRefFrom(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -142,8 +130,6 @@ func (x zeroPolicy) RemoveRefTo(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -157,8 +143,6 @@ func (x zeroPolicy) RemoveRefFrom(
 	refType motionproto.RefType,
 	from motionproto.Motion,
 	to motionproto.Motion,
-	fromPolicyNS ns.NS,
-	toPolicyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -170,7 +154,6 @@ func (x zeroPolicy) Freeze(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {
@@ -182,7 +165,6 @@ func (x zeroPolicy) Unfreeze(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	motion motionproto.Motion,
-	policyNS ns.NS,
 	args ...any,
 
 ) (motionproto.Report, notice.Notices) {

@@ -43,7 +43,6 @@ func UpdateMotions_StageOnly(
 			ctx,
 			cloned,
 			motion,
-			motionproto.MotionPolicyNS(motions[i].ID),
 			args...,
 		)
 		reportList = append(reportList, report)

@@ -61,8 +61,6 @@ func UnlinkMotions_StageOnly(
 		unref.Type,
 		from,
 		to,
-		motionproto.MotionPolicyNS(fromID),
-		motionproto.MotionPolicyNS(toID),
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), toID, noticesTo)
@@ -72,8 +70,6 @@ func UnlinkMotions_StageOnly(
 		unref.Type,
 		from,
 		to,
-		motionproto.MotionPolicyNS(fromID),
-		motionproto.MotionPolicyNS(toID),
 		args...,
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), fromID, noticesFrom)

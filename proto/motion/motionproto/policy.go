@@ -21,7 +21,6 @@ type Policy interface {
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion Motion,
-		instancePolicyNS ns.NS,
 		args ...any,
 	) (Report, notice.Notices)
 
@@ -30,7 +29,6 @@ type Policy interface {
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion Motion,
-		instancePolicyNS ns.NS,
 		args ...any,
 	) (Score, notice.Notices)
 
@@ -39,7 +37,6 @@ type Policy interface {
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion Motion,
-		instancePolicyNS ns.NS,
 		args ...any,
 	) (Report, notice.Notices)
 
@@ -48,14 +45,12 @@ type Policy interface {
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion Motions,
-		instancePolicyNS []ns.NS,
 	)
 
 	Close(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion Motion,
-		instancePolicyNS ns.NS,
 		decision Decision,
 		args ...any,
 	) (Report, notice.Notices)
@@ -64,7 +59,6 @@ type Policy interface {
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion Motion,
-		instancePolicyNS ns.NS,
 		args ...any,
 	) (Report, notice.Notices)
 
@@ -72,7 +66,6 @@ type Policy interface {
 		ctx context.Context,
 		cloned gov.Cloned,
 		motion Motion,
-		instancePolicyNS ns.NS,
 		args ...any,
 	) (form.Form, MotionBallots)
 
@@ -84,8 +77,6 @@ type Policy interface {
 		refType RefType,
 		from Motion,
 		to Motion,
-		fromPolicyNS ns.NS,
-		toPolicyNS ns.NS,
 		args ...any,
 	) (Report, notice.Notices)
 
@@ -97,8 +88,6 @@ type Policy interface {
 		refType RefType,
 		from Motion,
 		to Motion,
-		fromPolicyNS ns.NS,
-		toPolicyNS ns.NS,
 		args ...any,
 	) (Report, notice.Notices)
 
@@ -110,8 +99,6 @@ type Policy interface {
 		refType RefType,
 		from Motion,
 		to Motion,
-		fromPolicyNS ns.NS,
-		toPolicyNS ns.NS,
 		args ...any,
 	) (Report, notice.Notices)
 
@@ -123,8 +110,6 @@ type Policy interface {
 		refType RefType,
 		from Motion,
 		to Motion,
-		fromPolicyNS ns.NS,
-		toPolicyNS ns.NS,
 		args ...any,
 	) (Report, notice.Notices)
 
@@ -133,7 +118,6 @@ type Policy interface {
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion Motion,
-		instancePolicyNS ns.NS,
 		args ...any,
 	) (Report, notice.Notices)
 
@@ -142,7 +126,6 @@ type Policy interface {
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion Motion,
-		instancePolicyNS ns.NS,
 		args ...any,
 	) (Report, notice.Notices)
 }

@@ -29,7 +29,7 @@ func ShowMotion_Local(
 	m := motionproto.MotionKV.Get(ctx, motionproto.MotionNS, t, id)
 
 	p := motionproto.Get(ctx, m.Policy)
-	pv, pb := p.Show(ctx, cloned, m, motionproto.MotionPolicyNS(id), args...)
+	pv, pb := p.Show(ctx, cloned, m, args...)
 
 	return motionproto.MotionView{
 		Motion:  m,

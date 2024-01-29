@@ -20,6 +20,7 @@ func (qv SV) Tally(
 	ad *ballotproto.Ad,
 	prior *ballotproto.Tally,
 	fetched map[member.User]ballotproto.Elections, // newly fetched votes from participating users
+
 ) git.Change[form.Map, ballotproto.Tally] {
 
 	return qv.tally(ctx, cloned, ad, prior, fetched, false)

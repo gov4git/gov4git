@@ -121,30 +121,30 @@ func (x concernPolicy) Update(
 
 	// inputs
 	policyState := LoadPolicyState_Local(ctx, cloned)
-	instanceState := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), instanceState.PriorityPoll)
+	conState := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
+	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), conState.PriorityPoll)
 
 	// update idealized quadratic funding deficit
 	capFunding := capitalistFunding(&ads.Tally)
 	iqFunding := idealizedQuadraticFunding(&ads.Tally)
 	iqDeficit := iqFunding - capFunding
-	instanceState.IQDeficit = iqDeficit
+	conState.IQDeficit = iqDeficit
 
 	// update priority score
 	matchFunds := pmp_0.GetMatchFundBalance_Local(ctx, cloned.PublicClone())
 	latestPriorityScore := capFunding + matchRatio(matchFunds, policyState.MatchDeficit)*iqDeficit
-	if latestPriorityScore != instanceState.PriorityScore {
+	if latestPriorityScore != conState.PriorityScore {
 		notices = append(
 			notices,
 			notice.Noticef(ctx, "This issue's __priority score__ was updated to `%0.6f`.", latestPriorityScore)...,
 		)
 	}
-	instanceState.PriorityScore = latestPriorityScore
+	conState.PriorityScore = latestPriorityScore
 
 	// update eligible proposals
 
 	eligible := computeEligibleProposals(ctx, cloned.PublicClone(), con)
-	if !slices.Equal[motionproto.Refs](eligible, instanceState.EligibleProposals) {
+	if !slices.Equal[motionproto.Refs](eligible, conState.EligibleProposals) {
 		// display updated list of eligible proposals
 		if len(eligible) == 0 {
 			notices = append(
@@ -164,11 +164,11 @@ func (x concernPolicy) Update(
 			)
 		}
 	}
-	instanceState.EligibleProposals = eligible
+	conState.EligibleProposals = eligible
 
 	//
 
-	SaveMotionPolicyState_StageOnly(ctx, cloned.Public.Tree(), policyNS, instanceState)
+	SaveMotionPolicyState_StageOnly(ctx, cloned.Public.Tree(), policyNS, conState)
 
 	r0, n0 := x.updateFreeze(ctx, cloned, con, policyNS)
 	return r0, append(notices, n0...)

@@ -16,6 +16,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/concern"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
@@ -86,8 +87,9 @@ func (x proposalPolicy) Open(
 		member.Everybody,
 	)
 	zeroState := ScoreKernelState{
-		MotionID: prop.ID,
-		Bounty:   0.0,
+		MotionID:       prop.ID,
+		Bounty:         0.0,
+		CostMultiplier: 1.0,
 	}
 	ballotapi.SavePolicyState_StageOnly[ScoreKernelState](
 		ctx,
@@ -137,24 +139,28 @@ func (x proposalPolicy) Update(
 ) (motionproto.Report, notice.Notices) {
 
 	notices := notice.Notices{}
-	state := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
+
+	// inputs
+
+	conPolicyState := concern.LoadPolicyState_Local(ctx, cloned)
+	propState := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
+	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), propState.ApprovalPoll)
 
 	// update approval score
 
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.ApprovalPoll)
 	latestApprovalScore := ads.Tally.Scores[pmp_1.ProposalBallotChoice]
-	if latestApprovalScore != state.LatestApprovalScore {
+	if latestApprovalScore != propState.LatestApprovalScore {
 		notices = append(
 			notices,
 			notice.Noticef(ctx, "This PR's __approval score__ was updated to `%0.6f`.", latestApprovalScore)...,
 		)
 	}
-	state.LatestApprovalScore = latestApprovalScore
+	propState.LatestApprovalScore = latestApprovalScore
 
 	// update eligible concerns
 
 	eligible := computeEligibleConcerns(ctx, cloned.PublicClone(), prop)
-	if !slices.Equal[motionproto.Refs](eligible, state.EligibleConcerns) {
+	if !slices.Equal[motionproto.Refs](eligible, propState.EligibleConcerns) {
 		// display list of eligible concerns
 		if len(eligible) == 0 {
 			notices = append(
@@ -174,11 +180,17 @@ func (x proposalPolicy) Update(
 			)
 		}
 	}
-	state.EligibleConcerns = eligible
+	propState.EligibleConcerns = eligible
+
+	// update cost multiplier
+
+	eps := sumClaimedConcernEscrows(ctx, cloned, prop, eligible)
+	costMultiplier := (1 + float64(ads.Tally.NumVoters())) / (4 * conPolicyState.WithheldEscrowFraction * eps)
+	propState.CostMultiplier = costMultiplier
 
 	//
 
-	SaveMotionPolicyState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+	SaveMotionPolicyState_StageOnly(ctx, cloned.Public.Tree(), policyNS, propState)
 
 	// update ScoreKernelState
 	currentState := ScoreKernelState{
@@ -187,13 +199,14 @@ func (x proposalPolicy) Update(
 			ctx,
 			cloned,
 			prop,
-			state,
+			propState,
 		),
+		CostMultiplier: costMultiplier,
 	}
 	ballotapi.SavePolicyState_StageOnly[ScoreKernelState](
 		ctx,
 		cloned.PublicClone(),
-		state.ApprovalPoll,
+		propState.ApprovalPoll,
 		currentState,
 	)
 

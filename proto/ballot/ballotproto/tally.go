@@ -16,6 +16,10 @@ type Tally struct {
 	Charges       map[member.User]float64                     `json:"charges"`
 }
 
+func (x Tally) NumVoters() int {
+	return len(x.AcceptedVotes)
+}
+
 func (x Tally) Capitalization() float64 {
 	cap := 0.0
 	for _, spent := range x.Charges {

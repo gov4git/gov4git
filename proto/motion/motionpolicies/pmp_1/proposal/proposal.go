@@ -208,7 +208,6 @@ func (x proposalPolicy) Update(
 	return nil, notices
 }
 
-// XXX
 func (x proposalPolicy) Aggregate(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
@@ -217,6 +216,7 @@ func (x proposalPolicy) Aggregate(
 ) {
 }
 
+// XXX: should disberse rewards in a clearance sweep after all cons/props updated
 func (x proposalPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

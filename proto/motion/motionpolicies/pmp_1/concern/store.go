@@ -16,12 +16,10 @@ var (
 )
 
 func LoadPolicyState_Local(ctx context.Context, cloned gov.OwnerCloned) *PolicyState {
-
 	return git.FromFile[*PolicyState](ctx, cloned.PublicClone().Tree(), PolicyNS.Append(StateFilebase))
 }
 
 func SavePolicyState_StageOnly(ctx context.Context, cloned gov.OwnerCloned, ps *PolicyState) {
-
 	git.ToFileStage[*PolicyState](ctx, cloned.PublicClone().Tree(), PolicyNS.Append(StateFilebase), ps)
 }
 

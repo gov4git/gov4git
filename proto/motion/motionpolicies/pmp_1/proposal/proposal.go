@@ -8,7 +8,6 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
@@ -75,7 +74,7 @@ func (x proposalPolicy) Open(
 	// open a poll for the motion
 	ballotapi.Open_StageOnly(
 		ctx,
-		ballotio.QVPolicyName,
+		ProposalApprovalPollPolicyName, //XXX
 		cloned,
 		state.ApprovalPoll,
 		pmp_1.ProposalAccountID(prop.ID),
@@ -87,7 +86,8 @@ func (x proposalPolicy) Open(
 		member.Everybody,
 	)
 	zeroState := ScoreKernelState{
-		Bounty: 0.0,
+		MotionID: prop.ID,
+		Bounty:   0.0,
 	}
 	ballotapi.SavePolicyState_StageOnly[ScoreKernelState](
 		ctx,
@@ -187,6 +187,7 @@ func (x proposalPolicy) Update(
 
 	// update ScoreKernelState
 	currentState := ScoreKernelState{
+		MotionID: prop.ID,
 		Bounty: calcBounty(
 			ctx,
 			cloned,

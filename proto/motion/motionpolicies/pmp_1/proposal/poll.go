@@ -26,8 +26,9 @@ func init() {
 type ScoreKernel struct{}
 
 type ScoreKernelState struct {
-	MotionID motionproto.MotionID `json:"motion_id"`
-	Bounty   float64              `json:"bounty"`
+	MotionID       motionproto.MotionID `json:"motion_id"`
+	CostMultiplier float64              `json:"cost_multiplier"`
+	Bounty         float64              `json:"bounty"`
 }
 
 func (sk ScoreKernel) Score(

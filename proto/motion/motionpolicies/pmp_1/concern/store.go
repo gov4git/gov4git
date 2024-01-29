@@ -25,11 +25,11 @@ func SavePolicyState_StageOnly(ctx context.Context, cloned gov.OwnerCloned, ps *
 
 // instance
 
-func SaveInstanceState_StageOnly(ctx context.Context, t *git.Tree, policyNS ns.NS, state *ConcernState) {
+func SaveMotionPolicyState_StageOnly(ctx context.Context, t *git.Tree, policyNS ns.NS, state *ConcernState) {
 	git.ToFileStage[*ConcernState](ctx, t, policyNS.Append(StateFilebase), state)
 }
 
-func LoadInstanceState_Local(ctx context.Context, t *git.Tree, policyNS ns.NS) *ConcernState {
+func LoadMotionPolicyState_Local(ctx context.Context, t *git.Tree, policyNS ns.NS) *ConcernState {
 	state := git.FromFile[ConcernState](ctx, t, policyNS.Append(StateFilebase))
 	return &state
 }

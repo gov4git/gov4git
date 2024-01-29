@@ -21,6 +21,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
@@ -37,6 +38,15 @@ func (x concernPolicy) PostClone(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 ) {
+
+	err := must.Try(
+		func() {
+			LoadPolicyState_Local(ctx, cloned)
+		},
+	)
+	if git.IsNotExist(err) {
+		SavePolicyState_StageOnly(ctx, cloned, InitialPolicyState)
+	}
 }
 
 func (x concernPolicy) Open(
@@ -50,7 +60,7 @@ func (x concernPolicy) Open(
 
 	// initialize state
 	state := NewConcernState(con.ID)
-	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+	SaveInstanceState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
 	// open a poll for the motion
 	ballotapi.Open_StageOnly(
@@ -91,7 +101,7 @@ func (x concernPolicy) Score(
 
 ) (motionproto.Score, notice.Notices) {
 
-	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+	state := LoadInstanceState_Local(ctx, cloned.Public.Tree(), policyNS)
 	return motionproto.Score{
 		Attention: state.PriorityScore,
 	}, nil
@@ -111,7 +121,7 @@ func (x concernPolicy) Update(
 
 	// inputs
 	policyState := LoadPolicyState_Local(ctx, cloned)
-	instanceState := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+	instanceState := LoadInstanceState_Local(ctx, cloned.Public.Tree(), policyNS)
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), instanceState.PriorityPoll)
 
 	// update idealized quadratic funding deficit
@@ -158,7 +168,7 @@ func (x concernPolicy) Update(
 
 	//
 
-	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, instanceState)
+	SaveInstanceState_StageOnly(ctx, cloned.Public.Tree(), policyNS, instanceState)
 
 	r0, n0 := x.updateFreeze(ctx, cloned, con, policyNS)
 	return r0, append(notices, n0...)
@@ -184,7 +194,7 @@ func (x concernPolicy) updateFreeze(
 
 ) (motionproto.Report, notice.Notices) {
 
-	toState := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+	toState := LoadInstanceState_Local(ctx, cloned.Public.Tree(), policyNS)
 
 	notices := notice.Notices{}
 	if toState.EligibleProposals.Len() > 0 && !motion.Frozen {
@@ -217,7 +227,7 @@ func (x concernPolicy) Aggregate(
 	// load all motion policy states
 	concernPolicyStates := make([]*ConcernState, len(motion))
 	for i := range motion {
-		concernPolicyStates[i] = LoadState_Local(ctx, cloned.PublicClone().Tree(), instancePolicyNS[i])
+		concernPolicyStates[i] = LoadInstanceState_Local(ctx, cloned.PublicClone().Tree(), instancePolicyNS[i])
 	}
 
 	// aggregate match deficit
@@ -328,7 +338,7 @@ func (x concernPolicy) Show(
 ) (form.Form, motionproto.MotionBallots) {
 
 	// retrieve policy state
-	policyState := LoadState_Local(ctx, cloned.Tree(), policyNS)
+	policyState := LoadInstanceState_Local(ctx, cloned.Tree(), policyNS)
 
 	// retrieve poll state
 	priorityPollName := pmp_1.ConcernPollBallotName(motion.ID)

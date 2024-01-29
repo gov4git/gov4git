@@ -1,6 +1,7 @@
 # PMP
 
 - display matching fund size in notices and dashboard
+- run score after update/aggregate
 
 # M3
 

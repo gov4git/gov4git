@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotpolicies/sv"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
 func init() {
@@ -25,7 +26,8 @@ func init() {
 type ScoreKernel struct{}
 
 type ScoreKernelState struct {
-	Bounty float64 `json:"bounty"`
+	MotionID motionproto.MotionID `json:"motion_id"`
+	Bounty   float64              `json:"bounty"`
 }
 
 func (sk ScoreKernel) Score(

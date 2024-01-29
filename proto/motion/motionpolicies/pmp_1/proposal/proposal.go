@@ -184,8 +184,8 @@ func (x proposalPolicy) Update(
 
 	// update cost multiplier
 
-	eps := sumClaimedConcernEscrows(ctx, cloned, prop, eligible)
-	costMultiplier := (1 + float64(ads.Tally.NumVoters())) / (4 * conPolicyState.WithheldEscrowFraction * eps)
+	bounty := sumClaimedConcernEscrows(ctx, cloned, prop, eligible)
+	costMultiplier := (1 + float64(ads.Tally.NumVoters())) / (4 * conPolicyState.WithheldEscrowFraction * bounty)
 	propState.CostMultiplier = costMultiplier
 
 	//
@@ -194,13 +194,8 @@ func (x proposalPolicy) Update(
 
 	// update ScoreKernelState
 	currentState := ScoreKernelState{
-		MotionID: prop.ID,
-		Bounty: calcBounty(
-			ctx,
-			cloned,
-			prop,
-			propState,
-		),
+		MotionID:       prop.ID,
+		Bounty:         bounty,
 		CostMultiplier: costMultiplier,
 	}
 	ballotapi.SavePolicyState_StageOnly[ScoreKernelState](
@@ -211,21 +206,6 @@ func (x proposalPolicy) Update(
 	)
 
 	return nil, notices
-}
-
-func calcBounty(
-	ctx context.Context,
-	cloned gov.OwnerCloned,
-	prop motionproto.Motion,
-	state *ProposalState,
-) float64 {
-
-	bounty := 0.0
-	for _, ref := range state.EligibleConcerns {
-		adt := ballotapi.Show_Local(ctx, cloned.PublicClone().Tree(), pmp_1.ConcernPollBallotName(ref.To))
-		bounty += adt.Tally.Capitalization()
-	}
-	return bounty
 }
 
 // XXX

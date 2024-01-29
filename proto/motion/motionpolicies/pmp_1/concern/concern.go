@@ -60,7 +60,7 @@ func (x concernPolicy) Open(
 
 	// initialize state
 	state := NewConcernState(con.ID)
-	SaveInstanceState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+	SaveMotionPolicyState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
 	// open a poll for the motion
 	ballotapi.Open_StageOnly(
@@ -101,7 +101,7 @@ func (x concernPolicy) Score(
 
 ) (motionproto.Score, notice.Notices) {
 
-	state := LoadInstanceState_Local(ctx, cloned.Public.Tree(), policyNS)
+	state := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
 	return motionproto.Score{
 		Attention: state.PriorityScore,
 	}, nil
@@ -121,7 +121,7 @@ func (x concernPolicy) Update(
 
 	// inputs
 	policyState := LoadPolicyState_Local(ctx, cloned)
-	instanceState := LoadInstanceState_Local(ctx, cloned.Public.Tree(), policyNS)
+	instanceState := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), instanceState.PriorityPoll)
 
 	// update idealized quadratic funding deficit
@@ -168,7 +168,7 @@ func (x concernPolicy) Update(
 
 	//
 
-	SaveInstanceState_StageOnly(ctx, cloned.Public.Tree(), policyNS, instanceState)
+	SaveMotionPolicyState_StageOnly(ctx, cloned.Public.Tree(), policyNS, instanceState)
 
 	r0, n0 := x.updateFreeze(ctx, cloned, con, policyNS)
 	return r0, append(notices, n0...)
@@ -194,7 +194,7 @@ func (x concernPolicy) updateFreeze(
 
 ) (motionproto.Report, notice.Notices) {
 
-	toState := LoadInstanceState_Local(ctx, cloned.Public.Tree(), policyNS)
+	toState := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
 
 	notices := notice.Notices{}
 	if toState.EligibleProposals.Len() > 0 && !motion.Frozen {
@@ -227,7 +227,7 @@ func (x concernPolicy) Aggregate(
 	// load all motion policy states
 	concernPolicyStates := make([]*ConcernState, len(motion))
 	for i := range motion {
-		concernPolicyStates[i] = LoadInstanceState_Local(ctx, cloned.PublicClone().Tree(), instancePolicyNS[i])
+		concernPolicyStates[i] = LoadMotionPolicyState_Local(ctx, cloned.PublicClone().Tree(), instancePolicyNS[i])
 	}
 
 	// aggregate match deficit
@@ -338,7 +338,7 @@ func (x concernPolicy) Show(
 ) (form.Form, motionproto.MotionBallots) {
 
 	// retrieve policy state
-	policyState := LoadInstanceState_Local(ctx, cloned.Tree(), policyNS)
+	policyState := LoadMotionPolicyState_Local(ctx, cloned.Tree(), policyNS)
 
 	// retrieve poll state
 	priorityPollName := pmp_1.ConcernPollBallotName(motion.ID)

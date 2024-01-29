@@ -51,7 +51,7 @@ func (x proposalPolicy) Open(
 
 	// initialize state
 	state := NewProposalState(prop.ID)
-	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+	SaveMotionPolicyState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
 	// create a bounty account for the proposal
 	account.Create_StageOnly(
@@ -74,7 +74,7 @@ func (x proposalPolicy) Open(
 	// open a poll for the motion
 	ballotapi.Open_StageOnly(
 		ctx,
-		ProposalApprovalPollPolicyName, //XXX
+		ProposalApprovalPollPolicyName,
 		cloned,
 		state.ApprovalPoll,
 		pmp_1.ProposalAccountID(prop.ID),
@@ -101,7 +101,7 @@ func (x proposalPolicy) Open(
 		Motion: &metric.MotionEvent{
 			Open: &metric.MotionOpen{
 				ID:     metric.MotionID(prop.ID),
-				Type:   "proposal",
+				Type:   "proposal-v1",
 				Policy: metric.MotionPolicy(prop.Policy),
 			},
 		},
@@ -121,14 +121,9 @@ func (x proposalPolicy) Score(
 
 ) (motionproto.Score, notice.Notices) {
 
-	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
-
-	// compute score
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.ApprovalPoll)
-	attention := ads.Tally.Attention()
-
+	state := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
 	return motionproto.Score{
-		Attention: attention,
+		Attention: state.LatestApprovalScore,
 	}, nil
 }
 
@@ -142,7 +137,7 @@ func (x proposalPolicy) Update(
 ) (motionproto.Report, notice.Notices) {
 
 	notices := notice.Notices{}
-	state := LoadState_Local(ctx, cloned.Public.Tree(), policyNS)
+	state := LoadMotionPolicyState_Local(ctx, cloned.Public.Tree(), policyNS)
 
 	// update approval score
 
@@ -183,7 +178,7 @@ func (x proposalPolicy) Update(
 
 	//
 
-	SaveState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
+	SaveMotionPolicyState_StageOnly(ctx, cloned.Public.Tree(), policyNS, state)
 
 	// update ScoreKernelState
 	currentState := ScoreKernelState{
@@ -220,6 +215,7 @@ func calcBounty(
 	return bounty
 }
 
+// XXX
 func (x proposalPolicy) Aggregate(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
@@ -303,7 +299,7 @@ func (x proposalPolicy) Close(
 			Motion: &metric.MotionEvent{
 				Close: &metric.MotionClose{
 					ID:       metric.MotionID(prop.ID),
-					Type:     "proposal",
+					Type:     "proposal-v1",
 					Policy:   metric.MotionPolicy(prop.Policy),
 					Decision: decision.MetricDecision(),
 					Receipts: append(rewards.MetricReceipts(), bountyReceipt),
@@ -337,7 +333,7 @@ func (x proposalPolicy) Close(
 			Motion: &metric.MotionEvent{
 				Close: &metric.MotionClose{
 					ID:       metric.MotionID(prop.ID),
-					Type:     "proposal",
+					Type:     "proposal-v1",
 					Policy:   metric.MotionPolicy(prop.Policy),
 					Decision: decision.MetricDecision(),
 					Receipts: cancelApprovalPoll.Result.RefundedHistoryReceipts(),
@@ -409,7 +405,7 @@ func (x proposalPolicy) Show(
 ) (form.Form, motionproto.MotionBallots) {
 
 	// retrieve policy state
-	policyState := LoadState_Local(ctx, cloned.Tree(), policyNS)
+	policyState := LoadMotionPolicyState_Local(ctx, cloned.Tree(), policyNS)
 
 	// retrieve approval poll
 	approvalPoll := loadPropApprovalPollTally(ctx, cloned, motion)

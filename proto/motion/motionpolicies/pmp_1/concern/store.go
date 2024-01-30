@@ -4,21 +4,13 @@ import (
 	"context"
 
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
-	"github.com/gov4git/lib4git/git"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 )
 
-// policy
-
-var (
-	PolicyNS = motionproto.PolicyNS(ConcernPolicyName)
-)
-
-// XXX: this needs a registry
-func LoadPolicyState_Local(ctx context.Context, cloned gov.OwnerCloned) *PolicyState {
-	return git.FromFile[*PolicyState](ctx, cloned.PublicClone().Tree(), PolicyNS.Append(StateFilebase))
+func LoadClassState_Local(ctx context.Context, cloned gov.OwnerCloned) *PolicyState {
+	return motionapi.LoadClassState_Local[*PolicyState](ctx, cloned, ConcernPolicyName)
 }
 
-func SavePolicyState_StageOnly(ctx context.Context, cloned gov.OwnerCloned, ps *PolicyState) {
-	git.ToFileStage[*PolicyState](ctx, cloned.PublicClone().Tree(), PolicyNS.Append(StateFilebase), ps)
+func SaveClassState_StageOnly(ctx context.Context, cloned gov.OwnerCloned, ps *PolicyState) {
+	motionapi.SaveClassState_StageOnly[*PolicyState](ctx, cloned, ConcernPolicyName, ps)
 }

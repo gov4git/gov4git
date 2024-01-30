@@ -39,8 +39,8 @@ func (sk ScoreKernel) Score(
 
 ) sv.ScoredVotes {
 
-	// XXX:OPEN
 	// state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
+	// costMultipler := state.CostMultiplier
 
 	//XXX
 

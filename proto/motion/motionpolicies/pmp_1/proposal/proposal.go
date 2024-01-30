@@ -138,7 +138,7 @@ func (x proposalPolicy) Update(
 
 	// inputs
 
-	conPolicyState := concern.LoadPolicyState_Local(ctx, cloned)
+	conPolicyState := concern.LoadClassState_Local(ctx, cloned)
 	propState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), propState.ApprovalPoll)
 

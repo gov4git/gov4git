@@ -40,11 +40,11 @@ func (x concernPolicy) PostClone(
 
 	err := must.Try(
 		func() {
-			LoadPolicyState_Local(ctx, cloned)
+			LoadClassState_Local(ctx, cloned)
 		},
 	)
 	if git.IsNotExist(err) {
-		SavePolicyState_StageOnly(ctx, cloned, InitialPolicyState)
+		SaveClassState_StageOnly(ctx, cloned, InitialPolicyState)
 	}
 }
 
@@ -116,7 +116,7 @@ func (x concernPolicy) Update(
 	notices := notice.Notices{}
 
 	// inputs
-	policyState := LoadPolicyState_Local(ctx, cloned)
+	policyState := LoadClassState_Local(ctx, cloned)
 	conState := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), conState.PriorityPoll)
 
@@ -231,9 +231,9 @@ func (x concernPolicy) Aggregate(
 	}
 
 	// update policy state
-	policyState := LoadPolicyState_Local(ctx, cloned)
+	policyState := LoadClassState_Local(ctx, cloned)
 	policyState.MatchDeficit = matchDeficit
-	SavePolicyState_StageOnly(ctx, cloned, policyState)
+	SaveClassState_StageOnly(ctx, cloned, policyState)
 }
 
 func (x concernPolicy) Close(

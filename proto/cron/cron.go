@@ -82,18 +82,20 @@ func Cron(
 		base.Infof("CRON: tallying community votes")
 		report["tally"] = ballotapi.TallyAll_StageOnly(ctx, cloned, maxPar).Result
 
-		// rescore motions to capture updated tallies
-		base.Infof("CRON: scoring motions")
-		motionapi.ScoreMotions_StageOnly(ctx, cloned)
-
 		state.LastCommunityTally = time.Now()
 	}
 
 	// update and aggregate motion policies
 	for i := 0; i < 2; i++ {
+		base.Infof("CRON: updating motions")
 		motionapi.UpdateMotions_StageOnly(ctx, cloned)
+		base.Infof("CRON: aggregating motions")
 		motionapi.AggregateMotions_StageOnly(ctx, cloned)
 	}
+
+	// rescore motions to capture updated tallies
+	base.Infof("CRON: scoring motions")
+	motionapi.ScoreMotions_StageOnly(ctx, cloned)
 
 	// display notices on github
 	govgh.DisplayNotices_StageOnly(ctx, repo, ghc, cloned.PublicClone())

@@ -36,7 +36,7 @@ func (sk ScoreKernel) Score(
 
 ) sv.ScoredVotes {
 
-	qvSK := sv.QVScoreKernel{}
+	qvSK := sv.MakeQVScoreKernel(ctx, 1.0)
 	return qvSK.Score(ctx, cloned, ad, el)
 }
 

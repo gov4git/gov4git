@@ -21,7 +21,7 @@ func init() {
 		ctx,
 		QVPolicyName,
 		sv.SV{
-			Kernel: sv.QVScoreKernel{},
+			Kernel: sv.MakeQVScoreKernel(ctx, 1.0),
 		},
 	)
 }

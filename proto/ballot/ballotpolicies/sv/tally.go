@@ -55,7 +55,7 @@ func (qv SV) tally(
 
 	for u := range users {
 		oldVotes, newVotes := oldVotesByUser[u], newVotesByUser[u]
-		oldScore, augmentedScore := augmentAndScoreUserVotes(ctx, cloned, ad, qv.GetScorer(), oldVotes, newVotes)
+		oldScore, augmentedScore := augmentAndScoreUserVotes(ctx, cloned, ad, qv.GetScorer(ctx), oldVotes, newVotes)
 		costDiff := augmentedScore.Cost - oldScore.Cost
 
 		// try charging the user for the new votes

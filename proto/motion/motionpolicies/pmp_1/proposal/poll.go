@@ -39,12 +39,8 @@ func (sk ScoreKernel) Score(
 
 ) sv.ScoredVotes {
 
-	// state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
-	// costMultipler := state.CostMultiplier
-
-	//XXX
-
-	qvSK := sv.QVScoreKernel{}
+	state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
+	qvSK := sv.MakeQVScoreKernel(ctx, state.CostMultiplier)
 	return qvSK.Score(ctx, cloned, ad, el)
 }
 
@@ -55,6 +51,7 @@ func (sk ScoreKernel) CalcJS(
 
 ) ballotproto.MarginCalcJS {
 
+	//XXX: needs re-implementing, not reflective of Score at the moment
 	state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
 	js := fmt.Sprintf(scoreKernelMarginJS, state.Bounty)
 	return ballotproto.MarginCalcJS(js)

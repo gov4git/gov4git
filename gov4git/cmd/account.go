@@ -1,11 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/gov4git/v2/proto/account"
-	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )
 
@@ -22,16 +19,20 @@ var (
 		Short: "Issue to account",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			account.Issue(
-				ctx,
-				setup.Gov,
-				account.AccountID(accountToID),
-				account.H(
-					account.Asset(accountAsset),
-					accountQuantity,
-				),
-				accountNote,
+			api.Invoke(
+				func() {
+					LoadConfig()
+					account.Issue(
+						ctx,
+						setup.Gov,
+						account.AccountID(accountToID),
+						account.H(
+							account.Asset(accountAsset),
+							accountQuantity,
+						),
+						accountNote,
+					)
+				},
 			)
 		},
 	}
@@ -41,16 +42,20 @@ var (
 		Short: "Burn from account",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			account.Burn(
-				ctx,
-				setup.Gov,
-				account.AccountID(accountFromID),
-				account.H(
-					account.Asset(accountAsset),
-					accountQuantity,
-				),
-				accountNote,
+			api.Invoke(
+				func() {
+					LoadConfig()
+					account.Burn(
+						ctx,
+						setup.Gov,
+						account.AccountID(accountFromID),
+						account.H(
+							account.Asset(accountAsset),
+							accountQuantity,
+						),
+						accountNote,
+					)
+				},
 			)
 		},
 	}
@@ -60,17 +65,21 @@ var (
 		Short: "Transfer from one account to another",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			account.Transfer(
-				ctx,
-				setup.Gov,
-				account.AccountID(accountFromID),
-				account.AccountID(accountToID),
-				account.H(
-					account.Asset(accountAsset),
-					accountQuantity,
-				),
-				accountNote,
+			api.Invoke(
+				func() {
+					LoadConfig()
+					account.Transfer(
+						ctx,
+						setup.Gov,
+						account.AccountID(accountFromID),
+						account.AccountID(accountToID),
+						account.H(
+							account.Asset(accountAsset),
+							accountQuantity,
+						),
+						accountNote,
+					)
+				},
 			)
 		},
 	}
@@ -80,12 +89,15 @@ var (
 		Short: "List accounts",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			v := account.List(
-				ctx,
-				setup.Gov,
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					return account.List(
+						ctx,
+						setup.Gov,
+					)
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(v))
 		},
 	}
 
@@ -94,13 +106,16 @@ var (
 		Short: "Show account",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			v := account.Get(
-				ctx,
-				setup.Gov,
-				account.AccountID(accountID),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					return account.Get(
+						ctx,
+						setup.Gov,
+						account.AccountID(accountID),
+					)
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(v))
 		},
 	}
 
@@ -109,13 +124,17 @@ var (
 		Short: "Show account balance for a given asset",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			v := account.Get(
-				ctx,
-				setup.Gov,
-				account.AccountID(accountID),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					v := account.Get(
+						ctx,
+						setup.Gov,
+						account.AccountID(accountID),
+					)
+					return v.Balance(account.Asset(accountAsset)).Quantity
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(v.Balance(account.Asset(accountAsset)).Quantity))
 		},
 	}
 )

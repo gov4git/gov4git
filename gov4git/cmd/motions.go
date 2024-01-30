@@ -1,15 +1,13 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
 	"strings"
 
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
-	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )
 
@@ -26,20 +24,23 @@ var (
 		Short: "Open a new motion",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			motionapi.OpenMotion(
-				ctx,
-				setup.Organizer,
-				motionproto.MotionID(motionName),
-				motionproto.ParseMotionType(ctx, motionType),
-				motion.PolicyName(motionPolicy),
-				member.User(motionAuthor),
-				motionTitle,
-				motionDesc,
-				motionTrackerURL,
-				nil,
+			api.Invoke(
+				func() {
+					LoadConfig()
+					motionapi.OpenMotion(
+						ctx,
+						setup.Organizer,
+						motionproto.MotionID(motionName),
+						motionproto.ParseMotionType(ctx, motionType),
+						motion.PolicyName(motionPolicy),
+						member.User(motionAuthor),
+						motionTitle,
+						motionDesc,
+						motionTrackerURL,
+						nil,
+					)
+				},
 			)
-			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -48,20 +49,23 @@ var (
 		Short: "Close a motion",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			var d motionproto.Decision
-			if motionAccept {
-				d = motionproto.Accept
-			} else {
-				d = motionproto.Reject
-			}
-			motionapi.CloseMotion(
-				ctx,
-				setup.Organizer,
-				motionproto.MotionID(motionName),
-				d,
+			api.Invoke(
+				func() {
+					LoadConfig()
+					var d motionproto.Decision
+					if motionAccept {
+						d = motionproto.Accept
+					} else {
+						d = motionproto.Reject
+					}
+					motionapi.CloseMotion(
+						ctx,
+						setup.Organizer,
+						motionproto.MotionID(motionName),
+						d,
+					)
+				},
 			)
-			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -70,14 +74,16 @@ var (
 		Short: "List motions",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			if motionTrack {
-				mvs := motionapi.TrackMotionBatch(ctx, setup.Gov, setup.Member)
-				fmt.Fprint(os.Stdout, form.SprintJSON(mvs))
-			} else {
-				l := motionapi.ListMotionViews(ctx, setup.Gov)
-				fmt.Fprint(os.Stdout, form.SprintJSON(l))
-			}
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					if motionTrack {
+						return motionapi.TrackMotionBatch(ctx, setup.Gov, setup.Member)
+					} else {
+						return motionapi.ListMotionViews(ctx, setup.Gov)
+					}
+				},
+			)
 		},
 	}
 
@@ -86,14 +92,16 @@ var (
 		Short: "Show motion state and associated objects",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			if motionTrack {
-				s := motionapi.TrackMotion(ctx, setup.Gov, setup.Member, motionproto.MotionID(motionName))
-				fmt.Fprint(os.Stdout, form.SprintJSON(s))
-			} else {
-				mv := motionapi.ShowMotion(ctx, setup.Gov, motionproto.MotionID(motionName))
-				fmt.Fprint(os.Stdout, form.SprintJSON(mv))
-			}
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					if motionTrack {
+						return motionapi.TrackMotion(ctx, setup.Gov, setup.Member, motionproto.MotionID(motionName))
+					} else {
+						return motionapi.ShowMotion(ctx, setup.Gov, motionproto.MotionID(motionName))
+					}
+				},
+			)
 		},
 	}
 )

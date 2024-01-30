@@ -1,12 +1,9 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	govgh "github.com/gov4git/gov4git/v2/github"
 	"github.com/gov4git/gov4git/v2/github/deploy/tools"
-	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/vendor4git/github"
 	"github.com/spf13/cobra"
@@ -52,20 +49,24 @@ Therefore, aside for debugging purposes, users should deploy with:
 
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			must.Assertf(ctx, githubRelease != "", "github release must be specified")
+			api.Invoke1(
+				func() any {
+					must.Assertf(ctx, githubRelease != "", "github release must be specified")
 
-			project := govgh.ParseRepo(ctx, githubProject)
+					project := govgh.ParseRepo(ctx, githubProject)
 
-			var govPrefix govgh.Repo
-			if githubGov == "" {
-				govPrefix = project
-			} else {
-				govPrefix = govgh.ParseRepo(ctx, githubGov)
-			}
+					var govPrefix govgh.Repo
+					if githubGov == "" {
+						govPrefix = project
+					} else {
+						govPrefix = govgh.ParseRepo(ctx, githubGov)
+					}
 
-			// deploy governance on GitHub (by way of placing GitHub actions in the public governance repo)
-			config := govgh.Deploy(ctx, githubToken, project, govPrefix, githubRelease)
-			fmt.Fprint(os.Stdout, form.SprintJSON(config))
+					// deploy governance on GitHub (by way of placing GitHub actions in the public governance repo)
+					config := govgh.Deploy(ctx, githubToken, project, govPrefix, githubRelease)
+					return config
+				},
+			)
 		},
 	}
 
@@ -79,11 +80,15 @@ Therefore, aside for debugging purposes, users should deploy with:
 This creates a public repo. Adding the flag --private will result in creating a private repo.
 		`,
 		Run: func(cmd *cobra.Command, args []string) {
-			ghRepo := govgh.ParseRepo(ctx, githubRepo)
-			vendor := github.NewGitHubVendor(ctx, githubToken)
-			repo, err := vendor.CreateRepo(ctx, ghRepo.Name, ghRepo.Owner, githubPrivate)
-			must.NoError(ctx, err)
-			fmt.Fprint(os.Stdout, form.SprintJSON(repo))
+			api.Invoke1(
+				func() any {
+					ghRepo := govgh.ParseRepo(ctx, githubRepo)
+					vendor := github.NewGitHubVendor(ctx, githubToken)
+					repo, err := vendor.CreateRepo(ctx, ghRepo.Name, ghRepo.Owner, githubPrivate)
+					must.NoError(ctx, err)
+					return repo
+				},
+			)
 		},
 	}
 
@@ -95,10 +100,14 @@ This creates a public repo. Adding the flag --private will result in creating a 
 	gov4git github remove --token=GITHUB_ACCESS_TOKEN --repo=GITHUB_OWNER/GITHUB_REPO
 `,
 		Run: func(cmd *cobra.Command, args []string) {
-			ghRepo := govgh.ParseRepo(ctx, githubRepo)
-			vendor := github.NewGitHubVendor(ctx, githubToken)
-			err := vendor.RemoveRepo(ctx, ghRepo.Name, ghRepo.Owner)
-			must.NoError(ctx, err)
+			api.Invoke(
+				func() {
+					ghRepo := govgh.ParseRepo(ctx, githubRepo)
+					vendor := github.NewGitHubVendor(ctx, githubToken)
+					err := vendor.RemoveRepo(ctx, ghRepo.Name, ghRepo.Owner)
+					must.NoError(ctx, err)
+				},
+			)
 		},
 	}
 
@@ -107,12 +116,16 @@ This creates a public repo. Adding the flag --private will result in creating a 
 		Short: "Delete all comments from an issue or PR",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			ghRepo := govgh.ParseRepo(ctx, githubRepo)
-			tools.ClearComments(
-				ctx,
-				githubToken,
-				ghRepo,
-				githubIssueNo,
+			api.Invoke(
+				func() {
+					ghRepo := govgh.ParseRepo(ctx, githubRepo)
+					tools.ClearComments(
+						ctx,
+						githubToken,
+						ghRepo,
+						githubIssueNo,
+					)
+				},
 			)
 		},
 	}

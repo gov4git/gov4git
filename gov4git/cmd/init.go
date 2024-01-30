@@ -1,12 +1,9 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/gov4git/v2/proto/boot"
 	"github.com/gov4git/gov4git/v2/proto/id"
-	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )
 
@@ -16,9 +13,13 @@ var (
 		Short: "Initialize public and private repositories of your identity",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			chg := id.Init(ctx, setup.Member)
-			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					chg := id.Init(ctx, setup.Member)
+					return chg.Result
+				},
+			)
 		},
 	}
 
@@ -27,9 +28,13 @@ var (
 		Short: "Initialize public and private repositories of your governance",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			chg := boot.Boot(ctx, setup.Organizer)
-			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					chg := boot.Boot(ctx, setup.Organizer)
+					return chg.Result
+				},
+			)
 		},
 	}
 )

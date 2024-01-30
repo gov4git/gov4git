@@ -1,11 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/gov4git/gov4git/v2"
-	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +12,11 @@ var (
 		Short: "Version and build information",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Fprint(os.Stdout, form.SprintJSON(gov4git.GetVersionInfo()))
+			api.Invoke1(
+				func() any {
+					return gov4git.GetVersionInfo()
+				},
+			)
 		},
 	}
 )

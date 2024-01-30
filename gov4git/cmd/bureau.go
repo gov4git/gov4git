@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/gov4git/v2/proto/bureau"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/spf13/cobra"
@@ -19,11 +20,15 @@ var (
 		Short: "Fetch and process requests from community members",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			bureau.Process(
-				ctx,
-				setup.Organizer,
-				member.Group(bureauGroup),
+			api.Invoke(
+				func() {
+					LoadConfig()
+					bureau.Process(
+						ctx,
+						setup.Organizer,
+						member.Group(bureauGroup),
+					)
+				},
 			)
 		},
 	}
@@ -33,14 +38,18 @@ var (
 		Short: "Make a transfer request to the community governance",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			bureau.Transfer(
-				ctx,
-				setup.Member,
-				setup.Gov,
-				member.User(bureauFromUser),
-				member.User(bureauToUser),
-				bureauAmount,
+			api.Invoke(
+				func() {
+					LoadConfig()
+					bureau.Transfer(
+						ctx,
+						setup.Member,
+						setup.Gov,
+						member.User(bureauFromUser),
+						member.User(bureauToUser),
+						bureauAmount,
+					)
+				},
 			)
 		},
 	}

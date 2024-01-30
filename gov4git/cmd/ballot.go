@@ -2,16 +2,14 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"os"
 
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
-	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/must"
 	"github.com/spf13/cobra"
 )
@@ -29,21 +27,25 @@ var (
 		Short: "Open a new ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			chg := ballotapi.Open(
-				ctx,
-				ballotio.QVPolicyName,
-				setup.Organizer,
-				ballotproto.ParseBallotID(ballotName),
-				account.NobodyAccountID,
-				purpose.Unspecified,
-				"",
-				ballotTitle,
-				ballotDescription,
-				ballotChoices,
-				member.Group(ballotGroup),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					chg := ballotapi.Open(
+						ctx,
+						ballotio.QVPolicyName,
+						setup.Organizer,
+						ballotproto.ParseBallotID(ballotName),
+						account.NobodyAccountID,
+						purpose.Unspecified,
+						"",
+						ballotTitle,
+						ballotDescription,
+						ballotChoices,
+						member.Group(ballotGroup),
+					)
+					return chg.Result
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -52,13 +54,17 @@ var (
 		Short: "Freeze an open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			chg := ballotapi.Freeze(
-				ctx,
-				setup.Organizer,
-				ballotproto.ParseBallotID(ballotName),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					chg := ballotapi.Freeze(
+						ctx,
+						setup.Organizer,
+						ballotproto.ParseBallotID(ballotName),
+					)
+					return chg.Result
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -67,13 +73,17 @@ var (
 		Short: "Unfreeze an open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			chg := ballotapi.Unfreeze(
-				ctx,
-				setup.Organizer,
-				ballotproto.ParseBallotID(ballotName),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					chg := ballotapi.Unfreeze(
+						ctx,
+						setup.Organizer,
+						ballotproto.ParseBallotID(ballotName),
+					)
+					return chg.Result
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -82,14 +92,18 @@ var (
 		Short: "Close an open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			chg := ballotapi.Close(
-				ctx,
-				setup.Organizer,
-				ballotproto.ParseBallotID(ballotName),
-				account.AccountID(ballotEscrowTo),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					chg := ballotapi.Close(
+						ctx,
+						setup.Organizer,
+						ballotproto.ParseBallotID(ballotName),
+						account.AccountID(ballotEscrowTo),
+					)
+					return chg.Result
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -98,13 +112,17 @@ var (
 		Short: "Cancel an open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			chg := ballotapi.Cancel(
-				ctx,
-				setup.Organizer,
-				ballotproto.ParseBallotID(ballotName),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					chg := ballotapi.Cancel(
+						ctx,
+						setup.Organizer,
+						ballotproto.ParseBallotID(ballotName),
+					)
+					return chg.Result
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -113,13 +131,17 @@ var (
 		Short: "Show ballot details",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			r := ballotapi.Show(
-				ctx,
-				setup.Gov,
-				ballotproto.ParseBallotID(ballotName),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					r := ballotapi.Show(
+						ctx,
+						setup.Gov,
+						ballotproto.ParseBallotID(ballotName),
+					)
+					return r
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(r))
 		},
 	}
 
@@ -128,22 +150,24 @@ var (
 		Short: "List ballots",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			ads := ballotapi.ListFilter(
-				ctx,
-				setup.Gov,
-				ballotOnlyOpen,
-				ballotOnlyClosed,
-				ballotOnlyFrozen,
-				member.User(ballotWithParticipant),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					ads := ballotapi.ListFilter(
+						ctx,
+						setup.Gov,
+						ballotOnlyOpen,
+						ballotOnlyClosed,
+						ballotOnlyFrozen,
+						member.User(ballotWithParticipant),
+					)
+					if ballotOnlyNames {
+						return ballotproto.AdsToBallotNames(ads)
+					} else {
+						return ads
+					}
+				},
 			)
-			if ballotOnlyNames {
-				for _, n := range ballotproto.AdsToBallotNames(ads) {
-					fmt.Println(n)
-				}
-			} else {
-				fmt.Fprint(os.Stdout, form.SprintJSON(ads))
-			}
 		},
 	}
 
@@ -152,14 +176,18 @@ var (
 		Short: "Fetch current votes and record latest tally",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			chg := ballotapi.Tally(
-				ctx,
-				setup.Organizer,
-				ballotproto.ParseBallotID(ballotName),
-				ballotFetchPar,
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					chg := ballotapi.Tally(
+						ctx,
+						setup.Organizer,
+						ballotproto.ParseBallotID(ballotName),
+						ballotFetchPar,
+					)
+					return chg.Result
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -168,15 +196,19 @@ var (
 		Short: "Cast a vote on an open ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			chg := ballotapi.Vote(
-				ctx,
-				setup.Member,
-				setup.Gov,
-				ballotproto.ParseBallotID(ballotName),
-				parseElections(ctx, ballotElectionChoice, ballotElectionStrength),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					chg := ballotapi.Vote(
+						ctx,
+						setup.Member,
+						setup.Gov,
+						ballotproto.ParseBallotID(ballotName),
+						parseElections(ctx, ballotElectionChoice, ballotElectionStrength),
+					)
+					return chg.Result
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -188,14 +220,18 @@ It returns a report listing accepted, rejected and pending votes.
 Rejected votes are associated with a reason, such as "ballot is frozen".
 Pending votes have not yet been processed by the community's governance.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			status := ballotapi.Track(
-				ctx,
-				setup.Member,
-				setup.Gov,
-				ballotproto.ParseBallotID(ballotName),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					status := ballotapi.Track(
+						ctx,
+						setup.Member,
+						setup.Gov,
+						ballotproto.ParseBallotID(ballotName),
+					)
+					return status
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(status))
 		},
 	}
 
@@ -204,13 +240,17 @@ Pending votes have not yet been processed by the community's governance.`,
 		Short: "Erase a ballot",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			chg := ballotapi.Erase(
-				ctx,
-				setup.Organizer,
-				ballotproto.ParseBallotID(ballotName),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					chg := ballotapi.Erase(
+						ctx,
+						setup.Organizer,
+						ballotproto.ParseBallotID(ballotName),
+					)
+					return chg.Result
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 )

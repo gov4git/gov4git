@@ -1,12 +1,9 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/gov4git/v2/proto/member"
-	"github.com/gov4git/lib4git/form"
 	"github.com/gov4git/lib4git/git"
 	"github.com/spf13/cobra"
 )
@@ -24,14 +21,17 @@ var (
 		Short: "Add user to the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			member.AddUserByPublicAddress(
-				ctx,
-				setup.Gov,
-				member.User(userName),
-				id.PublicAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
+			api.Invoke(
+				func() {
+					LoadConfig()
+					member.AddUserByPublicAddress(
+						ctx,
+						setup.Gov,
+						member.User(userName),
+						id.PublicAddress{Repo: git.URL(userRepo), Branch: git.Branch(userBranch)},
+					)
+				},
 			)
-			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -40,13 +40,16 @@ var (
 		Short: "Remove user from the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			member.RemoveUser(
-				ctx,
-				setup.Gov,
-				member.User(userName),
+			api.Invoke(
+				func() {
+					LoadConfig()
+					member.RemoveUser(
+						ctx,
+						setup.Gov,
+						member.User(userName),
+					)
+				},
 			)
-			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -55,14 +58,17 @@ var (
 		Short: "Get user property",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			v := member.GetUserProp[interface{}](
-				ctx,
-				setup.Gov,
-				member.User(userName),
-				userKey,
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					return member.GetUserProp[interface{}](
+						ctx,
+						setup.Gov,
+						member.User(userName),
+						userKey,
+					)
+				},
 			)
-			fmt.Fprint(os.Stdout, v)
 		},
 	}
 
@@ -71,13 +77,16 @@ var (
 		Short: "List user's group memberships",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			l := member.ListUserGroups(
-				ctx,
-				setup.Gov,
-				member.User(userName),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					return member.ListUserGroups(
+						ctx,
+						setup.Gov,
+						member.User(userName),
+					)
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(l))
 		},
 	}
 )

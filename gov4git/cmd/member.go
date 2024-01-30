@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/spf13/cobra"
 )
@@ -18,12 +19,16 @@ var (
 		Short: "Add member",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			member.AddMember(
-				ctx,
-				setup.Gov,
-				member.User(memberUser),
-				member.Group(memberGroup),
+			api.Invoke(
+				func() {
+					LoadConfig()
+					member.AddMember(
+						ctx,
+						setup.Gov,
+						member.User(memberUser),
+						member.Group(memberGroup),
+					)
+				},
 			)
 		},
 	}
@@ -33,12 +38,16 @@ var (
 		Short: "Remove member from the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			member.RemoveMember(
-				ctx,
-				setup.Gov,
-				member.User(memberUser),
-				member.Group(memberGroup),
+			api.Invoke(
+				func() {
+					LoadConfig()
+					member.RemoveMember(
+						ctx,
+						setup.Gov,
+						member.User(memberUser),
+						member.Group(memberGroup),
+					)
+				},
 			)
 		},
 	}

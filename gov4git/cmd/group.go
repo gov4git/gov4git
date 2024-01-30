@@ -1,11 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/gov4git/v2/proto/member"
-	"github.com/gov4git/lib4git/form"
 	"github.com/spf13/cobra"
 )
 
@@ -22,13 +19,16 @@ var (
 		Short: "Add group to the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			member.AddGroup(
-				ctx,
-				setup.Gov,
-				member.Group(groupName),
+			api.Invoke(
+				func() {
+					LoadConfig()
+					member.AddGroup(
+						ctx,
+						setup.Gov,
+						member.Group(groupName),
+					)
+				},
 			)
-			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -37,13 +37,16 @@ var (
 		Short: "Remove group from the community",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			member.RemoveGroup(
-				ctx,
-				setup.Gov,
-				member.Group(groupName),
+			api.Invoke(
+				func() {
+					LoadConfig()
+					member.RemoveGroup(
+						ctx,
+						setup.Gov,
+						member.Group(groupName),
+					)
+				},
 			)
-			// fmt.Fprint(os.Stdout, form.SprintJSON(chg.Result))
 		},
 	}
 
@@ -52,13 +55,16 @@ var (
 		Short: "List users in group",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			l := member.ListGroupUsers(
-				ctx,
-				setup.Gov,
-				member.Group(groupName),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					return member.ListGroupUsers(
+						ctx,
+						setup.Gov,
+						member.Group(groupName),
+					)
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(l))
 		},
 	}
 	groupUsersCmd = &cobra.Command{
@@ -66,13 +72,16 @@ var (
 		Short: "List users in group",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			l := member.ListGroupUsers(
-				ctx,
-				setup.Gov,
-				member.Group(groupName),
+			api.Invoke1(
+				func() any {
+					LoadConfig()
+					return member.ListGroupUsers(
+						ctx,
+						setup.Gov,
+						member.Group(groupName),
+					)
+				},
 			)
-			fmt.Fprint(os.Stdout, form.SprintJSON(l))
 		},
 	}
 )

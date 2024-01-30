@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/lib4git/base"
 	lib4git "github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
@@ -24,10 +25,14 @@ var (
 		Short: "Clear local client cache",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			must.Assertf(ctx, setup.CacheDir != "", "cache dir not specified in config")
-			err := os.RemoveAll(setup.CacheDir)
-			must.NoError(ctx, err)
+			api.Invoke(
+				func() {
+					LoadConfig()
+					must.Assertf(ctx, setup.CacheDir != "", "cache dir not specified in config")
+					err := os.RemoveAll(setup.CacheDir)
+					must.NoError(ctx, err)
+				},
+			)
 		},
 	}
 
@@ -36,16 +41,20 @@ var (
 		Short: "Update local cache by prefetching community and user repos",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			LoadConfig()
-			must.Assertf(ctx, setup.CacheDir != "", "cache dir not specified in config")
-			if cacheUpdateIntervalSeconds > 0 {
-				for {
-					updateCacheBestEffort(ctx)
-					time.Sleep(time.Second * time.Duration(cacheUpdateIntervalSeconds))
-				}
-			} else {
-				updateCacheBestEffort(ctx)
-			}
+			api.Invoke(
+				func() {
+					LoadConfig()
+					must.Assertf(ctx, setup.CacheDir != "", "cache dir not specified in config")
+					if cacheUpdateIntervalSeconds > 0 {
+						for {
+							updateCacheBestEffort(ctx)
+							time.Sleep(time.Second * time.Duration(cacheUpdateIntervalSeconds))
+						}
+					} else {
+						updateCacheBestEffort(ctx)
+					}
+				},
+			)
 		},
 	}
 )

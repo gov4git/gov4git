@@ -59,6 +59,7 @@ func (sk ScoreKernel) CalcJS(
 
 const scoreKernelMarginJS = `
 
+// XXX: PLACEHOLDER. DO NOT USE.
 function calcMargin(currentTally, voteUser, voteChoice, targetVote) {
 
 	// compute currentVote and currentCharge (for logged in user)

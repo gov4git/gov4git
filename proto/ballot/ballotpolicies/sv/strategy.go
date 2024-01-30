@@ -33,16 +33,24 @@ type ScoredVotes struct {
 	Cost  float64
 }
 
-func (x SV) GetScorer() ScoreKernel {
+func (x SV) GetScorer(ctx context.Context) ScoreKernel {
 	if x.Kernel == nil {
-		return QVScoreKernel{}
+		return MakeQVScoreKernel(ctx, 1.0)
 	}
 	return x.Kernel
 }
 
-type QVScoreKernel struct{}
+type QVScoreKernel struct {
+	CostMultiplier float64 `json:"cost_multiplier"`
+}
 
-func (QVScoreKernel) Score(
+func MakeQVScoreKernel(ctx context.Context, costMultiplier float64) QVScoreKernel {
+	return QVScoreKernel{
+		CostMultiplier: costMultiplier,
+	}
+}
+
+func (k QVScoreKernel) Score(
 	ctx context.Context,
 	cloned gov.Cloned,
 	ad *ballotproto.Ad,
@@ -80,7 +88,7 @@ func qvScoreFromStrength(strength float64) float64 {
 	return sign * math.Sqrt(math.Abs(strength))
 }
 
-func (QVScoreKernel) CalcJS(
+func (k QVScoreKernel) CalcJS(
 	context.Context,
 	gov.Cloned,
 	*ballotproto.Ad,

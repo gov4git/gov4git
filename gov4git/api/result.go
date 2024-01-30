@@ -12,12 +12,13 @@ import (
 type Result struct {
 	Status   Status `json:"status"`
 	Returned any    `json:"returned,omitempty"`
-	Msg      string `json:"msg,omitempty"`
+	Msg      string `json:"msg,omitempty"`   // summary of error
+	Error    error  `json:"error,omitempty"` // structure of error
 }
 
 func Invoke(f func()) Result {
 	err := must.TryThru(f)
-	r := NewResult(nil, err.Wrapped())
+	r := NewResult(nil, err)
 	if err != nil && base.IsVerbose() {
 		fmt.Fprint(os.Stderr, string(err.Stack))
 	}
@@ -27,7 +28,7 @@ func Invoke(f func()) Result {
 
 func Invoke1[R1 any](f func() R1) Result {
 	r1, err := must.Try1Thru[R1](f)
-	r := NewResult(r1, err.Wrapped())
+	r := NewResult(r1, err)
 	if err != nil && base.IsVerbose() {
 		fmt.Fprint(os.Stderr, string(err.Stack))
 	}
@@ -35,13 +36,14 @@ func Invoke1[R1 any](f func() R1) Result {
 	return r
 }
 
-func NewResult(r any, err error) Result {
+func NewResult(r any, err *must.Error) Result {
 	var result Result
 	if err == nil {
 		result.Status = StatusSuccess
 	} else {
 		result.Status = StatusError
 		result.Msg = err.Error()
+		result.Error = err.Wrapped()
 	}
 	result.Returned = r
 	return result

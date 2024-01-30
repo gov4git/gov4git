@@ -4,7 +4,6 @@
 - display bounty in notices
 
 - clearance cron step?
-- run score after update/aggregate
 
 - update margin calc js functions
 

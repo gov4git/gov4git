@@ -69,7 +69,7 @@ func (k QVScoreKernel) Score(
 	for choice, ss := range score {
 		score[choice] = ballotproto.StrengthAndScore{
 			Strength: ss.Strength,
-			Score:    qvScoreFromStrength(ss.Strength),
+			Score:    qvScoreFromStrength(ss.Strength, k.CostMultiplier),
 		}
 	}
 	// compute aggregate cost
@@ -80,12 +80,12 @@ func (k QVScoreKernel) Score(
 	return ScoredVotes{Votes: el, Score: score, Cost: cost}
 }
 
-func qvScoreFromStrength(strength float64) float64 {
+func qvScoreFromStrength(strength float64, costMultiplier float64) float64 {
 	sign := 1.0
 	if strength < 0 {
 		sign = -1.0
 	}
-	return sign * math.Sqrt(math.Abs(strength))
+	return sign * math.Sqrt(math.Abs(strength/costMultiplier))
 }
 
 func (k QVScoreKernel) CalcJS(

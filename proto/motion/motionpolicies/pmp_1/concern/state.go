@@ -1,6 +1,8 @@
 package concern
 
 import (
+	"math"
+
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
@@ -12,8 +14,12 @@ type ConcernState struct {
 	PriorityPoll      ballotproto.BallotID `json:"priority_poll"`
 	EligibleProposals motionproto.Refs     `json:"eligible_proposals"`
 	//
-	IQDeficit     float64 `json:"iq_deficit"` // idealized quadratic funding deficit
-	PriorityScore float64 `json:"priority_score"`
+	IQDeficit     float64 `json:"iq_deficit"`     // idealized quadratic funding deficit
+	PriorityScore float64 `json:"priority_score"` // is "escrow"
+}
+
+func (x *ConcernState) Escrow() float64 {
+	return math.Abs(x.PriorityScore)
 }
 
 func NewConcernState(id motionproto.MotionID) *ConcernState {

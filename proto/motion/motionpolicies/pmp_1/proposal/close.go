@@ -37,7 +37,7 @@ func (x proposalPolicy) clearClose(
 		// accepting a proposal against the popular vote?
 		againstPopular := adt.Tally.Scores[pmp_1.ProposalBallotChoice] < 0
 
-		// close the referendum for the motion
+		// close the approval poll, move the funds to a reward account
 		approvalPollName := pmp_1.ProposalApprovalPollName(prop.ID)
 		closeApprovalPoll := ballotapi.Close_StageOnly(
 			ctx,
@@ -46,16 +46,22 @@ func (x proposalPolicy) clearClose(
 			pmp_1.ProposalRewardAccountID(prop.ID),
 		)
 
-		// close all concerns resolved by the motion, and
-		// transfer their escrows into the bounty account
-		resolved := loadResolvedConcerns(ctx, cloned, prop)
-		bounty := closeResolvedConcerns(ctx, cloned, prop, resolved)
+		// close all concerns consResolved by the motion, and
+		// transfer their funds into the bounty account
+		consResolved, consEscrows := loadResolvedConcerns(ctx, cloned, prop)
+		consFunds := closeResolvedConcerns(ctx, cloned, prop, consResolved)
 
-		// transfer bounty to author
+		// XXX: reward reviewers
+		_ = consEscrows
+
+		rewards := disberseRewards(ctx, cloned, prop)
+
+		// XXX: reward author
+
 		var bountyDonated bool
 		bountyReceipt := metric.Receipt{
 			Type:   metric.ReceiptTypeBounty,
-			Amount: bounty.MetricHolding(),
+			Amount: consFunds.MetricHolding(),
 		}
 		if prop.Author.IsNone() {
 			account.Transfer_StageOnly(
@@ -63,7 +69,7 @@ func (x proposalPolicy) clearClose(
 				cloned.PublicClone(),
 				pmp_1.ProposalBountyAccountID(prop.ID),
 				pmp_0.MatchingPoolAccountID,
-				bounty,
+				consFunds,
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
 			)
 			bountyDonated = true
@@ -74,14 +80,11 @@ func (x proposalPolicy) clearClose(
 				cloned.PublicClone(),
 				pmp_1.ProposalBountyAccountID(prop.ID),
 				member.UserAccountID(prop.Author),
-				bounty,
+				consFunds,
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
 			)
 			bountyReceipt.To = member.UserAccountID(prop.Author).HistoryAccountID()
 		}
-
-		// distribute rewards
-		rewards := disberseRewards(ctx, cloned, prop)
 
 		// metrics
 		metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{
@@ -99,11 +102,11 @@ func (x proposalPolicy) clearClose(
 		return &CloseReport{
 			Accepted:            true,
 			ApprovalPollOutcome: closeApprovalPoll.Result,
-			Resolved:            resolved,
-			Bounty:              bounty,
+			Resolved:            consResolved,
+			Bounty:              consFunds,
 			BountyDonated:       bountyDonated,
 			Rewarded:            rewards,
-		}, closeNotice(ctx, prop, againstPopular, closeApprovalPoll.Result, resolved, bounty, bountyDonated, rewards)
+		}, closeNotice(ctx, prop, againstPopular, closeApprovalPoll.Result, consResolved, consFunds, bountyDonated, rewards)
 
 	} else {
 

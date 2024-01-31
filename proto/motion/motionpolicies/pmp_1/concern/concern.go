@@ -112,10 +112,6 @@ func (x concernPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
-	if con.Closed {
-		return nil, nil
-	}
-
 	// outputs
 	notices := notice.Notices{}
 

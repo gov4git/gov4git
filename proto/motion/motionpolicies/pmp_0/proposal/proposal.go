@@ -135,10 +135,6 @@ func (x proposalPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
-	if prop.Closed {
-		return nil, nil
-	}
-
 	notices := notice.Notices{}
 	state := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
 
@@ -243,6 +239,9 @@ func (x proposalPolicy) Close(
 
 ) (motionproto.Report, notice.Notices) {
 
+	// ensure the set of eligible concerns is valid
+	_, uNotices := x.Update(ctx, cloned, prop)
+
 	// was the PR merged or not
 	isMerged := decision.IsAccept()
 
@@ -314,13 +313,16 @@ func (x proposalPolicy) Close(
 		})
 
 		return &CloseReport{
-			Accepted:            true,
-			ApprovalPollOutcome: closeApprovalPoll.Result,
-			Resolved:            resolved,
-			Bounty:              bounty,
-			BountyDonated:       bountyDonated,
-			Rewarded:            rewards,
-		}, closeNotice(ctx, prop, againstPopular, closeApprovalPoll.Result, resolved, bounty, bountyDonated, rewards)
+				Accepted:            true,
+				ApprovalPollOutcome: closeApprovalPoll.Result,
+				Resolved:            resolved,
+				Bounty:              bounty,
+				BountyDonated:       bountyDonated,
+				Rewarded:            rewards,
+			}, append(
+				uNotices,
+				closeNotice(ctx, prop, againstPopular, closeApprovalPoll.Result, resolved, bounty, bountyDonated, rewards)...,
+			)
 
 	} else {
 
@@ -348,14 +350,16 @@ func (x proposalPolicy) Close(
 		})
 
 		return &CloseReport{
-			Accepted:            false,
-			ApprovalPollOutcome: cancelApprovalPoll.Result,
-			Resolved:            nil,
-			Bounty:              account.H(account.PluralAsset, 0.0),
-			BountyDonated:       false,
-			Rewarded:            nil,
-		}, cancelNotice(ctx, prop, againstPopular, cancelApprovalPoll.Result)
-
+				Accepted:            false,
+				ApprovalPollOutcome: cancelApprovalPoll.Result,
+				Resolved:            nil,
+				Bounty:              account.H(account.PluralAsset, 0.0),
+				BountyDonated:       false,
+				Rewarded:            nil,
+			}, append(
+				uNotices,
+				cancelNotice(ctx, prop, againstPopular, cancelApprovalPoll.Result)...,
+			)
 	}
 }
 

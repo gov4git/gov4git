@@ -224,10 +224,14 @@ func (x proposalPolicy) Clear(
 		return nil, nil
 	}
 
+	// ensure the set of eligible concerns is valid
+	_, uNotices := x.Update(ctx, cloned, prop)
+
 	propState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
 	must.Assertf(ctx, !propState.Decision.IsEmpty(), "close decision missing during clearance")
 
-	return x.clearClose(ctx, cloned, prop, propState.Decision)
+	cReport, cNotices := x.clearClose(ctx, cloned, prop, propState.Decision)
+	return cReport, append(uNotices, cNotices...)
 }
 
 func (x proposalPolicy) Close(

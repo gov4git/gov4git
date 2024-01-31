@@ -20,7 +20,7 @@ func sumClaimedConcernEscrows(
 	escrow := 0.0
 	for _, ref := range eligible {
 		conState := motionapi.LoadPolicyState_Local[*concern.ConcernState](ctx, cloned.PublicClone(), ref.To)
-		escrow += conState.PriorityScore // equals concern escrow
+		escrow += conState.Escrow()
 	}
 
 	return escrow

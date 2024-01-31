@@ -12,6 +12,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/concern"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
@@ -20,15 +21,17 @@ func loadResolvedConcerns(
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
 
-) motionproto.Motions {
+) (resolved motionproto.Motions, escrows []float64) {
 
 	eligible := computeEligibleConcerns(ctx, cloned.PublicClone(), prop)
-	resolved := motionproto.Motions{}
 	for _, ref := range eligible {
 		con := motionapi.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
+		conState := motionapi.LoadPolicyState_Local[*concern.ConcernState](ctx, cloned.PublicClone(), con.ID)
+		//
 		resolved = append(resolved, con)
+		escrows = append(escrows, conState.Escrow())
 	}
-	return resolved
+	return resolved, escrows
 }
 
 func computeEligibleConcerns(ctx context.Context, cloned gov.Cloned, prop motionproto.Motion) motionproto.Refs {
@@ -89,13 +92,6 @@ func disberseRewards(
 
 	rewards := Rewards{}
 	adt := loadPropApprovalPollTally(ctx, cloned.PublicClone(), prop)
-
-	// get reward account balance
-	// totalWinnings := account.Get_Local(
-	// 	ctx,
-	// 	cloned.PublicClone(),
-	// 	pmp.ProposalRewardAccountID(prop.ID),
-	// ).Assets.Balance(account.PluralAsset).Quantity
 
 	// compute reward distribution
 	rewardFund := 0.0                      // total credits spent on negative votes

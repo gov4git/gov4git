@@ -55,7 +55,7 @@ func (x proposalPolicy) Close(
 		// XXX: reward reviewers
 		_ = consEscrows
 
-		rewards := disberseRewards(ctx, cloned, prop)
+		rewards := disberseRewardsAccepted(ctx, cloned, prop)
 
 		// XXX: reward author
 

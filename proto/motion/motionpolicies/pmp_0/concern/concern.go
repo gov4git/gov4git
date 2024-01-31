@@ -177,6 +177,10 @@ func (x concernPolicy) updateFreeze(
 
 ) (motionproto.Report, notice.Notices) {
 
+	if con.Closed {
+		return nil, nil
+	}
+
 	toState := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
 
 	notices := notice.Notices{}
@@ -232,9 +236,6 @@ func (x concernPolicy) Close(
 	must.Assertf(ctx, ok, "unrecognized account ID argument %v", args[0])
 	prop, ok := args[1].(motionproto.Motion)
 	must.Assertf(ctx, ok, "unrecognized proposal motion argument %v", args[1])
-
-	// update the policy state before closing the motion
-	x.Update(ctx, cloned, con)
 
 	// close the poll for the motion
 	priorityPollName := pmp_0.ConcernPollBallotName(con.ID)

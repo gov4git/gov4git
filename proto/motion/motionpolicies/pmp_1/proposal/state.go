@@ -13,6 +13,7 @@ type ProposalState struct {
 	LatestApprovalScore float64              `json:"latest_approval_score"`
 	EligibleConcerns    motionproto.Refs     `json:"eligible_concerns"`
 	CostMultiplier      float64              `json:"cost_multiplier"`
+	Decision            motionproto.Decision `json:"decision,omitempty"` // set on close or cancel, to be picked up by clearance pass
 }
 
 func NewProposalState(id motionproto.MotionID) *ProposalState {

@@ -243,9 +243,6 @@ func (x proposalPolicy) Close(
 
 ) (motionproto.Report, notice.Notices) {
 
-	// update the policy state before closing the motion
-	x.Update(ctx, cloned, prop)
-
 	// was the PR merged or not
 	isMerged := decision.IsAccept()
 

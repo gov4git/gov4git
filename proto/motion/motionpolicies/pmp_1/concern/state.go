@@ -1,8 +1,6 @@
 package concern
 
 import (
-	"math"
-
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
@@ -19,7 +17,10 @@ type ConcernState struct {
 }
 
 func (x *ConcernState) Escrow() float64 {
-	return math.Abs(x.PriorityScore)
+	if x.PriorityScore < 0 {
+		return 0
+	}
+	return x.PriorityScore
 }
 
 func NewConcernState(id motionproto.MotionID) *ConcernState {

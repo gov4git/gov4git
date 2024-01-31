@@ -84,9 +84,9 @@ func (x proposalPolicy) Open(
 		member.Everybody,
 	)
 	zeroState := ScoreKernelState{
-		MotionID:       prop.ID,
-		Bounty:         0.0,
-		CostMultiplier: 1.0,
+		MotionID:              prop.ID,
+		Bounty:                0.0,
+		InverseCostMultiplier: 1.0,
 	}
 	ballotapi.SavePolicyState_StageOnly[ScoreKernelState](
 		ctx,
@@ -180,8 +180,8 @@ func (x proposalPolicy) Update(
 	// update cost multiplier
 
 	bounty := sumClaimedConcernEscrows(ctx, cloned, prop, eligible)
-	costMultiplier := (1 + float64(ads.Tally.NumVoters())) / (4 * conPolicyState.WithheldEscrowFraction * bounty)
-	propState.CostMultiplier = costMultiplier
+	inverseCostMultiplier := (4 * conPolicyState.WithheldEscrowFraction * bounty) / (1 + float64(ads.Tally.NumVoters()))
+	propState.InverseCostMultiplier = inverseCostMultiplier
 
 	//
 
@@ -189,9 +189,9 @@ func (x proposalPolicy) Update(
 
 	// update ScoreKernelState
 	currentState := ScoreKernelState{
-		MotionID:       prop.ID,
-		Bounty:         bounty,
-		CostMultiplier: costMultiplier,
+		MotionID:              prop.ID,
+		Bounty:                bounty,
+		InverseCostMultiplier: inverseCostMultiplier,
 	}
 	ballotapi.SavePolicyState_StageOnly[ScoreKernelState](
 		ctx,

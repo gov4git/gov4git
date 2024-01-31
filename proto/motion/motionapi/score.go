@@ -33,7 +33,7 @@ func ScoreMotions_StageOnly(
 	t := cloned.Public.Tree()
 	motions := ListMotions_Local(ctx, t)
 	for i, motion := range motions {
-		if motion.Archived {
+		if motion.Archived || motion.Closed {
 			continue
 		}
 		p := motionproto.GetMotionPolicy(ctx, motion)

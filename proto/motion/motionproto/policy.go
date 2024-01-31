@@ -19,7 +19,7 @@ type Policy interface {
 
 	// pipeline
 
-	// Update is invoked, on all motions that are not archived.
+	// Update is invoked, on all motions that are not closed.
 	Update(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
@@ -27,14 +27,14 @@ type Policy interface {
 		args ...any,
 	) (Report, notice.Notices)
 
-	// Aggregate is invoked after Update, over all motions that are not archived.
+	// Aggregate is invoked after Update, over all motions that are not closed.
 	Aggregate(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion Motions,
 	)
 
-	// Score is invoked after Aggregate, on all motions that are not archived.
+	// Score is invoked after Aggregate, on all motions that are not closed.
 	Score(
 		ctx context.Context,
 		cloned gov.OwnerCloned,

@@ -74,5 +74,12 @@ func UnlinkMotions_StageOnly(
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), fromID, noticesFrom)
 
-	return reportFrom, noticesFrom, reportTo, noticesTo
+	// update policy states
+	_, toUpdateNotices := toPolicy.Update(ctx, cloned, to)
+	_, fromUpdateNotices := fromPolicy.Update(ctx, cloned, from)
+
+	return reportFrom,
+		append(noticesFrom, fromUpdateNotices...),
+		reportTo,
+		append(noticesTo, toUpdateNotices...)
 }

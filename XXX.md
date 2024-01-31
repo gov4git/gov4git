@@ -1,12 +1,7 @@
 # PMP
 
-- archive closed motions after clear pipeline
-
 - display matching fund size in notices and dashboard
 - display bounty in notices
-
-- clearance cron step?
-
 - update margin calc js functions
 
 # M3

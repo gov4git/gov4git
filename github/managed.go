@@ -87,14 +87,15 @@ func SyncManagedIssues_StageOnly(
 	// load github issues and governance motions, and
 	// index them under a common key space
 
-	ms0 := indexMotions(motionapi.ListMotions_Local(ctx, t))
+	index := indexMotions(motionapi.ListMotions_Local(ctx, t))
+
 	loadPR := func(ctx context.Context,
 		repo Repo,
 		issue *github.Issue,
 	) bool {
 
 		id := IssueNumberToMotionID(int64(issue.GetNumber()))
-		m, motionExists := ms0[id]
+		m, motionExists := index[id]
 
 		return IsIssueManaged(issue) && // merged state not relevant if issue is not managed
 			issue.GetState() == "closed" && // merged state is not relevant for open prs
@@ -103,42 +104,45 @@ func SyncManagedIssues_StageOnly(
 
 	_, issues := LoadIssues(ctx, ghc, repo, loadPR)
 
-	// sync motions with issues
-	syncMotionsWithIssues(
-		ctx,
-		repo,
-		ghc,
-		addr,
-		cloned,
-		syncChanges,
-		ms0,
-		issues,
-	)
-
-	// update references
-	ms0Refs := indexMotions(motionapi.ListMotions_Local(ctx, t))
-	syncRefs(ctx, cloned, syncChanges, issues, ms0Refs)
-
-	// motions have changed
-	ms1 := indexMotions(motionapi.ListMotions_Local(ctx, t))
-
-	// resync with GitHub to flush changes to GitHub issues
-	syncMotionsWithIssues(
-		ctx,
-		repo,
-		ghc,
-		addr,
-		cloned,
-		syncChanges,
-		ms1,
-		issues,
-	)
+	// call twice, to capture ref effects on newly created issues
+	syncRefsThenMotions(ctx, repo, ghc, addr, cloned, syncChanges, issues)
+	syncRefsThenMotions(ctx, repo, ghc, addr, cloned, syncChanges, issues)
 
 	syncChanges.IssuesCausingChange.Sort()
 	return
 }
 
-func syncMotionsWithIssues(
+func syncRefsThenMotions(
+	ctx context.Context,
+	repo Repo,
+	ghc *github.Client,
+	addr gov.OwnerAddress,
+	cloned gov.OwnerCloned,
+	syncChanges *SyncManagedChanges,
+	issues map[string]ImportedIssue,
+
+) {
+	// update references
+	index := indexMotions(motionapi.ListMotions_Local(ctx, cloned.PublicClone().Tree()))
+	syncRefs(ctx, cloned, syncChanges, issues, index)
+
+	// update motions
+	motionapi.Pipeline(ctx, cloned)
+
+	// sync motions with issues
+	syncMotions(
+		ctx,
+		repo,
+		ghc,
+		addr,
+		cloned,
+		syncChanges,
+		index,
+		issues,
+	)
+}
+
+func syncMotions(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,

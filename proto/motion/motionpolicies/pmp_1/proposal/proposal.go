@@ -20,7 +20,6 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
-	"github.com/gov4git/lib4git/must"
 )
 
 func init() {
@@ -218,36 +217,6 @@ func (x proposalPolicy) Clear(
 	_ ...any,
 
 ) (motionproto.Report, notice.Notices) {
-
-	// clear engages only after close or cancel
-	if !prop.Closed {
-		return nil, nil
-	}
-
-	// ensure the set of eligible concerns is valid
-	_, uNotices := x.Update(ctx, cloned, prop)
-
-	propState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
-	must.Assertf(ctx, !propState.Decision.IsEmpty(), "close decision missing during clearance")
-
-	cReport, cNotices := x.clearClose(ctx, cloned, prop, propState.Decision)
-	return cReport, append(uNotices, cNotices...)
-}
-
-func (x proposalPolicy) Close(
-	ctx context.Context,
-	cloned gov.OwnerCloned,
-	prop motionproto.Motion,
-	decision motionproto.Decision,
-	_ ...any,
-
-) (motionproto.Report, notice.Notices) {
-
-	must.Assertf(ctx, !decision.IsEmpty(), "close decision missing")
-
-	propState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
-	propState.Decision = decision
-	motionapi.SavePolicyState_StageOnly[*ProposalState](ctx, cloned.PublicClone(), prop.ID, propState)
 
 	return nil, nil
 }

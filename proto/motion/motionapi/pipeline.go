@@ -7,7 +7,7 @@ import (
 	"github.com/gov4git/lib4git/base"
 )
 
-func MainPipeline(
+func Pipeline(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 

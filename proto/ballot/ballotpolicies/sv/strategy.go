@@ -41,12 +41,12 @@ func (x SV) GetScorer(ctx context.Context) ScoreKernel {
 }
 
 type QVScoreKernel struct {
-	CostMultiplier float64 `json:"cost_multiplier"`
+	InverseCostMultiplier float64 `json:"inverse_cost_multiplier"`
 }
 
-func MakeQVScoreKernel(ctx context.Context, costMultiplier float64) QVScoreKernel {
+func MakeQVScoreKernel(ctx context.Context, inverseCostMultiplier float64) QVScoreKernel {
 	return QVScoreKernel{
-		CostMultiplier: costMultiplier,
+		InverseCostMultiplier: inverseCostMultiplier,
 	}
 }
 
@@ -69,7 +69,7 @@ func (k QVScoreKernel) Score(
 	for choice, ss := range score {
 		score[choice] = ballotproto.StrengthAndScore{
 			Strength: ss.Strength,
-			Score:    qvScoreFromStrength(ss.Strength, k.CostMultiplier),
+			Score:    qvScoreFromStrength(ss.Strength, k.InverseCostMultiplier),
 		}
 	}
 	// compute aggregate cost
@@ -80,12 +80,12 @@ func (k QVScoreKernel) Score(
 	return ScoredVotes{Votes: el, Score: score, Cost: cost}
 }
 
-func qvScoreFromStrength(strength float64, costMultiplier float64) float64 {
+func qvScoreFromStrength(strength float64, inverseCostMultiplier float64) float64 {
 	sign := 1.0
 	if strength < 0 {
 		sign = -1.0
 	}
-	return sign * math.Sqrt(math.Abs(strength/costMultiplier))
+	return sign * math.Sqrt(math.Abs(strength*inverseCostMultiplier))
 }
 
 func (k QVScoreKernel) CalcJS(

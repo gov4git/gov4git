@@ -9,7 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/notice"
 )
 
-func UpdateMotions(
+func ClearMotions(
 	ctx context.Context,
 	addr gov.OwnerAddress,
 	args ...any,
@@ -17,12 +17,12 @@ func UpdateMotions(
 ) ([]motionproto.Report, []notice.Notices) {
 
 	cloned := gov.CloneOwner(ctx, addr)
-	report, notices := UpdateMotions_StageOnly(ctx, cloned, args...)
-	proto.Commitf(ctx, cloned.PublicClone(), "motion_update", "Update motions")
+	report, notices := ClearMotions_StageOnly(ctx, cloned, args...)
+	proto.Commitf(ctx, cloned.PublicClone(), "motion_clear", "Clear motions")
 	return report, notices
 }
 
-func UpdateMotions_StageOnly(
+func ClearMotions_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	args ...any,
@@ -38,7 +38,7 @@ func UpdateMotions_StageOnly(
 			continue
 		}
 		p := motionproto.GetMotionPolicy(ctx, motion)
-		report, notices := p.Update(
+		report, notices := p.Clear(
 			ctx,
 			cloned,
 			motion,

@@ -46,6 +46,8 @@ type Motion struct {
 	Frozen    bool `json:"frozen"`
 	Closed    bool `json:"closed"`
 	Cancelled bool `json:"cancelled"`
+	//
+	Archived bool `json:"archived"`
 	// attention ranking, mutable
 	Score Score `json:"score"`
 	// network, mutable
@@ -149,7 +151,7 @@ func (x MotionsByID) Less(i, j int) bool { return x[i].ID < x[j].ID }
 
 func (x MotionsByID) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
 
-func FilterClosedMotions(ms Motions) Motions {
+func SelectOpenMotions(ms Motions) Motions {
 	r := Motions{}
 	for _, m := range ms {
 		if !m.Closed {

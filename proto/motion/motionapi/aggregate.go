@@ -34,8 +34,7 @@ func AggregateMotions_StageOnly(
 	policyMotions := map[motion.PolicyName]motionproto.Motions{}
 
 	for _, motion := range motions {
-		// only aggregate over open motions
-		if motion.Closed {
+		if motion.Archived {
 			continue
 		}
 		policyMotions[motion.Policy] = append(policyMotions[motion.Policy], motion)

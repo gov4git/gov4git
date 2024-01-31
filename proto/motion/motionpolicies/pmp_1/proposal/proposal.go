@@ -134,6 +134,10 @@ func (x proposalPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
+	if prop.Closed {
+		return nil, nil
+	}
+
 	notices := notice.Notices{}
 
 	// inputs
@@ -209,6 +213,24 @@ func (x proposalPolicy) Aggregate(
 	cloned gov.OwnerCloned,
 	motion motionproto.Motions,
 ) {
+}
+
+func (x proposalPolicy) Clear(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	prop motionproto.Motion,
+	args ...any,
+
+) (motionproto.Report, notice.Notices) {
+
+	// clear engages only after close or cancel
+	if !prop.Closed {
+		return nil, nil
+	}
+
+	//XXX
+
+	return nil, nil
 }
 
 // XXX: should disberse rewards in a clearance sweep after all cons/props updated

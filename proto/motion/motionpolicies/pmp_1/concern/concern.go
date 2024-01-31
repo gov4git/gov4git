@@ -112,6 +112,10 @@ func (x concernPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
+	if con.Closed {
+		return nil, nil
+	}
+
 	// outputs
 	notices := notice.Notices{}
 
@@ -218,6 +222,8 @@ func (x concernPolicy) Aggregate(
 
 ) {
 
+	motion = motionproto.SelectOpenMotions(motion)
+
 	// load all motion policy states
 	concernPolicyStates := make([]*ConcernState, len(motion))
 	for i, mot := range motion {
@@ -234,6 +240,24 @@ func (x concernPolicy) Aggregate(
 	policyState := LoadClassState_Local(ctx, cloned)
 	policyState.MatchDeficit = matchDeficit
 	SaveClassState_StageOnly(ctx, cloned, policyState)
+}
+
+func (x concernPolicy) Clear(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	con motionproto.Motion,
+	args ...any,
+
+) (motionproto.Report, notice.Notices) {
+
+	// clear engages only after close or cancel
+	if !con.Closed {
+		return nil, nil
+	}
+
+	//XXX
+
+	return nil, nil
 }
 
 func (x concernPolicy) Close(

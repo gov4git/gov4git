@@ -85,6 +85,8 @@ func Cron(
 		state.LastCommunityTally = time.Now()
 	}
 
+	// motions pipeline, begin
+
 	// update and aggregate motion policies
 	for i := 0; i < 2; i++ {
 		base.Infof("CRON: updating motions")
@@ -96,6 +98,16 @@ func Cron(
 	// rescore motions to capture updated tallies
 	base.Infof("CRON: scoring motions")
 	motionapi.ScoreMotions_StageOnly(ctx, cloned)
+
+	// clearance
+	base.Infof("CRON: clear motions")
+	motionapi.ClearMotions_StageOnly(ctx, cloned)
+
+	// archive closed motions
+	base.Infof("CRON: archive motions")
+	motionapi.ArchiveMotions_StageOnly(ctx, cloned)
+
+	// motions pipeline, end
 
 	// display notices on github
 	govgh.DisplayNotices_StageOnly(ctx, repo, ghc, cloned.PublicClone())

@@ -135,6 +135,10 @@ func (x proposalPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
+	if prop.Closed {
+		return nil, nil
+	}
+
 	notices := notice.Notices{}
 	state := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
 
@@ -218,6 +222,16 @@ func (x proposalPolicy) Aggregate(
 	cloned gov.OwnerCloned,
 	motion motionproto.Motions,
 ) {
+}
+
+func (x proposalPolicy) Clear(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	prop motionproto.Motion,
+	args ...any,
+
+) (motionproto.Report, notice.Notices) {
+	return nil, nil
 }
 
 func (x proposalPolicy) Close(

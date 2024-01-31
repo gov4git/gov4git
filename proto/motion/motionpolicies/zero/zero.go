@@ -64,6 +64,17 @@ func (x zeroPolicy) Aggregate(
 ) {
 }
 
+func (x zeroPolicy) Clear(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	motion motionproto.Motion,
+	args ...any,
+
+) (motionproto.Report, notice.Notices) {
+
+	return nil, nil
+}
+
 func (x zeroPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

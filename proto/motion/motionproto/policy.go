@@ -17,22 +17,9 @@ type Report = any
 type Policy interface {
 	gov.PostCloner
 
-	Open(
-		ctx context.Context,
-		cloned gov.OwnerCloned,
-		motion Motion,
-		args ...any,
-	) (Report, notice.Notices)
+	// pipeline
 
-	// Score is invoked, on all open motions.
-	Score(
-		ctx context.Context,
-		cloned gov.OwnerCloned,
-		motion Motion,
-		args ...any,
-	) (Score, notice.Notices)
-
-	// Update is invoked after Score, on all open motions.
+	// Update is invoked, on all motions that are not archived.
 	Update(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
@@ -40,12 +27,37 @@ type Policy interface {
 		args ...any,
 	) (Report, notice.Notices)
 
-	// Aggregate is invoked after Update, over all open motions.
+	// Aggregate is invoked after Update, over all motions that are not archived.
 	Aggregate(
 		ctx context.Context,
 		cloned gov.OwnerCloned,
 		motion Motions,
 	)
+
+	// Score is invoked after Aggregate, on all motions that are not archived.
+	Score(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		motion Motion,
+		args ...any,
+	) (Score, notice.Notices)
+
+	// Clear is invoked after Score, on all motions that are not archived.
+	Clear(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		motion Motion,
+		args ...any,
+	) (Report, notice.Notices)
+
+	// operations
+
+	Open(
+		ctx context.Context,
+		cloned gov.OwnerCloned,
+		motion Motion,
+		args ...any,
+	) (Report, notice.Notices)
 
 	Close(
 		ctx context.Context,

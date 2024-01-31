@@ -21,6 +21,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/must"
 )
 
 func init() {
@@ -134,10 +135,6 @@ func (x proposalPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
-	if prop.Closed {
-		return nil, nil
-	}
-
 	notices := notice.Notices{}
 
 	// inputs
@@ -219,7 +216,7 @@ func (x proposalPolicy) Clear(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
-	args ...any,
+	_ ...any,
 
 ) (motionproto.Report, notice.Notices) {
 
@@ -228,23 +225,40 @@ func (x proposalPolicy) Clear(
 		return nil, nil
 	}
 
-	//XXX
+	propState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
+	must.Assertf(ctx, !propState.Decision.IsEmpty(), "close decision missing during clearance")
 
-	return nil, nil
+	return x.clearClose(ctx, cloned, prop, propState.Decision)
 }
 
-// XXX: should disberse rewards in a clearance sweep after all cons/props updated
 func (x proposalPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
 	decision motionproto.Decision,
-	args ...any,
+	_ ...any,
 
 ) (motionproto.Report, notice.Notices) {
 
-	// update the policy state before closing the motion
-	x.Update(ctx, cloned, prop)
+	must.Assertf(ctx, !decision.IsEmpty(), "close decision missing")
+
+	propState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
+	propState.Decision = decision
+	motionapi.SavePolicyState_StageOnly[*ProposalState](ctx, cloned.PublicClone(), prop.ID, propState)
+
+	return nil, nil
+}
+
+func (x proposalPolicy) clearClose(
+	ctx context.Context,
+	cloned gov.OwnerCloned,
+	prop motionproto.Motion,
+	decision motionproto.Decision,
+	_ ...any,
+
+) (motionproto.Report, notice.Notices) {
+
+	//XXX
 
 	// was the PR merged or not
 	isMerged := decision.IsAccept()

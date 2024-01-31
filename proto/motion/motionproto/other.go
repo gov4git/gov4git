@@ -8,6 +8,10 @@ func (x Decision) String() string {
 	return string(x)
 }
 
+func (x Decision) IsEmpty() bool {
+	return x == ""
+}
+
 func (x Decision) IsAccept() bool {
 	return x == Accept
 }

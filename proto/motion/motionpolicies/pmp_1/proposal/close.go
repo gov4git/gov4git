@@ -15,7 +15,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/notice"
 )
 
-func (x proposalPolicy) clearClose(
+func (x proposalPolicy) Close(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
@@ -24,7 +24,8 @@ func (x proposalPolicy) clearClose(
 
 ) (motionproto.Report, notice.Notices) {
 
-	//XXX
+	// ensure that eligible set in policy state is valid
+	x.Update(ctx, cloned, prop)
 
 	// was the PR merged or not
 	isMerged := decision.IsAccept()

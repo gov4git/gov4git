@@ -54,6 +54,7 @@ func LinkMotions_StageOnly(
 	// apply policies
 	fromPolicy := motionproto.Get(ctx, from.Policy)
 	toPolicy := motionproto.Get(ctx, to.Policy)
+
 	// AddRefs are called in the opposite order of RemoveRefs
 	reportFrom, noticesFrom := fromPolicy.AddRefFrom(
 		ctx,
@@ -74,5 +75,12 @@ func LinkMotions_StageOnly(
 	)
 	AppendMotionNotices_StageOnly(ctx, cloned.PublicClone(), toID, noticesTo)
 
-	return reportFrom, noticesFrom, reportTo, noticesTo
+	// update policy states
+	_, fromUpdateNotices := fromPolicy.Update(ctx, cloned, from)
+	_, toUpdateNotices := toPolicy.Update(ctx, cloned, to)
+
+	return reportFrom,
+		append(noticesFrom, fromUpdateNotices...),
+		reportTo,
+		append(noticesTo, toUpdateNotices...)
 }

@@ -34,7 +34,7 @@ func UpdateMotions_StageOnly(
 	reportList := []motionproto.Report{}
 	noticesList := []notice.Notices{}
 	for i, motion := range motions {
-		if motion.Archived {
+		if motion.Archived || motion.Closed {
 			continue
 		}
 		p := motionproto.GetMotionPolicy(ctx, motion)

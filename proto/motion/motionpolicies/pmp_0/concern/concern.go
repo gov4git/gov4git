@@ -106,10 +106,6 @@ func (x concernPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
-	if con.Closed {
-		return nil, nil
-	}
-
 	notices := notice.Notices{}
 	state := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
 

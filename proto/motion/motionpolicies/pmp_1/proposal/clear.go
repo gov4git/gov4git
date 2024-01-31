@@ -11,9 +11,11 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/concern"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
+	"github.com/gov4git/lib4git/base"
 )
 
 func loadResolvedConcerns(
@@ -83,7 +85,7 @@ func loadPropApprovalPollTally(
 	return ballotapi.Show_Local(ctx, cloned.Tree(), pollName)
 }
 
-func disberseRewards(
+func disberseRewardsAccepted(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
@@ -93,28 +95,35 @@ func disberseRewards(
 	rewards := Rewards{}
 	adt := loadPropApprovalPollTally(ctx, cloned.PublicClone(), prop)
 
-	// compute reward distribution
-	rewardFund := 0.0                      // total credits spent on negative votes
-	totalCut := 0.0                        // sum of all positive votes
-	winnerCut := map[member.User]float64{} // positive votes per user
+	// compute rewards
+	idealPayout := map[member.User]float64{}
+	idealFunds := 0.0
+	realFunds := 0.0
 	for user, choices := range adt.Tally.ScoresByUser {
 		ss := choices[pmp_1.ProposalBallotChoice]
-		if ss.Score <= 0.0 {
-			// compute total credits spent on negative votes
-			rewardFund += math.Abs(ss.Strength)
-		} else {
-			totalCut += ss.Score
-			winnerCut[user] = ss.Score
+		if ss.Score > 0 {
+			idealPayout[user] = 2 * ss.Score
+			idealFunds += 2 * ss.Score
 		}
+		realFunds += math.Abs(ss.Strength)
 	}
 
-	// payout winnings
+	// compute shrink factor
+	if idealFunds <= 0.0 {
+		return nil
+	}
+	payoutShrinkFactor := min(realFunds/idealFunds, 1.0)
+	if payoutShrinkFactor < 1.0 {
+		base.Infof("proposal %v has reviewer reward shrink factor %v", prop.ID, payoutShrinkFactor)
+	}
+
+	// disberse payouts
 	for user, choices := range adt.Tally.ScoresByUser {
 		ss := choices[pmp_1.ProposalBallotChoice]
 		if ss.Score > 0.0 {
 			payout := account.H(
 				account.PluralAsset,
-				math.Abs(ss.Strength)+rewardFund*winnerCut[user]/totalCut,
+				payoutShrinkFactor*idealPayout[user],
 			)
 			rewards = append(rewards,
 				Reward{
@@ -129,9 +138,27 @@ func disberseRewards(
 				pmp_1.ProposalRewardAccountID(prop.ID),
 				member.UserAccountID(user),
 				payout,
-				fmt.Sprintf("reward for proposal %v", prop.ID),
+				fmt.Sprintf("reviewer reward for proposal %v", prop.ID),
 			)
 		}
+	}
+
+	// send remainder to matching fund
+	rewardAccount := account.Get_Local(ctx, cloned.PublicClone(), pmp_1.ProposalRewardAccountID(prop.ID))
+	remainder := rewardAccount.Balance(account.PluralAsset).Quantity
+	if remainder > 0 {
+		donation := account.H(
+			account.PluralAsset,
+			remainder,
+		)
+		account.Transfer_StageOnly(
+			ctx,
+			cloned.PublicClone(),
+			pmp_1.ProposalRewardAccountID(prop.ID),
+			pmp_0.MatchingPoolAccountID,
+			donation,
+			fmt.Sprintf("donation to matching fund for proposal %v", prop.ID),
+		)
 	}
 
 	rewards.Sort()

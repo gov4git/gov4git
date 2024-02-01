@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
+	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
@@ -85,15 +86,23 @@ func loadPropApprovalPollTally(
 	return ballotapi.Show_Local(ctx, cloned.Tree(), pollName)
 }
 
-func disberseRewardsAccepted(
+func disberseRewards(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
+	accepted bool,
 
-) Rewards {
+) (Rewards, metric.Receipts, float64) {
 
 	rewards := Rewards{}
 	adt := loadPropApprovalPollTally(ctx, cloned.PublicClone(), prop)
+
+	isWinner := func(score float64) bool {
+		if accepted {
+			return score > 0
+		}
+		return score < 0
+	}
 
 	// compute rewards
 	idealPayout := map[member.User]float64{}
@@ -101,16 +110,17 @@ func disberseRewardsAccepted(
 	realFunds := 0.0
 	for user, choices := range adt.Tally.ScoresByUser {
 		ss := choices[pmp_1.ProposalBallotChoice]
-		if ss.Score > 0 {
-			idealPayout[user] = 2 * ss.Score
-			idealFunds += 2 * ss.Score
+		if isWinner(ss.Score) {
+			pay := math.Abs(2 * ss.Score)
+			idealPayout[user] = pay
+			idealFunds += pay
 		}
 		realFunds += math.Abs(ss.Strength)
 	}
 
 	// compute shrink factor
 	if idealFunds <= 0.0 {
-		return nil
+		return nil, nil, 0.0
 	}
 	payoutShrinkFactor := min(realFunds/idealFunds, 1.0)
 	if payoutShrinkFactor < 1.0 {
@@ -120,7 +130,7 @@ func disberseRewardsAccepted(
 	// disberse payouts
 	for user, choices := range adt.Tally.ScoresByUser {
 		ss := choices[pmp_1.ProposalBallotChoice]
-		if ss.Score > 0.0 {
+		if isWinner(ss.Score) {
 			payout := account.H(
 				account.PluralAsset,
 				payoutShrinkFactor*idealPayout[user],
@@ -144,10 +154,12 @@ func disberseRewardsAccepted(
 	}
 
 	// send remainder to matching fund
+	receipts := metric.Receipts{}
 	rewardAccount := account.Get_Local(ctx, cloned.PublicClone(), pmp_1.ProposalRewardAccountID(prop.ID))
 	remainder := rewardAccount.Balance(account.PluralAsset).Quantity
+	donation := account.H(account.PluralAsset, 0.0)
 	if remainder > 0 {
-		donation := account.H(
+		donation = account.H(
 			account.PluralAsset,
 			remainder,
 		)
@@ -159,8 +171,16 @@ func disberseRewardsAccepted(
 			donation,
 			fmt.Sprintf("donation to matching fund for proposal %v", prop.ID),
 		)
+		receipts = append(
+			receipts,
+			metric.OneReceipt(
+				pmp_0.MatchingPoolAccountID.MetricAccountID(),
+				metric.ReceiptTypeDonation,
+				donation.MetricHolding(),
+			)...,
+		)
 	}
 
 	rewards.Sort()
-	return rewards
+	return rewards, receipts, donation.Quantity
 }

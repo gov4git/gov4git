@@ -27,7 +27,7 @@ func (x AccountID) String() string {
 	return string(x)
 }
 
-func (x AccountID) HistoryAccountID() metric.AccountID {
+func (x AccountID) MetricAccountID() metric.AccountID {
 	return metric.AccountID(x)
 }
 
@@ -220,8 +220,8 @@ func Transfer_StageOnly(
 	metric.Log_StageOnly(ctx, cloned, &metric.Event{
 		Account: &metric.AccountEvent{
 			Transfer: &metric.AccountTransferEvent{
-				From:   fromID.HistoryAccountID(),
-				To:     toID.HistoryAccountID(),
+				From:   fromID.MetricAccountID(),
+				To:     toID.MetricAccountID(),
 				Amount: amount.MetricHolding(),
 			},
 		},
@@ -281,7 +281,7 @@ func Issue_StageOnly(
 	metric.Log_StageOnly(ctx, cloned, &metric.Event{
 		Account: &metric.AccountEvent{
 			Issue: &metric.AccountIssueEvent{
-				To:     toID.HistoryAccountID(),
+				To:     toID.MetricAccountID(),
 				Amount: amount.MetricHolding(),
 			},
 		},
@@ -328,7 +328,7 @@ func Burn_StageOnly(
 	metric.Log_StageOnly(ctx, cloned, &metric.Event{
 		Account: &metric.AccountEvent{
 			Burn: &metric.AccountBurnEvent{
-				From:   fromID.HistoryAccountID(),
+				From:   fromID.MetricAccountID(),
 				Amount: amount.MetricHolding(),
 			},
 		},

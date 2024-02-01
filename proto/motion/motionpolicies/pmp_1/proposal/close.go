@@ -39,7 +39,6 @@ func (x proposalPolicy) Close(
 		againstPopular := adt.Tally.Scores[pmp_1.ProposalBallotChoice] < 0
 
 		// close the approval poll, move the funds to a reward account
-		approvalPollName := pmp_1.ProposalApprovalPollName(prop.ID)
 		closeApprovalPoll := ballotapi.Close_StageOnly(
 			ctx,
 			cloned,
@@ -47,15 +46,15 @@ func (x proposalPolicy) Close(
 			pmp_1.ProposalRewardAccountID(prop.ID),
 		)
 
+		// reward reviewers
+		rewards, donationReceipt, rewardDonation := disberseRewards(ctx, cloned, prop, true)
+
 		// close all concerns consResolved by the motion, and
 		// transfer their funds into the bounty account
 		consResolved, consEscrows := loadResolvedConcerns(ctx, cloned, prop)
 		consFunds := closeResolvedConcerns(ctx, cloned, prop, consResolved)
 
-		// XXX: reward reviewers
 		_ = consEscrows
-
-		rewards := disberseRewardsAccepted(ctx, cloned, prop)
 
 		// XXX: reward author
 
@@ -74,7 +73,7 @@ func (x proposalPolicy) Close(
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
 			)
 			bountyDonated = true
-			bountyReceipt.To = pmp_0.MatchingPoolAccountID.HistoryAccountID()
+			bountyReceipt.To = pmp_0.MatchingPoolAccountID.MetricAccountID()
 		} else {
 			account.Transfer_StageOnly(
 				ctx,
@@ -84,7 +83,7 @@ func (x proposalPolicy) Close(
 				consFunds,
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
 			)
-			bountyReceipt.To = member.UserAccountID(prop.Author).HistoryAccountID()
+			bountyReceipt.To = member.UserAccountID(prop.Author).MetricAccountID()
 		}
 
 		// metrics
@@ -95,31 +94,46 @@ func (x proposalPolicy) Close(
 					Type:     "proposal-v1",
 					Policy:   metric.MotionPolicy(prop.Policy),
 					Decision: decision.MetricDecision(),
-					Receipts: append(rewards.MetricReceipts(), bountyReceipt),
+					Receipts: append(rewards.MetricReceipts(), append(donationReceipt, bountyReceipt)...),
 				},
 			},
 		})
 
 		return &CloseReport{
-			Accepted:            true,
-			ApprovalPollOutcome: closeApprovalPoll.Result,
-			Resolved:            consResolved,
-			Bounty:              consFunds,
-			BountyDonated:       bountyDonated,
-			Rewarded:            rewards,
-		}, closeNotice(ctx, prop, againstPopular, closeApprovalPoll.Result, consResolved, consFunds, bountyDonated, rewards)
+				Accepted:            true,
+				ApprovalPollOutcome: closeApprovalPoll.Result,
+				Resolved:            consResolved,
+				Bounty:              consFunds,
+				BountyDonated:       bountyDonated,
+				Rewarded:            rewards,
+			}, closeNotice(
+				ctx,
+				prop,
+				isMerged,
+				againstPopular,
+				closeApprovalPoll.Result,
+				consResolved,
+				consFunds,
+				bountyDonated,
+				rewards,
+				rewardDonation,
+			)
 
 	} else {
 
 		// rejecting a proposal against the popular vote?
 		againstPopular := adt.Tally.Scores[pmp_1.ProposalBallotChoice] > 0
 
-		// cancel the referendum for the motion (refunds voters)
-		cancelApprovalPoll := ballotapi.Cancel_StageOnly(
+		// close the approval poll, move the funds to a reward account
+		closeApprovalPoll := ballotapi.Close_StageOnly(
 			ctx,
 			cloned,
 			approvalPollName,
+			pmp_1.ProposalRewardAccountID(prop.ID),
 		)
+
+		// reward reviewers
+		rewards, donationReceipt, rewardDonation := disberseRewards(ctx, cloned, prop, false)
 
 		// metrics
 		metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{
@@ -129,19 +143,32 @@ func (x proposalPolicy) Close(
 					Type:     "proposal-v1",
 					Policy:   metric.MotionPolicy(prop.Policy),
 					Decision: decision.MetricDecision(),
-					Receipts: cancelApprovalPoll.Result.RefundedHistoryReceipts(),
+					Receipts: append(rewards.MetricReceipts(), donationReceipt...),
 				},
 			},
 		})
 
 		return &CloseReport{
-			Accepted:            false,
-			ApprovalPollOutcome: cancelApprovalPoll.Result,
-			Resolved:            nil,
-			Bounty:              account.H(account.PluralAsset, 0.0),
-			BountyDonated:       false,
-			Rewarded:            nil,
-		}, cancelNotice(ctx, prop, againstPopular, cancelApprovalPoll.Result)
+				Accepted:            false,
+				ApprovalPollOutcome: closeApprovalPoll.Result,
+				Resolved:            nil,
+				Bounty:              account.H(account.PluralAsset, 0.0),
+				BountyDonated:       false,
+				Rewarded:            rewards,
+			}, closeNotice(
+				ctx,
+				prop,
+				isMerged,
+				againstPopular,
+				closeApprovalPoll.Result,
+				nil,
+				account.H(account.PluralAsset, 0.0),
+				false,
+				rewards,
+				rewardDonation,
+			)
 
 	}
 }
+
+// XXX: add donation in close report

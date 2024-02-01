@@ -17,8 +17,9 @@ func OneReceipt(to AccountID, typ ReceiptType, amt Holding) Receipts {
 type ReceiptType string
 
 const (
-	ReceiptTypeRefund ReceiptType = "refund"
-	ReceiptTypeReward ReceiptType = "reward"
-	ReceiptTypeBounty ReceiptType = "bounty"
-	ReceiptTypeCharge ReceiptType = "charge"
+	ReceiptTypeRefund   ReceiptType = "refund"
+	ReceiptTypeReward   ReceiptType = "reward"
+	ReceiptTypeBounty   ReceiptType = "bounty"
+	ReceiptTypeCharge   ReceiptType = "charge"
+	ReceiptTypeDonation ReceiptType = "donation"
 )

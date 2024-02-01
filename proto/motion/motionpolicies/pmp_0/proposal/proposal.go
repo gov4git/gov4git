@@ -254,7 +254,6 @@ func (x proposalPolicy) Close(
 		againstPopular := adt.Tally.Scores[pmp_0.ProposalBallotChoice] < 0
 
 		// close the referendum for the motion
-		approvalPollName := pmp_0.ProposalApprovalPollName(prop.ID)
 		closeApprovalPoll := ballotapi.Close_StageOnly(
 			ctx,
 			cloned,
@@ -283,7 +282,7 @@ func (x proposalPolicy) Close(
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
 			)
 			bountyDonated = true
-			bountyReceipt.To = pmp_0.MatchingPoolAccountID.HistoryAccountID()
+			bountyReceipt.To = pmp_0.MatchingPoolAccountID.MetricAccountID()
 		} else {
 			account.Transfer_StageOnly(
 				ctx,
@@ -293,7 +292,7 @@ func (x proposalPolicy) Close(
 				bounty,
 				fmt.Sprintf("bounty for proposal %v", prop.ID),
 			)
-			bountyReceipt.To = member.UserAccountID(prop.Author).HistoryAccountID()
+			bountyReceipt.To = member.UserAccountID(prop.Author).MetricAccountID()
 		}
 
 		// distribute rewards

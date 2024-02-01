@@ -251,7 +251,7 @@ func (x proposalPolicy) Cancel(
 
 	return &CancelReport{
 		ApprovalPollOutcome: chg.Result,
-	}, notice.Noticef(ctx, "Cancelling management of this PR, managed as Gov4Git concern `%v`.", prop.ID)
+	}, cancelNotice(ctx, prop, chg.Result)
 }
 
 type PolicyView struct {

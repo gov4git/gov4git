@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/journal"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 )
 
 func AssembleReport(
@@ -42,7 +44,14 @@ func AssembleReport_Local(
 	last30DaysSeries := ComputeSeries(entries, latest.AddDate(0, -1, 0), latest)
 	allTimeSeries := ComputeSeries(entries, earliest, latest)
 
+	matchAccount := account.Get_Local(ctx, cloned, pmp_0.MatchingPoolAccountID)
+	matchFunds := matchAccount.Balance(account.PluralAsset).Quantity
+
 	var w bytes.Buffer
+
+	fmt.Fprintf(&w, "## Community economics\n\n")
+
+	fmt.Fprintf(&w, "Currently, there are `%0.6f` credits in the __matching fund__.\n\n", matchFunds)
 
 	fmt.Fprintf(&w, "## Last 30-days\n\n")
 

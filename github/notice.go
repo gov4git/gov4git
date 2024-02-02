@@ -54,7 +54,7 @@ func flushNotices(
 
 		// TODO: check if notice already displayed, according to github
 
-		fmt.Fprintf(&w, "### Notice `%v`\n%s\n\n", nstate.ID, nstate.Notice.Body)
+		fmt.Fprintf(&w, "#### Notice `%v`\n%s\n\n", nstate.ID, nstate.Notice.Body)
 		nstate.MarkShown()
 		notShown++
 	}

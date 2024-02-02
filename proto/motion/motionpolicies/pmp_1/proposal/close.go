@@ -32,6 +32,7 @@ func (x proposalPolicy) Close(
 
 	approvalPollName := pmp_1.ProposalApprovalPollName(prop.ID)
 	adt := loadPropApprovalPollTally(ctx, cloned.PublicClone(), prop)
+	costOfReview := adt.Tally.Capitalization()
 
 	if isMerged {
 
@@ -50,26 +51,25 @@ func (x proposalPolicy) Close(
 
 		// reward reviewers
 
-		rewards, rewardDonationReceipts, rewardDonation := disberseRewards(ctx, cloned, prop, true)
+		rewards, rewardDonationReceipts, rewardDonation := calcReviewersRewards(ctx, cloned, prop, true)
 		receipts = append(receipts, rewards.MetricReceipts()...)
 		receipts = append(receipts, rewardDonationReceipts...)
 
 		// reward author
 
-		// close all concerns consResolved by the motion, and
+		// close all concerns resolvedCons by the motion, and
 		// transfer their funds into the bounty account
-		consResolved, consEscrows := loadResolvedConcerns(ctx, cloned, prop)
-		consFunds := closeResolvedConcerns(ctx, cloned, prop, consResolved)
+		resolvedCons, projectedBounties := loadResolvedConcerns(ctx, cloned, prop)
+		priorityFunds := closeResolvedConcerns(ctx, cloned, prop, resolvedCons)
 
-		// total escrow is the target pay for the author
-		escrowTotal := 0.0
-		for _, conEscrow := range consEscrows {
-			escrowTotal += conEscrow
+		projectedBounty := 0.0
+		for _, pb := range projectedBounties {
+			projectedBounty += pb
 		}
 
 		bountyAccount := pmp_1.ProposalBountyAccountID(prop.ID)
 
-		award := 0.0 // award to author
+		realizedBounty := 0.0 // award to author
 		bountyDonation := 0.0
 
 		if prop.Author.IsNone() {
@@ -79,15 +79,15 @@ func (x proposalPolicy) Close(
 				cloned.PublicClone(),
 				bountyAccount,
 				pmp_0.MatchingPoolAccountID,
-				consFunds,
+				priorityFunds,
 				fmt.Sprintf("bounty for proposal %v was donated", prop.ID),
 			)
-			bountyDonation = consFunds.Quantity
+			bountyDonation = priorityFunds.Quantity
 			receipts = append(receipts,
 				metric.Receipt{
 					To:     pmp_0.MatchingPoolAccountID.MetricAccountID(),
 					Type:   metric.ReceiptTypeBounty,
-					Amount: consFunds.MetricHolding(),
+					Amount: priorityFunds.MetricHolding(),
 				},
 			)
 
@@ -98,8 +98,8 @@ func (x proposalPolicy) Close(
 			matchAccount := account.Get_Local(ctx, cloned.PublicClone(), pmp_0.MatchingPoolAccountID)
 			matchFunds := matchAccount.Balance(account.PluralAsset).Quantity
 
-			awardFromCon, awardFromMatch, donateFromCon := calcAuthorAward(consFunds.Quantity, matchFunds, escrowTotal)
-			award = awardFromCon + awardFromMatch
+			awardFromCon, awardFromMatch, donateFromCon := calcRealBounty(priorityFunds.Quantity, matchFunds, projectedBounty)
+			realizedBounty = awardFromCon + awardFromMatch
 			bountyDonation = donateFromCon
 
 			if awardFromCon > 0 {
@@ -177,28 +177,20 @@ func (x proposalPolicy) Close(
 			},
 		})
 
-		return &CloseReport{
-				Accepted:            true,
-				ApprovalPollOutcome: closeApprovalPoll.Result,
-				Resolved:            consResolved,
-				Rewarded:            rewards,
-				RewardDonation:      rewardDonation,
-				Bounty:              consFunds.Quantity,
-				Escrow:              escrowTotal,
-				Award:               award,
-				BountyDonation:      bountyDonation,
-			}, closeNotice(
-				ctx,
-				prop,
-				isMerged,
-				againstPopular,
-				closeApprovalPoll.Result,
-				consResolved,
-				consFunds,
-				bountyDonation,
-				rewards,
-				rewardDonation,
-			)
+		report := &CloseReport{
+			Accepted:            true,
+			AgainstPopular:      againstPopular,
+			ApprovalPollOutcome: closeApprovalPoll.Result,
+			Resolved:            resolvedCons,
+			CostOfReview:        costOfReview,
+			Rewarded:            rewards,
+			RewardDonation:      rewardDonation,
+			CostOfPriority:      priorityFunds.Quantity,
+			ProjectedBounty:     projectedBounty,
+			RealizedBounty:      realizedBounty,
+			BountyDonation:      bountyDonation,
+		}
+		return report, closeNotice(ctx, prop, report)
 
 	} else {
 
@@ -214,7 +206,7 @@ func (x proposalPolicy) Close(
 		)
 
 		// reward reviewers
-		rewards, donationReceipt, rewardDonation := disberseRewards(ctx, cloned, prop, false)
+		rewards, donationReceipt, rewardDonation := calcReviewersRewards(ctx, cloned, prop, false)
 
 		// metrics
 		metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{
@@ -229,28 +221,20 @@ func (x proposalPolicy) Close(
 			},
 		})
 
-		return &CloseReport{
-				Accepted:            false,
-				ApprovalPollOutcome: closeApprovalPoll.Result,
-				Resolved:            nil,
-				Rewarded:            rewards,
-				RewardDonation:      rewardDonation,
-				Bounty:              0.0,
-				Escrow:              0.0,
-				Award:               0.0,
-				BountyDonation:      0.0,
-			}, closeNotice(
-				ctx,
-				prop,
-				isMerged,
-				againstPopular,
-				closeApprovalPoll.Result,
-				nil,
-				account.H(account.PluralAsset, 0.0),
-				0.0,
-				rewards,
-				rewardDonation,
-			)
+		report := &CloseReport{
+			Accepted:            false,
+			AgainstPopular:      againstPopular,
+			ApprovalPollOutcome: closeApprovalPoll.Result,
+			Resolved:            nil,
+			CostOfReview:        costOfReview,
+			Rewarded:            rewards,
+			RewardDonation:      rewardDonation,
+			CostOfPriority:      0.0,
+			ProjectedBounty:     0.0,
+			RealizedBounty:      0.0,
+			BountyDonation:      0.0,
+		}
+		return report, closeNotice(ctx, prop, report)
 
 	}
 }

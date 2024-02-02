@@ -1,7 +1,5 @@
 # PMP
 
-- display matching fund size on dashboard
-
 - update margin calc js functions
 
 # M3

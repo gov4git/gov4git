@@ -7,12 +7,12 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 )
 
-func priorityScore(capFunding, iqfDeficit, matchDeficit, matchFunds float64) float64 {
+func priorityScore(costOfPriority, idealDeficit, matchDeficit, matchFunds float64) float64 {
 
-	return capFunding + matchRatio(matchFunds, matchDeficit)*iqfDeficit
+	return costOfPriority + matchRatio(matchFunds, matchDeficit)*idealDeficit
 }
 
-func idealizedQuadraticFunding(tally *ballotproto.Tally) float64 {
+func idealFunding(tally *ballotproto.Tally) float64 {
 
 	voteSum := 0.0
 	for _, userSS := range tally.ScoresByUser {
@@ -20,16 +20,6 @@ func idealizedQuadraticFunding(tally *ballotproto.Tally) float64 {
 		voteSum += ss.Score
 	}
 	return voteSum * voteSum
-}
-
-func capitalistFunding(tally *ballotproto.Tally) float64 {
-
-	f := 0.0
-	for _, userSS := range tally.ScoresByUser {
-		ss := userSS[pmp_1.ConcernBallotChoice]
-		f += math.Abs(ss.Strength)
-	}
-	return f
 }
 
 func matchRatio(matchFunds float64, matchDeficit float64) float64 {

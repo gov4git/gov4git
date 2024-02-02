@@ -113,10 +113,12 @@ func (x concernPolicy) Update(
 
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
 	latestPriorityScore := ads.Tally.Scores[pmp_0.ConcernBallotChoice]
+	costOfPriority := ads.Tally.Capitalization()
 	if latestPriorityScore != state.LatestPriorityScore {
 		notices = append(
 			notices,
-			notice.Noticef(ctx, "This issue's __priority score__ was updated to `%0.6f`.", latestPriorityScore)...,
+			notice.Noticef(ctx, "This issue's __priority score__ is now `%0.6f`.\n"+
+				"The cost of priority is `%0.6f`.", latestPriorityScore, costOfPriority)...,
 		)
 	}
 	state.LatestPriorityScore = latestPriorityScore
@@ -129,7 +131,7 @@ func (x concernPolicy) Update(
 		if len(eligible) == 0 {
 			notices = append(
 				notices,
-				notice.Noticef(ctx, "The set of eligible proposals addressing this issue is now empty.\n")...,
+				notice.Noticef(ctx, "The set of eligible proposals claiming this issue is now empty.\n")...,
 			)
 		} else {
 			var w bytes.Buffer
@@ -140,7 +142,7 @@ func (x concernPolicy) Update(
 			}
 			notices = append(
 				notices,
-				notice.Noticef(ctx, "The set of eligible proposals addressing this issue changed to:\n"+w.String())...,
+				notice.Noticef(ctx, "The set of eligible proposals claiming this issue changed:\n"+w.String())...,
 			)
 		}
 	}

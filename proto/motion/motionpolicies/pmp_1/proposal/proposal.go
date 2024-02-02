@@ -144,10 +144,12 @@ func (x proposalPolicy) Update(
 	// update approval score
 
 	latestApprovalScore := ads.Tally.Scores[pmp_1.ProposalBallotChoice]
+	costOfReview := ads.Tally.Capitalization()
 	if latestApprovalScore != propState.LatestApprovalScore {
 		notices = append(
 			notices,
-			notice.Noticef(ctx, "This PR's __approval score__ was updated to `%0.6f`.", latestApprovalScore)...,
+			notice.Noticef(ctx, "This PR's __approval score__ is now `%0.6f`.\n"+
+				"The cost of review is `%0.6f`.", latestApprovalScore, costOfReview)...,
 		)
 	}
 	propState.LatestApprovalScore = latestApprovalScore
@@ -160,7 +162,7 @@ func (x proposalPolicy) Update(
 		if len(eligible) == 0 {
 			notices = append(
 				notices,
-				notice.Noticef(ctx, "The set of eligible issues addressed by this PR is now empty.\n")...,
+				notice.Noticef(ctx, "The set of eligible issues claimed by this PR is now empty.\n")...,
 			)
 		} else {
 			var w bytes.Buffer
@@ -171,7 +173,7 @@ func (x proposalPolicy) Update(
 			}
 			notices = append(
 				notices,
-				notice.Noticef(ctx, "The set of eligible issues addressed by this PR changed to:\n"+w.String())...,
+				notice.Noticef(ctx, "The set of eligible issues claimed by this PR changed:\n"+w.String())...,
 			)
 		}
 	}

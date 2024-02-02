@@ -86,7 +86,7 @@ func loadPropApprovalPollTally(
 	return ballotapi.Show_Local(ctx, cloned.Tree(), pollName)
 }
 
-func disberseRewards(
+func calcReviewersRewards(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
@@ -185,29 +185,29 @@ func disberseRewards(
 	return rewards, receipts, donation.Quantity
 }
 
-func calcAuthorAward(
-	concernFunds float64, // total credits in concern fund
-	matchingFunds float64, // total credits in matching fund
-	idealAward float64, // target credits to be paid out
+func calcRealBounty(
+	priorityFunds float64,
+	matchingFunds float64,
+	projectedBounty float64,
 
 ) (
-	awardFromConcern float64,
-	awardFromMatching float64,
-	donateFromConcern float64,
+	projectedBountyFromPriorityFunds float64,
+	projectedBountyFromMatchingFunds float64,
+	donationFromPriorityFunds float64,
 
 ) {
 
 	// ensure no negatives
-	concernFunds = max(concernFunds, 0)
+	priorityFunds = max(priorityFunds, 0)
 	matchingFunds = max(matchingFunds, 0)
-	idealAward = max(idealAward, 0)
+	projectedBounty = max(projectedBounty, 0)
 
-	awardFromConcern = min(idealAward, concernFunds)
-	awardDeficit := max(idealAward-awardFromConcern, 0)
-	if awardDeficit == 0.0 {
-		donateFromConcern = max(concernFunds-awardFromConcern, 0)
+	projectedBountyFromPriorityFunds = min(projectedBounty, priorityFunds)
+	bountyDeficit := max(projectedBounty-projectedBountyFromPriorityFunds, 0)
+	if bountyDeficit == 0.0 {
+		donationFromPriorityFunds = max(priorityFunds-projectedBountyFromPriorityFunds, 0)
 	} else {
-		awardFromMatching = min(awardDeficit, matchingFunds)
+		projectedBountyFromMatchingFunds = min(bountyDeficit, matchingFunds)
 	}
 
 	return

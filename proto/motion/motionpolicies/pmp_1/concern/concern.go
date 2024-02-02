@@ -121,18 +121,21 @@ func (x concernPolicy) Update(
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), conState.PriorityPoll)
 
 	// update idealized quadratic funding deficit
-	capFunding := capitalistFunding(&ads.Tally)
-	iqFunding := idealizedQuadraticFunding(&ads.Tally)
-	iqDeficit := iqFunding - capFunding
-	conState.IQDeficit = iqDeficit
+	costOfPriority := ads.Tally.Capitalization()
+	idealFunding := idealFunding(&ads.Tally)
+	idealDeficit := idealFunding - costOfPriority
+	conState.IQDeficit = idealDeficit
 
 	// update priority score
 	matchFunds := pmp_0.GetMatchFundBalance_Local(ctx, cloned.PublicClone())
-	latestPriorityScore := capFunding + matchRatio(matchFunds, policyState.MatchDeficit)*iqDeficit
+	latestPriorityScore := costOfPriority + matchRatio(matchFunds, policyState.MatchDeficit)*idealDeficit
 	if latestPriorityScore != conState.PriorityScore {
 		notices = append(
 			notices,
-			notice.Noticef(ctx, "This issue's __priority score__ was updated to `%0.6f`.", latestPriorityScore)...,
+			notice.Noticef(ctx,
+				"This issue's __priority score__ is now `%0.6f`.\n"+
+					"The cost of priority is `%0.6f`.",
+				latestPriorityScore, costOfPriority)...,
 		)
 	}
 	conState.PriorityScore = latestPriorityScore
@@ -145,7 +148,7 @@ func (x concernPolicy) Update(
 		if len(eligible) == 0 {
 			notices = append(
 				notices,
-				notice.Noticef(ctx, "The set of eligible proposals addressing this issue is now empty.\n")...,
+				notice.Noticef(ctx, "The set of eligible proposals claiming this issue is now empty.\n")...,
 			)
 		} else {
 			var w bytes.Buffer
@@ -156,7 +159,7 @@ func (x concernPolicy) Update(
 			}
 			notices = append(
 				notices,
-				notice.Noticef(ctx, "The set of eligible proposals addressing this issue changed to:\n"+w.String())...,
+				notice.Noticef(ctx, "The set of eligible proposals claiming this issue changed:\n"+w.String())...,
 			)
 		}
 	}

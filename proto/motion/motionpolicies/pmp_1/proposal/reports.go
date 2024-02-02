@@ -7,16 +7,18 @@ import (
 
 type CloseReport struct {
 	Accepted            bool                `json:"accepted"`
+	AgainstPopular      bool                `json:"against_popular"`
 	ApprovalPollOutcome ballotproto.Outcome `json:"approval_poll_outcome"`
 	Resolved            motionproto.Motions `json:"resolved"`
 	// reviewers
+	CostOfReview   float64 `json:"cost_of_review"`
 	Rewarded       Rewards `json:"rewards"`
 	RewardDonation float64 `json:"reward_donation"`
 	// author
-	Bounty         float64 `json:"bounty"` // actual funds held in concerns
-	Escrow         float64 `json:"escrow"` // target payment (may be different from bounty)
-	Award          float64 `json:"award"`  // actual payment to author
-	BountyDonation float64 `json:"bounty_donation"`
+	CostOfPriority  float64 `json:"cost_of_priority"`
+	ProjectedBounty float64 `json:"projected_bounty"`
+	RealizedBounty  float64 `json:"realized_bounty"`
+	BountyDonation  float64 `json:"bounty_donation"`
 }
 
 type CancelReport struct {

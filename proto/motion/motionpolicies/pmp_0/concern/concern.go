@@ -114,11 +114,13 @@ func (x concernPolicy) Update(
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
 	latestPriorityScore := ads.Tally.Scores[pmp_0.ConcernBallotChoice]
 	costOfPriority := ads.Tally.Capitalization()
+	state.CostOfPriority = costOfPriority
+
 	if latestPriorityScore != state.LatestPriorityScore {
 		notices = append(
 			notices,
 			notice.Noticef(ctx, "This issue's __priority score__ is now `%0.6f`.\n"+
-				"The cost of priority is `%0.6f`.", latestPriorityScore, costOfPriority)...,
+				"The _cost of priority_ is `%0.6f`.", latestPriorityScore, costOfPriority)...,
 		)
 	}
 	state.LatestPriorityScore = latestPriorityScore
@@ -147,6 +149,11 @@ func (x concernPolicy) Update(
 		}
 	}
 	state.EligibleProposals = eligible
+
+	notices = append(
+		notices,
+		notice.Noticef(ctx, "This PR's __projected bounty__ is now `%0.6f`.", costOfPriority)...,
+	)
 
 	//
 

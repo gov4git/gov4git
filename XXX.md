@@ -1,7 +1,6 @@
 # PMP
 
 - display matching fund size on dashboard
-- display bounty in notices
 
 - update margin calc js functions
 

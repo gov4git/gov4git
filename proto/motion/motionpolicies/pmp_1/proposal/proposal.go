@@ -149,14 +149,14 @@ func (x proposalPolicy) Update(
 		notices = append(
 			notices,
 			notice.Noticef(ctx, "This PR's __approval score__ is now `%0.6f`.\n"+
-				"The cost of review is `%0.6f`.", latestApprovalScore, costOfReview)...,
+				"The _cost of review_ is `%0.6f`.", latestApprovalScore, costOfReview)...,
 		)
 	}
 	propState.LatestApprovalScore = latestApprovalScore
 
 	// update eligible concerns
 
-	eligible := computeEligibleConcerns(ctx, cloned.PublicClone(), prop)
+	eligible := calcEligibleConcerns(ctx, cloned.PublicClone(), prop)
 	if !slices.Equal[motionproto.Refs](eligible, propState.EligibleConcerns) {
 		// display list of eligible concerns
 		if len(eligible) == 0 {
@@ -181,9 +181,19 @@ func (x proposalPolicy) Update(
 
 	// update cost multiplier
 
-	bounty := sumClaimedConcernEscrows(ctx, cloned, prop, eligible)
-	inverseCostMultiplier := (4 * conPolicyState.WithheldEscrowFraction * bounty) / (1 + float64(ads.Tally.NumVoters()))
+	projectedBounty := 0.0
+	for _, ref := range eligible {
+		conState := motionapi.LoadPolicyState_Local[*concern.ConcernState](ctx, cloned.PublicClone(), ref.To)
+		projectedBounty += conState.ProjectedBounty()
+	}
+
+	inverseCostMultiplier := (4 * conPolicyState.WithheldEscrowFraction * projectedBounty) / (1 + float64(ads.Tally.NumVoters()))
 	propState.InverseCostMultiplier = inverseCostMultiplier
+
+	notices = append(
+		notices,
+		notice.Noticef(ctx, "This PR's __projected bounty__ is now `%0.6f`.", projectedBounty)...,
+	)
 
 	//
 
@@ -192,7 +202,7 @@ func (x proposalPolicy) Update(
 	// update ScoreKernelState
 	currentState := ScoreKernelState{
 		MotionID:              prop.ID,
-		Bounty:                bounty,
+		Bounty:                projectedBounty,
 		InverseCostMultiplier: inverseCostMultiplier,
 	}
 	ballotapi.SavePolicyState_StageOnly[ScoreKernelState](

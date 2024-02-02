@@ -16,7 +16,7 @@ type ConcernState struct {
 	PriorityScore float64 `json:"priority_score"` // is "escrow"
 }
 
-func (x *ConcernState) Escrow() float64 {
+func (x *ConcernState) ProjectedBounty() float64 {
 	if x.PriorityScore < 0 {
 		return 0
 	}

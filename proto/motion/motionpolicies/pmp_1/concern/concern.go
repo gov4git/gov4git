@@ -134,7 +134,7 @@ func (x concernPolicy) Update(
 			notices,
 			notice.Noticef(ctx,
 				"This issue's __priority score__ is now `%0.6f`.\n"+
-					"The cost of priority is `%0.6f`.",
+					"The _cost of priority_ is `%0.6f`.",
 				latestPriorityScore, costOfPriority)...,
 		)
 	}
@@ -164,6 +164,11 @@ func (x concernPolicy) Update(
 		}
 	}
 	conState.EligibleProposals = eligible
+
+	notices = append(
+		notices,
+		notice.Noticef(ctx, "This PR's __projected bounty__ is now `%0.6f`.", conState.ProjectedBounty())...,
+	)
 
 	//
 

@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
@@ -48,10 +47,14 @@ func closeNotice(
 	againstPopular bool,
 	outcome ballotproto.Outcome,
 	resolved motionproto.Motions,
-	bounty account.Holding,
-	bountyDonated bool,
+	// reviewers
 	rewards Rewards,
 	rewardDonation float64,
+	// author
+	bounty float64,
+	escrow float64,
+	award float64,
+	bountyDonation float64,
 
 ) notice.Notices {
 
@@ -74,7 +77,8 @@ func closeNotice(
 	fmt.Fprintf(&w, "The PR approval tally was `%0.6f`.\n\n", outcome.Scores[pmp_1.ProposalBallotChoice])
 
 	// bounty
-	if bountyDonated {
+	XXX
+	if bountyDonation > 0.0 {
 		fmt.Fprintf(&w, "Bounty of `%0.6f` credits was donated to the matching fund.\n\n", bounty.Quantity)
 	} else {
 		fmt.Fprintf(&w, "Bounty of `%0.6f` credits was awarded to @%v.\n\n", bounty.Quantity, prop.Author)

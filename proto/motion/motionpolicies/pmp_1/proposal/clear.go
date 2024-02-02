@@ -184,3 +184,31 @@ func disberseRewards(
 	rewards.Sort()
 	return rewards, receipts, donation.Quantity
 }
+
+func calcAuthorAward(
+	concernFunds float64, // total credits in concern fund
+	matchingFunds float64, // total credits in matching fund
+	idealAward float64, // target credits to be paid out
+
+) (
+	awardFromConcern float64,
+	awardFromMatching float64,
+	donateFromConcern float64,
+
+) {
+
+	// ensure no negatives
+	concernFunds = max(concernFunds, 0)
+	matchingFunds = max(matchingFunds, 0)
+	idealAward = max(idealAward, 0)
+
+	awardFromConcern = min(idealAward, concernFunds)
+	awardDeficit := max(idealAward-awardFromConcern, 0)
+	if awardDeficit == 0.0 {
+		donateFromConcern = max(concernFunds-awardFromConcern, 0)
+	} else {
+		awardFromMatching = min(awardDeficit, matchingFunds)
+	}
+
+	return
+}

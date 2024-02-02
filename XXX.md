@@ -1,5 +1,8 @@
 # PMP
 
+- save pmp deficits/gaps in logs
+- rename bounty/escrow
+
 - display matching fund size in notices and dashboard
 - display bounty in notices
 - update margin calc js functions

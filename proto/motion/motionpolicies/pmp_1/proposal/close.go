@@ -35,6 +35,8 @@ func (x proposalPolicy) Close(
 
 	if isMerged {
 
+		receipts := metric.Receipts{}
+
 		// accepting a proposal against the popular vote?
 		againstPopular := adt.Tally.Scores[pmp_1.ProposalBallotChoice] < 0
 
@@ -47,43 +49,119 @@ func (x proposalPolicy) Close(
 		)
 
 		// reward reviewers
-		rewards, donationReceipt, rewardDonation := disberseRewards(ctx, cloned, prop, true)
+
+		rewards, rewardDonationReceipts, rewardDonation := disberseRewards(ctx, cloned, prop, true)
+		receipts = append(receipts, rewards.MetricReceipts()...)
+		receipts = append(receipts, rewardDonationReceipts...)
+
+		// reward author
 
 		// close all concerns consResolved by the motion, and
 		// transfer their funds into the bounty account
 		consResolved, consEscrows := loadResolvedConcerns(ctx, cloned, prop)
 		consFunds := closeResolvedConcerns(ctx, cloned, prop, consResolved)
 
-		_ = consEscrows
-
-		// XXX: reward author
-
-		var bountyDonated bool
-		bountyReceipt := metric.Receipt{
-			Type:   metric.ReceiptTypeBounty,
-			Amount: consFunds.MetricHolding(),
+		// total escrow is the target pay for the author
+		escrowTotal := 0.0
+		for _, conEscrow := range consEscrows {
+			escrowTotal += conEscrow
 		}
+
+		bountyAccount := pmp_1.ProposalBountyAccountID(prop.ID)
+
+		award := 0.0 // award to author
+		bountyDonation := 0.0
+
 		if prop.Author.IsNone() {
+
 			account.Transfer_StageOnly(
 				ctx,
 				cloned.PublicClone(),
-				pmp_1.ProposalBountyAccountID(prop.ID),
+				bountyAccount,
 				pmp_0.MatchingPoolAccountID,
 				consFunds,
-				fmt.Sprintf("bounty for proposal %v", prop.ID),
+				fmt.Sprintf("bounty for proposal %v was donated", prop.ID),
 			)
-			bountyDonated = true
-			bountyReceipt.To = pmp_0.MatchingPoolAccountID.MetricAccountID()
+			bountyDonation = consFunds.Quantity
+			receipts = append(receipts,
+				metric.Receipt{
+					To:     pmp_0.MatchingPoolAccountID.MetricAccountID(),
+					Type:   metric.ReceiptTypeBounty,
+					Amount: consFunds.MetricHolding(),
+				},
+			)
+
 		} else {
-			account.Transfer_StageOnly(
-				ctx,
-				cloned.PublicClone(),
-				pmp_1.ProposalBountyAccountID(prop.ID),
-				member.UserAccountID(prop.Author),
-				consFunds,
-				fmt.Sprintf("bounty for proposal %v", prop.ID),
-			)
-			bountyReceipt.To = member.UserAccountID(prop.Author).MetricAccountID()
+
+			authorAccount := member.UserAccountID(prop.Author)
+
+			matchAccount := account.Get_Local(ctx, cloned.PublicClone(), pmp_0.MatchingPoolAccountID)
+			matchFunds := matchAccount.Balance(account.PluralAsset).Quantity
+
+			awardFromCon, awardFromMatch, donateFromCon := calcAuthorAward(consFunds.Quantity, matchFunds, escrowTotal)
+			award = awardFromCon + awardFromMatch
+			bountyDonation = donateFromCon
+
+			if awardFromCon > 0 {
+				to := authorAccount
+				amt := account.H(account.PluralAsset, awardFromCon)
+				account.Transfer_StageOnly(
+					ctx,
+					cloned.PublicClone(),
+					bountyAccount,
+					to,
+					amt,
+					fmt.Sprintf("bounty to proposal %v author", prop.ID),
+				)
+				receipts = append(receipts,
+					metric.Receipt{
+						To:     to.MetricAccountID(),
+						Type:   metric.ReceiptTypeBounty,
+						Amount: amt.MetricHolding(),
+					},
+				)
+			}
+
+			if awardFromMatch > 0 {
+				to := authorAccount
+				amt := account.H(account.PluralAsset, awardFromMatch)
+				account.Transfer_StageOnly(
+					ctx,
+					cloned.PublicClone(),
+					pmp_0.MatchingPoolAccountID,
+					to,
+					amt,
+					fmt.Sprintf("matched bounty to proposal %v author", prop.ID),
+				)
+				receipts = append(receipts,
+					metric.Receipt{
+						To:     to.MetricAccountID(),
+						Type:   metric.ReceiptTypeBounty,
+						Amount: amt.MetricHolding(),
+					},
+				)
+			}
+
+			if donateFromCon > 0 {
+				to := pmp_0.MatchingPoolAccountID
+				amt := account.H(account.PluralAsset, donateFromCon)
+				account.Transfer_StageOnly(
+					ctx,
+					cloned.PublicClone(),
+					bountyAccount,
+					to,
+					amt,
+					fmt.Sprintf("donation of unused bounty for proposal %v to matching pool", prop.ID),
+				)
+				receipts = append(receipts,
+					metric.Receipt{
+						To:     to.MetricAccountID(),
+						Type:   metric.ReceiptTypeDonation,
+						Amount: amt.MetricHolding(),
+					},
+				)
+			}
+
 		}
 
 		// metrics
@@ -94,7 +172,7 @@ func (x proposalPolicy) Close(
 					Type:     "proposal-v1",
 					Policy:   metric.MotionPolicy(prop.Policy),
 					Decision: decision.MetricDecision(),
-					Receipts: append(rewards.MetricReceipts(), append(donationReceipt, bountyReceipt)...),
+					Receipts: receipts,
 				},
 			},
 		})
@@ -103,9 +181,12 @@ func (x proposalPolicy) Close(
 				Accepted:            true,
 				ApprovalPollOutcome: closeApprovalPoll.Result,
 				Resolved:            consResolved,
-				Bounty:              consFunds,
-				BountyDonated:       bountyDonated,
 				Rewarded:            rewards,
+				RewardDonation:      rewardDonation,
+				Bounty:              consFunds.Quantity,
+				Escrow:              escrowTotal,
+				Award:               award,
+				BountyDonation:      bountyDonation,
 			}, closeNotice(
 				ctx,
 				prop,
@@ -114,7 +195,7 @@ func (x proposalPolicy) Close(
 				closeApprovalPoll.Result,
 				consResolved,
 				consFunds,
-				bountyDonated,
+				bountyDonation,
 				rewards,
 				rewardDonation,
 			)
@@ -152,9 +233,12 @@ func (x proposalPolicy) Close(
 				Accepted:            false,
 				ApprovalPollOutcome: closeApprovalPoll.Result,
 				Resolved:            nil,
-				Bounty:              account.H(account.PluralAsset, 0.0),
-				BountyDonated:       false,
 				Rewarded:            rewards,
+				RewardDonation:      rewardDonation,
+				Bounty:              0.0,
+				Escrow:              0.0,
+				Award:               0.0,
+				BountyDonation:      0.0,
 			}, closeNotice(
 				ctx,
 				prop,
@@ -163,12 +247,10 @@ func (x proposalPolicy) Close(
 				closeApprovalPoll.Result,
 				nil,
 				account.H(account.PluralAsset, 0.0),
-				false,
+				0.0,
 				rewards,
 				rewardDonation,
 			)
 
 	}
 }
-
-// XXX: add donation in close report

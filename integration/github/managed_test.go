@@ -8,7 +8,7 @@ import (
 
 	govgh "github.com/gov4git/gov4git/v2/github"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/gov4git/v2/test"
@@ -48,7 +48,7 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(m.RefBy) < 1 {
 		t.Errorf("expecting %v, got %v", 1, m.RefBy)
 	}
-	ms0RefBy0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("1")}
+	ms0RefBy0 := motionproto.Ref{Type: pmp_0.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("1")}
 	if !m.RefBy.Contains(ms0RefBy0) {
 		t.Errorf("expecting %v, got %v", ms0RefBy0, m.RefBy)
 	}
@@ -65,8 +65,8 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(m.RefBy) < 2 {
 		t.Errorf("expecting %v, got %v", 2, m.RefBy)
 	}
-	ms1RefBy0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("2")}
-	ms1RefBy1 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("7"), To: motionproto.MotionID("2")}
+	ms1RefBy0 := motionproto.Ref{Type: pmp_0.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("2")}
+	ms1RefBy1 := motionproto.Ref{Type: pmp_0.ClaimsRefType, From: motionproto.MotionID("7"), To: motionproto.MotionID("2")}
 	if !m.RefBy.Contains(ms1RefBy0) {
 		t.Errorf("expecting %v, got %v", ms1RefBy0, m.RefBy)
 	}
@@ -86,8 +86,8 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(m.RefTo) < 2 {
 		t.Errorf("expecting %v, got %v", 2, m.RefTo)
 	}
-	ms2RefTo0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("1")}
-	ms2RefTo1 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("2")}
+	ms2RefTo0 := motionproto.Ref{Type: pmp_0.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("1")}
+	ms2RefTo1 := motionproto.Ref{Type: pmp_0.ClaimsRefType, From: motionproto.MotionID("5"), To: motionproto.MotionID("2")}
 	if !m.RefTo.Contains(ms2RefTo0) {
 		t.Errorf("expecting %v, got %v", ms2RefTo0, m.RefTo)
 	}
@@ -107,7 +107,7 @@ func TestSyncManagedIssues(t *testing.T) {
 	if len(m.RefTo) < 1 {
 		t.Errorf("expecting %v, got %v", 1, m.RefTo)
 	}
-	ms3RefTo0 := motionproto.Ref{Type: pmp.ClaimsRefType, From: motionproto.MotionID("7"), To: motionproto.MotionID("2")}
+	ms3RefTo0 := motionproto.Ref{Type: pmp_0.ClaimsRefType, From: motionproto.MotionID("7"), To: motionproto.MotionID("2")}
 	if !m.RefTo.Contains(ms3RefTo0) {
 		t.Errorf("expecting %v, got %v", ms3RefTo0, m.RefTo)
 	}

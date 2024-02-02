@@ -59,13 +59,8 @@ func (x proposalPolicy) Close(
 
 		// close all concerns resolvedCons by the motion, and
 		// transfer their funds into the bounty account
-		resolvedCons, projectedBounties := loadResolvedConcerns(ctx, cloned, prop)
+		resolvedCons, _, projectedBounty := loadResolvedConcerns(ctx, cloned, prop)
 		priorityFunds := closeResolvedConcerns(ctx, cloned, prop, resolvedCons)
-
-		projectedBounty := 0.0
-		for _, pb := range projectedBounties {
-			projectedBounty += pb
-		}
 
 		bountyAccount := pmp_1.ProposalBountyAccountID(prop.ID)
 

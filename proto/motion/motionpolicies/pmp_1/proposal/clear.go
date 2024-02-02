@@ -24,20 +24,26 @@ func loadResolvedConcerns(
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
 
-) (resolved motionproto.Motions, escrows []float64) {
+) (resolved motionproto.Motions, projectedBounties []float64, projectedBounty float64) {
 
-	eligible := computeEligibleConcerns(ctx, cloned.PublicClone(), prop)
+	eligible := calcEligibleConcerns(ctx, cloned.PublicClone(), prop)
 	for _, ref := range eligible {
 		con := motionapi.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
 		conState := motionapi.LoadPolicyState_Local[*concern.ConcernState](ctx, cloned.PublicClone(), con.ID)
 		//
 		resolved = append(resolved, con)
-		escrows = append(escrows, conState.Escrow())
+		projectedBounties = append(projectedBounties, conState.ProjectedBounty())
 	}
-	return resolved, escrows
+
+	projectedBounty = 0.0
+	for _, pb := range projectedBounties {
+		projectedBounty += pb
+	}
+
+	return resolved, projectedBounties, projectedBounty
 }
 
-func computeEligibleConcerns(ctx context.Context, cloned gov.Cloned, prop motionproto.Motion) motionproto.Refs {
+func calcEligibleConcerns(ctx context.Context, cloned gov.Cloned, prop motionproto.Motion) motionproto.Refs {
 	eligible := motionproto.Refs{}
 	for _, ref := range prop.RefTo {
 		if pmp_1.IsConcernProposalEligible(ctx, cloned, ref.To, prop.ID, ref.Type) {

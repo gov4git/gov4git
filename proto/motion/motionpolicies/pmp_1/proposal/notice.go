@@ -82,7 +82,7 @@ func closeNotice(
 	fmt.Fprintln(&w, "<hr/>") // author awards
 
 	if r.CostOfPriority > 0 {
-		fmt.Fprintf(&w, "The cost of priority of issues claimed by this PR (the cost of prioritization) was `%0.6f`.\n\n", r.CostOfPriority)
+		fmt.Fprintf(&w, "The _cost of priority_ of issues claimed by this PR (the cost of prioritization) was `%0.6f`.\n\n", r.CostOfPriority)
 	}
 
 	if r.ProjectedBounty > 0 {
@@ -94,7 +94,7 @@ func closeNotice(
 	}
 
 	if r.BountyDonation > 0 {
-		fmt.Fprintf(&w, "A donation of `%0.6f` credits from the cost of priority was made to the matching fund.\n\n", r.BountyDonation)
+		fmt.Fprintf(&w, "A donation of `%0.6f` credits from the _cost of priority_ was made to the matching fund.\n\n", r.BountyDonation)
 	}
 
 	fmt.Fprintln(&w, "<hr/>") // reviewer awards
@@ -108,11 +108,11 @@ func closeNotice(
 	}
 
 	if r.CostOfReview > 0 {
-		fmt.Fprintf(&w, "The cost of review of this PR was `%0.6f`.\n\n", r.CostOfReview)
+		fmt.Fprintf(&w, "The _cost of review_ of this PR was `%0.6f`.\n\n", r.CostOfReview)
 	}
 
 	if r.RewardDonation > 0 {
-		fmt.Fprintf(&w, "A donation of `%0.6f` credits from the cost of review was made to the matching fund.\n\n", r.RewardDonation)
+		fmt.Fprintf(&w, "A donation of `%0.6f` credits from the _cost of review_ was made to the matching fund.\n\n", r.RewardDonation)
 	}
 
 	fmt.Fprintln(&w, "<hr/>") // tally

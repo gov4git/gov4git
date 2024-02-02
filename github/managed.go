@@ -182,7 +182,6 @@ func syncMotion(
 	issue ImportedIssue,
 ) {
 
-	//XXX
 	if issue.IsManaged() {
 		if motion, ok := motions[id]; ok { // if motion for issue already exists, update it
 			changed := syncMeta(ctx, cloned, syncChanges, issue, motion)

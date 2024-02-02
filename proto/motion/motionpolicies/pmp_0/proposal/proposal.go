@@ -15,6 +15,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/concern"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
@@ -147,7 +148,7 @@ func (x proposalPolicy) Update(
 		notices = append(
 			notices,
 			notice.Noticef(ctx, "This PR's __approval score__ is now `%0.6f`.\n"+
-				"The cost of review is `%0.6f`.", latestApprovalScore, costOfReview)...,
+				"The _cost of review_ is `%0.6f`.", latestApprovalScore, costOfReview)...,
 		)
 	}
 	state.LatestApprovalScore = latestApprovalScore
@@ -176,6 +177,17 @@ func (x proposalPolicy) Update(
 		}
 	}
 	state.EligibleConcerns = eligible
+
+	projectedBounty := 0.0
+	for _, ref := range eligible {
+		conState := motionapi.LoadPolicyState_Local[*concern.ConcernState](ctx, cloned.PublicClone(), ref.To)
+		projectedBounty += conState.ProjectedBounty()
+	}
+
+	notices = append(
+		notices,
+		notice.Noticef(ctx, "This PR's __projected bounty__ is now `%0.6f`.", projectedBounty)...,
+	)
 
 	//
 

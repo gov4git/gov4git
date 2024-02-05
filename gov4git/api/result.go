@@ -23,6 +23,9 @@ func Invoke(f func()) Result {
 		fmt.Fprint(os.Stderr, string(err.Stack))
 	}
 	fmt.Fprint(os.Stdout, form.SprintJSON(r))
+	if err != nil {
+		os.Exit(1)
+	}
 	return r
 }
 
@@ -33,6 +36,9 @@ func Invoke1[R1 any](f func() R1) Result {
 		fmt.Fprint(os.Stderr, string(err.Stack))
 	}
 	fmt.Fprint(os.Stdout, form.SprintJSON(r))
+	if err != nil {
+		os.Exit(1)
+	}
 	return r
 }
 

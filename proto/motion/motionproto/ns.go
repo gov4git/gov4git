@@ -23,7 +23,7 @@ func MotionAccountID(motionID MotionID) account.AccountID {
 
 var (
 	// PoliciesNS is a namespace for holding individual policy class namespaces.
-	PoliciesNS = MotionNS.Append("policy")
+	PoliciesNS = proto.PolicyNS.Append("motion")
 
 	PolicyStateFilebase = "state.json"
 )

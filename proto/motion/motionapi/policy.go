@@ -31,7 +31,7 @@ func LoadPolicyState_Local[PS form.Form](
 
 ) PS {
 
-	return git.FromFile[PS](ctx, cloned.Tree(), id.PolicyNS())
+	return git.FromFile[PS](ctx, cloned.Tree(), id.PolicyNS(motionproto.PolicyStateFilebase))
 }
 
 func SavePolicyState[PS form.Form](
@@ -56,7 +56,7 @@ func SavePolicyState_StageOnly[PS form.Form](
 
 ) {
 
-	git.ToFileStage[PS](ctx, cloned.Tree(), id.PolicyNS(), policyState)
+	git.ToFileStage[PS](ctx, cloned.Tree(), id.PolicyNS(motionproto.PolicyStateFilebase), policyState)
 }
 
 // class state

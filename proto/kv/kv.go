@@ -78,7 +78,7 @@ func (x KV[K, V]) ListKeys(ctx context.Context, ns ns.NS, t *git.Tree) []K {
 	must.NoError(ctx, err)
 	r := []K{}
 	for _, info := range infos {
-		if !info.IsDir() { // TODO: filter dirs with key hashes?
+		if !info.IsDir() {
 			continue
 		}
 		keyFileNS := ns.Append(info.Name(), keyFilebase)
@@ -88,7 +88,7 @@ func (x KV[K, V]) ListKeys(ctx context.Context, ns ns.NS, t *git.Tree) []K {
 			},
 		)
 		if err != nil {
-			base.Errorf("unrecognizable kv dir %v", keyFileNS.Dir())
+			base.Errorf("unrecognizable kv dir %v", keyFileNS.Dir().GitPath())
 			continue
 		}
 		r = append(r, k)

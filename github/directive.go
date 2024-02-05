@@ -296,8 +296,8 @@ func processDirectiveIssue_StageOnly(
 		}
 		replyAndCloseIssue(ctx, repo, ghc, issue,
 			FollowUpSubject,
-			fmt.Sprintf("Transferred `%v` credits from member @%v to member @%v.",
-				d.GiveToMatchingFund.Amount, d.GiveToMatchingFund.From, pmp_0.MatchingPoolAccountID))
+			fmt.Sprintf("Transferred `%v` credits from member @%v to the matching fund.",
+				d.GiveToMatchingFund.Amount, d.GiveToMatchingFund.From))
 		return d, nil
 
 	}

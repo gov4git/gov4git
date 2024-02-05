@@ -2,6 +2,7 @@ package motionapi
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
@@ -34,9 +35,11 @@ func UpdateMotions_StageOnly(
 	reportList := []motionproto.Report{}
 	noticesList := []notice.Notices{}
 	for i, motion := range motions {
+		fmt.Printf("UPDATING motion %v\n", motion.ID)
 		if motion.Archived || motion.Closed {
 			continue
 		}
+		fmt.Printf("UPDATING motion %v continuing\n", motion.ID)
 		p := motionproto.GetMotionPolicy(ctx, motion)
 		report, notices := p.Update(
 			ctx,

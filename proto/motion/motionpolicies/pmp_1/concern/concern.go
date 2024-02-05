@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"slices"
+	"reflect"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
@@ -117,7 +117,8 @@ func (x concernPolicy) Update(
 
 	// inputs
 	policyState := LoadClassState_Local(ctx, cloned)
-	conState := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
+	conStatePrev := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
+	conState := conStatePrev.Copy()
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), conState.PriorityPoll)
 
 	// update idealized quadratic funding deficit
@@ -129,30 +130,32 @@ func (x concernPolicy) Update(
 	// update priority score
 	matchFunds := pmp_0.GetMatchFundBalance_Local(ctx, cloned.PublicClone())
 	latestPriorityScore := costOfPriority + matchRatio(matchFunds, policyState.MatchDeficit)*idealDeficit
-	if latestPriorityScore != conState.PriorityScore {
+	conState.PriorityScore = latestPriorityScore
+
+	// update eligible proposals
+	conState.EligibleProposals = computeEligibleProposals(ctx, cloned.PublicClone(), con)
+
+	// notices
+	if !reflect.DeepEqual(conState, conStatePrev) {
+
 		notices = append(
 			notices,
 			notice.Noticef(ctx,
 				"This issue's __priority score__ is now `%0.6f`.\n"+
-					"The _cost of priority_ is `%0.6f`.",
-				latestPriorityScore, costOfPriority)...,
+					"The _cost of priority_ is `%0.6f`.\n"+
+					"The __projected bounty__ is now `%0.6f`.",
+				latestPriorityScore, costOfPriority, conState.ProjectedBounty())...,
 		)
-	}
-	conState.PriorityScore = latestPriorityScore
 
-	// update eligible proposals
-
-	eligible := computeEligibleProposals(ctx, cloned.PublicClone(), con)
-	if !slices.Equal[motionproto.Refs](eligible, conState.EligibleProposals) {
 		// display updated list of eligible proposals
-		if len(eligible) == 0 {
+		if len(conState.EligibleProposals) == 0 {
 			notices = append(
 				notices,
 				notice.Noticef(ctx, "The set of eligible proposals claiming this issue is now empty.\n")...,
 			)
 		} else {
 			var w bytes.Buffer
-			for _, ref := range eligible {
+			for _, ref := range conState.EligibleProposals {
 				prop := motionapi.LookupMotion_Local(ctx, cloned.PublicClone(), ref.From)
 				fmt.Fprintf(&w, "- %s, managed as Gov4Git motion `%v` with community attention of `%0.6f`\n",
 					prop.TrackerURL, prop.ID, prop.Score.Attention)
@@ -162,13 +165,8 @@ func (x concernPolicy) Update(
 				notice.Noticef(ctx, "The set of eligible proposals claiming this issue changed:\n"+w.String())...,
 			)
 		}
-	}
-	conState.EligibleProposals = eligible
 
-	notices = append(
-		notices,
-		notice.Noticef(ctx, "This PR's __projected bounty__ is now `%0.6f`.", conState.ProjectedBounty())...,
-	)
+	}
 
 	//
 

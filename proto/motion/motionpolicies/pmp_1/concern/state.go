@@ -1,6 +1,8 @@
 package concern
 
 import (
+	"slices"
+
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
@@ -14,6 +16,12 @@ type ConcernState struct {
 	//
 	IQDeficit     float64 `json:"iq_deficit"`     // idealized quadratic funding deficit
 	PriorityScore float64 `json:"priority_score"` // is "escrow"
+}
+
+func (x *ConcernState) Copy() *ConcernState {
+	z := *x
+	z.EligibleProposals = slices.Clone(x.EligibleProposals)
+	return &z
 }
 
 func (x *ConcernState) ProjectedBounty() float64 {

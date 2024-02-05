@@ -112,6 +112,8 @@ func (x concernPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
+	fmt.Printf("UPDATING %v\n", con.ID)
+
 	// outputs
 	notices := notice.Notices{}
 
@@ -127,10 +129,17 @@ func (x concernPolicy) Update(
 	idealDeficit := idealFunding - costOfPriority
 	conState.IQDeficit = idealDeficit
 
+	fmt.Printf("UPDATING costOfPriority %v\n", costOfPriority)
+	fmt.Printf("UPDATING idealFunding %v\n", idealFunding)
+	fmt.Printf("UPDATING idealDeficit %v\n", idealDeficit)
+
 	// update priority score
 	matchFunds := pmp_0.GetMatchFundBalance_Local(ctx, cloned.PublicClone())
 	latestPriorityScore := costOfPriority + matchRatio(matchFunds, policyState.MatchDeficit)*idealDeficit
 	conState.PriorityScore = latestPriorityScore
+
+	fmt.Printf("UPDATING matchFunds %v\n", matchFunds)
+	fmt.Printf("UPDATING latestPriorityScore %v\n", latestPriorityScore)
 
 	// update eligible proposals
 	conState.EligibleProposals = computeEligibleProposals(ctx, cloned.PublicClone(), con)
@@ -138,11 +147,13 @@ func (x concernPolicy) Update(
 	// notices
 	if !reflect.DeepEqual(conState, conStatePrev) {
 
+		fmt.Printf("UPDATING issuing notices\n")
+
 		notices = append(
 			notices,
 			notice.Noticef(ctx,
 				"This issue's __priority score__ is now `%0.6f`.\n"+
-					"The _cost of priority_ is `%0.6f`.\n"+
+					"The __cost of priority__ is `%0.6f`.\n"+
 					"The __projected bounty__ is now `%0.6f`.",
 				latestPriorityScore, costOfPriority, conState.ProjectedBounty())...,
 		)
@@ -151,7 +162,7 @@ func (x concernPolicy) Update(
 		if len(conState.EligibleProposals) == 0 {
 			notices = append(
 				notices,
-				notice.Noticef(ctx, "The set of eligible proposals claiming this issue is now empty.\n")...,
+				notice.Noticef(ctx, "The set of eligible proposals claiming this issue is empty.\n")...,
 			)
 		} else {
 			var w bytes.Buffer

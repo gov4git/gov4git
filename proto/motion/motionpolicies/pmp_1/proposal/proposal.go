@@ -170,7 +170,7 @@ func (x proposalPolicy) Update(
 		notices = append(
 			notices,
 			notice.Noticef(ctx, "This PR's __approval score__ is now `%0.6f`.\n"+
-				"The _cost of review_ is `%0.6f`.\n"+
+				"The __cost of review__ is `%0.6f`.\n"+
 				"The __projected bounty__ is now `%0.6f`.", latestApprovalScore, costOfReview, projectedBounty)...,
 		)
 
@@ -178,7 +178,7 @@ func (x proposalPolicy) Update(
 		if len(propState.EligibleConcerns) == 0 {
 			notices = append(
 				notices,
-				notice.Noticef(ctx, "The set of eligible issues claimed by this PR is now empty.\n")...,
+				notice.Noticef(ctx, "The set of eligible issues claimed by this PR is empty.\n")...,
 			)
 		} else {
 			var w bytes.Buffer

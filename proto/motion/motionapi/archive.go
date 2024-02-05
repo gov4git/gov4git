@@ -30,7 +30,7 @@ func ArchiveMotions_StageOnly(
 	t := cloned.Public.Tree()
 	motions := ListMotions_Local(ctx, t)
 	for _, motion := range motions {
-		if !motion.Archived && motion.Closed {
+		if motion.Archived || !motion.Closed {
 			continue
 		}
 		motion.Archived = true

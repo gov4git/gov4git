@@ -90,12 +90,9 @@ func Cron(
 	// display notices on github
 	govgh.DisplayNotices_StageOnly(ctx, repo, ghc, cloned.PublicClone())
 
-	if shouldSyncCommunity {
-
-		// update community dashboard on github
-		base.Infof("CRON: publishing community dashboard")
-		govgh.PublishDashboard(ctx, repo, ghc, cloned.PublicClone())
-	}
+	// update community dashboard on github
+	base.Infof("CRON: publishing community dashboard")
+	govgh.PublishDashboard(ctx, repo, ghc, cloned.PublicClone())
 
 	// prepare commit message
 	report["cron"] = state

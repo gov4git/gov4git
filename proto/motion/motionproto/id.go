@@ -8,8 +8,8 @@ import (
 
 type MotionID string
 
-func (x MotionID) PolicyNS() ns.NS {
-	return MotionPolicyNS(x)
+func (x MotionID) PolicyNS(filebase string) ns.NS {
+	return MotionPolicyNS(x).Append(filebase)
 }
 
 func (x MotionID) String() string {

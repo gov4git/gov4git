@@ -13,6 +13,7 @@ import (
 
 var (
 	RootNS   = ns.NS{}
+	PolicyNS = RootNS.Append("policy")
 	ReadmeNS = RootNS.Append("README.md")
 )
 

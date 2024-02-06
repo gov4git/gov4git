@@ -1,14 +1,11 @@
-package proposal
+package pmp_1
 
 import (
 	"slices"
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
-
-const StateFilebase = "state.json"
 
 type ProposalState struct {
 	ApprovalPoll          ballotproto.BallotID `json:"approval_poll"`
@@ -26,7 +23,7 @@ func (x *ProposalState) Copy() *ProposalState {
 
 func NewProposalState(id motionproto.MotionID) *ProposalState {
 	return &ProposalState{
-		ApprovalPoll:          pmp_1.ProposalApprovalPollName(id),
+		ApprovalPoll:          ProposalApprovalPollName(id),
 		InverseCostMultiplier: 1.0,
 	}
 }

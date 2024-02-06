@@ -9,8 +9,8 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/concern"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/proposal"
+	_ "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/concern"
+	_ "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/proposal"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/test"
 )
@@ -41,7 +41,7 @@ func SetupTest(
 		cty.Organizer(),
 		testConcernID,
 		motionproto.MotionConcernType,
-		concern.ConcernPolicyName,
+		pmp_0.ConcernPolicyName,
 		cty.MemberUser(0),
 		"concern #1",
 		"body #1",
@@ -54,7 +54,7 @@ func SetupTest(
 		cty.Organizer(),
 		testProposalID,
 		motionproto.MotionProposalType,
-		proposal.ProposalPolicyName,
+		pmp_0.ProposalPolicyName,
 		cty.MemberUser(1),
 		"proposal #2",
 		"body #2",

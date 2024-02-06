@@ -14,7 +14,6 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/concern"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/lib4git/base"
 )
@@ -29,7 +28,7 @@ func loadResolvedConcerns(
 	eligible := calcEligibleConcerns(ctx, cloned.PublicClone(), prop)
 	for _, ref := range eligible {
 		con := motionapi.LookupMotion_Local(ctx, cloned.PublicClone(), ref.To)
-		conState := motionapi.LoadPolicyState_Local[*concern.ConcernState](ctx, cloned.PublicClone(), con.ID)
+		conState := motionapi.LoadPolicyState_Local[*pmp_1.ConcernState](ctx, cloned.PublicClone(), con.ID)
 		//
 		resolved = append(resolved, con)
 		projectedBounties = append(projectedBounties, conState.ProjectedBounty())
@@ -46,7 +45,7 @@ func loadResolvedConcerns(
 func calcEligibleConcerns(ctx context.Context, cloned gov.Cloned, prop motionproto.Motion) motionproto.Refs {
 	eligible := motionproto.Refs{}
 	for _, ref := range prop.RefTo {
-		if pmp_1.IsConcernProposalEligible(ctx, cloned, ref.To, prop.ID, ref.Type) {
+		if pmp_1.AreEligible(ctx, cloned, ref.To, prop.ID, ref.Type) {
 			eligible = append(eligible, ref)
 		}
 	}

@@ -4,6 +4,7 @@ package pmp_1
 import (
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
@@ -11,6 +12,9 @@ import (
 var (
 	ConcernBallotChoice  = pmp_0.ConcernBallotChoice
 	ProposalBallotChoice = pmp_0.ProposalBallotChoice
+
+	ConcernPolicyName  motion.PolicyName = "pmp-concern-policy-v1"
+	ProposalPolicyName motion.PolicyName = "pmp-proposal-v1"
 
 	ClaimsRefType = pmp_0.ClaimsRefType
 )

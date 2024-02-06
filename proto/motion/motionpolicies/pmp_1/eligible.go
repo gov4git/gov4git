@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
-func IsConcernProposalEligible(
+func AreEligible(
 	ctx context.Context,
 	cloned gov.Cloned,
 	conID motionproto.MotionID,
@@ -24,11 +24,11 @@ func IsConcernProposalEligible(
 	con := motionapi.LookupMotion_Local(ctx, cloned, conID)
 	prop := motionapi.LookupMotion_Local(ctx, cloned, propID)
 
-	if !con.IsConcern() {
+	if !con.IsConcern() || con.Policy != ConcernPolicyName {
 		return false
 	}
 
-	if !prop.IsProposal() {
+	if !prop.IsProposal() || prop.Policy != ProposalPolicyName {
 		return false
 	}
 
@@ -40,5 +40,7 @@ func IsConcernProposalEligible(
 		return false
 	}
 
-	return prop.Score.Attention > 0
+	propState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned, prop.ID)
+
+	return propState.LatestApprovalScore > 0
 }

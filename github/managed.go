@@ -12,11 +12,8 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
-
-	pmpv0_concern "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/concern"
-	pmpv0_proposal "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/proposal"
-	pmpv1_concern "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/concern"
-	pmpv1_proposal "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/proposal"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
@@ -320,15 +317,15 @@ func motionPolicyForIssue(issue ImportedIssue) motion.PolicyName {
 
 	case issue.ManagedByPMPv0:
 		if issue.PullRequest {
-			return pmpv0_proposal.ProposalPolicyName
+			return pmp_0.ProposalPolicyName
 		}
-		return pmpv0_concern.ConcernPolicyName
+		return pmp_0.ConcernPolicyName
 
 	case issue.ManagedByPMPv1:
 		if issue.PullRequest {
-			return pmpv1_proposal.ProposalPolicyName
+			return pmp_1.ProposalPolicyName
 		}
-		return pmpv1_concern.ConcernPolicyName
+		return pmp_1.ConcernPolicyName
 
 	}
 	panic("issue is not managed by a known protocol")

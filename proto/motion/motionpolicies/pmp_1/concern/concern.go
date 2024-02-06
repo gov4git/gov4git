@@ -13,7 +13,6 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/member"
-	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
@@ -26,10 +25,8 @@ import (
 )
 
 func init() {
-	motionproto.Install(context.Background(), ConcernPolicyName, concernPolicy{})
+	motionproto.Install(context.Background(), pmp_1.ConcernPolicyName, concernPolicy{})
 }
-
-const ConcernPolicyName = motion.PolicyName("pmp-concern-policy-v1")
 
 type concernPolicy struct{}
 
@@ -40,11 +37,11 @@ func (x concernPolicy) PostClone(
 
 	err := must.Try(
 		func() {
-			LoadClassState_Local(ctx, cloned)
+			pmp_1.LoadConcernClassState_Local(ctx, cloned)
 		},
 	)
 	if git.IsNotExist(err) {
-		SaveClassState_StageOnly(ctx, cloned, InitialPolicyState)
+		pmp_1.SaveConcernClassState_StageOnly(ctx, cloned, pmp_1.InitialPolicyState)
 	}
 }
 
@@ -57,8 +54,8 @@ func (x concernPolicy) Open(
 ) (motionproto.Report, notice.Notices) {
 
 	// initialize state
-	state := NewConcernState(con.ID)
-	motionapi.SavePolicyState_StageOnly[*ConcernState](ctx, cloned.PublicClone(), con.ID, state)
+	state := pmp_1.NewConcernState(con.ID)
+	motionapi.SavePolicyState_StageOnly[*pmp_1.ConcernState](ctx, cloned.PublicClone(), con.ID, state)
 
 	// open a poll for the motion
 	ballotapi.Open_StageOnly(
@@ -98,7 +95,7 @@ func (x concernPolicy) Score(
 
 ) (motionproto.Score, notice.Notices) {
 
-	state := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
+	state := motionapi.LoadPolicyState_Local[*pmp_1.ConcernState](ctx, cloned.PublicClone(), con.ID)
 	return motionproto.Score{
 		Attention: state.PriorityScore,
 	}, nil
@@ -112,14 +109,14 @@ func (x concernPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
-	fmt.Printf("UPDATING %v\n", con.ID)
+	fmt.Printf("UPDATING CONCERN %v\n", con.ID)
 
 	// outputs
 	notices := notice.Notices{}
 
 	// inputs
-	policyState := LoadClassState_Local(ctx, cloned)
-	conStatePrev := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
+	policyState := pmp_1.LoadConcernClassState_Local(ctx, cloned)
+	conStatePrev := motionapi.LoadPolicyState_Local[*pmp_1.ConcernState](ctx, cloned.PublicClone(), con.ID)
 	conState := conStatePrev.Copy()
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), conState.PriorityPoll)
 
@@ -129,17 +126,17 @@ func (x concernPolicy) Update(
 	idealDeficit := idealFunding - costOfPriority
 	conState.IQDeficit = idealDeficit
 
-	fmt.Printf("UPDATING costOfPriority %v\n", costOfPriority)
-	fmt.Printf("UPDATING idealFunding %v\n", idealFunding)
-	fmt.Printf("UPDATING idealDeficit %v\n", idealDeficit)
+	fmt.Printf("UPDATING CONCERN costOfPriority %v\n", costOfPriority)
+	fmt.Printf("UPDATING CONCERN idealFunding %v\n", idealFunding)
+	fmt.Printf("UPDATING CONCERN idealDeficit %v\n", idealDeficit)
 
 	// update priority score
 	matchFunds := pmp_0.GetMatchFundBalance_Local(ctx, cloned.PublicClone())
 	latestPriorityScore := costOfPriority + matchRatio(matchFunds, policyState.MatchDeficit)*idealDeficit
 	conState.PriorityScore = latestPriorityScore
 
-	fmt.Printf("UPDATING matchFunds %v\n", matchFunds)
-	fmt.Printf("UPDATING latestPriorityScore %v\n", latestPriorityScore)
+	fmt.Printf("UPDATING CONCERN matchFunds %v\n", matchFunds)
+	fmt.Printf("UPDATING CONCERN latestPriorityScore %v\n", latestPriorityScore)
 
 	// update eligible proposals
 	conState.EligibleProposals = computeEligibleProposals(ctx, cloned.PublicClone(), con)
@@ -147,7 +144,7 @@ func (x concernPolicy) Update(
 	// notices
 	if !reflect.DeepEqual(conState, conStatePrev) {
 
-		fmt.Printf("UPDATING issuing notices\n")
+		fmt.Printf("UPDATING CONCERN issuing notices\n")
 
 		notices = append(
 			notices,
@@ -181,7 +178,7 @@ func (x concernPolicy) Update(
 
 	//
 
-	motionapi.SavePolicyState_StageOnly[*ConcernState](ctx, cloned.PublicClone(), con.ID, conState)
+	motionapi.SavePolicyState_StageOnly[*pmp_1.ConcernState](ctx, cloned.PublicClone(), con.ID, conState)
 
 	r0, n0 := x.updateFreeze(ctx, cloned, con)
 	return r0, append(notices, n0...)
@@ -190,7 +187,7 @@ func (x concernPolicy) Update(
 func computeEligibleProposals(ctx context.Context, cloned gov.Cloned, con motionproto.Motion) motionproto.Refs {
 	eligible := motionproto.Refs{}
 	for _, ref := range con.RefBy {
-		if pmp_1.IsConcernProposalEligible(ctx, cloned, con.ID, ref.From, ref.Type) {
+		if pmp_1.AreEligible(ctx, cloned, con.ID, ref.From, ref.Type) {
 			eligible = append(eligible, ref)
 		}
 	}
@@ -210,7 +207,7 @@ func (x concernPolicy) updateFreeze(
 		return nil, nil
 	}
 
-	toState := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
+	toState := motionapi.LoadPolicyState_Local[*pmp_1.ConcernState](ctx, cloned.PublicClone(), con.ID)
 
 	notices := notice.Notices{}
 	if toState.EligibleProposals.Len() > 0 && !con.Frozen {
@@ -242,9 +239,9 @@ func (x concernPolicy) Aggregate(
 	motion = motionproto.SelectOpenMotions(motion)
 
 	// load all motion policy states
-	concernPolicyStates := make([]*ConcernState, len(motion))
+	concernPolicyStates := make([]*pmp_1.ConcernState, len(motion))
 	for i, mot := range motion {
-		concernPolicyStates[i] = motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), mot.ID)
+		concernPolicyStates[i] = motionapi.LoadPolicyState_Local[*pmp_1.ConcernState](ctx, cloned.PublicClone(), mot.ID)
 	}
 
 	// aggregate match deficit
@@ -254,9 +251,9 @@ func (x concernPolicy) Aggregate(
 	}
 
 	// update policy state
-	policyState := LoadClassState_Local(ctx, cloned)
+	policyState := pmp_1.LoadConcernClassState_Local(ctx, cloned)
 	policyState.MatchDeficit = matchDeficit
-	SaveClassState_StageOnly(ctx, cloned, policyState)
+	pmp_1.SaveConcernClassState_StageOnly(ctx, cloned, policyState)
 }
 
 func (x concernPolicy) Clear(
@@ -351,7 +348,7 @@ func (x concernPolicy) Cancel(
 }
 
 type PolicyView struct {
-	State          *ConcernState       `json:"state"`
+	State          *pmp_1.ConcernState `json:"state"`
 	PriorityPoll   ballotproto.AdTally `json:"priority_poll"`
 	PriorityMargin ballotproto.Margin  `json:"priority_margin"`
 }
@@ -365,7 +362,7 @@ func (x concernPolicy) Show(
 ) (form.Form, motionproto.MotionBallots) {
 
 	// retrieve policy state
-	policyState := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned, con.ID)
+	policyState := motionapi.LoadPolicyState_Local[*pmp_1.ConcernState](ctx, cloned, con.ID)
 
 	// retrieve poll state
 	priorityPollName := pmp_1.ConcernPollBallotName(con.ID)

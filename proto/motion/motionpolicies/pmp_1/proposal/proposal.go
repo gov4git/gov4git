@@ -164,7 +164,7 @@ func (x proposalPolicy) Update(
 
 	fmt.Printf("UPDATING PROPOSAL projectedBounty %v\n", projectedBounty)
 
-	inverseCostMultiplier := (4 * conPolicyState.WithheldEscrowFraction * projectedBounty) / (1 + float64(ads.Tally.NumVoters()))
+	inverseCostMultiplier := (4 * conPolicyState.WithheldEscrowFraction * max(1, projectedBounty)) / (1 + float64(ads.Tally.NumVoters()))
 	propState.InverseCostMultiplier = inverseCostMultiplier
 	fmt.Printf("UPDATING PROPOSAL inverseCostMultiplier %v\n", inverseCostMultiplier)
 

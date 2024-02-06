@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"slices"
+	"reflect"
 
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
@@ -13,7 +13,6 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/member"
-	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
@@ -24,10 +23,8 @@ import (
 )
 
 func init() {
-	motionproto.Install(context.Background(), ConcernPolicyName, concernPolicy{})
+	motionproto.Install(context.Background(), pmp_0.ConcernPolicyName, concernPolicy{})
 }
-
-const ConcernPolicyName = motion.PolicyName("pmp-concern-policy")
 
 type concernPolicy struct{}
 
@@ -46,8 +43,8 @@ func (x concernPolicy) Open(
 ) (motionproto.Report, notice.Notices) {
 
 	// initialize state
-	state := NewConcernState(con.ID)
-	motionapi.SavePolicyState_StageOnly[*ConcernState](ctx, cloned.PublicClone(), con.ID, state)
+	state := pmp_0.NewConcernState(con.ID)
+	motionapi.SavePolicyState_StageOnly[*pmp_0.ConcernState](ctx, cloned.PublicClone(), con.ID, state)
 
 	// open a poll for the motion
 	ballotapi.Open_StageOnly(
@@ -87,7 +84,7 @@ func (x concernPolicy) Score(
 
 ) (motionproto.Score, notice.Notices) {
 
-	state := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
+	state := motionapi.LoadPolicyState_Local[*pmp_0.ConcernState](ctx, cloned.PublicClone(), con.ID)
 
 	// compute motion score from the priority poll ballot
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
@@ -107,37 +104,41 @@ func (x concernPolicy) Update(
 ) (motionproto.Report, notice.Notices) {
 
 	notices := notice.Notices{}
-	state := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
+	conStatePrev := motionapi.LoadPolicyState_Local[*pmp_0.ConcernState](ctx, cloned.PublicClone(), con.ID)
+	conState := conStatePrev.Copy()
 
 	// update priority score
 
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
+	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), conState.PriorityPoll)
 	latestPriorityScore := ads.Tally.Scores[pmp_0.ConcernBallotChoice]
 	costOfPriority := ads.Tally.Capitalization()
-	state.CostOfPriority = costOfPriority
-
-	if latestPriorityScore != state.LatestPriorityScore {
-		notices = append(
-			notices,
-			notice.Noticef(ctx, "This issue's __priority score__ is now `%0.6f`.\n"+
-				"The _cost of priority_ is `%0.6f`.", latestPriorityScore, costOfPriority)...,
-		)
-	}
-	state.LatestPriorityScore = latestPriorityScore
+	conState.CostOfPriority = costOfPriority
+	conState.LatestPriorityScore = latestPriorityScore
 
 	// update eligible proposals
 
-	eligible := computeEligibleProposals(ctx, cloned.PublicClone(), con)
-	if !slices.Equal[motionproto.Refs](eligible, state.EligibleProposals) {
+	conState.EligibleProposals = computeEligibleProposals(ctx, cloned.PublicClone(), con)
+
+	// notices
+
+	if !reflect.DeepEqual(conState, conStatePrev) {
+
+		notices = append(
+			notices,
+			notice.Noticef(ctx, "This issue's __priority score__ is now `%0.6f`.\n"+
+				"The __cost of priority__ is `%0.6f`.\n"+
+				"The __projected bounty__ is now `%0.6f`.", latestPriorityScore, costOfPriority, costOfPriority)...,
+		)
+
 		// display updated list of eligible proposals
-		if len(eligible) == 0 {
+		if len(conState.EligibleProposals) == 0 {
 			notices = append(
 				notices,
-				notice.Noticef(ctx, "The set of eligible proposals claiming this issue is now empty.\n")...,
+				notice.Noticef(ctx, "The set of eligible proposals claiming this issue is empty.\n")...,
 			)
 		} else {
 			var w bytes.Buffer
-			for _, ref := range eligible {
+			for _, ref := range conState.EligibleProposals {
 				prop := motionapi.LookupMotion_Local(ctx, cloned.PublicClone(), ref.From)
 				fmt.Fprintf(&w, "- %s, managed as Gov4Git motion `%v` with community attention of `%0.6f`\n",
 					prop.TrackerURL, prop.ID, prop.Score.Attention)
@@ -147,17 +148,12 @@ func (x concernPolicy) Update(
 				notice.Noticef(ctx, "The set of eligible proposals claiming this issue changed:\n"+w.String())...,
 			)
 		}
-	}
-	state.EligibleProposals = eligible
 
-	notices = append(
-		notices,
-		notice.Noticef(ctx, "This PR's __projected bounty__ is now `%0.6f`.", costOfPriority)...,
-	)
+	}
 
 	//
 
-	motionapi.SavePolicyState_StageOnly[*ConcernState](ctx, cloned.PublicClone(), con.ID, state)
+	motionapi.SavePolicyState_StageOnly[*pmp_0.ConcernState](ctx, cloned.PublicClone(), con.ID, conState)
 
 	r0, n0 := x.updateFreeze(ctx, cloned, con)
 	return r0, append(notices, n0...)
@@ -186,7 +182,7 @@ func (x concernPolicy) updateFreeze(
 		return nil, nil
 	}
 
-	toState := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned.PublicClone(), con.ID)
+	toState := motionapi.LoadPolicyState_Local[*pmp_0.ConcernState](ctx, cloned.PublicClone(), con.ID)
 
 	notices := notice.Notices{}
 	if toState.EligibleProposals.Len() > 0 && !con.Frozen {
@@ -301,7 +297,7 @@ func (x concernPolicy) Cancel(
 }
 
 type PolicyView struct {
-	State          *ConcernState       `json:"state"`
+	State          *pmp_0.ConcernState `json:"state"`
 	PriorityPoll   ballotproto.AdTally `json:"priority_poll"`
 	PriorityMargin ballotproto.Margin  `json:"priority_margin"`
 }
@@ -315,7 +311,7 @@ func (x concernPolicy) Show(
 ) (form.Form, motionproto.MotionBallots) {
 
 	// retrieve policy state
-	policyState := motionapi.LoadPolicyState_Local[*ConcernState](ctx, cloned, con.ID)
+	policyState := motionapi.LoadPolicyState_Local[*pmp_0.ConcernState](ctx, cloned, con.ID)
 
 	// retrieve poll state
 	priorityPollName := pmp_0.ConcernPollBallotName(con.ID)

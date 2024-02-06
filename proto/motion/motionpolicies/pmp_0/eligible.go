@@ -40,5 +40,7 @@ func IsConcernProposalEligible(
 		return false
 	}
 
-	return prop.Score.Attention > 0
+	propState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned, prop.ID)
+
+	return propState.LatestApprovalScore > 0
 }

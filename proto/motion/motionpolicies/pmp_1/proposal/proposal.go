@@ -12,10 +12,8 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
 	"github.com/gov4git/gov4git/v2/proto/member"
-	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/concern"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
@@ -23,11 +21,10 @@ import (
 )
 
 func init() {
-	motionproto.Install(context.Background(), ProposalPolicyName, proposalPolicy{})
+	motionproto.Install(context.Background(), pmp_1.ProposalPolicyName, proposalPolicy{})
 }
 
 const (
-	ProposalPolicyName             motion.PolicyName      = "pmp-proposal-v1"
 	ProposalApprovalPollPolicyName ballotproto.PolicyName = "pmp-proposal-approval-v1"
 )
 
@@ -48,8 +45,8 @@ func (x proposalPolicy) Open(
 ) (motionproto.Report, notice.Notices) {
 
 	// initialize state
-	state := NewProposalState(prop.ID)
-	motionapi.SavePolicyState_StageOnly[*ProposalState](ctx, cloned.PublicClone(), prop.ID, state)
+	state := pmp_1.NewProposalState(prop.ID)
+	motionapi.SavePolicyState_StageOnly[*pmp_1.ProposalState](ctx, cloned.PublicClone(), prop.ID, state)
 
 	// create a bounty account for the proposal
 	account.Create_StageOnly(
@@ -119,7 +116,7 @@ func (x proposalPolicy) Score(
 
 ) (motionproto.Score, notice.Notices) {
 
-	state := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
+	state := motionapi.LoadPolicyState_Local[*pmp_1.ProposalState](ctx, cloned.PublicClone(), prop.ID)
 	return motionproto.Score{
 		Attention: state.LatestApprovalScore,
 	}, nil
@@ -133,12 +130,14 @@ func (x proposalPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
+	fmt.Printf("UPDATING PROPOSAL %v\n", prop.ID)
+
 	notices := notice.Notices{}
 
 	// inputs
 
-	conPolicyState := concern.LoadClassState_Local(ctx, cloned)
-	propStatePrev := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned.PublicClone(), prop.ID)
+	conPolicyState := pmp_1.LoadConcernClassState_Local(ctx, cloned)
+	propStatePrev := motionapi.LoadPolicyState_Local[*pmp_1.ProposalState](ctx, cloned.PublicClone(), prop.ID)
 	propState := propStatePrev.Copy()
 	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), propState.ApprovalPoll)
 
@@ -148,6 +147,9 @@ func (x proposalPolicy) Update(
 	costOfReview := ads.Tally.Capitalization()
 	propState.LatestApprovalScore = latestApprovalScore
 
+	fmt.Printf("UPDATING PROPOSAL latestApprovalScore %v\n", latestApprovalScore)
+	fmt.Printf("UPDATING PROPOSAL costOfReview %v\n", costOfReview)
+
 	// update eligible concerns
 
 	propState.EligibleConcerns = calcEligibleConcerns(ctx, cloned.PublicClone(), prop)
@@ -156,12 +158,15 @@ func (x proposalPolicy) Update(
 
 	projectedBounty := 0.0
 	for _, ref := range propState.EligibleConcerns {
-		conState := motionapi.LoadPolicyState_Local[*concern.ConcernState](ctx, cloned.PublicClone(), ref.To)
+		conState := motionapi.LoadPolicyState_Local[*pmp_1.ConcernState](ctx, cloned.PublicClone(), ref.To)
 		projectedBounty += conState.ProjectedBounty()
 	}
 
+	fmt.Printf("UPDATING PROPOSAL projectedBounty %v\n", projectedBounty)
+
 	inverseCostMultiplier := (4 * conPolicyState.WithheldEscrowFraction * projectedBounty) / (1 + float64(ads.Tally.NumVoters()))
 	propState.InverseCostMultiplier = inverseCostMultiplier
+	fmt.Printf("UPDATING PROPOSAL inverseCostMultiplier %v\n", inverseCostMultiplier)
 
 	// notices
 
@@ -197,7 +202,7 @@ func (x proposalPolicy) Update(
 
 	//
 
-	motionapi.SavePolicyState_StageOnly[*ProposalState](ctx, cloned.PublicClone(), prop.ID, propState)
+	motionapi.SavePolicyState_StageOnly[*pmp_1.ProposalState](ctx, cloned.PublicClone(), prop.ID, propState)
 
 	// update ScoreKernelState
 	currentState := ScoreKernelState{
@@ -267,11 +272,11 @@ func (x proposalPolicy) Cancel(
 }
 
 type PolicyView struct {
-	State          *ProposalState      `json:"state"`
-	ApprovalPoll   ballotproto.AdTally `json:"approval_poll"`
-	ApprovalMargin ballotproto.Margin  `json:"priority_margin"`
-	BountyAccount  account.AccountID   `json:"bounty_account"`
-	RewardAccount  account.AccountID   `json:"reward_account"`
+	State          *pmp_1.ProposalState `json:"state"`
+	ApprovalPoll   ballotproto.AdTally  `json:"approval_poll"`
+	ApprovalMargin ballotproto.Margin   `json:"priority_margin"`
+	BountyAccount  account.AccountID    `json:"bounty_account"`
+	RewardAccount  account.AccountID    `json:"reward_account"`
 }
 
 func (x proposalPolicy) Show(
@@ -283,7 +288,7 @@ func (x proposalPolicy) Show(
 ) (form.Form, motionproto.MotionBallots) {
 
 	// retrieve policy state
-	policyState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned, prop.ID)
+	policyState := motionapi.LoadPolicyState_Local[*pmp_1.ProposalState](ctx, cloned, prop.ID)
 
 	// retrieve approval poll
 	approvalPoll := loadPropApprovalPollTally(ctx, cloned, prop)

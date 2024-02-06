@@ -1,8 +1,9 @@
-package concern
+package pmp_0
 
 import (
+	"slices"
+
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
@@ -17,8 +18,14 @@ type ConcernState struct {
 
 func NewConcernState(id motionproto.MotionID) *ConcernState {
 	return &ConcernState{
-		PriorityPoll: pmp_0.ConcernPollBallotName(id),
+		PriorityPoll: ConcernPollBallotName(id),
 	}
+}
+
+func (x *ConcernState) Copy() *ConcernState {
+	q := *x
+	q.EligibleProposals = slices.Clone(x.EligibleProposals)
+	return &q
 }
 
 func (x *ConcernState) ProjectedBounty() float64 {

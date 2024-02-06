@@ -15,6 +15,9 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 
+	_ "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/use"
+	_ "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/use"
+
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/base"

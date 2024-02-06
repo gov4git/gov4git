@@ -24,7 +24,7 @@ func cancelNotice(
 
 	fmt.Fprintf(&w, "The PR approval tally was `%0.6f`.\n\n", outcome.Scores[pmp_1.ProposalBallotChoice])
 
-	fmt.Fprintln(&w, "<hr/>") // refunds
+	fmt.Fprintf(&w, "##\n\n") // refunds
 
 	fmt.Fprintf(&w, "Refunds issued:\n")
 	for _, refund := range ballotproto.FlattenRefunds(outcome.Refunded) {
@@ -32,7 +32,7 @@ func cancelNotice(
 	}
 	fmt.Fprintln(&w, "")
 
-	fmt.Fprintln(&w, "<hr/>") // tally
+	fmt.Fprintf(&w, "##\n\n") // tally
 
 	fmt.Fprintf(&w, "PR approval tally by reviewer was:\n")
 	for user, ss := range outcome.ScoresByUser {
@@ -65,7 +65,7 @@ func closeNotice(
 		}
 	}
 
-	fmt.Fprintf(&w, "The PR approval tally was `%0.6f`.\n\n", r.ApprovalPollOutcome.Scores[pmp_1.ProposalBallotChoice])
+	fmt.Fprintf(&w, "The PR __approval tally__ was `%0.6f`.\n\n", r.ApprovalPollOutcome.Scores[pmp_1.ProposalBallotChoice])
 
 	if r.Accepted {
 		if len(r.Resolved) > 0 {
@@ -79,28 +79,28 @@ func closeNotice(
 		}
 	}
 
-	fmt.Fprintln(&w, "<hr/>") // author awards
+	// fmt.Fprintf(&w, "##\n\n") // author awards
 
 	if r.CostOfPriority > 0 {
-		fmt.Fprintf(&w, "The _cost of priority_ of issues claimed by this PR (the cost of prioritization) was `%0.6f`.\n\n", r.CostOfPriority)
+		fmt.Fprintf(&w, "The __cost of priority__ of issues claimed by this PR (the cost of prioritization) was `%0.6f`.\n\n", r.CostOfPriority)
 	}
 
 	if r.ProjectedBounty > 0 {
-		fmt.Fprintf(&w, "The projected bounty, after matching, for the author of this PR was `%0.6f`.\n\n", r.ProjectedBounty)
+		fmt.Fprintf(&w, "The __projected bounty__, after matching, for the author of this PR was `%0.6f`.\n\n", r.ProjectedBounty)
 	}
 
 	if r.RealizedBounty > 0 {
-		fmt.Fprintf(&w, "The realized bounty fot the author of this PR was `%0.6f`.\n\n", r.RealizedBounty)
+		fmt.Fprintf(&w, "The __realized bounty__ for the __author__ of this PR was `%0.6f`.\n\n", r.RealizedBounty)
 	}
 
 	if r.BountyDonation > 0 {
-		fmt.Fprintf(&w, "A donation of `%0.6f` credits from the _cost of priority_ was made to the matching fund.\n\n", r.BountyDonation)
+		fmt.Fprintf(&w, "A __donation__ of `%0.6f` credits from the __cost of priority__ was made to the matching fund.\n\n", r.BountyDonation)
 	}
 
-	fmt.Fprintln(&w, "<hr/>") // reviewer awards
+	// fmt.Fprintf(&w, "##\n\n") // reviewer awards
 
 	if len(r.Rewarded) > 0 {
-		fmt.Fprintf(&w, "PR reviewers were rewarded:\n")
+		fmt.Fprintf(&w, "PR __reviewers__ were rewarded:\n")
 		for _, reward := range r.Rewarded {
 			fmt.Fprintf(&w, "- Reviewer @%v was rewarded `%0.6f` credits\n", reward.To, reward.Amount.Quantity)
 		}
@@ -108,14 +108,14 @@ func closeNotice(
 	}
 
 	if r.CostOfReview > 0 {
-		fmt.Fprintf(&w, "The _cost of review_ of this PR was `%0.6f`.\n\n", r.CostOfReview)
+		fmt.Fprintf(&w, "The __cost of review__ of this PR was `%0.6f`.\n\n", r.CostOfReview)
 	}
 
 	if r.RewardDonation > 0 {
-		fmt.Fprintf(&w, "A donation of `%0.6f` credits from the _cost of review_ was made to the matching fund.\n\n", r.RewardDonation)
+		fmt.Fprintf(&w, "A donation of `%0.6f` credits from the __cost of review__ was made to the matching fund.\n\n", r.RewardDonation)
 	}
 
-	fmt.Fprintln(&w, "<hr/>") // tally
+	// fmt.Fprintf(&w, "##\n\n") // tally
 
 	scoresByReviewer := r.ApprovalPollOutcome.ScoresByUser
 	if len(scoresByReviewer) > 0 {

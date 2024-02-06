@@ -130,8 +130,6 @@ func (x proposalPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
-	fmt.Printf("UPDATING PROPOSAL %v\n", prop.ID)
-
 	notices := notice.Notices{}
 
 	// inputs
@@ -147,9 +145,6 @@ func (x proposalPolicy) Update(
 	costOfReview := ads.Tally.Capitalization()
 	propState.LatestApprovalScore = latestApprovalScore
 
-	fmt.Printf("UPDATING PROPOSAL latestApprovalScore %v\n", latestApprovalScore)
-	fmt.Printf("UPDATING PROPOSAL costOfReview %v\n", costOfReview)
-
 	// update eligible concerns
 
 	propState.EligibleConcerns = calcEligibleConcerns(ctx, cloned.PublicClone(), prop)
@@ -162,11 +157,8 @@ func (x proposalPolicy) Update(
 		projectedBounty += conState.ProjectedBounty()
 	}
 
-	fmt.Printf("UPDATING PROPOSAL projectedBounty %v\n", projectedBounty)
-
 	inverseCostMultiplier := (4 * conPolicyState.WithheldEscrowFraction * max(1, projectedBounty)) / (1 + float64(ads.Tally.NumVoters()))
 	propState.InverseCostMultiplier = inverseCostMultiplier
-	fmt.Printf("UPDATING PROPOSAL inverseCostMultiplier %v\n", inverseCostMultiplier)
 
 	// notices
 

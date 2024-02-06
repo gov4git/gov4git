@@ -109,8 +109,6 @@ func (x concernPolicy) Update(
 
 ) (motionproto.Report, notice.Notices) {
 
-	fmt.Printf("UPDATING CONCERN %v\n", con.ID)
-
 	// outputs
 	notices := notice.Notices{}
 
@@ -126,25 +124,16 @@ func (x concernPolicy) Update(
 	idealDeficit := idealFunding - costOfPriority
 	conState.IQDeficit = idealDeficit
 
-	fmt.Printf("UPDATING CONCERN costOfPriority %v\n", costOfPriority)
-	fmt.Printf("UPDATING CONCERN idealFunding %v\n", idealFunding)
-	fmt.Printf("UPDATING CONCERN idealDeficit %v\n", idealDeficit)
-
 	// update priority score
 	matchFunds := pmp_0.GetMatchFundBalance_Local(ctx, cloned.PublicClone())
 	latestPriorityScore := costOfPriority + matchRatio(matchFunds, policyState.MatchDeficit)*idealDeficit
 	conState.PriorityScore = latestPriorityScore
-
-	fmt.Printf("UPDATING CONCERN matchFunds %v\n", matchFunds)
-	fmt.Printf("UPDATING CONCERN latestPriorityScore %v\n", latestPriorityScore)
 
 	// update eligible proposals
 	conState.EligibleProposals = computeEligibleProposals(ctx, cloned.PublicClone(), con)
 
 	// notices
 	if !reflect.DeepEqual(conState, conStatePrev) {
-
-		fmt.Printf("UPDATING CONCERN issuing notices\n")
 
 		notices = append(
 			notices,

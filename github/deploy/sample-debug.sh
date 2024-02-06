@@ -13,3 +13,4 @@ gov4git --config sample-config.json account issue --to pmp+matching --asset plur
 # gov4git --config sample-config.json ballot vote --name pmp/motion/priority_poll/8 --choices rank --strengths 10.0
 # gov4git --config sample-config.json ballot vote --name pmp/motion/approval_poll/10 --choices rank --strengths 20.0
 # gov4git --config sample-config.json ballot show --name pmp/motion/approval_poll/10
+# gov4git --config sample-config.json motion show --name 10

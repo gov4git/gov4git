@@ -24,8 +24,14 @@ func ListMotions_Local(
 ) motionproto.Motions {
 
 	_, motions := motionproto.MotionKV.ListKeyValues(ctx, motionproto.MotionNS, t)
-	motionproto.MotionsByID(motions).Sort()
-	return motions
+	knownPolicyMotions := motionproto.Motions{}
+	for _, m := range motions {
+		if motionproto.TryGetPolicy(ctx, m.Policy) != nil {
+			knownPolicyMotions = append(knownPolicyMotions, m)
+		}
+	}
+	motionproto.MotionsByID(knownPolicyMotions).Sort()
+	return knownPolicyMotions
 }
 
 func ListMotionViews(
@@ -45,9 +51,12 @@ func ListMotionViews_Local(
 
 	t := cloned.Tree()
 	ids := motionproto.MotionKV.ListKeys(ctx, motionproto.MotionNS, t)
-	mvs := make(motionproto.MotionViews, len(ids))
-	for i, id := range ids {
-		mvs[i] = ShowMotion_Local(ctx, cloned, id)
+	mvs := make(motionproto.MotionViews, 0, len(ids))
+	for _, id := range ids {
+		mv := ShowMotion_Local(ctx, cloned, id)
+		if !mv.IsMissingPolicy() {
+			mvs = append(mvs, mv)
+		}
 	}
 	mvs.Sort()
 	return mvs

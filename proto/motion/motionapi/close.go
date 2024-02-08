@@ -41,7 +41,7 @@ func CloseMotion_StageOnly(
 	must.Assert(ctx, !motion.Closed, motionproto.ErrMotionAlreadyClosed)
 
 	// apply policy
-	pcy := motionproto.Get(ctx, motion.Policy)
+	pcy := motionproto.GetPolicy(ctx, motion.Policy)
 	report, notices := pcy.Close(
 		ctx,
 		cloned,

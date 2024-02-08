@@ -38,7 +38,7 @@ func Change_StageOnly(
 
 ) git.Change[form.Map, ballotproto.Ad] {
 
-	ad, _ := ballotio.LoadPolicy(ctx, cloned.Public.Tree(), id)
+	ad := ballotio.LoadAd_Local(ctx, cloned.Public.Tree(), id)
 	ad.Title = title
 	ad.Description = description
 	git.ToFileStage(ctx, cloned.Public.Tree(), id.AdNS(), ad)

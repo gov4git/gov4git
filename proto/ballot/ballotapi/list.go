@@ -3,6 +3,7 @@ package ballotapi
 import (
 	"context"
 
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
@@ -29,7 +30,9 @@ func List_Local(
 	ads := ballotproto.Advertisements{}
 	for _, id := range ids {
 		ad := git.FromFile[ballotproto.Ad](ctx, cloned.Tree(), id.AdNS())
-		ads = append(ads, ad)
+		if ballotio.TryLookupPolicy(ctx, ad.Policy) != nil {
+			ads = append(ads, ad)
+		}
 	}
 
 	ads.Sort()

@@ -35,7 +35,7 @@ func Cancel_StageOnly(
 	t := cloned.Public.Tree()
 
 	// verify ad and policy are present
-	ad, policy := ballotio.LoadPolicy(ctx, t, id)
+	ad, policy := ballotio.LoadAdPolicy_Local(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot already closed")
 
 	tally := loadTally_Local(ctx, t, id)

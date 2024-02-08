@@ -27,7 +27,7 @@ func GetMargin_Local(
 ) *ballotproto.Margin {
 
 	t := cloned.Tree()
-	ad, policy := ballotio.LoadPolicy(ctx, t, id)
+	ad, policy := ballotio.LoadAdPolicy_Local(ctx, t, id)
 	tally := loadTally_Local(ctx, t, id)
 	return policy.Margin(ctx, cloned, &ad, &tally)
 }

@@ -52,8 +52,8 @@ func UnlinkMotions_StageOnly(
 	motionproto.MotionKV.Set(ctx, motionproto.MotionNS, t, toID, to)
 
 	// apply policies
-	fromPolicy := motionproto.Get(ctx, from.Policy)
-	toPolicy := motionproto.Get(ctx, to.Policy)
+	fromPolicy := motionproto.GetPolicy(ctx, from.Policy)
+	toPolicy := motionproto.GetPolicy(ctx, to.Policy)
 	// RemoveRefs are called in the opposite order of AddRefs
 	reportTo, noticesTo := toPolicy.RemoveRefTo(
 		ctx,

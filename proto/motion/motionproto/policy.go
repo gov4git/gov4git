@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -159,8 +160,23 @@ func Install(ctx context.Context, name motion.PolicyName, policy Policy) {
 	gov.InstallPostClone(ctx, "motion-policy-"+string(name), policy)
 }
 
-func Get(ctx context.Context, key motion.PolicyName) Policy {
-	return policyRegistry.Get(ctx, key)
+func TryGetPolicy(ctx context.Context, key motion.PolicyName) Policy {
+	p, _ := must.Try1[Policy](
+		func() Policy {
+			return policyRegistry.Get(ctx, key)
+		},
+	)
+	return p
+}
+
+func GetPolicy(ctx context.Context, key motion.PolicyName) Policy {
+	p, err := must.Try1[Policy](
+		func() Policy {
+			return policyRegistry.Get(ctx, key)
+		},
+	)
+	must.Assertf(ctx, err == nil, "motion policy not supported") // ERR
+	return p
 }
 
 func InstalledMotionPolicies() []string {
@@ -180,7 +196,7 @@ func GetMotionPolicy(ctx context.Context, m Motion) Policy {
 }
 
 func GetMotionPolicyByName(ctx context.Context, pn motion.PolicyName) Policy {
-	return Get(ctx, pn)
+	return GetPolicy(ctx, pn)
 }
 
 // MotionPolicyNS returns the private policy namespace for a given motion instance.

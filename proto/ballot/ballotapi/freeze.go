@@ -36,7 +36,7 @@ func Freeze_StageOnly(
 
 	t := cloned.Public.Tree()
 
-	ad, _ := ballotio.LoadPolicy(ctx, t, id)
+	ad := ballotio.LoadAd_Local(ctx, t, id)
 
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 	must.Assertf(ctx, !ad.Frozen, "ballot already frozen")
@@ -62,6 +62,6 @@ func IsFrozen_Local(
 
 ) bool {
 
-	ad, _ := ballotio.LoadPolicy(ctx, cloned.Tree(), id)
+	ad := ballotio.LoadAd_Local(ctx, cloned.Tree(), id)
 	return ad.Frozen
 }

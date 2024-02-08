@@ -73,7 +73,7 @@ func OpenMotion_StageOnly(
 	motionproto.MotionKV.Set(ctx, motionproto.MotionNS, t, id, motion)
 
 	// apply policy
-	pcy := motionproto.Get(ctx, policyName)
+	pcy := motionproto.GetPolicy(ctx, policyName)
 	report, notices := pcy.Open(
 		ctx,
 		cloned,

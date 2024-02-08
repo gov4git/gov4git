@@ -5,6 +5,7 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
+	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/gov4git/v2/proto/member"
@@ -59,6 +60,9 @@ func Panorama_Local(
 		// 	voterProfile,
 		// 	voterOwner.PublicClone(),
 		// )
+		if ballotio.TryLookupPolicy(ctx, ad.Policy) == nil { // only consider ballots with known policies
+			continue
+		}
 		if ad.Closed {
 			continue
 		}
@@ -83,8 +87,7 @@ func Panorama_Local(
 	}
 
 	// rescore and update motions
-	motionapi.ScoreMotions_StageOnly(ctx, gov.LiftCloned(ctx, cloned))
-	motionapi.UpdateMotions_StageOnly(ctx, gov.LiftCloned(ctx, cloned))
+	motionapi.Pipeline(ctx, gov.LiftCloned(ctx, cloned))
 
 	projMVS := motionapi.TrackMotionBatch_Local(ctx, cloned, voterAddr, voterOwner)
 	// TODO: fully simulate tallying by processing voter's mail (see above)

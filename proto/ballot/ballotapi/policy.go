@@ -57,7 +57,7 @@ func SavePolicyState_StageOnly[PS form.Form](
 ) {
 
 	t := cloned.Tree()
-	ad, _ := ballotio.LoadPolicy(ctx, t, id)
+	ad := ballotio.LoadAd_Local(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot already closed")
 	git.ToFileStage[PS](ctx, t, id.PolicyNS(), policyState)
 }

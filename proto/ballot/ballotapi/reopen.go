@@ -36,12 +36,12 @@ func Reopen_StageOnly(
 	t := cloned.Public.Tree()
 
 	// verify ad and policy are present
-	ad, strat := ballotio.LoadPolicy(ctx, t, id)
+	ad, policy := ballotio.LoadAdPolicy_Local(ctx, t, id)
 	must.Assertf(ctx, ad.Closed, "ballot is not closed")
 	must.Assertf(ctx, !ad.Cancelled, "ballot was cancelled")
 
 	tally := loadTally_Local(ctx, t, id)
-	chg := strat.Reopen(ctx, cloned, &ad, &tally)
+	chg := policy.Reopen(ctx, cloned, &ad, &tally)
 
 	// remove prior outcome
 	_, err := git.TreeRemove(ctx, t, id.OutcomeNS())

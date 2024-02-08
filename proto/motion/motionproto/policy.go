@@ -166,7 +166,7 @@ func Get(ctx context.Context, key motion.PolicyName) Policy {
 			return policyRegistry.Get(ctx, key)
 		},
 	)
-	must.Assertf(ctx, err == nil, "unsupported motion policy") // ERR
+	must.Assertf(ctx, err == nil, "motion policy not supported") // ERR
 	return p
 }
 

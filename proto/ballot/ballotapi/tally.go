@@ -45,7 +45,7 @@ func Tally_StageOnly(
 ) (git.Change[form.Map, ballotproto.Tally], bool) {
 
 	t := cloned.Public.Tree()
-	ad, _ := ballotio.LoadPolicy(ctx, t, id)
+	ad := ballotio.LoadAd_Local(ctx, t, id)
 
 	pv := loadParticipatingVoters(ctx, cloned.PublicClone(), ad)
 	votersCloned := clonePar(ctx, pv.VoterAccounts, maxPar)
@@ -105,7 +105,7 @@ func TallyFetchedVotes_StageOnly(
 ) (git.Change[form.Map, ballotproto.Tally], bool) {
 
 	t := cloned.Tree()
-	ad, strat := ballotio.LoadPolicy(ctx, t, id)
+	ad, policy := ballotio.LoadAdPolicy_Local(ctx, t, id)
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 
 	currentTally := loadTally_Local(ctx, t, id)
@@ -137,7 +137,7 @@ func TallyFetchedVotes_StageOnly(
 		), true
 	}
 
-	updatedTally := strat.Tally(ctx, cloned, &ad, &currentTally, fetchedVotesToElections(fetchedVotes)).Result
+	updatedTally := policy.Tally(ctx, cloned, &ad, &currentTally, fetchedVotesToElections(fetchedVotes)).Result
 
 	// write updated tally
 	git.ToFileStage(ctx, t, id.TallyNS(), updatedTally)

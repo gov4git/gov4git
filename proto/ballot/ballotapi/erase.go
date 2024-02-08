@@ -36,8 +36,8 @@ func Erase_StageOnly(
 
 	t := cloned.Public.Tree()
 
-	// verify ad and policy are present
-	ballotio.LoadPolicy(ctx, t, ballotID)
+	// verify ad is present
+	ballotio.LoadAd_Local(ctx, t, ballotID)
 
 	// erase
 	ballotproto.BallotKV.Remove(ctx, ballotproto.BallotNS, cloned.PublicClone().Tree(), ballotID)

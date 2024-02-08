@@ -42,12 +42,12 @@ func Vote_StageOnly(
 
 ) git.Change[form.Map, mail.RequestEnvelope[ballotproto.VoteEnvelope]] {
 
-	ad, strat := ballotio.LoadPolicy(ctx, cloned.Tree(), ballotID)
+	ad, policy := ballotio.LoadAdPolicy_Local(ctx, cloned.Tree(), ballotID)
 
 	must.Assertf(ctx, !ad.Closed, "ballot is closed")
 	must.Assertf(ctx, !ad.Frozen, "ballot is frozen")
 
-	verifyElections(ctx, strat, voterAddr, cloned.Address(), voterOwner, cloned, ad, elections)
+	verifyElections(ctx, policy, voterAddr, cloned.Address(), voterOwner, cloned, ad, elections)
 	envelope := ballotproto.VoteEnvelope{
 		AdCommit:  git.Head(ctx, cloned.Repo()),
 		Ad:        ad,

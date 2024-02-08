@@ -5,6 +5,7 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
+	"github.com/gov4git/lib4git/must"
 )
 
 func ShowMotion(
@@ -28,12 +29,22 @@ func ShowMotion_Local(
 	t := cloned.Tree()
 	m := motionproto.MotionKV.Get(ctx, motionproto.MotionNS, t, id)
 
-	p := motionproto.Get(ctx, m.Policy)
-	pv, pb := p.Show(ctx, cloned, m, args...)
+	mv, err := must.Try1[motionproto.MotionView](
+		func() motionproto.MotionView {
+			p := motionproto.Get(ctx, m.Policy)
+			pv, pb := p.Show(ctx, cloned, m, args...)
 
-	return motionproto.MotionView{
-		Motion:  m,
-		Ballots: pb,
-		Policy:  pv,
+			return motionproto.MotionView{
+				Motion:  m,
+				Ballots: pb,
+				Policy:  pv,
+			}
+		},
+	)
+	if err != nil {
+		return motionproto.MotionView{
+			Motion: m,
+		}
 	}
+	return mv
 }

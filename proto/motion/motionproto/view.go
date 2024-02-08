@@ -14,6 +14,10 @@ type MotionView struct {
 	Voter   *ballotproto.VoterStatus `json:"voter_status,omitempty"`
 }
 
+func (mv MotionView) IsMissingPolicy() bool {
+	return mv.Policy == nil
+}
+
 type MotionViews []MotionView
 
 func (x MotionViews) Len() int {

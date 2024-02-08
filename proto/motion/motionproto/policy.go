@@ -9,6 +9,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/notice"
 	"github.com/gov4git/lib4git/form"
+	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/ns"
 )
 
@@ -160,7 +161,13 @@ func Install(ctx context.Context, name motion.PolicyName, policy Policy) {
 }
 
 func Get(ctx context.Context, key motion.PolicyName) Policy {
-	return policyRegistry.Get(ctx, key)
+	p, err := must.Try1[Policy](
+		func() Policy {
+			return policyRegistry.Get(ctx, key)
+		},
+	)
+	must.Assertf(ctx, err == nil, "unsupported motion policy") // ERR
+	return p
 }
 
 func InstalledMotionPolicies() []string {

@@ -40,7 +40,7 @@ func FreezeMotion_StageOnly(
 	must.Assert(ctx, !motion.Frozen, motionproto.ErrMotionAlreadyFrozen)
 
 	// apply policy
-	pcy := motionproto.Get(ctx, motion.Policy)
+	pcy := motionproto.GetPolicy(ctx, motion.Policy)
 	report, notices := pcy.Freeze(
 		ctx,
 		cloned,
@@ -92,7 +92,7 @@ func UnfreezeMotion_StageOnly(
 	must.Assert(ctx, motion.Frozen, motionproto.ErrMotionNotFrozen)
 
 	// apply policy
-	pcy := motionproto.Get(ctx, motion.Policy)
+	pcy := motionproto.GetPolicy(ctx, motion.Policy)
 	report, notices := pcy.Unfreeze(
 		ctx,
 		cloned,

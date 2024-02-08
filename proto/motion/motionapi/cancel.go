@@ -40,7 +40,7 @@ func CancelMotion_StageOnly(
 	must.Assertf(ctx, !motion.Cancelled, "motion %v already cancelled", motion.ID)
 
 	// apply policy
-	pcy := motionproto.Get(ctx, motion.Policy)
+	pcy := motionproto.GetPolicy(ctx, motion.Policy)
 	report, notices := pcy.Cancel(
 		ctx,
 		cloned,

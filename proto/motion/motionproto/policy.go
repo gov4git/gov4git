@@ -160,7 +160,16 @@ func Install(ctx context.Context, name motion.PolicyName, policy Policy) {
 	gov.InstallPostClone(ctx, "motion-policy-"+string(name), policy)
 }
 
-func Get(ctx context.Context, key motion.PolicyName) Policy {
+func TryGetPolicy(ctx context.Context, key motion.PolicyName) Policy {
+	p, _ := must.Try1[Policy](
+		func() Policy {
+			return policyRegistry.Get(ctx, key)
+		},
+	)
+	return p
+}
+
+func GetPolicy(ctx context.Context, key motion.PolicyName) Policy {
 	p, err := must.Try1[Policy](
 		func() Policy {
 			return policyRegistry.Get(ctx, key)
@@ -187,7 +196,7 @@ func GetMotionPolicy(ctx context.Context, m Motion) Policy {
 }
 
 func GetMotionPolicyByName(ctx context.Context, pn motion.PolicyName) Policy {
-	return Get(ctx, pn)
+	return GetPolicy(ctx, pn)
 }
 
 // MotionPolicyNS returns the private policy namespace for a given motion instance.

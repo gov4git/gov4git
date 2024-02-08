@@ -24,8 +24,14 @@ func ListMotions_Local(
 ) motionproto.Motions {
 
 	_, motions := motionproto.MotionKV.ListKeyValues(ctx, motionproto.MotionNS, t)
-	motionproto.MotionsByID(motions).Sort()
-	return motions
+	knownPolicyMotions := motionproto.Motions{}
+	for _, m := range motions {
+		if motionproto.TryGetPolicy(ctx, m.Policy) != nil {
+			knownPolicyMotions = append(knownPolicyMotions, m)
+		}
+	}
+	motionproto.MotionsByID(knownPolicyMotions).Sort()
+	return knownPolicyMotions
 }
 
 func ListMotionViews(

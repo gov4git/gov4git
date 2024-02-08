@@ -31,7 +31,7 @@ func ShowMotion_Local(
 
 	mv, err := must.Try1[motionproto.MotionView](
 		func() motionproto.MotionView {
-			p := motionproto.Get(ctx, m.Policy)
+			p := motionproto.GetPolicy(ctx, m.Policy)
 			pv, pb := p.Show(ctx, cloned, m, args...)
 
 			return motionproto.MotionView{

@@ -16,7 +16,7 @@ type QVScoreKernel struct {
 
 func MakeQVScoreKernel(ctx context.Context, inverseCostMultiplier float64) QVScoreKernel {
 	return QVScoreKernel{
-		InverseCostMultiplier: inverseCostMultiplier,
+		InverseCostMultiplier: max(1, inverseCostMultiplier),
 	}
 }
 
@@ -56,7 +56,7 @@ func qvScoreFromStrength(strength float64, inverseCostMultiplier float64) float6
 	if strength < 0 {
 		sign = -1.0
 	}
-	return sign * math.Sqrt(math.Abs(strength*max(1, inverseCostMultiplier)))
+	return sign * math.Sqrt(math.Abs(strength*inverseCostMultiplier))
 }
 
 // strength = SIGN(score) * score^2 / max(1, inverseCostMultiplier)
@@ -65,7 +65,7 @@ func qvStrengthFromScore(score float64, inverseCostMultiplier float64) float64 {
 	if score < 0 {
 		sign = -1.0
 	}
-	return sign * score * score / max(1, inverseCostMultiplier)
+	return sign * score * score / inverseCostMultiplier
 }
 
 func (k QVScoreKernel) CalcJS(
@@ -87,19 +87,19 @@ func (k QVScoreKernel) CalcJS(
 		},
 		Cost: &ballotproto.MarginCalculator{
 			Label:       "Cost",
-			Description: "Additional cost to reach a desired impact",
+			Description: "Additional cost to reach a desired total impact",
 			FnJS:        fmt.Sprintf(qvCostJSFmt, k.InverseCostMultiplier, form.SprintJSON(tally)),
 		},
 		Impact: &ballotproto.MarginCalculator{
 			Label:       "Impact",
-			Description: "Additional impact to reach a desired cost",
+			Description: "Additional impact to reach a desired total cost",
 			FnJS:        fmt.Sprintf(qvImpactJSFmt, k.InverseCostMultiplier, form.SprintJSON(tally)),
 		},
 	}
 }
 
 const (
-	// Additional cost to reach a desired impact
+	// Additional cost to reach a desired total impact
 	qvCostJSFmt = `
 	function(voteUser, voteChoice, voteImpact) {
 		let inverseCostMultiplier = %f;
@@ -115,13 +115,13 @@ const (
 			}
 		}
 
-		var voteCost = voteImpact * voteImpact / Math.max(1, inverseCostMultiplier);
+		var voteCost = voteImpact * voteImpact / inverseCostMultiplier;
 		var costDiff = voteCost - currentVoteCost;
 		return costDiff;
 	}
 	`
 
-	// Additional impact to reach a desired cost
+	// Additional impact to reach a desired total cost
 	qvImpactJSFmt = `
 	function(voteUser, voteChoice, voteCost) {
 		let inverseCostMultiplier = %f;
@@ -137,8 +137,8 @@ const (
 			}
 		}
 
-		XXX
-		return costDiff;
+		var voteImpact = Math.sqrt(voteCost * inverseCostMultiplier)
+		return [voteImpact-currentVoteImpact, -voteImpact-currentVoteImpact];
 	}
 	`
 )

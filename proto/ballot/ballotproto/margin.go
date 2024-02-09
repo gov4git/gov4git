@@ -11,12 +11,12 @@ package ballotproto
 		},
 		"cost" : {
 			"label": "Cost",
-			"description": "Cost, given impact",
+			"description": "Additional cost to reach a desired total impact",
 			"fn_js": "function(voteUser, voteChoice, voteImpact) { ... }",
 		},
 		"impact" : {
 			"label": "Impact",
-			"description": "Impact, given cost",
+			"description": "Additional impact to reach a desired total cost",
 			"fn_js": "function(voteUser, voteChoice, voteCost) { ... }",
 		},
 	}

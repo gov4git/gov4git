@@ -85,10 +85,10 @@ func loadPropApprovalPollTally(
 	cloned gov.Cloned,
 	prop motionproto.Motion,
 
-) ballotproto.AdTally {
+) ballotproto.AdTallyMargin {
 
 	pollName := pmp_1.ProposalApprovalPollName(prop.ID)
-	return ballotapi.Show_Local(ctx, cloned.Tree(), pollName)
+	return ballotapi.Show_Local(ctx, cloned, pollName)
 }
 
 func calcReviewersRewards(

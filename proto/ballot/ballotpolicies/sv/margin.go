@@ -11,12 +11,9 @@ func (qv SV) Margin(
 	ctx context.Context,
 	cloned gov.Cloned,
 	ad *ballotproto.Ad,
-	current *ballotproto.Tally,
+	tally *ballotproto.Tally,
 
 ) *ballotproto.Margin {
 
-	return &ballotproto.Margin{
-		CalcJS: qv.Kernel.CalcJS(ctx, cloned, ad),
-	}
-
+	return qv.Kernel.CalcJS(ctx, cloned, ad, tally)
 }

@@ -2,9 +2,7 @@ package proposal
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotpolicies/sv"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
@@ -44,15 +42,20 @@ func (sk ScoreKernel) CalcJS(
 	ctx context.Context,
 	cloned gov.Cloned,
 	ad *ballotproto.Ad,
+	tally *ballotproto.Tally,
 
-) ballotproto.MarginCalcJS {
+) *ballotproto.Margin {
 
-	state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
-	js := fmt.Sprintf(scoreKernelMarginJS, state.Bounty)
-	return ballotproto.MarginCalcJS(js)
+	qvSK := sv.MakeQVScoreKernel(ctx, 1.0)
+	return qvSK.CalcJS(ctx, cloned, ad, tally)
+
+	// XXX: projected reward
+	// state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
+	// js := fmt.Sprintf(scoreKernelMarginJS, state.Bounty)
+	// return ballotproto.MarginCalcJS(js)
 }
 
-const scoreKernelMarginJS = `
+const XXXscoreKernelMarginJS = `
 
 function calcMargin(currentTally, voteUser, voteChoice, targetVote) {
 

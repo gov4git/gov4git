@@ -137,7 +137,7 @@ func (x proposalPolicy) Update(
 	conPolicyState := pmp_1.LoadConcernClassState_Local(ctx, cloned)
 	propStatePrev := motionapi.LoadPolicyState_Local[*pmp_1.ProposalState](ctx, cloned.PublicClone(), prop.ID)
 	propState := propStatePrev.Copy()
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), propState.ApprovalPoll)
+	ads := ballotapi.Show_Local(ctx, cloned.PublicClone(), propState.ApprovalPoll)
 
 	// update approval score
 
@@ -264,11 +264,11 @@ func (x proposalPolicy) Cancel(
 }
 
 type PolicyView struct {
-	State          *pmp_1.ProposalState `json:"state"`
-	ApprovalPoll   ballotproto.AdTally  `json:"approval_poll"`
-	ApprovalMargin ballotproto.Margin   `json:"priority_margin"`
-	BountyAccount  account.AccountID    `json:"bounty_account"`
-	RewardAccount  account.AccountID    `json:"reward_account"`
+	State          *pmp_1.ProposalState      `json:"state"`
+	ApprovalPoll   ballotproto.AdTallyMargin `json:"approval_poll"`
+	ApprovalMargin ballotproto.Margin        `json:"priority_margin"`
+	BountyAccount  account.AccountID         `json:"bounty_account"`
+	RewardAccount  account.AccountID         `json:"reward_account"`
 }
 
 func (x proposalPolicy) Show(
@@ -298,6 +298,7 @@ func (x proposalPolicy) Show(
 				BallotChoices: approvalPoll.Ad.Choices,
 				BallotAd:      approvalPoll.Ad,
 				BallotTally:   approvalPoll.Tally,
+				BallotMargin:  approvalPoll.Margin,
 			},
 		}
 }

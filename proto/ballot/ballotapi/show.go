@@ -6,7 +6,6 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
 
@@ -15,20 +14,35 @@ func Show(
 	addr gov.Address,
 	id ballotproto.BallotID,
 
-) ballotproto.AdTally {
+) ballotproto.AdTallyMargin {
 
-	return Show_Local(ctx, gov.Clone(ctx, addr).Tree(), id)
+	return Show_Local(ctx, gov.Clone(ctx, addr), id)
 }
 
 func Show_Local(
 	ctx context.Context,
-	t *git.Tree,
+	cloned gov.Cloned,
 	id ballotproto.BallotID,
 
-) ballotproto.AdTally {
+) ballotproto.AdTallyMargin {
 
-	ad := ballotio.LoadAd_Local(ctx, t, id)
-	var tally ballotproto.Tally
-	must.Try(func() { tally = loadTally_Local(ctx, t, id) })
-	return ballotproto.AdTally{Ad: ad, Tally: tally}
+	ad := ballotio.LoadAd_Local(ctx, cloned.Tree(), id)
+
+	tally, _ := must.Try1[ballotproto.Tally](
+		func() ballotproto.Tally {
+			return loadTally_Local(ctx, cloned.Tree(), id)
+		},
+	)
+
+	margin, _ := must.Try1[*ballotproto.Margin](
+		func() *ballotproto.Margin {
+			return GetMargin_Local(ctx, cloned, id)
+		},
+	)
+
+	return ballotproto.AdTallyMargin{
+		Ad:     ad,
+		Tally:  tally,
+		Margin: margin,
+	}
 }

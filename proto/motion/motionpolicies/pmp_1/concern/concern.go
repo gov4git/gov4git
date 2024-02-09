@@ -116,7 +116,7 @@ func (x concernPolicy) Update(
 	policyState := pmp_1.LoadConcernClassState_Local(ctx, cloned)
 	conStatePrev := motionapi.LoadPolicyState_Local[*pmp_1.ConcernState](ctx, cloned.PublicClone(), con.ID)
 	conState := conStatePrev.Copy()
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), conState.PriorityPoll)
+	ads := ballotapi.Show_Local(ctx, cloned.PublicClone(), conState.PriorityPoll)
 
 	// update idealized quadratic funding deficit
 	costOfPriority := ads.Tally.Capitalization()
@@ -337,9 +337,9 @@ func (x concernPolicy) Cancel(
 }
 
 type PolicyView struct {
-	State          *pmp_1.ConcernState `json:"state"`
-	PriorityPoll   ballotproto.AdTally `json:"priority_poll"`
-	PriorityMargin ballotproto.Margin  `json:"priority_margin"`
+	State          *pmp_1.ConcernState       `json:"state"`
+	PriorityPoll   ballotproto.AdTallyMargin `json:"priority_poll"`
+	PriorityMargin ballotproto.Margin        `json:"priority_margin"`
 }
 
 func (x concernPolicy) Show(
@@ -355,19 +355,20 @@ func (x concernPolicy) Show(
 
 	// retrieve poll state
 	priorityPollName := pmp_1.ConcernPollBallotName(con.ID)
-	pollState := ballotapi.Show_Local(ctx, cloned.Tree(), priorityPollName)
+	priorityPoll := ballotapi.Show_Local(ctx, cloned, priorityPollName)
 
 	return PolicyView{
 			State:          policyState,
-			PriorityPoll:   pollState,
+			PriorityPoll:   priorityPoll,
 			PriorityMargin: *ballotapi.GetMargin_Local(ctx, cloned, priorityPollName),
 		}, motionproto.MotionBallots{
 			motionproto.MotionBallot{
 				Label:         "priority_poll",
 				BallotID:      policyState.PriorityPoll,
-				BallotChoices: pollState.Ad.Choices,
-				BallotAd:      pollState.Ad,
-				BallotTally:   pollState.Tally,
+				BallotChoices: priorityPoll.Ad.Choices,
+				BallotAd:      priorityPoll.Ad,
+				BallotTally:   priorityPoll.Tally,
+				BallotMargin:  priorityPoll.Margin,
 			},
 		}
 }

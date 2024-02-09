@@ -1,35 +1,35 @@
 package ballotproto
 
-// MarginCalcJS must be a JS function of this form:
-//
-//	function calcMargin(currentTally, voteUser, voteChoice, voteTarget) {
-//		...
-//		return {
-//			"help": {
-//				"label": "Help",
-//				"description": "This ballot uses a standard Quadratic Voting.",
-//				"value": null,
-//			},
-//			"currentVote": {
-//				"label": "Current vote",
-//				"description": "Your current vote",
-//				"value": currentVote,
-//			},
-//			"targetVote" : {
-//				"label": "Target vote",
-//				"description": "Your target vote",
-//				"value": targetVote,
-//			},
-//			"cost" : {
-//				"label": "Cost",
-//				"description": "Cost of changing your vote",
-//				"value": cost,
-//			},
-//			...
-//		}
-//	}
-type MarginCalcJS string
+// Margin captures functions for computing vote marginals:
+/*
 
+	{
+		"help": {
+			"label": "Help",
+			"description": "Description of ballot",
+			"fn_js": "function() { return "This is a QV ballot." }",
+		},
+		"cost" : {
+			"label": "Cost",
+			"description": "Cost, given impact",
+			"fn_js": "function(voteUser, voteChoice, voteImpact) { ... }",
+		},
+		"impact" : {
+			"label": "Impact",
+			"description": "Impact, given cost",
+			"fn_js": "function(voteUser, voteChoice, voteCost) { ... }",
+		},
+	}
+
+*/
 type Margin struct {
-	CalcJS MarginCalcJS `json:"calc_js"`
+	Help   *MarginCalculator `json:"help,omitempty"`
+	Cost   *MarginCalculator `json:"cost,omitempty"`
+	Impact *MarginCalculator `json:"impact,omitempty"`
+}
+
+type MarginCalculator struct {
+	Label       string `json:"label"`
+	Description string `json:"description"`
+	FnJS        string `json:"fn_js"`
 }

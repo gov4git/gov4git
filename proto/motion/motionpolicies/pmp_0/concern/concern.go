@@ -87,7 +87,7 @@ func (x concernPolicy) Score(
 	state := motionapi.LoadPolicyState_Local[*pmp_0.ConcernState](ctx, cloned.PublicClone(), con.ID)
 
 	// compute motion score from the priority poll ballot
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.PriorityPoll)
+	ads := ballotapi.Show_Local(ctx, cloned.PublicClone(), state.PriorityPoll)
 	attention := ads.Tally.Attention()
 
 	return motionproto.Score{
@@ -109,7 +109,7 @@ func (x concernPolicy) Update(
 
 	// update priority score
 
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), conState.PriorityPoll)
+	ads := ballotapi.Show_Local(ctx, cloned.PublicClone(), conState.PriorityPoll)
 	latestPriorityScore := ads.Tally.Scores[pmp_0.ConcernBallotChoice]
 	costOfPriority := ads.Tally.Capitalization()
 	conState.CostOfPriority = costOfPriority
@@ -297,9 +297,9 @@ func (x concernPolicy) Cancel(
 }
 
 type PolicyView struct {
-	State          *pmp_0.ConcernState `json:"state"`
-	PriorityPoll   ballotproto.AdTally `json:"priority_poll"`
-	PriorityMargin ballotproto.Margin  `json:"priority_margin"`
+	State          *pmp_0.ConcernState       `json:"state"`
+	PriorityPoll   ballotproto.AdTallyMargin `json:"priority_poll"`
+	PriorityMargin ballotproto.Margin        `json:"priority_margin"`
 }
 
 func (x concernPolicy) Show(
@@ -315,19 +315,20 @@ func (x concernPolicy) Show(
 
 	// retrieve poll state
 	priorityPollName := pmp_0.ConcernPollBallotName(con.ID)
-	pollState := ballotapi.Show_Local(ctx, cloned.Tree(), priorityPollName)
+	priorityPoll := ballotapi.Show_Local(ctx, cloned, priorityPollName)
 
 	return PolicyView{
 			State:          policyState,
-			PriorityPoll:   pollState,
+			PriorityPoll:   priorityPoll,
 			PriorityMargin: *ballotapi.GetMargin_Local(ctx, cloned, priorityPollName),
 		}, motionproto.MotionBallots{
 			motionproto.MotionBallot{
 				Label:         "priority_poll",
 				BallotID:      policyState.PriorityPoll,
-				BallotChoices: pollState.Ad.Choices,
-				BallotAd:      pollState.Ad,
-				BallotTally:   pollState.Tally,
+				BallotChoices: priorityPoll.Ad.Choices,
+				BallotAd:      priorityPoll.Ad,
+				BallotTally:   priorityPoll.Tally,
+				BallotMargin:  priorityPoll.Margin,
 			},
 		}
 }

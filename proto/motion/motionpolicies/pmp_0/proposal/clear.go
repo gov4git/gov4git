@@ -11,8 +11,8 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
 func loadResolvedConcerns(
@@ -58,7 +58,7 @@ func closeResolvedConcerns(
 			con.ID,
 			motionproto.Accept,
 			pmp_0.ProposalBountyAccountID(prop.ID), // account to send bounty to
-			prop,                                 // proposal that resolves the issue
+			prop,                                   // proposal that resolves the issue
 		)
 	}
 
@@ -74,10 +74,10 @@ func loadPropApprovalPollTally(
 	cloned gov.Cloned,
 	prop motionproto.Motion,
 
-) ballotproto.AdTally {
+) ballotproto.AdTallyMargin {
 
 	pollName := pmp_0.ProposalApprovalPollName(prop.ID)
-	return ballotapi.Show_Local(ctx, cloned.Tree(), pollName)
+	return ballotapi.Show_Local(ctx, cloned, pollName)
 }
 
 func disberseRewards(

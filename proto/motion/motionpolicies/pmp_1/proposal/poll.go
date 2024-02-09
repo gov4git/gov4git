@@ -2,7 +2,6 @@ package proposal
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
@@ -48,16 +47,21 @@ func (sk ScoreKernel) CalcJS(
 	ctx context.Context,
 	cloned gov.Cloned,
 	ad *ballotproto.Ad,
+	tally *ballotproto.Tally,
 
-) ballotproto.MarginCalcJS {
+) *ballotproto.Margin {
+
+	state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
+	qvSK := sv.MakeQVScoreKernel(ctx, state.InverseCostMultiplier)
+	return qvSK.CalcJS(ctx, cloned, ad, tally)
 
 	//XXX: needs re-implementing, not reflective of Score at the moment
-	state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
-	js := fmt.Sprintf(scoreKernelMarginJS, state.Bounty)
-	return ballotproto.MarginCalcJS(js)
+	// state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
+	// js := fmt.Sprintf(scoreKernelMarginJS, state.Bounty)
+	// return ballotproto.MarginCalcJS(js)
 }
 
-const scoreKernelMarginJS = `
+const XXXscoreKernelMarginJS = `
 
 // XXX: PLACEHOLDER. DO NOT USE.
 function calcMargin(currentTally, voteUser, voteChoice, targetVote) {

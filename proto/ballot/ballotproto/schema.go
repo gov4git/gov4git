@@ -20,7 +20,8 @@ type BallotAddress struct {
 	Name BallotID
 }
 
-type AdTally struct {
-	Ad    Ad    `json:"ballot_advertisement"`
-	Tally Tally `json:"ballot_tally"`
+type AdTallyMargin struct {
+	Ad     Ad      `json:"ballot_advertisement"`
+	Tally  Tally   `json:"ballot_tally"`
+	Margin *Margin `json:"ballot_margin,omitempty"`
 }

@@ -9,7 +9,7 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 	"github.com/gov4git/gov4git/v2/gov4git/api"
 	"github.com/gov4git/gov4git/v2/proto/boot"
 	"github.com/gov4git/gov4git/v2/proto/gov"

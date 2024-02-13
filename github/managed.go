@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
@@ -127,7 +127,7 @@ func syncRefsThenMotions(
 	syncRefs(ctx, cloned, syncChanges, issues, index)
 
 	// update motions
-	motionapi.Pipeline(ctx, cloned)
+	motionapi.Pipeline_StageOnly(ctx, cloned)
 
 	// sync motions with issues
 	syncMotions(

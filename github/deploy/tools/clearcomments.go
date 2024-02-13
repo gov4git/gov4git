@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 	govgh "github.com/gov4git/gov4git/v2/github"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/must"

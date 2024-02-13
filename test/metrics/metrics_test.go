@@ -8,7 +8,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/metrics"
 	"github.com/gov4git/gov4git/v2/runtime"
 	"github.com/gov4git/gov4git/v2/test"
-	"github.com/gov4git/gov4git/v2/test/motion/pmp"
+	pmp "github.com/gov4git/gov4git/v2/test/motion/pmp_0"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/testutil"
 )

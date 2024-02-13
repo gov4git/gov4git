@@ -117,7 +117,7 @@ func (x proposalPolicy) Score(
 	state := motionapi.LoadPolicyState_Local[*pmp_0.ProposalState](ctx, cloned.PublicClone(), prop.ID)
 
 	// compute score
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), state.ApprovalPoll)
+	ads := ballotapi.Show_Local(ctx, cloned.PublicClone(), state.ApprovalPoll)
 	attention := ads.Tally.Attention()
 
 	return motionproto.Score{
@@ -139,7 +139,7 @@ func (x proposalPolicy) Update(
 
 	// update approval score
 
-	ads := ballotapi.Show_Local(ctx, cloned.Public.Tree(), propState.ApprovalPoll)
+	ads := ballotapi.Show_Local(ctx, cloned.PublicClone(), propState.ApprovalPoll)
 	latestApprovalScore := ads.Tally.Scores[pmp_0.ProposalBallotChoice]
 	costOfReview := ads.Tally.Capitalization()
 	propState.LatestApprovalScore = latestApprovalScore
@@ -219,7 +219,7 @@ func calcBounty(
 
 	bounty := 0.0
 	for _, ref := range state.EligibleConcerns {
-		adt := ballotapi.Show_Local(ctx, cloned.PublicClone().Tree(), pmp_0.ConcernPollBallotName(ref.To))
+		adt := ballotapi.Show_Local(ctx, cloned.PublicClone(), pmp_0.ConcernPollBallotName(ref.To))
 		bounty += adt.Tally.Capitalization()
 	}
 	return bounty
@@ -408,11 +408,11 @@ func (x proposalPolicy) Cancel(
 }
 
 type PolicyView struct {
-	State          *pmp_0.ProposalState `json:"state"`
-	ApprovalPoll   ballotproto.AdTally  `json:"approval_poll"`
-	ApprovalMargin ballotproto.Margin   `json:"priority_margin"`
-	BountyAccount  account.AccountID    `json:"bounty_account"`
-	RewardAccount  account.AccountID    `json:"reward_account"`
+	State          *pmp_0.ProposalState      `json:"state"`
+	ApprovalPoll   ballotproto.AdTallyMargin `json:"approval_poll"`
+	ApprovalMargin ballotproto.Margin        `json:"priority_margin"`
+	BountyAccount  account.AccountID         `json:"bounty_account"`
+	RewardAccount  account.AccountID         `json:"reward_account"`
 }
 
 func (x proposalPolicy) Show(
@@ -442,6 +442,7 @@ func (x proposalPolicy) Show(
 				BallotChoices: approvalPoll.Ad.Choices,
 				BallotAd:      approvalPoll.Ad,
 				BallotTally:   approvalPoll.Tally,
+				BallotMargin:  approvalPoll.Margin,
 			},
 		}
 }

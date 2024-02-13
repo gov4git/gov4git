@@ -1,35 +1,48 @@
 package ballotproto
 
-// MarginCalcJS must be a JS function of this form:
+// Margin captures functions for computing vote marginals.
+// This is how Margin looks in JSON:
 //
-//	function calcMargin(currentTally, voteUser, voteChoice, voteTarget) {
-//		...
-//		return {
+//		{
 //			"help": {
 //				"label": "Help",
-//				"description": "This ballot uses a standard Quadratic Voting.",
-//				"value": null,
-//			},
-//			"currentVote": {
-//				"label": "Current vote",
-//				"description": "Your current vote",
-//				"value": currentVote,
-//			},
-//			"targetVote" : {
-//				"label": "Target vote",
-//				"description": "Your target vote",
-//				"value": targetVote,
+//				"description": "Description of ballot",
+//				"fn_js": "function() { return "This is a QV ballot." }",
 //			},
 //			"cost" : {
 //				"label": "Cost",
-//				"description": "Cost of changing your vote",
-//				"value": cost,
+//				"description": "Additional cost to reach a desired total impact",
+//				"fn_js": "function(voteUser, voteChoice, voteImpact) { ... }",
 //			},
-//			...
+//			"impact" : {
+//				"label": "Impact",
+//				"description": "Additional impact to reach a desired total cost",
+//				"fn_js": "function(voteUser, voteChoice, voteCost) { ... }",
+//			},
 //		}
-//	}
-type MarginCalcJS string
-
+//
+//	Arguments of the "cost" function:
+//		- voteUser: user name of the voter
+//		- voteChoice: ballot choice
+//		- voteImpact: total vote impact, desired by the voter
+//	Result of the "cost" function:
+//		- the _additional_ cost to the voter to reach the desired impact
+//
+//	Arguments of the "impact" function:
+//		- voteUser: user name of the voter
+//		- voteChoice: ballot choice
+//		- voteCost: the total cost (including what has already been charged) the user is willing to spend
+//	Result of the "impact" function returns an array with two values:
+//		- the _additional_ impact the user can add to their current impact
+//		- the _additional_ impact the user can subtract from their current impact
 type Margin struct {
-	CalcJS MarginCalcJS `json:"calc_js"`
+	Help   *MarginCalculator `json:"help,omitempty"`
+	Cost   *MarginCalculator `json:"cost,omitempty"`
+	Impact *MarginCalculator `json:"impact,omitempty"`
+}
+
+type MarginCalculator struct {
+	Label       string `json:"label"`
+	Description string `json:"description"`
+	FnJS        string `json:"fn_js"`
 }

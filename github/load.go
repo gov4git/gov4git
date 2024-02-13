@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/util"

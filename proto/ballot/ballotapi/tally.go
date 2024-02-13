@@ -158,6 +158,22 @@ func TallyFetchedVotes_StageOnly(
 	), true
 }
 
+func ReTally_StageOnly(
+	ctx context.Context,
+	cloned gov.Cloned,
+	id ballotproto.BallotID,
+
+) {
+	t := cloned.Tree()
+	ad, policy := ballotio.LoadAdPolicy_Local(ctx, t, id)
+	must.Assertf(ctx, !ad.Closed, "ballot is closed")
+	currentTally := loadTally_Local(ctx, t, id)
+
+	updatedTally := policy.Tally(ctx, cloned, &ad, &currentTally, nil).Result
+
+	git.ToFileStage(ctx, t, id.TallyNS(), updatedTally)
+}
+
 func rejectFetchedVotes(fv FetchedVotes, rej map[member.User]ballotproto.RejectedElections) {
 	for _, fv := range fv {
 		for _, el := range fv.Elections {

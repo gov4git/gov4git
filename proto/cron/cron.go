@@ -85,7 +85,7 @@ func Cron(
 		state.LastCommunityTally = time.Now()
 	}
 
-	motionapi.Pipeline(ctx, cloned)
+	motionapi.Pipeline_StageOnly(ctx, cloned)
 
 	// display notices on github
 	govgh.DisplayNotices_StageOnly(ctx, repo, ghc, cloned.PublicClone())

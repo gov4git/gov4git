@@ -121,7 +121,7 @@ func (x concernPolicy) Update(
 	// update idealized quadratic funding deficit
 	costOfPriority := ads.Tally.Capitalization()
 	idealFunding := idealFunding(&ads.Tally)
-	idealDeficit := idealFunding - costOfPriority
+	idealDeficit := max(0, idealFunding-costOfPriority)
 	conState.IQDeficit = idealDeficit
 
 	// update priority score

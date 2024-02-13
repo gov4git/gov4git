@@ -3,11 +3,24 @@ package motionapi
 import (
 	"context"
 
+	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/lib4git/base"
 )
 
 func Pipeline(
+	ctx context.Context,
+	addr gov.OwnerAddress,
+
+) {
+
+	cloned := gov.CloneOwner(ctx, addr)
+	Pipeline_StageOnly(ctx, cloned)
+	proto.Commitf(ctx, cloned.PublicClone(), "motion_pipeline", "motion pipeline")
+	cloned.PublicClone().Push(ctx)
+}
+
+func Pipeline_StageOnly(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 

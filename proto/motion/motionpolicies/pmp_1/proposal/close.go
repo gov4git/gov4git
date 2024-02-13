@@ -24,13 +24,16 @@ func (x proposalPolicy) Close(
 
 ) (motionproto.Report, notice.Notices) {
 
+	approvalPollName := pmp_1.ProposalApprovalPollName(prop.ID)
+
 	// ensure that eligible set in policy state is valid
+	x.Update(ctx, cloned, prop)
+	ballotapi.ReTally_StageOnly(ctx, cloned.PublicClone(), approvalPollName)
 	x.Update(ctx, cloned, prop)
 
 	// was the PR merged or not
 	isMerged := decision.IsAccept()
 
-	approvalPollName := pmp_1.ProposalApprovalPollName(prop.ID)
 	adt := loadPropApprovalPollTally(ctx, cloned.PublicClone(), prop)
 	costOfReview := adt.Tally.Capitalization()
 

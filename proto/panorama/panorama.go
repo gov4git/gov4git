@@ -87,7 +87,7 @@ func Panorama_Local(
 	}
 
 	// rescore and update motions
-	motionapi.Pipeline(ctx, gov.LiftCloned(ctx, cloned))
+	motionapi.Pipeline_StageOnly(ctx, gov.LiftCloned(ctx, cloned))
 
 	projMVS := motionapi.TrackMotionBatch_Local(ctx, cloned, voterAddr, voterOwner)
 	// TODO: fully simulate tallying by processing voter's mail (see above)

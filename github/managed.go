@@ -127,7 +127,7 @@ func syncRefsThenMotions(
 	syncRefs(ctx, cloned, syncChanges, issues, index)
 
 	// update motions
-	motionapi.Pipeline(ctx, cloned)
+	motionapi.Pipeline_StageOnly(ctx, cloned)
 
 	// sync motions with issues
 	syncMotions(

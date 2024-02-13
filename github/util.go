@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 	"github.com/gov4git/gov4git/v2"
 	"github.com/gov4git/gov4git/v2/materials"
 	"github.com/gov4git/lib4git/must"

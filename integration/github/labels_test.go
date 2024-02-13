@@ -7,7 +7,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v58/github"
 	govgh "github.com/gov4git/gov4git/v2/github"
 )
 

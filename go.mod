@@ -5,9 +5,9 @@ go 1.21
 require (
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.10.0
-	github.com/google/go-github/v55 v55.0.0
+	github.com/google/go-github/v58 v58.0.0
 	github.com/gov4git/lib4git v0.0.31
-	github.com/gov4git/vendor4git v0.0.3
+	github.com/gov4git/vendor4git v0.0.5
 	github.com/migueleliasweb/go-github-mock v0.0.19
 	github.com/rogpeppe/go-internal v1.11.0
 	github.com/spf13/cobra v1.6.1

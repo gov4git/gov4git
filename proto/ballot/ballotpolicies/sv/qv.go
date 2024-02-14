@@ -106,7 +106,7 @@ const (
 		let tally = %s;
 		var currentVoteImpact = 0.0;
 		var currentVoteCost = 0.0;
-		var currentScoresByUser = currentTally.scores_by_user[voteUser];
+		var currentScoresByUser = tally.scores_by_user[voteUser];
 		if (currentScoresByUser !== undefined) {
 			var currentChoiceByUser = currentScoresByUser[voteChoice];
 			if (currentChoiceByUser !== undefined) {
@@ -128,7 +128,7 @@ const (
 		let tally = %s;
 		var currentVoteImpact = 0.0;
 		var currentVoteCost = 0.0;
-		var currentScoresByUser = currentTally.scores_by_user[voteUser];
+		var currentScoresByUser = tally.scores_by_user[voteUser];
 		if (currentScoresByUser !== undefined) {
 			var currentChoiceByUser = currentScoresByUser[voteChoice];
 			if (currentChoiceByUser !== undefined) {

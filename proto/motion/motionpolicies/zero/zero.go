@@ -18,6 +18,15 @@ const ZeroPolicyName = motion.PolicyName("zero-policy")
 
 type zeroPolicy struct{}
 
+func (x zeroPolicy) Descriptor() motionproto.PolicyDescriptor {
+	return motionproto.PolicyDescriptor{
+		Description:       "The zero policy does nothing.",
+		GithubLabel:       "",
+		AppliesToConcern:  true,
+		AppliesToProposal: true,
+	}
+}
+
 func (x zeroPolicy) PostClone(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

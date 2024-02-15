@@ -115,3 +115,8 @@ func SaveClassState_StageOnly[PS form.Form](
 		policyState,
 	)
 }
+
+func SupportedPolicies(ctx context.Context) map[string]motionproto.PolicyDescriptor {
+
+	return motionproto.InstalledPolicyDescriptors()
+}

@@ -15,7 +15,18 @@ import (
 
 type Report = any
 
+type PolicyDescriptor struct {
+	Description       string `json:"description"`         // markdown description
+	GithubLabel       string `json:"github_label"`        // label to apply on github to activate policy
+	AppliesToConcern  bool   `json:"applies_to_concern"`  // can be applied to concerns
+	AppliesToProposal bool   `json:"applies_to_proposal"` // can be applied to proposals
+}
+
 type Policy interface {
+
+	// Descriptor returns a markdown description of the policy.
+	Descriptor() PolicyDescriptor
+
 	gov.PostCloner
 
 	// pipeline
@@ -180,8 +191,17 @@ func GetPolicy(ctx context.Context, key motion.PolicyName) Policy {
 	return p
 }
 
-func InstalledMotionPolicies() []string {
+func InstalledPolicyKeys() []string {
 	return namesToStrings(policyRegistry.ListKeys())
+}
+
+func InstalledPolicyDescriptors() map[string]PolicyDescriptor {
+	x := map[string]PolicyDescriptor{}
+	keys, policies := policyRegistry.List()
+	for i, k := range keys {
+		x[k.String()] = policies[i].Descriptor()
+	}
+	return x
 }
 
 func namesToStrings(ns []motion.PolicyName) []string {

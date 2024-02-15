@@ -9,12 +9,15 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
-var (
+const (
 	ConcernBallotChoice  = pmp_0.ConcernBallotChoice
 	ProposalBallotChoice = pmp_0.ProposalBallotChoice
 
 	ConcernPolicyName  motion.PolicyName = "pmp-concern-policy-v1"
 	ProposalPolicyName motion.PolicyName = "pmp-proposal-v1"
+
+	ConcernPolicyGithubLabel   = "gov4git:pmp-v1"
+	ProposalPolicyGithubLabel  = ConcernPolicyGithubLabel
 
 	ClaimsRefType = pmp_0.ClaimsRefType
 )

@@ -30,6 +30,15 @@ func init() {
 
 type concernPolicy struct{}
 
+func (x concernPolicy) Descriptor() motionproto.PolicyDescriptor {
+	return motionproto.PolicyDescriptor{
+		Description:       "[Plural Management Protocol](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4688040) v1",
+		GithubLabel:       pmp_1.ConcernPolicyGithubLabel,
+		AppliesToConcern:  true,
+		AppliesToProposal: false,
+	}
+}
+
 func (x concernPolicy) PostClone(
 	ctx context.Context,
 	cloned gov.OwnerCloned,

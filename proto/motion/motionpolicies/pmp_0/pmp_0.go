@@ -8,12 +8,15 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
-var (
+const (
 	ConcernBallotChoice  = "rank"
 	ProposalBallotChoice = "rank"
 
 	ConcernPolicyName  motion.PolicyName = "pmp-concern-policy"
 	ProposalPolicyName motion.PolicyName = "pmp-proposal"
+
+	ConcernPolicyGithubLabel  = "gov4git:pmp-v0"
+	ProposalPolicyGithubLabel = ConcernPolicyGithubLabel
 
 	// We explicitly avoid using "resolves" as the keyword for referencing issues/PRs, as
 	// "resolves" triggers Github to automatically close resolved issues when a PR is closed, thereby

@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 )
@@ -23,9 +25,10 @@ const (
 	DirectiveLabel = "gov4git:directive"
 
 	// labels for issues that are managed
+	// TODO: generate labels from the descriptors of installed motion policies
 	IssueIsManagedLabel        = "gov4git:managed"
-	IssueIsManagedByPMPv0Label = "gov4git:pmp-v0"
-	IssueIsManagedByPMPv1Label = "gov4git:pmp-v1"
+	IssueIsManagedByPMPv0Label = pmp_0.ConcernPolicyGithubLabel
+	IssueIsManagedByPMPv1Label = pmp_1.ConcernPolicyGithubLabel
 
 	// the issue with this label will be used as a dashboard display
 	DashboardIssueLabel = "gov4git:dashboard"

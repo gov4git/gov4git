@@ -104,6 +104,19 @@ var (
 			)
 		},
 	}
+
+	motionPoliciesCmd = &cobra.Command{
+		Use:   "policies",
+		Short: "Display descriptors for installed motion policies",
+		Long:  ``,
+		Run: func(cmd *cobra.Command, args []string) {
+			api.Invoke1(
+				func() map[string]motionproto.PolicyDescriptor {
+					return motionapi.SupportedPolicies(ctx)
+				},
+			)
+		},
+	}
 )
 
 var (
@@ -122,7 +135,7 @@ func init() {
 	motionCmd.AddCommand(motionOpenCmd)
 	motionOpenCmd.Flags().StringVar(&motionName, "name", "", "unique name for motion")
 	motionOpenCmd.MarkFlagRequired("name")
-	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(motionproto.InstalledMotionPolicies(), ", ")+")")
+	motionOpenCmd.Flags().StringVar(&motionPolicy, "policy", "", "policy ("+strings.Join(motionproto.InstalledPolicyKeys(), ", ")+")")
 	motionOpenCmd.MarkFlagRequired("policy")
 	motionOpenCmd.Flags().StringVar(&motionAuthor, "author", "", "author user name")
 	motionOpenCmd.MarkFlagRequired("author")
@@ -144,4 +157,6 @@ func init() {
 	motionShowCmd.Flags().StringVar(&motionName, "name", "", "name of motion")
 	motionShowCmd.MarkFlagRequired("name")
 	motionShowCmd.Flags().BoolVar(&motionTrack, "track", false, "include this voter's tracking info")
+
+	motionCmd.AddCommand(motionPoliciesCmd)
 }

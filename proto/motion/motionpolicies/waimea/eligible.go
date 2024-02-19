@@ -1,4 +1,4 @@
-package alcap
+package waimea
 
 import (
 	"context"
@@ -42,5 +42,5 @@ func AreEligible(
 
 	propState := motionapi.LoadPolicyState_Local[*ProposalState](ctx, cloned, prop.ID)
 
-	return propState.LatestApprovalScore > 0
+	return propState.ApprovalScore > 0
 }

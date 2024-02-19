@@ -1,4 +1,4 @@
-package alcap
+package waimea
 
 import (
 	"slices"
@@ -8,10 +8,10 @@ import (
 )
 
 type ProposalState struct {
-	ApprovalPoll        ballotproto.BallotID `json:"approval_poll"`
-	LatestApprovalScore float64              `json:"latest_approval_score"`
-	EligibleConcerns    motionproto.Refs     `json:"eligible_concerns"`
-	Decision            motionproto.Decision `json:"decision,omitempty"` // set on close or cancel, to be picked up by clearance pass
+	ApprovalPoll     ballotproto.BallotID `json:"approval_poll"`
+	ApprovalScore    float64              `json:"approval_score"`
+	EligibleConcerns motionproto.Refs     `json:"eligible_concerns"`
+	Decision         motionproto.Decision `json:"decision,omitempty"` // set on close or cancel, to be picked up by clearance pass
 }
 
 func (x *ProposalState) Copy() *ProposalState {

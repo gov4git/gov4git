@@ -1,4 +1,4 @@
-package alcap
+package waimea
 
 import (
 	"fmt"

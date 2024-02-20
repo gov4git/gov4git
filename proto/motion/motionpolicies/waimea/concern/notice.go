@@ -71,16 +71,16 @@ func closeNotice(
 	if len(refunds) > 0 {
 		fmt.Fprintf(&w, "Refunds issued:\n")
 		for _, refund := range refunds {
-			fmt.Fprintf(&w, "- User @%v was refunded `%0.6f` credits\n", refund.User, refund.Amount.Quantity)
+			fmt.Fprintf(&w, "- Prioritizer @%v was refunded `%0.6f` credits\n", refund.User, refund.Amount.Quantity)
 		}
 		fmt.Fprintln(&w, "")
 	}
 
 	// tally by user
 	if len(outcome.ScoresByUser) > 0 {
-		fmt.Fprintf(&w, "Tally breakdown by user:\n")
+		fmt.Fprintf(&w, "Issue priority tally by prioritizer was:\n")
 		for user, ss := range outcome.ScoresByUser {
-			fmt.Fprintf(&w, "- User @%v contributed `%0.6f` votes\n", user, ss[waimea.ConcernBallotChoice].Vote())
+			fmt.Fprintf(&w, "- Prioritizer @%v contributed `%0.6f` votes\n", user, ss[waimea.ConcernBallotChoice].Vote())
 		}
 	}
 

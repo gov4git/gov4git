@@ -24,8 +24,10 @@ import (
 )
 
 func init() {
-	motionproto.Install(context.Background(), waimea.ConcernPolicyName, concernPolicy{})
+	motionproto.Install(context.Background(), waimea.ConcernPolicyName, ConcernPolicy)
 }
+
+var ConcernPolicy concernPolicy
 
 type concernPolicy struct{}
 
@@ -51,6 +53,8 @@ func (x concernPolicy) PostClone(
 	if git.IsNotExist(err) {
 		waimea.SaveConcernClassState_StageOnly(ctx, cloned, waimea.InitialPolicyState)
 	}
+
+	waimea.Boot_StageOnly(ctx, cloned.PublicClone())
 }
 
 func (x concernPolicy) Open(
@@ -63,20 +67,20 @@ func (x concernPolicy) Open(
 
 	// initialize state
 	policyState := waimea.LoadConcernClassState_Local(ctx, cloned)
-	state := waimea.NewConcernState(con.ID, policyState.CostOfPriorityMatch)
+	state := waimea.NewConcernState(con.ID, policyState.PriorityMatch)
 	motionapi.SavePolicyState_StageOnly[*waimea.ConcernState](ctx, cloned.PublicClone(), con.ID, state)
 
 	// open a priority poll for the motion
 	ballotapi.Open_StageOnly(
 		ctx,
-		ballotio.QVPolicyName, // XXX: linear policy?
+		ballotio.QVPolicyName,
 		cloned,
 		state.PriorityPoll,
 		waimea.ConcernAccountID(con.ID),
 		purpose.Concern,
 		con.Policy,
 		fmt.Sprintf("Prioritization poll for motion %v", con.ID),
-		fmt.Sprintf("Up/down vote the priority for issue %v", con.ID),
+		fmt.Sprintf("Vote for the priority of concern (issue) %v", con.ID),
 		[]string{waimea.ConcernBallotChoice},
 		member.Everybody,
 	)
@@ -131,7 +135,7 @@ func (x concernPolicy) Update(
 	conState.CostOfPriority = ads.Tally.Capitalization()
 
 	// update priority score
-	conState.CostOfPriorityMatch = policyState.CostOfPriorityMatch
+	conState.PriorityMatch = policyState.PriorityMatch
 	conState.PriorityScore = ads.Tally.Scores[waimea.ConcernBallotChoice]
 
 	// update eligible proposals
@@ -159,8 +163,9 @@ func (x concernPolicy) Update(
 			var w bytes.Buffer
 			for _, ref := range conState.EligibleProposals {
 				prop := motionapi.LookupMotion_Local(ctx, cloned.PublicClone(), ref.From)
-				fmt.Fprintf(&w, "- %s, managed as Gov4Git motion `%v` with priority score of `%0.6f`\n",
-					prop.TrackerURL, prop.ID, prop.Score.Attention) //XXX: use the policy state for priority score?
+				propState := motionapi.LoadPolicyState_Local[*waimea.ProposalState](ctx, cloned.PublicClone(), prop.ID)
+				fmt.Fprintf(&w, "- %s, managed as Gov4Git proposal `%v` with approval score of `%0.6f`\n",
+					prop.TrackerURL, prop.ID, propState.ApprovalScore)
 			}
 			notices = append(
 				notices,
@@ -226,16 +231,16 @@ func (x concernPolicy) updateFreeze(
 func (x concernPolicy) Aggregate(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	motion motionproto.Motions,
+	cons motionproto.Motions,
 
 ) {
 
-	motion = motionproto.SelectOpenMotions(motion)
+	cons = motionproto.SelectOpenMotions(cons)
 
 	// load all motion policy states
-	conStates := make([]*waimea.ConcernState, len(motion))
-	for i, mot := range motion {
-		conStates[i] = motionapi.LoadPolicyState_Local[*waimea.ConcernState](ctx, cloned.PublicClone(), mot.ID)
+	conStates := make([]*waimea.ConcernState, len(cons))
+	for i, con := range cons {
+		conStates[i] = motionapi.LoadPolicyState_Local[*waimea.ConcernState](ctx, cloned.PublicClone(), con.ID)
 	}
 
 	// aggregate cost of priority

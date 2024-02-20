@@ -10,11 +10,11 @@ import (
 const StateFilebase = "state.json"
 
 type ConcernState struct {
-	PriorityPoll        ballotproto.BallotID `json:"priority_poll"`
-	EligibleProposals   motionproto.Refs     `json:"eligible_proposals"`
-	CostOfPriority      float64              `json:"cost_of_priority"`
-	PriorityScore       float64              `json:"priority_score"`
-	CostOfPriorityMatch float64              `json:"cost_of_priority_match"` // copied from policy state
+	PriorityPoll      ballotproto.BallotID `json:"priority_poll"`
+	CostOfPriority    float64              `json:"cost_of_priority"`
+	PriorityScore     float64              `json:"priority_score"`
+	PriorityMatch     float64              `json:"priority_match"` // copied from policy state
+	EligibleProposals motionproto.Refs     `json:"eligible_proposals"`
 }
 
 func (x *ConcernState) Copy() *ConcernState {
@@ -27,23 +27,28 @@ func (x *ConcernState) ProjectedBounty() float64 {
 	if x.PriorityScore < 0 {
 		return 0
 	}
-	return x.PriorityScore * x.CostOfPriorityMatch
+	return x.PriorityScore * x.PriorityMatch
 }
 
-func NewConcernState(id motionproto.MotionID, costOfPriorityMatch float64) *ConcernState {
+func NewConcernState(id motionproto.MotionID, priorityMatch float64) *ConcernState {
 	return &ConcernState{
-		PriorityPoll:        ConcernPollBallotName(id),
-		CostOfPriorityMatch: costOfPriorityMatch,
+		PriorityPoll:  ConcernPollBallotName(id),
+		PriorityMatch: priorityMatch,
 	}
 }
 
 type ConcernPolicyState struct {
-	CostOfPriorityMatch   float64 `json:"cost_of_priority_match"`
-	CostOfReviewForAuthor float64 `json:"cost_of_review_for_author"`
-	TotalCostOfPriority   float64 `json:"total_cost_of_priority"`
+	// parameters
+	PriorityMatch float64 `json:"priority_match"`
+	ReviewMatch   float64 `json:"review_match"`
+	// state
+	TotalCostOfPriority float64 `json:"total_cost_of_priority"`
+	TotalCostOfReview   float64 `json:"total_cost_of_review"`
 }
 
 var InitialPolicyState = &ConcernPolicyState{
-	CostOfPriorityMatch:   1.0,
-	CostOfReviewForAuthor: 0.2,
+	PriorityMatch:       2.0,
+	ReviewMatch:         2.0,
+	TotalCostOfPriority: 0.0,
+	TotalCostOfReview:   0.0,
 }

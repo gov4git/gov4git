@@ -10,13 +10,11 @@ import (
 	"github.com/gov4git/gov4git/v2/proto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/member"
-	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
 
 	_ "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0/use"
 	_ "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1/use"
+	_ "github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/waimea/use"
 
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/notice"
@@ -31,6 +29,7 @@ func SyncManagedIssues(
 	repo Repo,
 	githubClient *github.Client,
 	govAddr gov.OwnerAddress,
+
 ) git.Change[form.Map, *SyncManagedChanges] {
 
 	govCloned := gov.CloneOwner(ctx, govAddr)
@@ -314,26 +313,6 @@ func syncMeta(
 	return true
 }
 
-func motionPolicyForIssue(issue ImportedIssue) motion.PolicyName {
-
-	switch {
-
-	case issue.ManagedByPMPv0:
-		if issue.PullRequest {
-			return pmp_0.ProposalPolicyName
-		}
-		return pmp_0.ConcernPolicyName
-
-	case issue.ManagedByPMPv1:
-		if issue.PullRequest {
-			return pmp_1.ProposalPolicyName
-		}
-		return pmp_1.ConcernPolicyName
-
-	}
-	panic("issue is not managed by a known protocol")
-}
-
 func syncCreateMotionForIssue(
 	ctx context.Context,
 	addr gov.OwnerAddress,
@@ -350,7 +329,7 @@ func syncCreateMotionForIssue(
 		cloned,
 		id,
 		issue.MotionType(),
-		motionPolicyForIssue(issue),
+		issue.ManagedByPolicy,
 		findMemberForGithubLogin(ctx, cloned.PublicClone(), issue.Author),
 		issue.Title,
 		issue.Body,

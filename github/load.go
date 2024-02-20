@@ -9,6 +9,10 @@ import (
 	"time"
 
 	"github.com/google/go-github/v58/github"
+	"github.com/gov4git/gov4git/v2/proto/motion"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/waimea"
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/must"
 	"github.com/gov4git/lib4git/util"
@@ -64,27 +68,39 @@ func LabelsToStrings(labels []*github.Label) []string {
 	return labelStrings
 }
 
+func policyForIssue(issue *github.Issue) motion.PolicyName {
+	labels := LabelsToStrings(issue.Labels)
+	switch {
+	case util.IsIn(IssueIsManagedLabel, labels...):
+		if issue.IsPullRequest() {
+			return waimea.ProposalPolicyName
+		} else {
+			return waimea.ConcernPolicyName
+		}
+	case util.IsIn(IssueIsManagedByWaimeaLabel, labels...):
+		if issue.IsPullRequest() {
+			return waimea.ProposalPolicyName
+		} else {
+			return waimea.ConcernPolicyName
+		}
+	case util.IsIn(IssueIsManagedByPMPv0Label, labels...):
+		if issue.IsPullRequest() {
+			return pmp_0.ProposalPolicyName
+		} else {
+			return pmp_0.ConcernPolicyName
+		}
+	case util.IsIn(IssueIsManagedByPMPv1Label, labels...):
+		if issue.IsPullRequest() {
+			return pmp_1.ProposalPolicyName
+		} else {
+			return pmp_1.ConcernPolicyName
+		}
+	}
+	return ""
+}
+
 func IsIssueManaged(issue *github.Issue) bool {
-	labels := LabelsToStrings(issue.Labels)
-	return areLabelsManagedByPMPv0(labels) || areLabelsManagedByPMPv1(labels)
-}
-
-func IsIssueManagedByPMPv0(issue *github.Issue) bool {
-	labels := LabelsToStrings(issue.Labels)
-	return areLabelsManagedByPMPv0(labels)
-}
-
-func IsIssueManagedByPMPv1(issue *github.Issue) bool {
-	labels := LabelsToStrings(issue.Labels)
-	return areLabelsManagedByPMPv1(labels)
-}
-
-func areLabelsManagedByPMPv0(labels []string) bool {
-	return util.IsIn(IssueIsManagedLabel, labels...) || util.IsIn(IssueIsManagedByPMPv0Label, labels...)
-}
-
-func areLabelsManagedByPMPv1(labels []string) bool {
-	return util.IsIn(IssueIsManagedByPMPv1Label, labels...)
+	return policyForIssue(issue) != ""
 }
 
 type LoadPRFunc func(
@@ -110,22 +126,21 @@ func TransformIssue(
 		must.NoError(ctx, err)
 	}
 	return ImportedIssue{
-		ManagedByPMPv0: IsIssueManagedByPMPv0(issue),
-		ManagedByPMPv1: IsIssueManagedByPMPv1(issue),
-		URL:            issue.GetHTMLURL(),
-		Author:         author,
-		Number:         int64(issue.GetNumber()),
-		Title:          issue.GetTitle(),
-		Body:           issue.GetBody(),
-		Labels:         LabelsToStrings(issue.Labels),
-		ClosedAt:       unwrapTimestamp(issue.ClosedAt),
-		CreatedAt:      unwrapTimestamp(issue.CreatedAt),
-		UpdatedAt:      unwrapTimestamp(issue.UpdatedAt),
-		Refs:           parseIssueRefs(ctx, repo, issue),
-		Locked:         issue.GetLocked(),
-		Closed:         issue.GetState() == "closed",
-		PullRequest:    issue.IsPullRequest(),
-		Merged:         pr != nil && pr.GetMerged(),
+		ManagedByPolicy: policyForIssue(issue),
+		URL:             issue.GetHTMLURL(),
+		Author:          author,
+		Number:          int64(issue.GetNumber()),
+		Title:           issue.GetTitle(),
+		Body:            issue.GetBody(),
+		Labels:          LabelsToStrings(issue.Labels),
+		ClosedAt:        unwrapTimestamp(issue.ClosedAt),
+		CreatedAt:       unwrapTimestamp(issue.CreatedAt),
+		UpdatedAt:       unwrapTimestamp(issue.UpdatedAt),
+		Refs:            parseIssueRefs(ctx, repo, issue),
+		Locked:          issue.GetLocked(),
+		Closed:          issue.GetState() == "closed",
+		PullRequest:     issue.IsPullRequest(),
+		Merged:          pr != nil && pr.GetMerged(),
 	}
 }
 

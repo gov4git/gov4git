@@ -13,7 +13,7 @@ const (
 	ConcernPolicyName  motion.PolicyName = "waimea-concern"
 	ProposalPolicyName motion.PolicyName = "waimea-proposal"
 
-	ConcernPolicyGithubLabel  = "gov4git:waimea" //XXX: add to github driver
+	ConcernPolicyGithubLabel  = "gov4git:waimea"
 	ProposalPolicyGithubLabel = ConcernPolicyGithubLabel
 
 	ClaimsRefType = "claims"

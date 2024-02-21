@@ -8,7 +8,6 @@ import (
 
 	"github.com/gov4git/gov4git/v2/proto/account"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/history/metric"
@@ -69,7 +68,7 @@ func (x concernPolicy) Open(
 	// open a poll for the motion
 	ballotapi.Open_StageOnly(
 		ctx,
-		ballotio.QVPolicyName,
+		ConcernPriorityPollPolicyName,
 		cloned,
 		state.PriorityPoll,
 		pmp_1.ConcernAccountID(con.ID),

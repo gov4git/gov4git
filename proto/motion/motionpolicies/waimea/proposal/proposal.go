@@ -25,10 +25,6 @@ func init() {
 	motionproto.Install(context.Background(), waimea.ProposalPolicyName, proposalPolicy{})
 }
 
-const (
-	ProposalApprovalPollPolicyName ballotproto.PolicyName = "waimea-proposal-approval"
-)
-
 type proposalPolicy struct{}
 
 func (x proposalPolicy) Descriptor() motionproto.PolicyDescriptor {

@@ -7,8 +7,10 @@ import (
 	"time"
 
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
+	"github.com/gov4git/gov4git/v2/proto/motion"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_0"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/pmp_1"
+	"github.com/gov4git/gov4git/v2/proto/motion/motionpolicies/waimea"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 	"github.com/gov4git/gov4git/v2/proto/purpose"
 )
@@ -26,9 +28,10 @@ const (
 
 	// labels for issues that are managed
 	// TODO: generate labels from the descriptors of installed motion policies
-	IssueIsManagedLabel        = "gov4git:managed"
-	IssueIsManagedByPMPv0Label = pmp_0.ConcernPolicyGithubLabel
-	IssueIsManagedByPMPv1Label = pmp_1.ConcernPolicyGithubLabel
+	IssueIsManagedLabel         = "gov4git:managed"
+	IssueIsManagedByPMPv0Label  = pmp_0.ConcernPolicyGithubLabel
+	IssueIsManagedByPMPv1Label  = pmp_1.ConcernPolicyGithubLabel
+	IssueIsManagedByWaimeaLabel = waimea.ConcernPolicyGithubLabel
 
 	// the issue with this label will be used as a dashboard display
 	DashboardIssueLabel = "gov4git:dashboard"
@@ -43,6 +46,7 @@ var GovernanceLabels = []string{
 	IssueIsManagedLabel,
 	IssueIsManagedByPMPv0Label,
 	IssueIsManagedByPMPv1Label,
+	IssueIsManagedByWaimeaLabel,
 	DashboardIssueLabel,
 }
 
@@ -61,17 +65,16 @@ type ImportedIssue struct {
 	//
 	Refs []ImportedRef `json:"refs"`
 	//
-	Locked            bool `json:"locked"`
-	Closed            bool `json:"closed"`
-	PullRequest       bool `json:"pull_request"`
-	Merged            bool `json:"merged"`
-	ManagedByPMPv0    bool `json:"managed_by_pmp_v0,omitempty"`
-	ManagedByPMPv1    bool `json:"managed_by_pmp_v1,omitempty"`
-	ForPrioritization bool `json:"for_prioritization"`
+	Locked      bool `json:"locked"`
+	Closed      bool `json:"closed"`
+	PullRequest bool `json:"pull_request"`
+	Merged      bool `json:"merged"`
+	//
+	ManagedByPolicy motion.PolicyName `json:"managed_by_policy,omitempty"`
 }
 
 func (x ImportedIssue) IsManaged() bool {
-	return x.ManagedByPMPv0 || x.ManagedByPMPv1
+	return x.ManagedByPolicy != ""
 }
 
 func (x ImportedIssue) Key() string {

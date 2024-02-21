@@ -15,7 +15,7 @@ func cancelNotice(ctx context.Context, motion motionproto.Motion, outcome ballot
 
 	var w bytes.Buffer
 
-	fmt.Fprintf(&w, "This issue, managed as Gov4Git proposal `%v`, has been cancelled 🌂\n\n", motion.ID)
+	fmt.Fprintf(&w, "This issue, managed as Gov4Git concern `%v`, has been cancelled 🌂\n\n", motion.ID)
 
 	fmt.Fprintf(&w, "The issue priority tally was `%0.6f`.\n\n", outcome.Scores[pmp_1.ConcernBallotChoice])
 
@@ -45,7 +45,7 @@ func closeNotice(
 
 	var w bytes.Buffer
 
-	fmt.Fprintf(&w, "This issue, managed as Gov4Git proposal `%v`, has been closed 🎉\n\n", con.ID)
+	fmt.Fprintf(&w, "This issue, managed as Gov4Git concern `%v`, has been closed 🎉\n\n", con.ID)
 
 	fmt.Fprintf(&w, "The issue priority tally was `%0.6f`.\n\n", outcome.Scores[pmp_1.ConcernBallotChoice])
 

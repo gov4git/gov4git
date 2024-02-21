@@ -161,7 +161,7 @@ func (x proposalPolicy) Update(
 	projectedBounty := 0.0
 	for _, ref := range propState.EligibleConcerns {
 		conState := motionapi.LoadPolicyState_Local[*waimea.ConcernState](ctx, cloned.PublicClone(), ref.To)
-		projectedBounty += conState.ProjectedBounty()
+		projectedBounty += conState.ProjectedPriorityBounty()
 	}
 	propState.ProjectedPriorityBounty = projectedBounty
 

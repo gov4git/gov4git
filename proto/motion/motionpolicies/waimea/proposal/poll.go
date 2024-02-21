@@ -66,6 +66,18 @@ func (sk ScoreKernel) CalcJS(
 	return margin
 }
 
+/*
+	For testing:
+		let tally = {
+			"scores_by_user": {
+				"p1": {"rank": { "score": 1, "strength": 1}},
+				"p2": {"rank": { "score": 2, "strength": 4}},
+				"n1": {"rank": { "score": -1, "strength": -1}},
+				"n2": {"rank": { "score": -2, "strength": -4}},
+			},
+		};
+*/
+
 const (
 	rewardJSFmt = `
 	function(voteUser, voteChoice, voteImpact) {

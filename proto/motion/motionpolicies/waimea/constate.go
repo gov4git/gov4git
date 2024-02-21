@@ -23,7 +23,7 @@ func (x *ConcernState) Copy() *ConcernState {
 	return &z
 }
 
-func (x *ConcernState) ProjectedBounty() float64 {
+func (x *ConcernState) ProjectedPriorityBounty() float64 {
 	if x.PriorityScore < 0 {
 		return 0
 	}

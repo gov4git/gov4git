@@ -56,7 +56,7 @@ func (x proposalPolicy) Close(
 
 		// reward reviewers
 
-		rewards, rewardDonationReceipts, rewardDonation := calcReviewersRewards(ctx, cloned, prop, true)
+		rewards, rewardDonationReceipts, rewardDonation := disberseReviewersRewards(ctx, cloned, prop, true)
 		receipts = append(receipts, rewards.MetricReceipts()...)
 		receipts = append(receipts, rewardDonationReceipts...)
 
@@ -167,7 +167,7 @@ func (x proposalPolicy) Close(
 		)
 
 		// reward reviewers
-		rewards, donationReceipt, rewardDonation := calcReviewersRewards(ctx, cloned, prop, false)
+		rewards, donationReceipt, rewardDonation := disberseReviewersRewards(ctx, cloned, prop, false)
 
 		// metrics
 		metric.Log_StageOnly(ctx, cloned.PublicClone(), &metric.Event{

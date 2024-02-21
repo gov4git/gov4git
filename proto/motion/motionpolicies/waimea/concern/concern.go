@@ -149,7 +149,7 @@ func (x concernPolicy) Update(
 				"This issue's __priority score__ is now `%0.6f`.\n"+
 					"The __cost of priority__ is `%0.6f`.\n"+
 					"The __projected bounty__ is now `%0.6f`.",
-				conState.PriorityScore, conState.CostOfPriority, conState.ProjectedBounty())...,
+				conState.PriorityScore, conState.CostOfPriority, conState.ProjectedPriorityBounty())...,
 		)
 
 		// display updated list of eligible proposals

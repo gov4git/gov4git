@@ -29,7 +29,7 @@ func loadResolvedConcerns(
 		conState := motionapi.LoadPolicyState_Local[*waimea.ConcernState](ctx, cloned.PublicClone(), con.ID)
 		//
 		resolved = append(resolved, con)
-		projectedBounties = append(projectedBounties, conState.ProjectedBounty())
+		projectedBounties = append(projectedBounties, conState.ProjectedPriorityBounty())
 	}
 
 	totalProjectedBounty = 0.0
@@ -89,7 +89,7 @@ func loadApprovalPoll(
 	return ballotapi.Show_Local(ctx, cloned, pollName)
 }
 
-func calcReviewersRewards(
+func disberseReviewersRewards(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	prop motionproto.Motion,
@@ -128,10 +128,9 @@ func calcReviewersRewards(
 	for user, choices := range approvalPoll.Tally.ScoresByUser {
 		ss := choices[waimea.ProposalBallotChoice]
 		if isWinner(ss.Score) {
-			payout := account.H(
-				account.PluralAsset,
-				loserTotalCost*winnerShares[user]/winnerTotalShares+winnerCost[user],
-			)
+			q := loserTotalCost*winnerShares[user]/winnerTotalShares + winnerCost[user]
+			fmt.Printf("payout to %v is %v\n", user, q)
+			payout := account.H(account.PluralAsset, q)
 			rewards = append(rewards,
 				Reward{
 					To:     user,

@@ -24,10 +24,6 @@ func init() {
 	motionproto.Install(context.Background(), pmp_1.ProposalPolicyName, proposalPolicy{})
 }
 
-const (
-	ProposalApprovalPollPolicyName ballotproto.PolicyName = "pmp-proposal-approval-v1"
-)
-
 type proposalPolicy struct{}
 
 func (x proposalPolicy) Descriptor() motionproto.PolicyDescriptor {

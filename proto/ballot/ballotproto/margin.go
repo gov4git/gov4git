@@ -35,10 +35,18 @@ package ballotproto
 //	Result of the "impact" function returns an array with two values:
 //		- the _additional_ impact the user can add to their current impact
 //		- the _additional_ impact the user can subtract from their current impact
+//
+//	Arguments of the "reward" function:
+//		- voteUser: user name of the voter
+//		- voteChoice: ballot choice
+//		- voteImpact: total vote impact, desired by the voter
+//	Result of the "reward" function:
+//		- the _potential_ reward to the voter, assuming a favorable outcome
 type Margin struct {
 	Help   *MarginCalculator `json:"help,omitempty"`
 	Cost   *MarginCalculator `json:"cost,omitempty"`
 	Impact *MarginCalculator `json:"impact,omitempty"`
+	Reward *MarginCalculator `json:"reward,omitempty"`
 }
 
 type MarginCalculator struct {

@@ -1,36 +1,28 @@
-package proposal
+package concern
 
 import (
 	"context"
 
-	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotpolicies/sv"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotproto"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
 )
 
 func init() {
 	ctx := context.Background()
 	ballotio.Install(
 		ctx,
-		ProposalApprovalPollPolicyName,
+		ConcernPriorityPollPolicyName,
 		sv.SV{
 			Kernel: ScoreKernel{},
 		},
 	)
 }
 
-const ProposalApprovalPollPolicyName ballotproto.PolicyName = "pmp-proposal-approval-v1"
+const ConcernPriorityPollPolicyName ballotproto.PolicyName = "pmp-concern-priority-v1"
 
 type ScoreKernel struct{}
-
-type ScoreKernelState struct {
-	MotionID              motionproto.MotionID `json:"motion_id"`
-	InverseCostMultiplier float64              `json:"inverse_cost_multiplier"`
-	Bounty                float64              `json:"bounty"`
-}
 
 func (sk ScoreKernel) Score(
 	ctx context.Context,
@@ -40,8 +32,7 @@ func (sk ScoreKernel) Score(
 
 ) sv.ScoredVotes {
 
-	state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
-	qvSK := sv.MakeQVScoreKernel(ctx, state.InverseCostMultiplier)
+	qvSK := sv.MakeQVScoreKernel(ctx, 1.0)
 	return qvSK.Score(ctx, cloned, ad, el)
 }
 
@@ -53,12 +44,11 @@ func (sk ScoreKernel) CalcJS(
 
 ) *ballotproto.Margin {
 
-	state := ballotapi.LoadPolicyState_Local[ScoreKernelState](ctx, cloned, ad.ID)
-	qvSK := sv.MakeQVScoreKernel(ctx, state.InverseCostMultiplier)
+	qvSK := sv.MakeQVScoreKernel(ctx, 1.0)
 	margin := qvSK.CalcJS(ctx, cloned, ad, tally)
 	margin.Reward = &ballotproto.MarginCalculator{
 		Label:       "Reward",
-		Description: "Potential reward for the voter, assuming the vote is aligned with the PR outcome",
+		Description: "Potential reward to the voter, assuming a favorable outcome",
 		FnJS:        rewardJSFmt,
 	}
 	return margin
@@ -67,7 +57,7 @@ func (sk ScoreKernel) CalcJS(
 const (
 	rewardJSFmt = `
 	function(voteUser, voteChoice, voteImpact) {
-		return 2*Math.abs(voteImpact);
+		return 0;
 	}
 	`
 )

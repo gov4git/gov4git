@@ -22,7 +22,7 @@ On the other hand open source — in its purest and most popular form — is pra
 
 We believe that this inattention to the governance needs of open source communities is the main cause of well-known problems in open source — lack of __sustainable__ maintainership and support, lack of __funding__, __supply chain vulnerabilities__, as well as __community fragmentation__ upon commercialization or institutionalization of impactful projects.
 
-We think that open source communities should have both tools and standard templates of governance, much like startup companies in the tech industry have tools and templates for all matters of business — management, finance, compensation, bookkeeping, HR, and so on.
+We think that open source communities should have both tools and standard templates of governance, much like tech companies (from startups to large corporations) have tools and templates for all matters of business — management, finance, compensation, bookkeeping, HR, and so on.
 
 The governance of any community must reflect its **ethos**, as well as the **circumstances** that brought members into the community.
 

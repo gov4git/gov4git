@@ -1,5 +1,3 @@
-Waimea blog
-
 # Waimea: Collective management and compensation for open source communities
 
 Waimea is a new Gov4Git governance mechanism we developed specifically for open-source software development and community management. It is available in [v2.2.0](https://github.com/gov4git/gov4git/releases/tag/v2.2.0) and after.
@@ -156,3 +154,7 @@ XXX
 ### When and how is a pull request closed (accepted or rejected)?
 
 XXX
+
+## Contact us and try our solution
+
+We are actively looking for trial and early adopter communities. We think that the current release of Gov4Git, equipped with Waimea, is ideal for community managers and open-source communities of peers. [Get in touch with us](https://docs.google.com/forms/d/e/1FAIpQLSeO9obA-9jFFABMoN0Vjzcsmf9fRDKD5L9OiBq49MExUQ6b4A/viewform) and briefly tell us your use case. We are looking forward to providing our trial users and early adopters with support and attention every step of the way.

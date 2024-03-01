@@ -91,7 +91,7 @@ func closeNotice(
 	}
 
 	if r.RealizedBounty > 0 {
-		fmt.Fprintf(&w, "The __realized bounty__ for the author of this PR was `%0.6f`, comprising:"+
+		fmt.Fprintf(&w, "The __realized bounty__ for the author of this PR was `%0.6f`, comprising:\n"+
 			"- A __priority bounty__ of `%0.6f`, and\n"+
 			"- A __review bounty__ of `%0.6f`.\n\n",
 			r.RealizedBounty, r.ProjectedPriorityBounty, r.ProjectedReviewBounty)

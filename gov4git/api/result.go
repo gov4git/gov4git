@@ -3,6 +3,8 @@ package api
 import (
 	"fmt"
 	"os"
+	"runtime"
+	"runtime/pprof"
 
 	"github.com/gov4git/lib4git/base"
 	"github.com/gov4git/lib4git/form"
@@ -17,6 +19,36 @@ type Result struct {
 }
 
 func Invoke(f func()) Result {
+
+	// mem profile
+	defer func() {
+		if memProfilePath != "" {
+			f, err := os.Create(memProfilePath)
+			if err != nil {
+				base.Fatalf("could not create memory profile (%v)", err)
+			}
+			defer f.Close() // error handling omitted for example
+			runtime.GC()    // get up-to-date statistics
+			if err := pprof.WriteHeapProfile(f); err != nil {
+				base.Fatalf("could not write memory profile (%v)", err)
+			}
+		}
+	}()
+
+	// cpu profile
+	if cpuProfilePath != "" {
+		f, err := os.Create(cpuProfilePath)
+		if err != nil {
+			base.Fatalf("could not create CPU profile (%v)", err)
+		}
+		defer f.Close() // error handling omitted for example
+		if err := pprof.StartCPUProfile(f); err != nil {
+			base.Fatalf("could not start CPU profile (%v)", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
+	//
 	err := must.TryThru(f)
 	r := NewResult(nil, err)
 	if err != nil && base.IsVerbose() {
@@ -30,6 +62,36 @@ func Invoke(f func()) Result {
 }
 
 func Invoke1[R1 any](f func() R1) Result {
+
+	// mem profile
+	defer func() {
+		if memProfilePath != "" {
+			f, err := os.Create(memProfilePath)
+			if err != nil {
+				base.Fatalf("could not create memory profile (%v)", err)
+			}
+			defer f.Close() // error handling omitted for example
+			runtime.GC()    // get up-to-date statistics
+			if err := pprof.WriteHeapProfile(f); err != nil {
+				base.Fatalf("could not write memory profile (%v)", err)
+			}
+		}
+	}()
+
+	// cpu profile
+	if cpuProfilePath != "" {
+		f, err := os.Create(cpuProfilePath)
+		if err != nil {
+			base.Fatalf("could not create CPU profile (%v)", err)
+		}
+		defer f.Close() // error handling omitted for example
+		if err := pprof.StartCPUProfile(f); err != nil {
+			base.Fatalf("could not start CPU profile (%v)", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
+	//
 	r1, err := must.Try1Thru[R1](f)
 	r := NewResult(r1, err)
 	if err != nil && base.IsVerbose() {
@@ -61,3 +123,15 @@ const (
 	StatusSuccess Status = "success"
 	StatusError   Status = "error"
 )
+
+var cpuProfilePath string
+
+func SetCPUProfilePath(filepath string) {
+	cpuProfilePath = filepath
+}
+
+var memProfilePath string
+
+func SetMemProfilePath(filepath string) {
+	memProfilePath = filepath
+}

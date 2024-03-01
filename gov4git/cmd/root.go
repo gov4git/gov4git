@@ -30,8 +30,9 @@ var (
 var ctx = github.WithTokenSource(git.WithTTL(git.WithAuth(context.Background(), nil), nil), nil)
 
 var (
-	configPath string
-	verbose    bool
+	configPath  string
+	verbose     bool
+	profilePath string
 )
 
 func init() {
@@ -41,6 +42,7 @@ func init() {
 	rootCmd.SilenceErrors = true
 	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "config file (default is $HOME/.gov4git/config.json)")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "run in developer mode with verbose logging")
+	rootCmd.PersistentFlags().StringVarP(&profilePath, "profile", "p", "", "profile execution to a file")
 
 	rootCmd.AddCommand(initIDCmd)
 	rootCmd.AddCommand(initGovCmd)
@@ -67,6 +69,7 @@ func initAfterFlags() {
 		base.LogQuietly()
 	}
 	base.Infof("gov4git version: %v, os: %v, arch: %v", gov4git.Short(), runtime.GOOS, runtime.GOARCH)
+	api.SetProfilePath(profilePath)
 }
 
 func LoadConfig() {

@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
+	"github.com/gov4git/gov4git/v2/proto/regime"
 )
 
 func TrackMotion(
@@ -29,6 +30,8 @@ func TrackMotion_Local(
 	mid motionproto.MotionID,
 
 ) motionproto.MotionView {
+
+	ctx = regime.Dry(ctx)
 
 	mv := ShowMotion_Local(ctx, cloned, mid)
 	if len(mv.Ballots) > 0 {
@@ -62,6 +65,8 @@ func TrackMotionBatch_Local(
 	voterOwner id.OwnerCloned,
 
 ) motionproto.MotionViews {
+
+	ctx = regime.Dry(ctx)
 
 	mids := motionproto.MotionKV.ListKeys(ctx, motionproto.MotionNS, cloned.Tree())
 	mvs := make(motionproto.MotionViews, len(mids))

@@ -6,7 +6,7 @@ require (
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/google/go-github/v58 v58.0.0
-	github.com/gov4git/lib4git v0.0.32
+	github.com/gov4git/lib4git v0.0.33
 	github.com/gov4git/vendor4git v0.0.6
 	github.com/migueleliasweb/go-github-mock v0.0.19
 	github.com/rogpeppe/go-internal v1.11.0

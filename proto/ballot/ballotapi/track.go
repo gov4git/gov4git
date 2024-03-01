@@ -7,6 +7,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/gov"
 	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/gov4git/v2/proto/member"
+	"github.com/gov4git/gov4git/v2/proto/regime"
 	"github.com/gov4git/lib4git/git"
 	"github.com/gov4git/lib4git/must"
 )
@@ -46,6 +47,8 @@ func Track_StageOnly(
 	ballotID ballotproto.BallotID,
 
 ) ballotproto.VoterStatus {
+
+	ctx = regime.Dry(ctx)
 
 	// determine the voter's username in the community
 	user := member.FindClonedUser_Local(ctx, cloned, voterOwner)

@@ -7,13 +7,11 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotapi"
 	"github.com/gov4git/gov4git/v2/proto/ballot/ballotio"
 	"github.com/gov4git/gov4git/v2/proto/gov"
-	"github.com/gov4git/gov4git/v2/proto/history/metric"
-	"github.com/gov4git/gov4git/v2/proto/history/trace"
 	"github.com/gov4git/gov4git/v2/proto/id"
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
-	"github.com/gov4git/gov4git/v2/proto/notice"
+	"github.com/gov4git/gov4git/v2/proto/regime"
 )
 
 type Panoramic struct {
@@ -44,9 +42,7 @@ func Panorama_Local(
 
 	// mute metrics and traces to improve performance
 	// panorama performs a throw-away computation, so logs are not necessary
-	ctx = metric.Mute(ctx)
-	ctx = trace.Mute(ctx)
-	ctx = notice.Mute(ctx)
+	ctx = regime.Dry(ctx)
 
 	voterUser := member.FindClonedUser_Local(ctx, cloned, voterOwner)
 	// voterProfile := member.GetUser_Local(ctx, cloned, voterUser)

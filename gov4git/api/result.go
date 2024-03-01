@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"runtime/pprof"
 
 	"github.com/gov4git/lib4git/base"
@@ -18,8 +19,25 @@ type Result struct {
 }
 
 func Invoke(f func()) Result {
-	if profilePath != "" {
-		f, err := os.Create(profilePath)
+
+	// mem profile
+	defer func() {
+		if memProfilePath != "" {
+			f, err := os.Create(memProfilePath)
+			if err != nil {
+				base.Fatalf("could not create memory profile (%v)", err)
+			}
+			defer f.Close() // error handling omitted for example
+			runtime.GC()    // get up-to-date statistics
+			if err := pprof.WriteHeapProfile(f); err != nil {
+				base.Fatalf("could not write memory profile (%v)", err)
+			}
+		}
+	}()
+
+	// cpu profile
+	if cpuProfilePath != "" {
+		f, err := os.Create(cpuProfilePath)
 		if err != nil {
 			base.Fatalf("could not create CPU profile (%v)", err)
 		}
@@ -29,6 +47,7 @@ func Invoke(f func()) Result {
 		}
 		defer pprof.StopCPUProfile()
 	}
+
 	//
 	err := must.TryThru(f)
 	r := NewResult(nil, err)
@@ -43,8 +62,25 @@ func Invoke(f func()) Result {
 }
 
 func Invoke1[R1 any](f func() R1) Result {
-	if profilePath != "" {
-		f, err := os.Create(profilePath)
+
+	// mem profile
+	defer func() {
+		if memProfilePath != "" {
+			f, err := os.Create(memProfilePath)
+			if err != nil {
+				base.Fatalf("could not create memory profile (%v)", err)
+			}
+			defer f.Close() // error handling omitted for example
+			runtime.GC()    // get up-to-date statistics
+			if err := pprof.WriteHeapProfile(f); err != nil {
+				base.Fatalf("could not write memory profile (%v)", err)
+			}
+		}
+	}()
+
+	// cpu profile
+	if cpuProfilePath != "" {
+		f, err := os.Create(cpuProfilePath)
 		if err != nil {
 			base.Fatalf("could not create CPU profile (%v)", err)
 		}
@@ -54,6 +90,7 @@ func Invoke1[R1 any](f func() R1) Result {
 		}
 		defer pprof.StopCPUProfile()
 	}
+
 	//
 	r1, err := must.Try1Thru[R1](f)
 	r := NewResult(r1, err)
@@ -87,8 +124,14 @@ const (
 	StatusError   Status = "error"
 )
 
-var profilePath string
+var cpuProfilePath string
 
-func SetProfilePath(filepath string) {
-	profilePath = filepath
+func SetCPUProfilePath(filepath string) {
+	cpuProfilePath = filepath
+}
+
+var memProfilePath string
+
+func SetMemProfilePath(filepath string) {
+	memProfilePath = filepath
 }

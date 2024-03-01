@@ -13,6 +13,7 @@ import (
 	"github.com/gov4git/gov4git/v2/proto/member"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionapi"
 	"github.com/gov4git/gov4git/v2/proto/motion/motionproto"
+	"github.com/gov4git/gov4git/v2/proto/notice"
 )
 
 type Panoramic struct {
@@ -45,6 +46,7 @@ func Panorama_Local(
 	// panorama performs a throw-away computation, so logs are not necessary
 	ctx = metric.Mute(ctx)
 	ctx = trace.Mute(ctx)
+	ctx = notice.Mute(ctx)
 
 	voterUser := member.FindClonedUser_Local(ctx, cloned, voterOwner)
 	// voterProfile := member.GetUser_Local(ctx, cloned, voterUser)

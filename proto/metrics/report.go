@@ -47,6 +47,8 @@ func AssembleReport_Local(
 	matchAccount := account.Get_Local(ctx, cloned, pmp_0.MatchingPoolAccountID)
 	matchFunds := matchAccount.Balance(account.PluralAsset).Quantity
 
+	capTable := GetCapTable_Local(ctx, cloned)
+
 	var w bytes.Buffer
 
 	fmt.Fprintf(&w, "## Community economics\n\n")
@@ -129,6 +131,16 @@ func AssembleReport_Local(
 	fmt.Fprintf(&w, "| Credits issued | %0.6f |\n", allTimeSeries.DailyCreditsIssued.Total())
 	fmt.Fprintf(&w, "| Credits burned | %0.6f |\n", allTimeSeries.DailyCreditsBurned.Total())
 	fmt.Fprintf(&w, "| Credits transferred | %0.6f |\n\n", allTimeSeries.DailyCreditsTransferred.Total())
+
+	if len(capTable) > 0 {
+		fmt.Printf("### Capitalization table\n\n")
+		fmt.Fprintf(&w, "| User|  Capitalization |\n")
+		fmt.Fprintf(&w, "|  :--- |  :--- |\n")
+		for _, uc := range capTable {
+			fmt.Fprintf(&w, "|  @%s |  %0.6f |\n", uc.Name, uc.Cap)
+		}
+		fmt.Fprintln(&w)
+	}
 
 	return &ReportAssets{
 		Series: &ReportSeries{

@@ -315,7 +315,7 @@ func syncMeta(
 
 func syncCreateMotionForIssue(
 	ctx context.Context,
-	addr gov.OwnerAddress,
+	_ gov.OwnerAddress,
 	cloned gov.OwnerCloned,
 	chg *SyncManagedChanges,
 	issue ImportedIssue,

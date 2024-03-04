@@ -113,7 +113,7 @@ func (x proposalPolicy) Open(
 	})
 
 	return nil, notice.Noticef(ctx,
-		"Started managing this PR as Gov4Git proposal `%v` with initial __approval score__ of `%0.6f`."+
+		"Started managing this PR, using the Waimea Protocol, as Gov4Git proposal `%v` with initial __approval score__ of `%0.6f`."+
 			waimea.Welcome, prop.ID, state.ApprovalScore)
 }
 

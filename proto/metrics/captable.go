@@ -16,7 +16,7 @@ func (x CapTable) Len() int {
 }
 
 func (x CapTable) Less(i, j int) bool {
-	return x[i].Cap < x[j].Cap
+	return x[i].Cap > x[j].Cap
 }
 
 func (x CapTable) Swap(i, j int) {

@@ -91,7 +91,7 @@ func (x concernPolicy) Open(
 		},
 	})
 
-	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v` with initial __priority score__ of `%0.6f`."+
+	return nil, notice.Noticef(ctx, "Started managing this issue, using the Plural Management Protocol v1,  as Gov4Git concern `%v` with initial __priority score__ of `%0.6f`."+
 		pmp_1.Welcome, con.ID, state.PriorityScore)
 }
 

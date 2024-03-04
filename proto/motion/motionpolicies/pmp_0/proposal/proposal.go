@@ -111,7 +111,7 @@ func (x proposalPolicy) Open(
 	})
 
 	return nil, notice.Noticef(ctx,
-		"Started managing this PR as Gov4Git proposal `%v` with initial __approval score__ of `%0.6f`."+
+		"Started managing this PR, using the Plural Management Protocol v0, as Gov4Git proposal `%v` with initial __approval score__ of `%0.6f`."+
 			pmp_0.Welcome, prop.ID, state.LatestApprovalScore)
 }
 

@@ -95,8 +95,9 @@ func (x concernPolicy) Open(
 		},
 	})
 
-	return nil, notice.Noticef(ctx, "Started managing this issue as Gov4Git concern `%v` with initial __priority score__ of `%0.6f`."+
-		waimea.Welcome, con.ID, state.PriorityScore)
+	return nil, notice.Noticef(ctx,
+		"Started managing this issue, using the Open-Source Management Protocol (Waimea), as Gov4Git concern `%v` with initial __priority score__ of `%0.6f`."+
+			waimea.Welcome, con.ID, state.PriorityScore)
 }
 
 func (x concernPolicy) Score(

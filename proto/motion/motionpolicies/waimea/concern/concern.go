@@ -198,7 +198,7 @@ func (x concernPolicy) updateFreeze(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
 	con motionproto.Motion,
-	args ...any,
+	_ ...any,
 
 ) (motionproto.Report, notice.Notices) {
 

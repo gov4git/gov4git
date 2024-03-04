@@ -211,8 +211,8 @@ func createDeployEnvironment(
 }
 
 const (
-	DefaultGithubFreq       = 120     // seconds
-	DefaultCommunityFreq    = 60 * 60 // seconds
+	DefaultGithubFreq       = 120 // seconds
+	DefaultCommunityFreq    = 120 // seconds
 	DefaultFetchParallelism = 5
 )
 

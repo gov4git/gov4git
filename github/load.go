@@ -154,7 +154,7 @@ func unwrapTimestamp(ts *github.Timestamp) *time.Time {
 // parseIssueRefs parses all references to issues or pull requests from the body of an issue.
 // Reference directives are of the form: "addresses|resolves|etc. https://github.com/gov4git/testing.project/issues/2"
 // References are extracted syntactically and are not guaranteed to correspond to real issues.
-func parseIssueRefs(ctx context.Context, repo Repo, issue *github.Issue) []ImportedRef {
+func parseIssueRefs(_ context.Context, _ Repo, issue *github.Issue) []ImportedRef {
 
 	refs := []ImportedRef{}
 	matches := refRegexp.FindAllStringSubmatch(issue.GetBody(), -1)

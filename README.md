@@ -52,4 +52,4 @@ Historical project documentation, including talks, white papers, long-term visio
 ## Communications
 
 - [@gov4git](https://x.com/gov4git) on Twitter/X
-- [gov4git](https://discord.gg/FqweERMB) on Discord
+- [gov4git](https://discord.gg/aheKQude) on Discord

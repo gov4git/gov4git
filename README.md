@@ -32,7 +32,10 @@ sudo chmod +x ./gov4git-desktop-app.AppImage
 
 ## How it works
 
-![Gov4Git user flow.](doc/images/how-it-works.png)
+[![Overview: Deploy, manage, and collaborate.](doc/images/appvote.png)](doc/DEPLOY-MANAGE-COLLABORATE-OVERVIEW.pdf)
+
+- [Overview](doc/DEPLOY-MANAGE-COLLABORATE-OVERVIEW.pdf)
+- [Step-by-step guide](doc/DEPLOY-MANAGE-COLLABORATE-DETAILED.pdf)
 
 ## Quick demo
 

@@ -36,6 +36,7 @@ sudo chmod +x ./gov4git-desktop-app.AppImage
 
 - [Overview](doc/DEPLOY-MANAGE-COLLABORATE-OVERVIEW.pdf)
 - [Step-by-step guide](doc/DEPLOY-MANAGE-COLLABORATE-DETAILED.pdf)
+- [Explanation of the open-source governance mechanism and incentives](https://medium.com/@gov4git/waimea-collective-management-and-compensation-for-open-source-communities-affa9b9093e9)
 
 ## Quick demo
 

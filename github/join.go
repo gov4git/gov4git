@@ -147,13 +147,15 @@ func processJoinRequestIssue_StageOnly(
 	}
 
 	// verify that the gov4git repo url matches the login of the requesting user
-	if !allowNonGithubJoins && info.PublicRepo.Owner != info.User {
-		base.Infof("reguster's GitHub login %s does not match the public repo owner %s", info.User, info.PublicRepo.Owner)
+	normUser := strings.ToLower(info.User)
+	normOwner := strings.ToLower(info.PublicRepo.Owner)
+	if !allowNonGithubJoins && normOwner != normUser {
+		base.Infof("reguster's GitHub login %s does not match the public repo owner %s", normUser, normOwner)
 		replyAndCloseIssue(
 			ctx, repo, ghc, issue, FollowUpSubject,
 			fmt.Sprintf(
 				"The regusting user, @%s, does not match the owner, @%s, of the provided Gov4Git public identity repo.",
-				info.User, info.PublicRepo.Owner,
+				normUser, normOwner,
 			),
 		)
 		return ""

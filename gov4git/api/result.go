@@ -20,6 +20,14 @@ type Result struct {
 
 func Invoke(f func()) Result {
 
+	// exit on error, but after dumping cpu and mem profiles
+	var xerr *must.Error
+	defer func() {
+		if xerr != nil {
+			os.Exit(1)
+		}
+	}()
+
 	// mem profile
 	defer func() {
 		if memProfilePath != "" {
@@ -49,20 +57,25 @@ func Invoke(f func()) Result {
 	}
 
 	//
-	err := must.TryThru(f)
-	r := NewResult(nil, err)
-	if err != nil && base.IsVerbose() {
-		fmt.Fprint(os.Stderr, string(err.Stack))
+	xerr = must.TryThru(f)
+	r := NewResult(nil, xerr)
+	if xerr != nil && base.IsVerbose() {
+		fmt.Fprint(os.Stderr, string(xerr.Stack))
 	}
 	fmt.Fprint(os.Stdout, form.SprintJSON(r))
-	if err != nil {
-		os.Exit(1)
-	}
 	return r
 }
 
 func Invoke1[R1 any](f func() R1) Result {
 
+	// exit on error, but after dumping cpu and mem profiles
+	var xerr *must.Error
+	defer func() {
+		if xerr != nil {
+			os.Exit(1)
+		}
+	}()
+
 	// mem profile
 	defer func() {
 		if memProfilePath != "" {
@@ -92,15 +105,13 @@ func Invoke1[R1 any](f func() R1) Result {
 	}
 
 	//
-	r1, err := must.Try1Thru[R1](f)
-	r := NewResult(r1, err)
-	if err != nil && base.IsVerbose() {
-		fmt.Fprint(os.Stderr, string(err.Stack))
+	var r1 R1
+	r1, xerr = must.Try1Thru[R1](f)
+	r := NewResult(r1, xerr)
+	if xerr != nil && base.IsVerbose() {
+		fmt.Fprint(os.Stderr, string(xerr.Stack))
 	}
 	fmt.Fprint(os.Stdout, form.SprintJSON(r))
-	if err != nil {
-		os.Exit(1)
-	}
 	return r
 }
 

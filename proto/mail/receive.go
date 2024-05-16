@@ -54,11 +54,14 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 	senderNextSeqNo, _ := git.TryFromFile[SeqNo](ctx, sender, senderNextNS)
 
 	// write receive box info
-	info := ReceiveBoxInfo{SenderCred: senderCred, Topic: topic}
-	git.ToFileStage(ctx, receiver, receiverInfoNS, info)
+	if _, err := receiver.Filesystem.Stat(receiverInfoNS.GitPath()); err != nil {
+		info := ReceiveBoxInfo{SenderCred: senderCred, Topic: topic}
+		git.ToFileStage(ctx, receiver, receiverInfoNS, info)
+	}
 
 	// read unread messages
 	receiverLatestNextSeqNo := receiverNextSeqNo
+	changed := false
 	base.Infof("receiving receiverSeqNo=%v senderSeqNo=%v", receiverNextSeqNo, senderNextSeqNo)
 	msgEffects := []MsgEffect[Msg, Effect]{}
 	for i := receiverNextSeqNo; i < senderNextSeqNo; i++ {
@@ -73,10 +76,13 @@ func Receive_StageOnly[Msg form.Form, Effect form.Form](
 		git.ToFileStage(ctx, receiver, receiverTopicNS.Append(msgFilebase), msgEffect)
 		msgEffects = append(msgEffects, msgEffect)
 		receiverLatestNextSeqNo = i + 1
+		changed = true
 	}
 
 	// write receiver-side next seq no
-	git.ToFileStage(ctx, receiver, receiverNextNS, receiverLatestNextSeqNo)
+	if changed {
+		git.ToFileStage(ctx, receiver, receiverNextNS, receiverLatestNextSeqNo)
+	}
 
 	return git.NewChange(
 		fmt.Sprintf("Received %d messages", len(msgEffects)),

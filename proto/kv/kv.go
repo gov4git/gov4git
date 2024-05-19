@@ -31,9 +31,8 @@ func (KV[K, V]) KeyNS(ns ns.NS, key K) ns.NS {
 func (x KV[K, V]) Set(ctx context.Context, ns ns.NS, t *git.Tree, key K, value V) git.ChangeNoResult {
 	keyNS := x.KeyNS(ns, key)
 	git.TreeMkdirAll(ctx, t, keyNS)
-	form.ToFile(ctx, t.Filesystem, keyNS.Append(keyFilebase), key)
-	form.ToFile(ctx, t.Filesystem, keyNS.Append(valueFilebase), value)
-	git.Add(ctx, t, keyNS)
+	git.ToFileStage(ctx, t, keyNS.Append(keyFilebase), key)
+	git.ToFileStage(ctx, t, keyNS.Append(valueFilebase), value)
 	return git.NewChangeNoResult(
 		fmt.Sprintf("Change value of %v in namespace %v", key, ns),
 		"kv_set",

@@ -118,7 +118,7 @@ func fetchIssueComments(
 	return comments
 }
 
-func isJoinApprovalPresent(ctx context.Context, approvers []string, comments []*github.IssueComment) bool {
+func isJoinApprovalPresent(_ context.Context, approvers []string, comments []*github.IssueComment) bool {
 	for _, comment := range comments {
 		u := comment.GetUser()
 		if u == nil {

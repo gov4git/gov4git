@@ -137,7 +137,7 @@ func processDirectiveIssue_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	govAddr gov.OwnerAddress,
+	_ gov.OwnerAddress,
 	cloned gov.OwnerCloned,
 	maintainers []string,
 	issue *github.Issue,

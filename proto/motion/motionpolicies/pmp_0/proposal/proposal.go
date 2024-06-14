@@ -221,7 +221,7 @@ func (x proposalPolicy) Update(
 func calcBounty(
 	ctx context.Context,
 	cloned gov.OwnerCloned,
-	prop motionproto.Motion,
+	_ motionproto.Motion,
 	state *pmp_0.ProposalState,
 
 ) float64 {

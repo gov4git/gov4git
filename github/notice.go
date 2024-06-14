@@ -37,7 +37,7 @@ func flushNotices(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client,
-	cloned gov.Cloned,
+	_ gov.Cloned,
 	queue *notice.NoticeQueue,
 	issueNum int,
 ) {

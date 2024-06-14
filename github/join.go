@@ -108,7 +108,7 @@ func processJoinRequestIssue_StageOnly(
 	ctx context.Context,
 	repo Repo,
 	ghc *github.Client, // if nil, a new client for repo will be created
-	govAddr gov.OwnerAddress,
+	_ gov.OwnerAddress,
 	govCloned gov.OwnerCloned,
 	approverGitHubUsers []string,
 	allowNonGithubJoins bool,

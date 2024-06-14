@@ -10,7 +10,7 @@ Make sure you have the [Go language installed](https://golang.org/doc/install) o
 Install `gov4git` on your local machine:
 
 ```bash
-go get github.com/gov4git/gov4git/gov4git@latest
+go install github.com/gov4git/gov4git/v2/gov4git@latest
 ```
 
 Verify `gov4git` is installed:

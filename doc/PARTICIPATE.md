@@ -33,7 +33,7 @@ This is an example of the life of an accepted PR:
 
 And this is an example of the life of a rejected PR:
 
-![Life of an accepted PR](../materials/sample_life_of_accepted_pr.png)
+![Life of an rejected PR](../materials/sample_life_of_rejected_pr.png)
 
 Additionally, community members participate in governance by creating new issues and PRs on GitHub.
 
